@@ -1,0 +1,782 @@
+openapi: 3.1.0
+x-stoplight:
+  id: dutt3s5fxxm1c
+info:
+  title: API 1
+  version: '1.0'
+servers:
+  - url: 'http://localhost:4000'
+paths:
+  /auth/register:
+    post:
+      summary: Register
+      operationId: register
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '409':
+          description: User with this phone number is already exists
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                password:
+                  type: string
+                  format: password
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+              required:
+                - phone
+                - password
+      description: User registration
+      security: []
+    parameters: []
+  /auth/login:
+    post:
+      summary: Login
+      operationId: login
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: Auth cookie with user.id
+        '403':
+          description: Incorrect login or password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                password:
+                  type: string
+                  format: password
+              required:
+                - login
+                - password
+      description: Log in
+      security: []
+  /groups:
+    get:
+      summary: GetGroups
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
+                required:
+                  - items
+        '401':
+          description: Unauthorized
+      operationId: getGroups
+      parameters: []
+      description: Get user's groups
+    post:
+      summary: CreateGroup
+      operationId: createGroup
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+      description: Create new grooup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                users:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - name
+  '/groups/{groupId}':
+    get:
+      summary: Get group
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupWithUsers'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: getGroup
+      description: Get group
+      parameters: []
+    parameters:
+      - schema:
+          type: integer
+        name: groupId
+        in: path
+        required: true
+    put:
+      summary: Update group
+      operationId: updateGroup
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupWithUsers'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                users:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - name
+                - users
+      description: Update group
+    delete:
+      summary: Delete group
+      operationId: deleteGroup
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: Delete group
+  /accounts:
+    get:
+      summary: Get accounts
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Account'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      operationId: getAccounts
+      description: Get accounts owned by group
+      parameters:
+        - $ref: '#/components/parameters/groupId'
+    parameters: []
+    post:
+      summary: Create account
+      operationId: createAccount
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                currency:
+                  type: string
+                icon:
+                  type: string
+                color:
+                  type: string
+                order:
+                  type: integer
+              required:
+                - name
+                - currency
+      description: Create new account
+      parameters:
+        - $ref: '#/components/parameters/groupId'
+  '/accounts/{accountId}':
+    parameters:
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Unique identifier of account
+    get:
+      summary: Get account
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: getAccount
+      description: Get account
+    put:
+      summary: Update account
+      operationId: updateAccount
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      description: Update account
+    delete:
+      summary: Delete account
+      operationId: deleteAccount
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: Delete account
+  /categories:
+    parameters: []
+    get:
+      summary: Get categories
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: getCategories
+      description: Get categories owned by group
+      parameters:
+        - $ref: '#/components/parameters/groupId'
+    post:
+      summary: Create category
+      operationId: createCategory
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      description: Create new category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                color:
+                  type: string
+                icon:
+                  type: string
+                order:
+                  type: number
+              required:
+                - name
+        description: ''
+      parameters:
+        - $ref: '#/components/parameters/groupId'
+  '/categories/{categoryId}':
+    parameters:
+      - schema:
+          type: string
+        name: categoryId
+        in: path
+        required: true
+    get:
+      summary: Get category
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: getCategory
+      description: Get category
+    put:
+      summary: ''
+      operationId: updateCategory
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      description: Update category
+    delete:
+      summary: Delete category
+      operationId: deleteCategory
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: Delete category
+  /transactions:
+    parameters: []
+    get:
+      summary: Get transactions
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+      operationId: getAllTransactions
+      parameters:
+        - $ref: '#/components/parameters/groupId'
+        - $ref: '#/components/parameters/skip'
+        - $ref: '#/components/parameters/take'
+        - schema:
+            type: integer
+          in: query
+          name: accountId
+          description: Unique identifier of account
+      description: Get transactions owned by group with pagination
+    post:
+      summary: Create transaction
+      operationId: createTransaction
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+      parameters:
+        - $ref: '#/components/parameters/groupId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              x-examples:
+                Example 1:
+                  date: '2019-08-24T14:15:22Z'
+                  amount: 0
+                  coment: string
+                  categoryId: 0
+                  accountId: 0
+                  linkedTransactionId: 0
+              properties:
+                date:
+                  type: string
+                  format: date-time
+                amount:
+                  type: integer
+                coment:
+                  type: string
+                categoryId:
+                  type: integer
+                accountId:
+                  type: integer
+                linkedTransactionId:
+                  type: integer
+              required:
+                - date
+                - amount
+                - categoryId
+                - accountId
+      description: Create new transaction
+  '/transactions/{transactionId}':
+    parameters:
+      - schema:
+          type: integer
+        name: transactionId
+        in: path
+        required: true
+    get:
+      summary: Get transaction
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: getTransaction
+      description: Get transaction
+    put:
+      summary: Update transaction
+      operationId: updateTransaction
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      description: Update transaction
+    delete:
+      summary: Delete transaction
+      operationId: deleteTransaction
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      description: Delete transaction
+  '/users/{userId}':
+    parameters:
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+    get:
+      summary: Get user
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: getUser
+      description: Get user
+    put:
+      summary: Update user
+      operationId: updateUser
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '409':
+          description: Conflict
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      description: Update user
+components:
+  schemas:
+    User:
+      title: User
+      type: object
+      description: ''
+      examples:
+        - id: 142
+          name: Alice Smith
+          email: alice.smith@gmail.com
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+      required:
+        - id
+        - name
+        - phone
+    Account:
+      title: Account
+      x-stoplight:
+        id: unf7bq4mn3kvv
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        currency:
+          type: string
+        icon:
+          type: string
+        color:
+          type: string
+        order:
+          type: integer
+      required:
+        - id
+        - name
+        - currency
+    Group:
+      title: Group
+      x-stoplight:
+        id: e0h22m6h61qcm
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    GroupWithUsers:
+      title: GroupWithUsers
+      x-stoplight:
+        id: 5npshnrwaew6v
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+      required:
+        - id
+        - name
+    Category:
+      title: Category
+      x-stoplight:
+        id: 2o71eencc9k0h
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        icon:
+          type: string
+        color:
+          type: string
+        order:
+          type: integer
+      required:
+        - id
+        - name
+    Transaction:
+      title: Transaction
+      x-stoplight:
+        id: 6fckhiyu2vc2k
+      type: object
+      properties:
+        id:
+          type: string
+        date:
+          type: string
+          format: date-time
+        amount:
+          type: number
+        coment:
+          type: string
+        categoryId:
+          type: number
+        accountId:
+          type: number
+        linkedTransactionId:
+          type:
+            - number
+            - 'null'
+      required:
+        - id
+        - date
+        - amount
+        - categoryId
+        - accountId
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+  parameters:
+    groupId:
+      name: groupId
+      in: query
+      required: true
+      schema:
+        type: integer
+      description: Unique identifier of group
+    skip:
+      name: skip
+      in: query
+      required: true
+      schema:
+        type: integer
+      description: How much items to skip
+    take:
+      name: take
+      in: query
+      required: true
+      schema:
+        type: integer
+      description: How much items to take
+security:
+  - Bearer: []
