@@ -11,6 +11,11 @@ export type MenuItem = {
 
 export const menu = readable<MenuItem[]>([
   {
+    icon: '/icons/account.svg',
+    title: 'auth.login',
+    path: routes.login.path,
+  },
+  {
     icon: '/icons/briefcase-outline.svg',
     title: 'accounts.title',
     path: routes.accounts.path,
@@ -23,7 +28,7 @@ export const menu = readable<MenuItem[]>([
   {
     icon: '/icons/cog-outline.svg',
     title: 'settings.title',
-    path: routes.settings.path,
+    path: '/uikit',
   },
 ]);
 

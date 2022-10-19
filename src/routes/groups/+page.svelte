@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { api } from '$lib/api';
+  import Button from '$lib/Button.svelte';
   import Loading from '$lib/Loading.svelte';
   import { routes } from '$lib/store/routes';
   import { groupId } from '$lib/store/user';
@@ -21,12 +22,12 @@
 <div class="groups-container">
   {#await fetchGroups}
     <Loading />
-  {:then groups}
+  {:then response}
     <div class="groups-list">
-      {#each groups.data.items as group}
-        <button on:click={selectGroup(group.id)} class="groups-list-item">{group.name}</button>
+      {#each response.data.items as group}
+        <Button click={selectGroup(group.id)} color="white" bordered>{group.name}</Button>
       {/each}
-      <button on:click={addGroup} class="groups-list-item create">Add</button>
+      <Button click={addGroup}>Add</Button>
     </div>
   {/await}
 </div>
@@ -46,26 +47,5 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-  }
-  .groups-list-item {
-    font-size: 1rem;
-    list-style-type: none;
-    text-align: center;
-    padding: 0.75rem;
-    border-radius: 0.75rem;
-    background: var(--header-background-color);
-    border: 1px solid var(--border-color);
-  }
-  .groups-list-item:hover {
-    cursor: pointer;
-    opacity: 0.9;
-  }
-  .groups-list-item:active {
-    opacity: 0.8;
-  }
-  .groups-list-item.create {
-    background: none;
-    color: var(--secondary-text-color);
-    border: 2px dashed var(--border-color);
   }
 </style>

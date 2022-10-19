@@ -20,9 +20,9 @@
     </span>
   {/if}
   {#if type == 'text'}
-    <input class:error={!!error} bind:value {placeholder} {required} />
+    <input bind:this={input} class:error={!!error} bind:value {placeholder} {required} />
   {:else}
-    <input class:error={!!error} bind:value {placeholder} {required} type="password" />
+    <input bind:this={input} class:error={!!error} bind:value {placeholder} {required} type="password" />
   {/if}
   {#if error}
     <span class="error-text">{error}</span>

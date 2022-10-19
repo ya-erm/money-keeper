@@ -1,9 +1,15 @@
 <script lang="ts">
+  import '$lib/store/user';
   import '$lib/translate';
   import Menu from '$lib/Menu.svelte';
   import Header from '$lib/Header.svelte';
   import ThemeProvider from '$lib/ThemeProvider.svelte';
+  import Toasts from '$lib/toasts/Toasts.svelte';
+
+  export const ssr = false;
 </script>
+
+<Toasts />
 
 <main>
   <Header />

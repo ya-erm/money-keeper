@@ -1,0 +1,28 @@
+.flex {
+  display: flex;
+}
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+.items-center {
+  align-items: center;
+}
+
+.gap-0\.5 {
+  gap: 0.5rem;
+}
+.gap-1 {
+  gap: 1rem;
+}
+
+.p-0\.5 {
+  padding: 0.5rem;
+}
+.p-1 {
+  padding: 1rem;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
