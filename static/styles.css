@@ -8,6 +8,9 @@
 .items-center {
   align-items: center;
 }
+.justify-between {
+  justify-content: space-between;
+}
 
 .gap-0\.5 {
   gap: 0.5rem;

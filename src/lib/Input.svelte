@@ -1,8 +1,11 @@
 <script lang="ts">
+  export let name: string | null = null;
   export let label: string | null = null;
   export let error: string | null = null;
   export let type: 'text' | 'password' = 'text';
   export let required: boolean = false;
+  export let minlength: number | null = null;
+  export let maxlength: number | null = null;
 
   let input: HTMLInputElement;
 
@@ -11,6 +14,10 @@
   export function focus() {
     input.focus();
   }
+
+  const handleChange = (e: Event) => {
+    value = (e.target as HTMLInputElement).value;
+  };
 </script>
 
 <label class="input-container">
@@ -19,11 +26,18 @@
       <span>{label}:</span>
     </span>
   {/if}
-  {#if type == 'text'}
-    <input bind:this={input} class:error={!!error} bind:value {placeholder} {required} />
-  {:else}
-    <input bind:this={input} class:error={!!error} bind:value {placeholder} {required} type="password" />
-  {/if}
+  <input
+    bind:this={input}
+    on:change={handleChange}
+    class:error={!!error}
+    {placeholder}
+    {minlength}
+    {maxlength}
+    {required}
+    {value}
+    {type}
+    {name}
+  />
   {#if error}
     <span class="error-text">{error}</span>
   {/if}

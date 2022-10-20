@@ -25,9 +25,9 @@
   {:then response}
     <div class="groups-list">
       {#each response.data.items as group}
-        <Button click={selectGroup(group.id)} color="white" bordered>{group.name}</Button>
+        <Button on:click={selectGroup(group.id)} color="white" bordered>{group.name}</Button>
       {/each}
-      <Button click={addGroup}>Add</Button>
+      <Button on:click={addGroup}>Add</Button>
     </div>
   {/await}
 </div>

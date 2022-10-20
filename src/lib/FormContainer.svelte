@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let submit: (e: SubmitEvent) => void;
+  export let submit: (e: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }) => void;
 </script>
 
 <div class="content">
@@ -20,7 +20,8 @@
   .form-container {
     align-self: center;
     width: 300px;
-    margin: 1rem auto;
+    max-width: calc(100vw - 4rem);
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: 1rem;

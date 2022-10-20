@@ -35,6 +35,15 @@ export const showToast = (options: ToastOptions) => {
   return { id };
 };
 
+export const showErrorToast = (message: string, options?: Partial<ToastOptions>) =>
+  showToast({ ...options, type: 'error', message });
+
+export const showSuccessToast = (message: string, options?: Partial<ToastOptions>) =>
+  showToast({ ...options, type: 'success', message });
+
+export const showInfoToast = (message: string, options?: Partial<ToastOptions>) =>
+  showToast({ ...options, type: 'info', message });
+
 export const hideToast = (id: number) => {
   toasts.update((all) => all.filter((t) => t.id !== id));
 };

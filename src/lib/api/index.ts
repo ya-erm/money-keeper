@@ -2,6 +2,9 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { Api } from '$lib/api/Api';
 
+export { isApiErrorResponse } from './ApiError';
+export type { ApiError, ApiErrorResponse, ApiErrorCode } from './ApiError';
+
 export const api = new Api({
   baseUrl: 'http://localhost:4000',
   baseApiParams: {
@@ -9,6 +12,7 @@ export const api = new Api({
   },
   securityWorker: (data) => ({
     headers: { Authorization: `Bearer ${data}` },
+    format: 'json',
   }),
   customFetch: (input, options) =>
     fetch(input, options).then((res) => {

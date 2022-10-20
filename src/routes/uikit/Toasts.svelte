@@ -21,8 +21,8 @@
   </label>
   <Input bind:value={$message} />
   <div>
-    <Button text="Info" click={handleClick('info')} />
-    <Button text="Success" color="success" click={handleClick('success')} />
-    <Button text="Error" color="danger" click={handleClick('error')} />
+    <Button text="Info" on:click={handleClick('info')} />
+    <Button text="Success" color="success" on:click={handleClick('success')} />
+    <Button text="Error" color="danger" on:click={handleClick('error')} />
   </div>
 </div>

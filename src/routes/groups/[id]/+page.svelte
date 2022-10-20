@@ -2,52 +2,64 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { api } from '$lib/api';
+  import type { GroupWithUsers } from '$lib/api/Api';
   import Button from '$lib/Button.svelte';
   import FormContainer from '$lib/FormContainer.svelte';
-  import Input from '$lib/Input.svelte';
+  import Icon from '$lib/Icon.svelte';
   import { backLink, title } from '$lib/store/navigation';
   import { routes } from '$lib/store/routes';
+  import createBooleanStore from '$lib/utils/createBooleanStore';
   import { writable } from 'svelte/store';
-  import Users from '../Users.svelte';
+  import GroupNameModal from './GroupNameModal.svelte';
+  import GroupUsersList from './GroupUsersList.svelte';
 
   backLink.set(routes.groups.path);
 
-  const name = writable('');
-
   const groupId = parseInt($page.params.id);
+  const group = writable<GroupWithUsers | null>(null);
 
-  const fetchGroup = api.groups.getGroup(groupId).then((response) => {
-    const group = response.data;
-    title.set(group.name);
-    name.set(group.name);
-    return group;
-  });
+  group.subscribe((g) => g && title.set(g?.name));
 
-  const handleSubmit = async (e: SubmitEvent) => {
-    const response = await api.groups.updateGroup(groupId, {
-      name: $name,
-      users: [], // TODO
-    });
-    if (response.ok) {
-      goto(routes.groups.path);
-    }
-  };
+  (async () => {
+    try {
+      const { data } = await api.groups.getGroup(groupId);
+      group.set(data);
+    } catch {}
+  })();
+
+  const [modalOpened, openModal, closeModal] = createBooleanStore();
 
   const deleteGroup = async () => {
-    const response = await api.groups.deleteGroup(groupId);
-    if (response.ok) {
-      goto(routes.groups.path);
-    }
+    await api.groups.deleteGroup(groupId);
+    goto(routes.groups.path);
   };
 </script>
 
-{#await fetchGroup then group}
-  <FormContainer submit={handleSubmit}>
-    <Input label="Name" bind:value={$name} required />
-
-    <Users users={group.users ?? []} />
-
-    <Button text="Save" type="submit" />
-    <Button text="Delete" click={deleteGroup} appearance="transparent" color="danger" />
+{#if !!$group}
+  <FormContainer submit={() => {}}>
+    <div>
+      <div>Name:</div>
+      <div class="editable-value">
+        <span>{$group.name}</span>
+        <Button on:click={openModal} appearance="transparent" color="white">
+          <Icon path="/icons/pencil.svg" size="1.25rem" />
+        </Button>
+      </div>
+    </div>
+    <GroupNameModal {group} bind:opened={$modalOpened} close={closeModal} />
+    <GroupUsersList {group} />
+    <Button text="Delete group" on:click={deleteGroup} appearance="transparent" color="danger" />
   </FormContainer>
-{/await}
+{/if}
+
+<style>
+  .editable-value {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 0.5rem;
+    font-weight: 600;
+    gap: 0.5rem;
+  }
+</style>

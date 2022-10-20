@@ -1,1 +1,1 @@
-export { showToast, hideToast } from './toasts';
+export { showToast, showErrorToast, showInfoToast, showSuccessToast, hideToast } from './toasts';

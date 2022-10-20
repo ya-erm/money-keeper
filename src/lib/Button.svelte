@@ -1,11 +1,14 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
+
   export let text: string | null = null;
   export let appearance: 'solid' | 'transparent' = 'solid';
   export let color: 'primary' | 'secondary' | 'white' | 'success' | 'danger' = 'primary';
   export let type: 'button' | 'submit' = 'button';
   export let bordered: boolean = false;
 
-  export let click: ((e: MouseEvent) => void) | null = null;
+  const dispatch = createEventDispatcher();
+  export let click = (e: MouseEvent) => dispatch('click', e);
 </script>
 
 <button
