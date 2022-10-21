@@ -3,11 +3,11 @@
   import { page } from '$app/stores';
   import { api } from '$lib/api';
   import type { GroupWithUsers } from '$lib/api/Api';
-  import Button from '$lib/Button.svelte';
-  import FormContainer from '$lib/FormContainer.svelte';
-  import Icon from '$lib/Icon.svelte';
-  import { backLink, title } from '$lib/store/navigation';
-  import { routes } from '$lib/store/routes';
+  import { routes } from '$lib/routes';
+  import Button from '$lib/ui/Button.svelte';
+  import FormContainer from '$lib/ui/FormContainer.svelte';
+  import { backLink, title } from '$lib/ui/header';
+  import Icon from '$lib/ui/Icon.svelte';
   import createBooleanStore from '$lib/utils/createBooleanStore';
   import { writable } from 'svelte/store';
   import GroupNameModal from './GroupNameModal.svelte';
@@ -36,7 +36,7 @@
 </script>
 
 {#if !!$group}
-  <FormContainer submit={() => {}}>
+  <FormContainer>
     <div>
       <div>Name:</div>
       <div class="editable-value">

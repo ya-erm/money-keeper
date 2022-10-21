@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Button from '$lib/Button.svelte';
-  import Input from '$lib/Input.svelte';
-  import { showToast } from '$lib/toasts';
-  import type { ToastType } from '$lib/toasts/toasts';
+  import Button from '$lib/ui/Button.svelte';
+  import Input from '$lib/ui/Input.svelte';
+  import { showToast } from '$lib/ui/toasts';
+  import type { ToastType } from '$lib/ui/toasts/toasts';
   import { writable } from 'svelte/store';
 
   const dismissible = writable(true);

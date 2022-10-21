@@ -1,4 +1,4 @@
-import { storable } from './storable';
+import { storable } from '$lib/storable';
 
 export const darkMode = storable(false, 'dark_mode');
 

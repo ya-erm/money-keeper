@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { createEventDispatcher, onDestroy } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
+  import { fade } from 'svelte/transition';
 
   export let opened: boolean;
   export let header: string | null = null;
@@ -19,8 +20,15 @@
 <svelte:window on:keydown={handleKeydown} />
 
 {#if opened}
-  <div class="modal-background" on:click={close} aria-hidden />
-  <div class="modal" role="dialog" aria-modal="true" bind:this={modal}>
+  <div class="modal-background" on:click={close} in:fade={{ duration: 300 }} out:fade={{ duration: 300 }} aria-hidden />
+  <div
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    bind:this={modal}
+    in:fade={{ duration: 100 }}
+    out:fade={{ duration: 100 }}
+  >
     {#if $$slots.header}
       <slot name="header" />
     {:else if !!header}

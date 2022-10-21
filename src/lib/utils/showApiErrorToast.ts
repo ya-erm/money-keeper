@@ -1,5 +1,5 @@
 import { isApiErrorResponse } from '$lib/api';
-import { showToast } from '$lib/toasts';
+import { showToast } from '$lib/ui/toasts';
 
 export function showApiErrorToast(e: unknown) {
   if (isApiErrorResponse(e)) {

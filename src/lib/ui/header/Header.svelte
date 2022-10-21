@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { findRoute } from '$lib/routes';
   import { translate } from '$lib/translate';
   import { derived } from 'svelte/store';
-  import { backLink, rightButton, title } from './store/navigation';
-  import { findRoute } from './store/routes';
+  import { backLink, rightButton, title } from './header';
 
   const titleText = derived([page, translate, title], ([page, translate, title]) => {
     const route = findRoute(page.url.pathname);

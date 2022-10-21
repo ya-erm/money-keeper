@@ -1,11 +1,12 @@
 <script>
-  import { title } from '$lib/store/navigation';
-  import { darkMode } from '$lib/store/theme';
-  import Switch from '$lib/Switch.svelte';
+  import { title } from '$lib/ui/header';
+  import Switch from '$lib/ui/Switch.svelte';
+  import { darkMode } from '$lib/ui/theme';
 
   import Buttons from './Buttons.svelte';
   import Colors from './Colors.svelte';
   import Inputs from './Inputs.svelte';
+  import Modals from './Modals.svelte';
   import Toasts from './Toasts.svelte';
 
   title.set('UI Kit');
@@ -23,4 +24,5 @@
   <Buttons />
   <Inputs />
   <Toasts />
+  <Modals />
 </div>

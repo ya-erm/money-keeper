@@ -9,7 +9,7 @@
 
   let input: HTMLInputElement;
 
-  export let value: string | null;
+  export let value: string | null = null;
   export let placeholder: string | null = null;
   export function focus() {
     input.focus();

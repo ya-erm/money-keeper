@@ -1,17 +1,14 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { api } from '$lib/api';
-  import Button from '$lib/Button.svelte';
-  import Loading from '$lib/Loading.svelte';
-  import { routes } from '$lib/store/routes';
-  import { groupId } from '$lib/store/user';
+  import { routes } from '$lib/routes';
+  import Button from '$lib/ui/Button.svelte';
+  import Loading from '$lib/ui/Loading.svelte';
 
   const fetchGroups = api.groups.getGroups();
 
   const selectGroup = (id: number) => () => {
-    groupId.set(id);
     goto(`${routes.groups.path}/${id}`);
-    // goto(routes.accounts.path);
   };
 
   const addGroup = () => {

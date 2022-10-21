@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/Button.svelte';
+  import Button from '$lib/ui/Button.svelte';
   import { writable } from 'svelte/store';
 
   const bordered = writable(false);

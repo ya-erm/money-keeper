@@ -1,7 +1,7 @@
 import { page } from '$app/stores';
 import type { Messages } from '$lib/translate';
 import { derived, readable } from 'svelte/store';
-import { routes } from './routes';
+import { routes } from '../../routes';
 
 export type MenuItem = {
   icon: string;
@@ -12,7 +12,7 @@ export type MenuItem = {
 export const menu = readable<MenuItem[]>([
   {
     icon: '/icons/account.svg',
-    title: 'auth.login',
+    title: 'auth.profile',
     path: routes.login.path,
   },
   {

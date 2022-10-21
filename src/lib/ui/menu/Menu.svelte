@@ -1,10 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
+  import { backLink } from '$lib/ui/header/header';
   import { derived } from 'svelte/store';
-  import { menu } from './store/menu';
-  import { backLink } from './store/navigation';
-  import { routes } from './store/routes';
+  import { menu } from './menu';
 
   const isActive = derived(page, (page) => {
     return (path: string) => page.url.pathname === path;

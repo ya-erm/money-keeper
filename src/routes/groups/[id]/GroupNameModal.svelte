@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { api } from '$lib/api';
-  import Button from '$lib/Button.svelte';
-  import FormContainer from '$lib/FormContainer.svelte';
-  import Input from '$lib/Input.svelte';
   import { page } from '$app/stores';
-  import Modal from '$lib/Modal.svelte';
+  import { api } from '$lib/api';
   import type { GroupWithUsers } from '$lib/api/Api';
+  import Button from '$lib/ui/Button.svelte';
+  import FormContainer from '$lib/ui/FormContainer.svelte';
+  import Input from '$lib/ui/Input.svelte';
+  import Modal from '$lib/ui/Modal.svelte';
   import type { Writable } from 'svelte/store';
 
   export let opened: boolean;

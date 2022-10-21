@@ -1,12 +1,12 @@
 <script lang="ts">
-  import '$lib/store/user';
   import '$lib/translate';
-  import Menu from '$lib/Menu.svelte';
-  import Header from '$lib/Header.svelte';
-  import ThemeProvider from '$lib/ThemeProvider.svelte';
-  import Toasts from '$lib/toasts/Toasts.svelte';
 
-  export const ssr = false;
+  import Header from '$lib/ui/header/Header.svelte';
+  import Menu from '$lib/ui/menu/Menu.svelte';
+  import ThemeProvider from '$lib/ui/theme/ThemeProvider.svelte';
+  import Toasts from '$lib/ui/toasts/Toasts.svelte';
+
+  // export const ssr = false;
 </script>
 
 <Toasts />

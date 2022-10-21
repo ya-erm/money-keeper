@@ -1,5 +1,5 @@
 <script>
-  import Input from '$lib/Input.svelte';
+  import Input from '$lib/ui/Input.svelte';
 </script>
 
 <h2>Input</h2>

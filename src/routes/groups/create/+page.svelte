@@ -1,11 +1,11 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { api } from '$lib/api';
-  import Button from '$lib/Button.svelte';
-  import FormContainer from '$lib/FormContainer.svelte';
-  import Input from '$lib/Input.svelte';
-  import { backLink } from '$lib/store/navigation';
-  import { routes } from '$lib/store/routes';
+  import Button from '$lib/ui/Button.svelte';
+  import FormContainer from '$lib/ui/FormContainer.svelte';
+  import Input from '$lib/ui/Input.svelte';
+  import { backLink } from '$lib/ui/header';
+  import { routes } from '$lib/routes';
   import { writable } from 'svelte/store';
 
   backLink.set(routes.groups.path);

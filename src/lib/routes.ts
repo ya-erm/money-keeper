@@ -8,7 +8,9 @@ type Route = {
 type RouteKey =
   | 'root'
   | 'login'
+  | 'logout'
   | 'register'
+  | 'profile'
   | 'groups'
   | 'groups.create'
   | 'accounts'
@@ -22,11 +24,19 @@ export const routes: { [key in RouteKey]: Route } = {
   },
   login: {
     path: '/login',
-    title: 'auth.login',
+    title: 'auth.login.title',
+  },
+  logout: {
+    path: '/logout',
+    title: 'auth.logout.title',
   },
   register: {
     path: '/register',
     title: 'auth.register',
+  },
+  profile: {
+    path: '/profile',
+    title: 'auth.profile',
   },
   groups: {
     path: '/groups',
