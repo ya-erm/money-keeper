@@ -12,12 +12,18 @@ datasource db {
 
 model User {
   id    Int     @id @default(autoincrement())
-  email String? @unique
-  phone String  @unique
+  login String  @unique
   name  String?
 
   password UserPassword?
   tokens   AuthToken[]
+  groups   UserToGroup[]
+
+  outgoingInvites  Invite[] @relation("outgoingInvites")
+  incommingInvites Invite[] @relation("incommingInvites")
+
+  blocksUsers    BlockList[] @relation("blocks")
+  blockedByUsers BlockList[] @relation("blockedBy")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -40,4 +46,97 @@ model AuthToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+}
+
+model UserToGroup {
+  userId  Int
+  groupId Int
+  order   Int @default(0)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([userId, groupId])
+}
+
+model Invite {
+  id           Int     @id @default(autoincrement())
+  senderId     Int
+  receiverId   Int?
+  receiverInfo String
+  accepted     Boolean
+  rejected     Boolean
+
+  sender   User  @relation(name: "outgoingInvites", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User? @relation(name: "incommingInvites", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model BlockList {
+  userId        Int
+  blockedUserId Int
+
+  user        User @relation(name: "blocks", fields: [userId], references: [id], onDelete: Cascade)
+  blockedUser User @relation(name: "blockedBy", fields: [blockedUserId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([userId, blockedUserId])
+}
+
+model Group {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  users        UserToGroup[]
+  accounts     Account[]
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id       Int     @id @default(autoincrement())
+  ownerId  Int
+  name     String
+  currency String
+  icon     String?
+  color    String?
+
+  owner       Group         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  Transaction Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id    Int     @id @default(autoincrement())
+  name  String
+  icon  String?
+  color String?
+  type  String
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Transaction Transaction[]
+}
+
+model Transaction {
+  id         Int      @id @default(autoincrement())
+  ownerId    Int
+  accountId  Int
+  categoryId Int
+  date       DateTime
+  amount     Decimal
+  comment    String?
+
+  owner    Group    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  account  Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
