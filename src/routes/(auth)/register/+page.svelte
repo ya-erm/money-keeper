@@ -10,8 +10,6 @@
 
   export let form: ActionData;
 
-  let name = '';
-  let phone = '';
   let password = '';
   let repeatPassword = '';
 
@@ -35,14 +33,15 @@
 </script>
 
 <FormContainer action="?/register" onSubmit={handleSubmit}>
-  <Input label={$translate('auth.name')} name="name" bind:value={name} required />
-  <Input label={$translate('auth.phone')} name="phone" bind:value={phone} required />
+  <Input label={$translate('auth.name')} name="name" required />
+  <Input label={$translate('auth.login')} name="login" required />
   <Input
     label={$translate('auth.password')}
     bind:value={password}
     name="password"
     type="password"
     minlength={6}
+    autocomplete
     required
   />
   <Input

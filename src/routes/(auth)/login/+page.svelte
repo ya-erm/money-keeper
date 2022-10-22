@@ -23,7 +23,7 @@
 
 <FormContainer action="?/login">
   <Input label={$translate('auth.login')} name="login" required />
-  <Input label={$translate('auth.password')} name="password" type="password" required />
+  <Input label={$translate('auth.password')} name="password" type="password" required autocomplete />
   <Button text={$translate('auth.sign_in')} type="submit" />
   <a slot="footer" href="/register">{$translate('auth.register')}</a>
 </FormContainer>

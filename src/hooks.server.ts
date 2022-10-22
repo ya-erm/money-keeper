@@ -1,5 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
-import { db } from '$lib/server/database';
+
+import { db } from '$lib/server';
 
 export const handle: Handle = async ({ event, resolve }) => {
   // get cookies from browser
@@ -20,11 +21,15 @@ export const handle: Handle = async ({ event, resolve }) => {
     return await resolve(event);
   }
 
-  // update last usage of token
-  await db.authToken.update({
-    where: { id: token.id },
-    data: { lastUsage: new Date() },
-  });
+  try {
+    // update last usage of token
+    await db.authToken.update({
+      where: { id: token.id },
+      data: { lastUsage: new Date() },
+    });
+  } catch (e) {
+    console.error('Failed to update field lastUsage of authToken', e);
+  }
 
   const user = token?.user;
 
@@ -32,6 +37,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   if (user) {
     event.locals.user = {
       id: user.id,
+      login: user.login,
       name: user.name ?? `User #${user.id}`,
     };
   }

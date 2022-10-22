@@ -1,44 +1,34 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
-  import { api } from '$lib/api';
-  import type { GroupWithUsers } from '$lib/api/Api';
+  import { enhance } from '$app/forms';
+  import { writable } from 'svelte/store';
+
   import { routes } from '$lib/routes';
+  import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import FormContainer from '$lib/ui/FormContainer.svelte';
   import { backLink, title } from '$lib/ui/header';
   import Icon from '$lib/ui/Icon.svelte';
   import createBooleanStore from '$lib/utils/createBooleanStore';
-  import { writable } from 'svelte/store';
-  import GroupNameModal from './GroupNameModal.svelte';
+
+  import type { PageData } from './$types';
+  import GroupNameModal from './EditGroupNameModal.svelte';
   import GroupUsersList from './GroupUsersList.svelte';
+
+  export let data: PageData;
 
   backLink.set(routes.groups.path);
 
-  const groupId = parseInt($page.params.id);
-  const group = writable<GroupWithUsers | null>(null);
+  const group = writable(data.group);
 
-  group.subscribe((g) => g && title.set(g?.name));
-
-  (async () => {
-    try {
-      const { data } = await api.groups.getGroup(groupId);
-      group.set(data);
-    } catch {}
-  })();
+  group.subscribe((g) => g && title.set(g.name));
 
   const [modalOpened, openModal, closeModal] = createBooleanStore();
-
-  const deleteGroup = async () => {
-    await api.groups.deleteGroup(groupId);
-    goto(routes.groups.path);
-  };
 </script>
 
 {#if !!$group}
   <FormContainer>
     <div>
-      <div>Name:</div>
+      <div>{$translate('groups.name')}:</div>
       <div class="editable-value">
         <span>{$group.name}</span>
         <Button on:click={openModal} appearance="transparent" color="white">
@@ -48,7 +38,9 @@
     </div>
     <GroupNameModal {group} bind:opened={$modalOpened} close={closeModal} />
     <GroupUsersList {group} />
-    <Button text="Delete group" on:click={deleteGroup} appearance="transparent" color="danger" />
+    <form action="?/deleteGroup" method="POST" use:enhance class="flex-col items-center">
+      <Button text={$translate('groups.delete_group')} type="submit" appearance="transparent" color="danger" />
+    </form>
   </FormContainer>
 {/if}
 

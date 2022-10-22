@@ -10,7 +10,7 @@ module.exports = {
       files: ['*.svelte', '*.ts'],
       rules: {
         '@typescript-eslint/ban-ts-comment': 'off',
-        'no-console': 'warn',
+        'no-console': ['warn', { allow: ['warn', 'error'] }],
       },
     },
   ],

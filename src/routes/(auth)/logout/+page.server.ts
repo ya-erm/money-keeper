@@ -1,5 +1,5 @@
 import { routes } from '$lib/routes';
-import { db } from '$lib/server/database';
+import { db } from '$lib/server';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

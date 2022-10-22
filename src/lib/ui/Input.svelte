@@ -4,6 +4,7 @@
   export let error: string | null = null;
   export let type: 'text' | 'password' = 'text';
   export let required: boolean = false;
+  export let autocomplete: boolean = false;
   export let minlength: number | null = null;
   export let maxlength: number | null = null;
 
@@ -29,6 +30,7 @@
   <input
     bind:this={input}
     on:change={handleChange}
+    autocomplete={autocomplete ? 'on' : undefined}
     class:error={!!error}
     {placeholder}
     {minlength}

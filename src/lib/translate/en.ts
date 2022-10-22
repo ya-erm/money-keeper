@@ -2,6 +2,7 @@ import { addMessages } from 'svelte-i18n';
 import type { Dictionary } from './messages';
 
 export const enDict: Dictionary = {
+  // Common
   'common.back': 'Back',
   'common.select': 'Select',
   'common.available_variants': 'Available variants',
@@ -13,6 +14,12 @@ export const enDict: Dictionary = {
   'common.ascending': 'Ascending',
   'common.descending': 'Descending',
   'common.grouping': 'Grouping',
+  'common.no_items': 'No items yet',
+  'common.create': 'Create',
+  'common.save': 'Save',
+  'common.add': 'Add',
+  'common.failed_to_save_changes': 'Failed to save changes',
+  // Auth
   'auth.login.title': 'Login',
   'auth.login': 'Login',
   'auth.password': 'Password',
@@ -32,10 +39,19 @@ export const enDict: Dictionary = {
   'auth.profile': 'Profile',
   'auth.logged_in_as': 'You are logged in as {name}!',
   'auth.not_logged_in': 'You are not logged in',
+  // Accounts
   'accounts.title': 'Accounts',
+  // Groups
   'groups.title': 'Groups',
-  'groups.users_count': '{count} users',
   'groups.create_group': 'Create group',
+  'groups.name': 'Название',
+  'groups.edit_group_name': 'Редактирование название группы',
+  'groups.users': 'Пользователи',
+  'groups.add_user': 'Добавить пользователя',
+  'groups.failed_to_add_user': 'Не удалось добавить пользователя',
+  'groups.username': 'Имя пользователя',
+  'groups.delete_group': 'Удалить группу',
+  // Settigns
   'settings.title': 'Settings',
   'settings.language': 'Language',
   'settings.select_language': 'Select language',

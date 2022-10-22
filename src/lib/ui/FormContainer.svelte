@@ -1,29 +1,33 @@
 <script lang="ts">
   import { applyAction, enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
+  import type { ActionResult } from '@sveltejs/kit';
 
-  export let action: string;
+  export let action: string | undefined = undefined;
   export let onSubmit: (e: SubmitEvent) => void | Promise<void> = () => {};
+  export let onResult: ((result: ActionResult<any>) => void) | null = null;
 </script>
 
 <div class="content">
   <form
-    on:submit={onSubmit}
     {action}
     method="POST"
     class="form-container"
-    use:enhance={() => {
-      return async ({ result }) => {
+    on:submit={onSubmit}
+    use:enhance={() =>
+      async ({ result }) => {
+        if (onResult) {
+          return onResult(result);
+        }
         // rerun the `load` function for the page
         // https://kit.svelte.dev/docs/modules#$app-navigation-invalidateall
-        invalidateAll();
+        // invalidateAll();
 
         // since we're customizing the default behaviour
         // we don't want to reimplement what `use:enhance` does
         // so we can use `applyResult` and pass the `result`
         await applyAction(result);
-      };
-    }}
+      }}
   >
     <slot />
   </form>

@@ -1,51 +1,27 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import { api } from '$lib/api';
-  import type { GroupWithUsers } from '$lib/api/Api';
-  import Button from '$lib/ui/Button.svelte';
-  import FormContainer from '$lib/ui/FormContainer.svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import Modal from '$lib/ui/Modal.svelte';
-  import createBooleanStore from '$lib/utils/createBooleanStore';
   import type { Writable } from 'svelte/store';
 
-  export let group: Writable<GroupWithUsers | null>;
+  import { translate } from '$lib/translate';
+  import Button from '$lib/ui/Button.svelte';
+  import createBooleanStore from '$lib/utils/createBooleanStore';
 
-  const groupId = parseInt($page.params.id);
+  import AddUserToGroupModal from './AddUserToGroupModal.svelte';
+  import type { GroupWithUsers } from './interface';
 
-  const [modalOpened, openModal, closeModal] = createBooleanStore();
-
-  let user: string = '';
-
-  const handleAddUser = async () => {
-    try {
-      const users = $group?.users?.map((u) => u.phone) ?? [];
-      const resposnse = await api.groups.updateGroup(groupId, {
-        name: $group!.name,
-        users: [...users, user],
-      });
-      group.set(resposnse.data);
-      closeModal();
-    } catch {}
-  };
+  export let group: Writable<GroupWithUsers>;
+  const [opened, openModal, closeModal] = createBooleanStore();
 </script>
 
-<div>Users:</div>
+<div>{$translate('groups.users')}:</div>
 <ul class="users-list">
   {#each $group?.users ?? [] as user}
     <Button color="white" bordered>
-      {user.name} ({user.phone})
+      {user.name} ({user.login})
     </Button>
   {/each}
 </ul>
-<Button on:click={openModal}>Add user</Button>
-
-<Modal header="Add user" bind:opened={$modalOpened} on:close={closeModal}>
-  <FormContainer submit={handleAddUser}>
-    <Input label="Phone or email" bind:value={user} required />
-    <Button text="Add" type="submit" />
-  </FormContainer>
-</Modal>
+<Button text={$translate('groups.add_user')} on:click={openModal} />
+<AddUserToGroupModal {group} opened={$opened} {closeModal} />
 
 <style>
   .users-list {

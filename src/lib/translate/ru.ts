@@ -2,6 +2,7 @@ import { addMessages } from 'svelte-i18n';
 import type { Dictionary } from './messages';
 
 export const ruDict: Dictionary = {
+  // Common
   'common.back': 'Назад',
   'common.select': 'Выбрать',
   'common.available_variants': 'Доступные варианты',
@@ -13,6 +14,12 @@ export const ruDict: Dictionary = {
   'common.ascending': 'По возрастанию',
   'common.descending': 'По убыванию',
   'common.grouping': 'Группировка',
+  'common.no_items': 'Здесь пока ничего нет',
+  'common.create': 'Создать',
+  'common.save': 'Сохранить',
+  'common.add': 'Добавить',
+  'common.failed_to_save_changes': 'Не удалось сохранить изменения',
+  // Auth
   'auth.login.title': 'Вход',
   'auth.login': 'Логин',
   'auth.password': 'Пароль',
@@ -32,10 +39,19 @@ export const ruDict: Dictionary = {
   'auth.profile': 'Профиль',
   'auth.logged_in_as': 'Вы зашли как {name}!',
   'auth.not_logged_in': 'Вы не авторизованы',
+  // Accounts
   'accounts.title': 'Счета',
+  // Groups
   'groups.title': 'Группы',
-  'groups.users_count': '{count} участников',
   'groups.create_group': 'Создать группу',
+  'groups.name': 'Название',
+  'groups.edit_group_name': 'Изменить название группы',
+  'groups.users': 'Пользователи',
+  'groups.add_user': 'Добавить пользователя',
+  'groups.failed_to_add_user': 'Не удалось добавить пользователя',
+  'groups.username': 'Имя пользователя',
+  'groups.delete_group': 'Удалить группу',
+  // Settings
   'settings.title': 'Настройки',
   'settings.language': 'Язык',
   'settings.select_language': 'Выберите язык',

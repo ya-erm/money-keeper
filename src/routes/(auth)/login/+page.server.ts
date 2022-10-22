@@ -1,10 +1,10 @@
 import { redirect } from '@sveltejs/kit';
 import bcrypt from 'bcrypt';
-import type { Action, Actions, PageServerLoad } from './$types';
 
-import { db } from '$lib/server/database';
-import { apiError } from '$lib/server/apiError';
+import { db, serverError } from '$lib/server';
 import { routes } from '$lib/routes';
+
+import type { Action, Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
   // redirect user if logged in
@@ -19,22 +19,22 @@ const login: Action = async ({ cookies, request }) => {
   const password = data.get('password');
 
   if (typeof login !== 'string' || typeof password !== 'string' || !login || !password) {
-    return apiError(400, 'BAD_REQUEST', 'Validation error');
+    return serverError(400, 'BAD_REQUEST', 'Validation error');
   }
 
   const user = await db.user.findUnique({
-    where: { phone: login },
+    where: { login },
     include: { password: { select: { hash: true } } },
   });
 
   if (!user) {
-    return apiError(403, 'INCORRECT_LOGIN_OR_PASSWORD');
+    return serverError(403, 'INCORRECT_LOGIN_OR_PASSWORD');
   }
 
   const correctPassword = await bcrypt.compare(password, user.password?.hash ?? '');
 
   if (!correctPassword) {
-    return apiError(403, 'INCORRECT_LOGIN_OR_PASSWORD');
+    return serverError(403, 'INCORRECT_LOGIN_OR_PASSWORD');
   }
 
   const token = await db.authToken.create({

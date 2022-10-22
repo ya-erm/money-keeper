@@ -1,4 +1,5 @@
 export type Messages =
+  // Common
   | 'common.back'
   | 'common.select'
   | 'common.available_variants'
@@ -10,6 +11,11 @@ export type Messages =
   | 'common.ascending'
   | 'common.descending'
   | 'common.grouping'
+  | 'common.no_items'
+  | 'common.create'
+  | 'common.save'
+  | 'common.add'
+  | 'common.failed_to_save_changes'
   // Auth
   | 'auth.login.title'
   | 'auth.login'
@@ -30,11 +36,19 @@ export type Messages =
   | 'auth.profile'
   | 'auth.logged_in_as'
   | 'auth.not_logged_in'
-  // Other
+  // Accounts
   | 'accounts.title'
+  // Groups
   | 'groups.title'
   | 'groups.create_group'
-  | 'groups.users_count'
+  | 'groups.name'
+  | 'groups.edit_group_name'
+  | 'groups.users'
+  | 'groups.add_user'
+  | 'groups.failed_to_add_user'
+  | 'groups.username'
+  | 'groups.delete_group'
+  // Settings
   | 'settings.title'
   | 'settings.common'
   | 'settings.language'

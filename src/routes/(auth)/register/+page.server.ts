@@ -1,8 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import bcrypt from 'bcrypt';
 
-import { db } from '$lib/server/database';
-import { apiError } from '$lib/server/apiError';
+import { db, serverError } from '$lib/server';
 import type { Action, Actions, PageServerLoad } from './$types';
 import { routes } from '$lib/routes';
 
@@ -16,32 +15,32 @@ export const load: PageServerLoad = async ({ locals }) => {
 const register: Action = async ({ request }) => {
   const data = await request.formData();
   const name = data.get('name');
-  const phone = data.get('phone');
+  const login = data.get('login');
   const password = data.get('password');
 
   if (
     typeof name !== 'string' ||
-    typeof phone !== 'string' ||
+    typeof login !== 'string' ||
     typeof password !== 'string' ||
     !name ||
-    !phone ||
+    !login ||
     !password
   ) {
-    return apiError(400, 'BAD_REQUEST');
+    return serverError(400, 'BAD_REQUEST');
   }
 
   const user = await db.user.findUnique({
-    where: { phone },
+    where: { login },
   });
 
   if (user) {
-    return apiError(400, 'USER_ALREADY_EXISTS');
+    return serverError(400, 'USER_ALREADY_EXISTS');
   }
 
   await db.user.create({
     data: {
       name,
-      phone,
+      login,
       password: {
         create: { hash: await bcrypt.hash(password, 10) },
       },

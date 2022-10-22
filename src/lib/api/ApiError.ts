@@ -1,5 +1,3 @@
-import type { HttpResponse } from './Api';
-
 export type ApiError = {
   error: {
     status: number;
@@ -9,12 +7,6 @@ export type ApiError = {
 };
 
 export function isApiError(e: unknown): e is ApiError {
-  return !!e && typeof e === 'object' && 'error' in e;
-}
-
-export type ApiErrorResponse = HttpResponse<unknown, ApiError>;
-
-export function isApiErrorResponse(e: unknown): e is ApiErrorResponse {
   return !!e && typeof e === 'object' && 'error' in e;
 }
 
