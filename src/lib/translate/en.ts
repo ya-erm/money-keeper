@@ -6,6 +6,7 @@ export const enDict: Dictionary = {
   'common.back': 'Back',
   'common.select': 'Select',
   'common.available_variants': 'Available variants',
+  'common.optional': 'optional',
   'common.loading': 'Loading...',
   'common.show_more': 'Show more',
   'common.sorting': 'Sorting',
@@ -18,7 +19,8 @@ export const enDict: Dictionary = {
   'common.create': 'Create',
   'common.save': 'Save',
   'common.add': 'Add',
-  'common.failed_to_save_changes': 'Failed to save changes',
+  'common.save_changes_failure': 'Failed to save changes',
+  'common.save_changes_success': 'Changes were saved',
   // Auth
   'auth.login.title': 'Login',
   'auth.login': 'Login',
@@ -41,6 +43,17 @@ export const enDict: Dictionary = {
   'auth.not_logged_in': 'You are not logged in',
   // Accounts
   'accounts.title': 'Accounts',
+  'accounts.create_account': 'Create account',
+  'accounts.create_account_failure': 'Failed to create account',
+  'accounts.create_account_success': 'Account was created',
+  'accounts.update_account': 'Update account',
+  'accounts.delete_account': 'Delete account',
+  'accounts.delete_account_failure': 'Failed to delete account',
+  'accounts.delete_account_success': 'Account was deleted',
+  'accounts.name': 'Name',
+  'accounts.currency': 'Currency',
+  'accounts.icon': 'Icon',
+  'accounts.color': 'Color',
   // Groups
   'groups.title': 'Groups',
   'groups.create_group': 'Create group',
@@ -51,7 +64,7 @@ export const enDict: Dictionary = {
   'groups.failed_to_add_user': 'Не удалось добавить пользователя',
   'groups.username': 'Имя пользователя',
   'groups.delete_group': 'Удалить группу',
-  // Settigns
+  // Settings
   'settings.title': 'Settings',
   'settings.language': 'Language',
   'settings.select_language': 'Select language',

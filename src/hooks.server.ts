@@ -42,6 +42,22 @@ export const handle: Handle = async ({ event, resolve }) => {
     };
   }
 
+  // get selected group id from cookies
+  const groupId = parseInt(event.cookies.get('groupId') ?? '');
+  if (user && groupId && !Number.isNaN(groupId)) {
+    const userInGroup = await db.userToGroup.findUnique({
+      where: {
+        userId_groupId: {
+          userId: user.id,
+          groupId: groupId,
+        },
+      },
+    });
+    event.locals.groupId = userInGroup ? groupId : null;
+  } else {
+    event.locals.groupId = null;
+  }
+
   // load page as normal
   return await resolve(event);
 };

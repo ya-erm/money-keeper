@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { translate } from '$lib/translate';
+
   export let name: string | null = null;
   export let label: string | null = null;
   export let error: string | null = null;
@@ -12,6 +14,7 @@
 
   export let value: string | null = null;
   export let placeholder: string | null = null;
+  export let optional: boolean = false;
   export function focus() {
     input.focus();
   }
@@ -24,7 +27,10 @@
 <label class="input-container">
   {#if label}
     <span class="label-text" class:error={!!error}>
-      <span>{label}:</span>
+      <span>{label}</span>
+      {#if optional}
+        <span class="optional">({$translate('common.optional')})</span>
+      {/if}
     </span>
   {/if}
   <input
@@ -57,18 +63,25 @@
   .label-text.error {
     color: var(--red-color);
   }
+  .optional {
+    font-size: 0.9em;
+    opacity: 0.5;
+  }
 
   input {
     font-size: 1rem;
     border-radius: 0.75rem;
     padding: 0.75rem;
     border: 1px solid var(--border-color);
+    background-color: var(--header-background-color);
+    color: var(--text-color);
     outline: none;
   }
   input:focus {
-    border: 1px solid var(--active-text-color);
+    border: 1px solid var(--active-color);
   }
   input.error {
+    color: var(--red-color);
     border: 1px solid var(--red-color);
   }
   .error-text {

@@ -11,9 +11,11 @@ type UserInfo = {
 declare namespace App {
   interface Locals {
     user: UserInfo | null;
+    groupId: number | null;
   }
   interface PageData {
     user: UserInfo | null;
+    groupId: number | null;
   }
   // interface Error {}
   // interface Platform {}

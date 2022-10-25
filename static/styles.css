@@ -34,10 +34,19 @@ body.dark-mode {
   --border-color: #272729;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 a {
   color: var(--active-color);
 }
 
+.hidden {
+  display: none;
+}
+
+/* Flex */
 .flex {
   display: flex;
 }
@@ -45,13 +54,56 @@ a {
   display: flex;
   flex-direction: column;
 }
+.flex-grow {
+  flex-grow: 1;
+}
+.flex-grow-0 {
+  flex-grow: 0;
+}
+.flex-shrink {
+  flex-shrink: 1;
+}
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+.flex-1 {
+  flex: 1
+}
+
+/* Align items */
 .items-center {
   align-items: center;
 }
+.items-baseline {
+  align-items: baseline;
+}
+.items-start {
+  align-items: flex-start;
+}
+.items-end {
+  align-items: flex-end;
+}
+.items-stretch {
+  align-items: stretch;
+}
+
+/* Justify content */
 .justify-between {
   justify-content: space-between;
 }
+.justify-center {
+  justify-content: center;
+}
 
+/* Width, height */
+.w-full {
+  width: 100%;
+}
+.h-full {
+  height: 100%;
+}
+
+/* Gap */
 .gap-0\.5 {
   gap: 0.5rem;
 }
@@ -59,6 +111,7 @@ a {
   gap: 1rem;
 }
 
+/* Padding */
 .p-0\.5 {
   padding: 0.5rem;
 }
@@ -66,6 +119,27 @@ a {
   padding: 1rem;
 }
 
+/* Padding x-axis */
+.px-0\.5 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+.px-1 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Padding y-axis */
+.py-0\.5 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.py-1 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* Cursor */
 .cursor-pointer {
   cursor: pointer;
 }

@@ -45,7 +45,11 @@
     left: 0;
     width: 100%;
     height: 100%;
+    z-index: 100;
     background: rgba(0, 0, 0, 0.3);
+  }
+  :global(body.dark-mode .modal-background) {
+    background: rgba(0, 0, 0, 0.7);
   }
   .modal {
     left: 50%;
@@ -55,9 +59,11 @@
     max-width: calc(100vw - 4em);
     max-height: calc(100vh - 4em);
     border-radius: 0.75em;
-    background: white;
+    background: var(--header-background-color);
+    border: 1px solid var(--border-color);
     padding: 1em;
     overflow: auto;
+    z-index: 101;
   }
   .header {
     font-weight: 600;

@@ -2,7 +2,7 @@
   import { createEventDispatcher } from 'svelte';
 
   export let text: string | null = null;
-  export let appearance: 'solid' | 'transparent' = 'solid';
+  export let appearance: 'solid' | 'transparent' | 'link' = 'solid';
   export let color: 'primary' | 'secondary' | 'white' | 'success' | 'danger' = 'primary';
   export let type: 'button' | 'submit' = 'button';
   export let bordered: boolean = false;
@@ -12,21 +12,22 @@
 </script>
 
 <button
-  on:click={click}
+  on:click|stopPropagation={click}
   class:primary={color === 'primary'}
   class:secondary={color === 'secondary'}
   class:success={color === 'success'}
   class:danger={color === 'danger'}
   class:white={color === 'white'}
   class:solid={appearance === 'solid'}
-  class:transparent={appearance === 'transparent'}
-  class:border={bordered === true}
+  class:transparent={appearance === 'transparent' || appearance === 'link'}
+  class:border={bordered === true && appearance !== 'link'}
+  class:link={appearance === 'link'}
   {type}
 >
+  <slot />
   {#if text}
     {text}
   {/if}
-  <slot />
 </button>
 
 <style>
@@ -34,6 +35,10 @@
     font-size: 1rem;
     padding: 0.75rem;
     border-radius: 0.75rem;
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-around;
     cursor: pointer;
     outline: none;
     border: none;
@@ -68,9 +73,16 @@
     color: var(--primary-text-color);
     background: var(--header-background-color);
   }
+
   /* Transparent */
   button.transparent {
     background: none;
+  }
+  button.transparent:hover {
+    opacity: 0.7;
+  }
+  button.transparent:active {
+    opacity: 0.6;
   }
 
   button.transparent.primary {
@@ -99,5 +111,11 @@
   }
   button.transparent.danger.border {
     box-shadow: 0 0 0 1px var(--red-color);
+  }
+
+  /** Link */
+  button.link {
+    text-decoration: underline;
+    padding: 0;
   }
 </style>

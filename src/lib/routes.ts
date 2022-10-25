@@ -14,6 +14,7 @@ type RouteKey =
   | 'groups'
   | 'groups.create'
   | 'accounts'
+  | 'accounts.create'
   | 'settings'
   | 'settings.language';
 
@@ -49,6 +50,10 @@ export const routes: { [key in RouteKey]: Route } = {
   accounts: {
     path: '/accounts',
     title: 'accounts.title',
+  },
+  'accounts.create': {
+    path: '/accounts/create',
+    title: 'accounts.create_account',
   },
   settings: {
     path: '/settings',

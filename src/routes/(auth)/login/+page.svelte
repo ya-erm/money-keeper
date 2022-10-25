@@ -1,10 +1,15 @@
 <script lang="ts">
+  import { applyAction } from '$app/forms';
+  import { invalidateAll } from '$app/navigation';
+  import type { ActionResult } from '@sveltejs/kit';
+
   import { isApiError } from '$lib/api/ApiError';
+  import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import FormContainer from '$lib/ui/FormContainer.svelte';
   import Input from '$lib/ui/Input.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
-  import { translate } from '$lib/translate';
+
   import type { ActionData } from './$types';
 
   export let form: ActionData;
@@ -19,9 +24,14 @@
         break;
     }
   }
+
+  const handleResult = (result: ActionResult) => {
+    invalidateAll();
+    applyAction(result);
+  };
 </script>
 
-<FormContainer action="?/login">
+<FormContainer action="?/login" onResult={handleResult}>
   <Input label={$translate('auth.login')} name="login" required />
   <Input label={$translate('auth.password')} name="password" type="password" required autocomplete />
   <Button text={$translate('auth.sign_in')} type="submit" />

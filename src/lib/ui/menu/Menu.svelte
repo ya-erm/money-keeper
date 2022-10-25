@@ -51,7 +51,7 @@
   }
   .menu-item:hover,
   .menu-item.active {
-    color: var(--active-text-color);
+    color: var(--active-color);
   }
   .menu-item:active {
     opacity: 0.7;

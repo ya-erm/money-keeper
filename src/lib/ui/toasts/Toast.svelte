@@ -21,13 +21,13 @@
 </script>
 
 <article class={type} role="alert">
-  <Icon path={icon} />
+  <Icon path={icon} size={1.5} />
   <div class="text">
     <slot />
   </div>
   {#if dismissible}
     <button class="close" on:click={() => dispatch('dismiss')}>
-      <Icon path="/icons/close.svg" size={24} />
+      <Icon path="/icons/close.svg" size={1.5} />
     </button>
   {/if}
 </article>
