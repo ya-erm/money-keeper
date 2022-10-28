@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import { findRoute } from '$lib/routes';
   import { translate } from '$lib/translate';
+  import Icon from '$lib/ui/Icon.svelte';
   import { derived } from 'svelte/store';
   import { backLink, rightButton, title } from './header';
 
@@ -19,7 +20,7 @@
   <div class="navigation-back-button">
     {#if $backLink}
       <a href={$backLink} on:click={() => backLink.set(null)}>
-        <span class="indicator" />
+        <Icon name="mdi:chevron-left" />
         {$translate(findRoute($backLink)?.title ?? 'common.back')}
       </a>
     {/if}
@@ -49,15 +50,7 @@
     align-items: center;
     color: var(--active-color);
     text-decoration: none;
-    padding: 5px;
-  }
-  .navigation-back-button .indicator {
-    flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-    background-color: var(--active-color);
-    mask: url('/icons/chevron-left.svg') no-repeat 50% 50%;
+    padding: 0.5rem;
   }
   .navigation-bar {
     display: grid;
@@ -70,7 +63,7 @@
   }
   .navigation-title {
     text-align: center;
-    font-size: 18px;
+    font-size: 1.25rem;
   }
   .navigation-right-button {
     text-align: right;

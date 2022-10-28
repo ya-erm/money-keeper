@@ -11,23 +11,23 @@
   const icon = (() => {
     switch (type) {
       case 'info':
-        return '/icons/information-outline.svg';
+        return 'mdi:information-outline';
       case 'error':
-        return '/icons/close-circle-outline.svg';
+        return 'mdi:close-circle-outline';
       case 'success':
-        return '/icons/check-circle-outline.svg';
+        return 'mdi:check-circle-outline';
     }
   })();
 </script>
 
 <article class={type} role="alert">
-  <Icon path={icon} size={1.5} />
+  <Icon name={icon} size={1.5} />
   <div class="text">
     <slot />
   </div>
   {#if dismissible}
     <button class="close" on:click={() => dispatch('dismiss')}>
-      <Icon path="/icons/close.svg" size={1.5} />
+      <Icon name="mdi:close" size={1.5} />
     </button>
   {/if}
 </article>

@@ -3,6 +3,7 @@
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import { backLink } from '$lib/ui/header/header';
+  import Icon from '$lib/ui/Icon.svelte';
   import { derived } from 'svelte/store';
   import { menu } from './menu';
 
@@ -18,11 +19,7 @@
 <div class="menu-bar" class:hidden={$hidden}>
   {#each $menu as item}
     <a href={item.path} class="menu-item" class:active={$isActive(item.path)} on:click={() => backLink.set(null)}>
-      <div
-        class="icon"
-        class:active={$isActive(item.path)}
-        style={`mask-image:url('${item.icon}'); -webkit-mask-image:url('${item.icon}')`}
-      />
+      <Icon name={item.icon} size={1.5} />
       <span class="text">{$translate(item.title)}</span>
     </a>
   {/each}
@@ -55,16 +52,6 @@
   }
   .menu-item:active {
     opacity: 0.7;
-  }
-  .menu-item .icon {
-    width: 30px;
-    height: 30px;
-    mask: no-repeat 50% 50%;
-    background-color: var(--secondary-text-color);
-  }
-  .menu-item:hover .icon,
-  .menu-item .icon.active {
-    background-color: var(--active-color);
   }
   .menu-item .text {
     font-size: 0.7em;

@@ -32,7 +32,7 @@
       <div class="editable-value">
         <span>{$group.name}</span>
         <Button on:click={openModal} appearance="transparent" color="white">
-          <Icon path="/icons/pencil.svg" size="1.25rem" />
+          <Icon name="mdi:pencil" />
         </Button>
       </div>
     </div>

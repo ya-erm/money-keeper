@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '$lib/icons';
   import '$lib/translate';
 
   import Header from '$lib/ui/header/Header.svelte';

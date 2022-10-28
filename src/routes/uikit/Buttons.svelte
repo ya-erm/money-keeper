@@ -34,16 +34,16 @@
     <Button appearance="link" color="danger" text="Danger" bordered={$bordered} />
     <Button appearance="link" color="white" text="White" bordered={$bordered} />
   </div>
-  <div>
+  <div class="flex items-center gap-0.5">
     Icons:
     <Button text="Primary" bordered={$bordered}>
-      <Icon path="/icons/pencil.svg" />
+      <Icon name="mdi:pencil" />
     </Button>
     <Button bordered={$bordered}>
-      <Icon path="/icons/pencil.svg" />
+      <Icon name="mdi:pencil" />
     </Button>
     <Button appearance="transparent" bordered={$bordered}>
-      <Icon path="/icons/pencil.svg" />
+      <Icon name="mdi:pencil" />
     </Button>
   </div>
 </div>

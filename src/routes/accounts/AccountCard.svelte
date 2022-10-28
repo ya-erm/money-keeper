@@ -14,11 +14,11 @@
 <div class="w-full h-full p-1 flex-col items-center justify-between">
   <div class="w-full flex items-center gap-0.5">
     <div class="account-icon flex items-center justify-center">
-      <Icon path={account.icon || '/icons/briefcase-outline.svg'} padding={0.5} />
+      <Icon name={account.icon || 'mdi:briefcase-outline'} padding={0.5} />
     </div>
     <div class="flex-grow">{account.name}</div>
     <Button appearance="link" color="white" on:click={() => goto(`${routes.accounts.path}/${account.id}`)}>
-      <Icon path="/icons/pencil.svg" size={1.5} padding={0.5} />
+      <Icon name="mdi:pencil" padding={0.5} />
     </Button>
   </div>
   <div class="money-value flex">{value} {account.currency}</div>

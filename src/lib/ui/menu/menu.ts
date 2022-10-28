@@ -11,22 +11,22 @@ export type MenuItem = {
 
 export const menu = readable<MenuItem[]>([
   {
-    icon: '/icons/account.svg',
+    icon: 'mdi:account',
     title: 'auth.profile',
     path: routes.login.path,
   },
   {
-    icon: '/icons/briefcase-outline.svg',
-    title: 'accounts.title',
-    path: routes.accounts.path,
-  },
-  {
-    icon: '/icons/account-group.svg',
+    icon: 'mdi:account-group',
     title: 'groups.title',
     path: routes.groups.path,
   },
   {
-    icon: '/icons/cog-outline.svg',
+    icon: 'mdi:briefcase-outline',
+    title: 'accounts.title',
+    path: routes.accounts.path,
+  },
+  {
+    icon: 'mdi:cog-outline',
     title: 'settings.title',
     path: '/uikit',
   },
