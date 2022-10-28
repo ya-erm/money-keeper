@@ -54,6 +54,17 @@ export const enDict: Dictionary = {
   'accounts.currency': 'Currency',
   'accounts.icon': 'Icon',
   'accounts.color': 'Color',
+  // Categories
+  'categories.title': 'Categories',
+  'categories.create_category': 'Create category',
+  'categories.create_category_success': 'Category was created',
+  'categories.create_category_failure': 'Failed to create category',
+  'categories.edit_category': 'Edit category',
+  'categories.delete_category': 'Delete category',
+  'categories.delete_category_failure': 'Failed to delete category',
+  'categories.delete_category_success': 'Category was deleted',
+  'categories.name': 'Name',
+  'categories.icon': 'Icon',
   // Groups
   'groups.title': 'Groups',
   'groups.create_group': 'Create group',

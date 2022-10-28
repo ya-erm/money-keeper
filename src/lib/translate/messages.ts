@@ -51,6 +51,17 @@ export type Messages =
   | 'accounts.currency'
   | 'accounts.icon'
   | 'accounts.color'
+  // Categories
+  | 'categories.title'
+  | 'categories.create_category'
+  | 'categories.create_category_success'
+  | 'categories.create_category_failure'
+  | 'categories.edit_category'
+  | 'categories.delete_category'
+  | 'categories.delete_category_failure'
+  | 'categories.delete_category_success'
+  | 'categories.name'
+  | 'categories.icon'
   // Groups
   | 'groups.title'
   | 'groups.create_group'

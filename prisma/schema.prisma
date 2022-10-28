@@ -91,6 +91,7 @@ model Group {
 
   users        UserToGroup[]
   accounts     Account[]
+  categories   Category[]
   transactions Transaction[]
 
   createdAt DateTime @default(now())
@@ -113,15 +114,19 @@ model Account {
 }
 
 model Category {
-  id    Int     @id @default(autoincrement())
-  name  String
-  icon  String?
-  color String?
-  type  String
+  id      Int     @id @default(autoincrement())
+  ownerId Int
+  name    String
+  icon    String?
+  color   String?
+  type    String
+  order   Int     @default(0)
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  Transaction Transaction[]
+  owner        Group         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Transaction {

@@ -54,6 +54,17 @@ export const ruDict: Dictionary = {
   'accounts.currency': 'Валюта',
   'accounts.icon': 'Значок',
   'accounts.color': 'Цвет',
+  // Categories
+  'categories.title': 'Категории',
+  'categories.create_category': 'Создать категорию',
+  'categories.create_category_success': 'Категория создана',
+  'categories.create_category_failure': 'Не удалось создать категорию',
+  'categories.edit_category': 'Редактировать категорию',
+  'categories.delete_category': 'Удалить категорию',
+  'categories.delete_category_failure': 'Не удалось удалить категорию',
+  'categories.delete_category_success': 'Категория удалена',
+  'categories.name': 'Название',
+  'categories.icon': 'Значок',
   // Groups
   'groups.title': 'Группы',
   'groups.create_group': 'Создать группу',

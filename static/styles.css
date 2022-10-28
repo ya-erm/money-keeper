@@ -69,6 +69,10 @@ a {
 .flex-1 {
   flex: 1
 }
+.flex-center {
+  align-items: center;
+  justify-content: center;
+}
 
 /* Align items */
 .items-center {

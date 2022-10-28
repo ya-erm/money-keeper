@@ -1,13 +1,14 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
+  import { onMount } from 'svelte';
+
+  import { page } from '$app/stores';
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import { page } from '$app/stores';
+  import { backLink } from '$lib/ui/header';
 
   import type { PageData } from './$types';
   import AccountCard from './AccountCard.svelte';
-  import { onMount } from 'svelte';
-  import { goto } from '$app/navigation';
-  import { backLink } from '$lib/ui/header';
 
   backLink.set(null);
 

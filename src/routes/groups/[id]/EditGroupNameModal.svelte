@@ -23,7 +23,7 @@
       group.set(result.data.group);
       close();
     } else {
-      showErrorToast($translate('common.failed_to_save_changes'));
+      showErrorToast($translate('common.save_changes_failure'));
     }
   };
 </script>

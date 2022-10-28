@@ -26,6 +26,11 @@ export const menu = readable<MenuItem[]>([
     path: routes.accounts.path,
   },
   {
+    icon: 'mdi:shape-outline',
+    title: 'categories.title',
+    path: routes.categories.path,
+  },
+  {
     icon: 'mdi:cog-outline',
     title: 'settings.title',
     path: '/uikit',
