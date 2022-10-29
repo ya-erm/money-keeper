@@ -16,6 +16,7 @@ type RouteKey =
   | 'accounts'
   | 'accounts.create'
   | 'categories'
+  | 'categories.create'
   | 'settings'
   | 'settings.language';
 
@@ -59,6 +60,10 @@ export const routes: { [key in RouteKey]: Route } = {
   categories: {
     path: '/categories',
     title: 'categories.title',
+  },
+  'categories.create': {
+    path: '/categories/create',
+    title: 'categories.create_category',
   },
   settings: {
     path: '/settings',

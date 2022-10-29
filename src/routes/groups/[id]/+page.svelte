@@ -16,11 +16,10 @@
 
   export let data: PageData;
 
+  title.set($translate('groups.edit_group'));
   backLink.set(routes.groups.path);
 
   const group = writable(data.group);
-
-  group.subscribe((g) => g && title.set(g.name));
 
   const [modalOpened, openModal, closeModal] = createBooleanStore();
 </script>

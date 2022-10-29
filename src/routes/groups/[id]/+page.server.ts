@@ -1,10 +1,14 @@
-import { redirect } from '@sveltejs/kit';
+import type { Group, User, UserToGroup } from '@prisma/client';
+import { error, redirect } from '@sveltejs/kit';
 
 import { routes } from '$lib/routes';
-import { db, serverError } from '$lib/server';
+import { db, isServerError, serverError } from '$lib/server';
+import { checkUser, getStringParameterOrThrow } from '$lib/utils';
 
-import type { Action, Actions, PageServerLoad } from './$types';
+import type { Action, Actions, PageServerLoad, RouteParams } from './$types';
 import type { GroupWithUsers } from './interface';
+
+type GroupDbo = Pick<Group, 'id' | 'name'> & { users: (UserToGroup & { user: Pick<User, 'id' | 'name' | 'login'> })[] };
 
 const selection = {
   id: true,
@@ -22,105 +26,122 @@ const selection = {
   },
 };
 
-export const load: PageServerLoad = async ({ params, locals }) => {
-  if (!locals.user) {
-    throw redirect(302, routes.login.path);
-  }
+const validate = async (params: RouteParams, locals: App.Locals) => {
+  const groupId = parseInt(params.id);
 
-  const id = parseInt(params.id);
-
-  if (Number.isNaN(id)) {
-    return serverError(400, 'BAD_REQUEST');
+  if (Number.isNaN(groupId)) {
+    throw serverError(400, 'BAD_REQUEST');
   }
 
   const group = await db.group.findUnique({
-    where: { id },
-    select: selection,
+    where: { id: groupId },
+    select: { id: true },
   });
 
   if (!group) {
-    return serverError(404, 'NOT_FOUND');
+    throw serverError(404, 'NOT_FOUND');
   }
 
-  const groupDto: GroupWithUsers = {
-    id: group.id,
-    name: group.name,
-    users: group.users.map(({ user }) => user),
-  };
+  const user = checkUser(locals);
 
-  return { group: groupDto };
-};
-
-const updateGroup: Action = async ({ params, request }) => {
-  const data = await request.formData();
-  const name = data.get('name');
-
-  if (typeof name !== 'string' || !name) {
-    return serverError(400, 'BAD_REQUEST');
-  }
-
-  const id = parseInt(params.id);
-
-  const group = await db.group.update({
-    where: { id },
-    data: {
-      name,
-    },
-    select: selection,
+  const userInGroup = await db.userToGroup.findUnique({
+    where: { userId_groupId: { userId: user.id, groupId } },
   });
 
-  const groupDto: GroupWithUsers = {
-    id: group.id,
-    name: group.name,
-    users: group.users.map(({ user }) => user),
+  if (!userInGroup) {
+    throw serverError(403, 'FORBIDDEN');
+  }
+
+  return {
+    user,
+    groupId,
   };
-
-  return { group: groupDto };
-
-  throw redirect(302, `${routes.groups.path}/${id}`);
 };
 
-const deleteGroup: Action = async ({ params }) => {
-  const id = parseInt(params.id);
+const mapGroup = (group: GroupDbo): GroupWithUsers => ({
+  id: group.id,
+  name: group.name,
+  users: group.users.map(({ user }) => user),
+});
 
-  await db.group.delete({ where: { id } });
+export const load: PageServerLoad = async ({ params, locals }) => {
+  try {
+    const { groupId } = await validate(params, locals);
 
-  throw redirect(302, routes.groups.path);
+    const group = await db.group.findUniqueOrThrow({
+      where: { id: groupId },
+      select: selection,
+    });
+
+    return { group: mapGroup(group) };
+  } catch (e) {
+    if (isServerError(e)) throw error(e.status, e.data.error.code);
+    throw e;
+  }
 };
 
-const addUser: Action = async ({ params, request }) => {
-  const id = parseInt(params.id);
+const updateGroup: Action = async ({ params, request, locals }) => {
+  try {
+    const { groupId } = await validate(params, locals);
 
-  if (Number.isNaN(id)) {
-    return serverError(400, 'BAD_REQUEST');
+    const data = await request.formData();
+    const name = getStringParameterOrThrow(data, 'name');
+
+    const group = await db.group.update({
+      where: { id: groupId },
+      data: {
+        name,
+      },
+      select: selection,
+    });
+
+    return { group: mapGroup(group) };
+  } catch (e) {
+    if (isServerError(e)) return e;
+    throw e;
   }
+};
 
-  const data = await request.formData();
-  const login = data.get('login');
+const deleteGroup: Action = async ({ params, locals }) => {
+  try {
+    const { groupId } = await validate(params, locals);
 
-  if (typeof login !== 'string' || !login) {
-    return serverError(400, 'BAD_REQUEST');
+    await db.group.delete({ where: { id: groupId } });
+
+    throw redirect(302, routes.groups.path);
+  } catch (e) {
+    if (isServerError(e)) return e;
+    throw e;
   }
+};
 
-  const user = await db.user.findUnique({ where: { login } });
+const addUser: Action = async ({ params, request, locals }) => {
+  try {
+    const { groupId } = await validate(params, locals);
 
-  if (!user) {
-    return serverError(404, 'NOT_FOUND');
+    const data = await request.formData();
+    const login = getStringParameterOrThrow(data, 'login');
+
+    const user = await db.user.findUnique({ where: { login } });
+
+    if (!user) {
+      return serverError(404, 'NOT_FOUND');
+    }
+
+    await db.userToGroup.create({
+      data: { groupId, userId: user.id },
+    });
+
+    const group = await db.group.findUniqueOrThrow({
+      where: { id: groupId },
+      select: selection,
+    });
+
+    return { group: mapGroup(group) };
+  } catch (e) {
+    if (isServerError(e)) return e;
+    throw e;
   }
-
-  await db.userToGroup.create({
-    data: { groupId: id, userId: user.id },
-  });
-
-  const group = await db.group.findUniqueOrThrow({ where: { id }, select: selection });
-
-  const groupDto: GroupWithUsers = {
-    id: group.id,
-    name: group.name,
-    users: group.users.map(({ user }) => user),
-  };
-
-  return { group: groupDto };
 };
 
 export const actions: Actions = {
