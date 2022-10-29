@@ -17,29 +17,34 @@
 
   let accountListElement: Element;
 
-  const scrollToCard = (id: string | number) => {
+  const scrollToCard = (id?: string | number) => {
+    if (!id) return;
     const card = accountListElement.querySelector(`#account-card-${id}`);
     card?.scrollIntoView({ behavior: 'smooth', inline: 'center' });
   };
 
+  $: cardId = $page.url.hash.match(/\#account-card-(\d+)/)?.[1];
+
   onMount(() => {
-    const hash = $page.url.hash;
-    const id = hash.substring('#account-card-'.length);
-    if (id) {
-      scrollToCard(id);
-    }
+    scrollToCard(cardId);
   });
 
-  const handleClick = (id: number) => async () => {
-    await goto(`${routes.accounts.path}#account-card-${id}`, { noscroll: true });
-    scrollToCard(id);
+  const handleScroll = () => {
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const index = accountListElement.scrollLeft / (26 * rem);
+    if (Number.isInteger(index) && !!accounts[index]) {
+      const id = accounts[index]?.id;
+      if (`${id}` !== cardId) {
+        goto(`${routes.accounts.path}#account-card-${id}`, { noscroll: true });
+      }
+    }
   };
 </script>
 
 <div class="accounts-container">
-  <div bind:this={accountListElement} class="accounts-list">
+  <div class="accounts-list" bind:this={accountListElement} on:scroll={handleScroll}>
     {#each accounts as account}
-      <div class="account-card" on:click={handleClick(account.id)} aria-hidden>
+      <div class="account-card" on:click={() => scrollToCard(account.id)} aria-hidden>
         <AccountCard {account} />
         <div id={`account-card-${account.id}`} class="account-card-anchor" />
       </div>
@@ -61,12 +66,14 @@
     min-width: 100vw;
     display: flex;
     overflow-x: auto;
+    scroll-snap-type: x mandatory;
     gap: 1rem;
   }
   .accounts-list::-webkit-scrollbar {
     display: none;
   }
   .account-card {
+    scroll-snap-align: center;
     flex-shrink: 0;
     height: 15rem;
     width: 25rem;
