@@ -21,9 +21,11 @@ const iconsToBundle = [
   'mdi:close-circle-outline',
   'mdi:cog-outline',
   'mdi:information-outline',
+  'mdi:folder-outline',
   'mdi:login',
   'mdi:logout',
   'mdi:pencil',
+  'mdi:plus',
   'mdi:shape-outline',
 ];
 

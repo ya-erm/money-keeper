@@ -89,6 +89,7 @@ CREATE TABLE "Category" (
     "icon" TEXT,
     "color" TEXT,
     "type" TEXT NOT NULL,
+    "order" INTEGER NOT NULL DEFAULT 0,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     CONSTRAINT "Category_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "Group" ("id") ON DELETE CASCADE ON UPDATE CASCADE
@@ -101,7 +102,7 @@ CREATE TABLE "Transaction" (
     "accountId" INTEGER NOT NULL,
     "categoryId" INTEGER NOT NULL,
     "date" DATETIME NOT NULL,
-    "amount" DECIMAL NOT NULL,
+    "amount" REAL NOT NULL,
     "comment" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,

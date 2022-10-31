@@ -6,18 +6,15 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals }) => {
   const { groupId } = checkUserAndGroup(locals);
 
-  const accounts = await db.account.findMany({
+  const transactions = await db.transaction.findMany({
     where: { ownerId: groupId },
     include: {
-      transactions: {
-        include: {
-          category: true,
-        },
-      },
+      account: true,
+      category: true,
     },
   });
 
   return {
-    accounts,
+    transactions,
   };
 };

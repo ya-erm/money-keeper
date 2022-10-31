@@ -106,8 +106,8 @@ model Account {
   icon     String?
   color    String?
 
-  owner       Group         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  Transaction Transaction[]
+  owner        Group         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -135,7 +135,7 @@ model Transaction {
   accountId  Int
   categoryId Int
   date       DateTime
-  amount     Decimal
+  amount     Float
   comment    String?
 
   owner    Group    @relation(fields: [ownerId], references: [id], onDelete: Cascade)

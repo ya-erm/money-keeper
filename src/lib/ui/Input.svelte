@@ -4,7 +4,7 @@
   export let name: string | null = null;
   export let label: string | null = null;
   export let error: string | null = null;
-  export let type: 'text' | 'password' = 'text';
+  export let type: 'text' | 'password' | 'date' | 'number' = 'text';
   export let required: boolean = false;
   export let autocomplete: boolean = false;
   export let minlength: number | null = null;
@@ -37,6 +37,7 @@
     bind:this={input}
     on:change={handleChange}
     autocomplete={autocomplete ? 'on' : undefined}
+    step={type === 'number' ? '0.01' : undefined}
     class:error={!!error}
     {placeholder}
     {minlength}

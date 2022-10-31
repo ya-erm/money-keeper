@@ -1,16 +1,23 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   import { page } from '$app/stores';
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import { backLink } from '$lib/ui/header';
+  import Button from '$lib/ui/Button.svelte';
+  import { backLink, rightButton } from '$lib/ui/header';
+  import Icon from '$lib/ui/Icon.svelte';
+
+  import TransactionListItem from '../transactions/TransactionListItem.svelte';
 
   import type { PageData } from './$types';
   import AccountCard from './AccountCard.svelte';
+  import AddAccountButton from './AddAccountButton.svelte';
 
   backLink.set(null);
+  rightButton.set(AddAccountButton);
+  onDestroy(() => rightButton.set(null));
 
   export let data: PageData;
   $: accounts = data.accounts;
@@ -20,13 +27,18 @@
   const scrollToCard = (id?: string | number) => {
     if (!id) return;
     const card = accountListElement.querySelector(`#account-card-${id}`);
-    card?.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+    card?.scrollIntoView({ behavior: 'auto', inline: 'center' });
   };
 
   $: cardId = $page.url.hash.match(/\#account-card-(\d+)/)?.[1];
+  $: account = accounts.find((x) => x.id.toString() === cardId);
 
   onMount(() => {
-    scrollToCard(cardId);
+    if (cardId) {
+      scrollToCard(cardId);
+    } else if (!!accounts.length) {
+      goto(`${routes.accounts.path}#account-card-${accounts[0].id}`, { noscroll: true });
+    }
   });
 
   const handleScroll = () => {
@@ -53,6 +65,23 @@
       {$translate('accounts.create_account')}
     </a>
   </div>
+</div>
+
+<div class="p-1">
+  <h3 style:font-weight="normal" style:margin-top="0">{$translate('transactions.title')}</h3>
+  <a class="flex-col" href={`${routes['transactions.create'].path}?accountId=${cardId}`}>
+    <Button>
+      <Icon name="mdi:plus" />
+      {$translate('transactions.new_transaction')}
+    </Button>
+  </a>
+  {#if account}
+    <div class="mt-1 flex-col gap-1">
+      {#each account?.transactions ?? [] as transaction}
+        <TransactionListItem hideSource transaction={{ ...transaction, account }} />
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style>
