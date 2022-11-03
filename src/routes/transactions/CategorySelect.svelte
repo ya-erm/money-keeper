@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Category } from '@prisma/client';
-  import { writable } from 'svelte/store';
 
   import { translate } from '$lib/translate';
   import GridCircleItem from '$lib/ui/GridCircleItem.svelte';

@@ -6,6 +6,9 @@
 
   export let transaction: Transaction & { account: Account; category: Category };
   export let hideSource: boolean = false;
+
+  const incoming = transaction.category.type === 'IN';
+  const outgoing = transaction.category.type === 'OUT';
 </script>
 
 <a href={`${routes.transactions.path}/${transaction.id}`}>
@@ -23,8 +26,8 @@
       </div>
       <div class="small-text">{transaction.comment}</div>
     </div>
-    <span class="amount">
-      <span>{transaction.amount}</span>
+    <span class="amount" class:incoming class:outgoing>
+      <span>{incoming ? '+' : outgoing ? '-' : ''}{transaction.amount}</span>
       <span class="small-text">{transaction.account.currency}</span>
     </span>
   </div>
@@ -62,5 +65,11 @@
   }
   .amount {
     white-space: nowrap;
+  }
+  .incoming {
+    color: var(--green-color);
+  }
+  .outgoing {
+    color: var(--red-color);
   }
 </style>

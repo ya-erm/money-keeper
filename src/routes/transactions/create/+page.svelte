@@ -9,6 +9,7 @@
   import AccountSelect from '../AccountSelect.svelte';
   import CategorySelect from '../CategorySelect.svelte';
   import type { PageData } from './$types';
+  import TypeSwitch from './TypeSwitch.svelte';
 
   export let data: PageData;
   $: accounts = data.accounts;
@@ -20,7 +21,6 @@
     if (!formData.get('accountId')) {
       showErrorToast($translate('transactions.account_is_required'));
       e.preventDefault();
-
       return;
     }
     if (!formData.get('categoryId')) {
@@ -35,6 +35,7 @@
 
 <form bind:this={formElement} action="?/create" method="POST" on:submit={handleSubmit}>
   <div class="flex-col gap-1 p-1">
+    <TypeSwitch />
     <AccountSelect {accounts} fromUrl />
     <CategorySelect {categories} />
     <Input label={$translate('transactions.date')} name="date" type="date" value={now} required />

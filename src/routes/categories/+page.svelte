@@ -7,11 +7,13 @@
   import type { PageData } from './$types';
 
   export let data: PageData;
-  $: categories = data.categories;
+  $: incommings = data.categories.filter((c) => c.type === 'IN');
+  $: outgoings = data.categories.filter((c) => c.type === 'OUT');
 </script>
 
-<div class="grid p-1">
-  {#each categories as category (category.id)}
+<h2>{$translate('categories.incomings')}</h2>
+<div class="grid px-1 mb-1">
+  {#each incommings as category (category.id)}
     <GridCircleItem
       onClick={() => goto(`${routes.categories.path}/${category.id}`)}
       icon={category.icon || 'mdi:folder-outline'}
@@ -19,13 +21,34 @@
     />
   {/each}
   <GridCircleItem
-    onClick={() => goto(routes['categories.create'].path)}
+    onClick={() => goto(`${routes['categories.create'].path}?type=IN`)}
+    text={$translate('common.add')}
+    icon="mdi:plus"
+  />
+</div>
+
+<h2 class="mt-2">{$translate('categories.outgoings')}</h2>
+<div class="grid px-1">
+  {#each outgoings as category (category.id)}
+    <GridCircleItem
+      onClick={() => goto(`${routes.categories.path}/${category.id}`)}
+      icon={category.icon || 'mdi:folder-outline'}
+      text={category.name}
+    />
+  {/each}
+  <GridCircleItem
+    onClick={() => goto(`${routes['categories.create'].path}?type=OUT`)}
     text={$translate('common.add')}
     icon="mdi:plus"
   />
 </div>
 
 <style>
+  h2 {
+    text-align: center;
+    font-weight: normal;
+    font-size: 1.15rem;
+  }
   .grid {
     display: flex;
     flex-wrap: wrap;

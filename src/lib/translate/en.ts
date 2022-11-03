@@ -56,6 +56,8 @@ export const enDict: Dictionary = {
   'accounts.color': 'Color',
   // Categories
   'categories.title': 'Categories',
+  'categories.incomings': 'Incomings',
+  'categories.outgoings': 'Outgoings',
   'categories.create_category': 'Create category',
   'categories.create_category_success': 'Category was created',
   'categories.create_category_failure': 'Failed to create category',

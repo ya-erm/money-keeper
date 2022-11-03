@@ -25,9 +25,9 @@
       </a>
     {/if}
   </div>
-  <div class="navigation-title">
+  <h1 class="navigation-title my-0">
     {$titleText}
-  </div>
+  </h1>
   <div class="navigation-right-button">
     {#if $rightButton}
       <svelte:component this={$rightButton} />
@@ -62,6 +62,7 @@
     height: 60px;
   }
   .navigation-title {
+    font-weight: normal;
     text-align: center;
     font-size: 1.25rem;
   }

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { onDestroy, onMount } from 'svelte';
+  import type { TransactionWithCategory } from './interfaces';
 
   import { page } from '$app/stores';
   import { routes } from '$lib/routes';
@@ -32,6 +33,12 @@
 
   $: cardId = $page.url.hash.match(/\#account-card-(\d+)/)?.[1];
   $: account = accounts.find((x) => x.id.toString() === cardId);
+  $: groups = (account?.transactions ?? []).reduce((res, t) => {
+    const date = t.date.toISOString().substring(0, 10);
+    if (!res[date]) res[date] = [];
+    res[date].push(t);
+    return res;
+  }, {} as { [key: string]: TransactionWithCategory[] });
 
   onMount(() => {
     if (cardId) {
@@ -68,17 +75,20 @@
 </div>
 
 <div class="p-1">
-  <h3 style:font-weight="normal" style:margin-top="0">{$translate('transactions.title')}</h3>
+  <h3 style:font-weight="normal" class="mt-0">{$translate('transactions.title')}</h3>
   <a class="flex-col" href={`${routes['transactions.create'].path}?accountId=${cardId}`}>
     <Button>
       <Icon name="mdi:plus" />
       {$translate('transactions.new_transaction')}
     </Button>
   </a>
-  {#if account}
+  {#if !!account?.transactions?.length}
     <div class="mt-1 flex-col gap-1">
-      {#each account?.transactions ?? [] as transaction}
-        <TransactionListItem hideSource transaction={{ ...transaction, account }} />
+      {#each Object.entries(groups) as [date, transactions]}
+        <div>{date}</div>
+        {#each transactions as transaction}
+          <TransactionListItem hideSource transaction={{ ...transaction, account }} />
+        {/each}
       {/each}
     </div>
   {/if}

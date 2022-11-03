@@ -53,6 +53,8 @@ export type Messages =
   | 'accounts.color'
   // Categories
   | 'categories.title'
+  | 'categories.incomings'
+  | 'categories.outgoings'
   | 'categories.create_category'
   | 'categories.create_category_success'
   | 'categories.create_category_failure'

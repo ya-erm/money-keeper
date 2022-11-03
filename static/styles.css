@@ -145,32 +145,56 @@ a {
 }
 
 /* Margin */
+.mt-0, .my-0, .m-0 {
+  margin-top: 0;
+}
 .mt-0\.5, .my-0\.5, .m-0\.5 {
   margin-top: 0.5rem;
 }
 .mt-1, .my-1, .m-1 {
   margin-top: 1rem;
 }
+.mt-2, .my-2, .m-2 {
+  margin-top: 2rem;
+}
 
+.mb-0, .my-0, .m-0 {
+  margin-bottom: 0;
+}
 .mb-0\.5, .my-0\.5, .m-0\.5 {
   margin-bottom: 0.5rem;
 }
 .mb-1, .my-1, .m-1 {
   margin-bottom: 1rem;
 }
+.mb-2, .my-2, .m-2 {
+  margin-bottom: 2rem;
+}
 
+.ml-0, .mx-0, .m-0 {
+  margin-left: 0;
+}
 .ml-0\.5, .mx-0\.5, .m-0\.5 {
   margin-left: 0.5rem;
 }
 .ml-1, .mx-1, .m-1 {
   margin-left: 1rem;
 }
+.ml-2, .mx-2, .m-2 {
+  margin-left: 2rem;
+}
 
+.mr-0, .mx-0, .m-0 {
+  margin-right: 0;
+}
 .mr-0\.5, .mx-0\.5, .m-0\.5 {
   margin-right: 0.5rem;
 }
 .mr-1, .mx-1, .m-1 {
   margin-right: 1rem;
+}
+.mr-2, .mx-2, .m-2 {
+  margin-right: 2rem;
 }
 
 /* Cursor */

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import type { ActionResult } from '@sveltejs/kit';
 
   import { routes } from '$lib/routes';
@@ -11,6 +12,8 @@
 
   backLink.set(routes.categories.path);
 
+  const type = $page.url.searchParams.get('type');
+
   const onCreate = (result: ActionResult, next: (result: ActionResult) => void) => {
     if (result.type === 'success') {
       showSuccessToast($translate('categories.create_category_success'));
@@ -22,6 +25,7 @@
 </script>
 
 <FormContainer action={'?/create'} onResult={onCreate}>
+  <input name="type" value={type} class="hidden" required />
   <Input label={$translate('categories.name')} name="name" required />
   <Input label={$translate('categories.icon')} name="icon" optional />
   <Button text={$translate('common.create')} type="submit" />

@@ -11,15 +11,17 @@ import {
 
 import type { Action, Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ url, locals }) => {
   const { groupId } = checkUserAndGroup(locals);
+
+  const type = url.searchParams.get('type') ?? 'OUT';
 
   const accounts = await db.account.findMany({
     where: { ownerId: groupId },
   });
 
   const categories = await db.category.findMany({
-    where: { ownerId: groupId },
+    where: { ownerId: groupId, type },
   });
 
   return {

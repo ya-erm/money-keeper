@@ -6,9 +6,7 @@
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
 
-  export let account: Account;
-
-  const value = 0;
+  export let account: Account & { sum: number };
 </script>
 
 <div class="w-full h-full p-1 flex-col items-center justify-between">
@@ -21,7 +19,7 @@
       <Icon name="mdi:pencil" padding={0.5} />
     </Button>
   </div>
-  <div class="money-value flex">{value} {account.currency}</div>
+  <div class="money-value flex">{account.sum} {account.currency}</div>
   <div class="flex footer" />
 </div>
 

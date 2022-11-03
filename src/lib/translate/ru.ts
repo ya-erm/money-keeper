@@ -56,6 +56,8 @@ export const ruDict: Dictionary = {
   'accounts.color': 'Цвет',
   // Categories
   'categories.title': 'Категории',
+  'categories.incomings': 'Доходы',
+  'categories.outgoings': 'Расходы',
   'categories.create_category': 'Создать категорию',
   'categories.create_category_success': 'Категория создана',
   'categories.create_category_failure': 'Не удалось создать категорию',

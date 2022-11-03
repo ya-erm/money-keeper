@@ -9,6 +9,7 @@ import type { Action, Actions } from './$types';
 const create: Action = async ({ request, locals }) => {
   try {
     const data = await request.formData();
+    const type = getStringParameterOrThrow(data, 'type');
     const name = getStringParameterOrThrow(data, 'name');
     const icon = getStringOptionalParameterOrThrow(data, 'icon');
 
@@ -18,7 +19,7 @@ const create: Action = async ({ request, locals }) => {
       data: {
         name,
         icon,
-        type: 'OUT',
+        type,
         owner: { connect: { id: groupId } },
       },
       select: {

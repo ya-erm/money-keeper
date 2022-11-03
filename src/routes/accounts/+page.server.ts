@@ -10,6 +10,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     where: { ownerId: groupId },
     include: {
       transactions: {
+        orderBy: { date: 'desc' },
         include: {
           category: true,
         },
@@ -18,6 +19,9 @@ export const load: PageServerLoad = async ({ locals }) => {
   });
 
   return {
-    accounts,
+    accounts: accounts.map((account) => ({
+      ...account,
+      sum: account.transactions.reduce((acc, t) => acc + t.amount * (t.category.type === 'IN' ? 1 : -1), 0),
+    })),
   };
 };
