@@ -8,7 +8,7 @@
 </script>
 
 <button on:click={onClick} class:selected class="grid-item flex-col flex-center gap-0.5 cursor-pointer" type="button">
-  <div class="circle">
+  <div class="circle mx-0.5">
     <Icon name={icon} size={2} />
   </div>
   <span class="text" title={text}>
@@ -18,6 +18,7 @@
 
 <style>
   .grid-item {
+    padding: 0;
     border: none;
     outline: none;
     background: none;
@@ -31,7 +32,7 @@
   }
   .grid-item .text {
     font-size: 0.8rem;
-    max-width: 4rem;
+    max-width: 5rem;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
