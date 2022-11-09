@@ -97,6 +97,21 @@ export const ruDict: Dictionary = {
   'transactions.comment': 'Комментарий',
   'transactions.edit_transaction': 'Редактировать операцию',
   'transactions.delete_transaction': 'Удалить операцию',
+  'transactions.import': 'Импорт',
+  'transactions.import.title': 'Импорт операций',
+  'transactions.import.invalid_expression': 'Введите поисковый запрос, чтобы выбрать операции одной категории',
+  'transactions.import.no_category': 'Без категории',
+  'transactions.import.set_category': 'Указать категорию',
+  'transactions.import.select_category_title': 'Выберите категорию',
+  'transactions.import.select_category_multi_title':
+    'Выберите категорию для {count, plural, one {# операции} other {# операций}}',
+  'transactions.import.apply': 'Применить категорию',
+  'transactions.import.category_applied':
+    'Категория "{category}" применена для {count, plural, one {# операции} other {# операций}}',
+  'transactions.import.select_category_for_all_operations': 'Выберите категории для всех операций',
+  'transactions.import.finish': 'Завершить импорт',
+  'transactions.import.finished':
+    '{count, plural, one {Импортирована # операция} few {Импортировано # операций} other {Импортировано # операций}}',
   // Settings
   'settings.title': 'Настройки',
   'settings.language': 'Язык',

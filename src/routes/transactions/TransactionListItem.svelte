@@ -1,17 +1,28 @@
 <script lang="ts">
-  import type { Account, Category, Transaction } from '@prisma/client';
-
+  import type { TransactionWithAccountAndCategory } from '$lib/interfaces';
   import { routes } from '$lib/routes';
   import Icon from '$lib/ui/Icon.svelte';
 
-  export let transaction: Transaction & { account: Account; category: Category };
+  export let transaction: TransactionWithAccountAndCategory;
   export let hideSource: boolean = false;
+  export let onClick: ((transaction: TransactionWithAccountAndCategory) => void) | null = null;
 
   const incoming = transaction.category.type === 'IN';
   const outgoing = transaction.category.type === 'OUT';
+
+  const handleClick = (e: MouseEvent) => {
+    if (onClick) {
+      e.preventDefault();
+      onClick(transaction);
+    }
+  };
 </script>
 
-<a href={`${routes.transactions.path}/${transaction.id}`}>
+<a
+  href={transaction.id ? `${routes.transactions.path}/${transaction.id}` : '#'}
+  on:click={handleClick}
+  class="flex-grow"
+>
   <div class="flex gap-0.5 items-center justify-between">
     <div class="icon flex-center">
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />

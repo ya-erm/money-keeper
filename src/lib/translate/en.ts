@@ -97,6 +97,21 @@ export const enDict: Dictionary = {
   'transactions.comment': 'Comment',
   'transactions.edit_transaction': 'Edit operation',
   'transactions.delete_transaction': 'Delete operation',
+  'transactions.import': 'Import',
+  'transactions.import.title': 'Import operations',
+  'transactions.import.invalid_expression': 'Enter search request to filter operations of one category',
+  'transactions.import.no_category': 'No category',
+  'transactions.import.set_category': 'Set category',
+  'transactions.import.select_category_title': 'Select category',
+  'transactions.import.select_category_multi_title':
+    'Select category for {count, plural, =1 {# operation} other {# operations}}',
+  'transactions.import.apply': 'Apply category',
+  'transactions.import.category_applied':
+    'Category "{category}" applied for {count, plural, =1 {# operation} other {# operations}}',
+  'transactions.import.select_category_for_all_operations': 'Select categories for all operations',
+  'transactions.import.finish': 'Finish import',
+  'transactions.import.finished': '{count, plural, one {# operation was imported} other {# operations were imported}}',
+
   // Settings
   'settings.title': 'Settings',
   'settings.language': 'Language',
