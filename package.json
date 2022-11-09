@@ -14,7 +14,8 @@
     "lint": "prettier --plugin-search-dir . --check . && eslint .",
     "format": "prettier --plugin-search-dir . --write .",
     "generate:icons": "node ./pack-icons.js && prettier --write ./src/lib/icons.ts",
-    "generate": "npm run generate:icons"
+    "generate:prisma": "npx prisma generate",
+    "generate": "npm run generate:icons && npm run generate:prisma"
   },
   "devDependencies": {
     "@iconify/json": "^2.1.130",
