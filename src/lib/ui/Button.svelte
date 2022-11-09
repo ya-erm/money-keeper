@@ -38,7 +38,6 @@
     padding: 0.75rem;
     border-radius: 0.75rem;
     display: inline-flex;
-    flex: 1;
     gap: 0.5rem;
     align-items: center;
     justify-content: center;

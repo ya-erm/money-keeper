@@ -21,9 +21,16 @@
 <Modal header={$translate('accounts.delete_account_confirm')} bind:opened>
   <FormContainer width={20} action="?/delete" onResult={onDelete}>
     <span>{$translate('accounts.delete_account_confirm_description')}</span>
-    <div class="flex gap-1">
+    <div class="actions gap-1">
       <Button text={$translate('accounts.delete_account')} color="danger" type="submit" />
       <Button text={$translate('common.cancel')} on:click={() => (opened = false)} color="white" bordered />
     </div>
   </FormContainer>
 </Modal>
+
+<style>
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+</style>

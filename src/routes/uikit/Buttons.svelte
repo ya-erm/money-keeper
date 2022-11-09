@@ -34,7 +34,7 @@
     <Button appearance="link" color="danger" text="Danger" bordered={$bordered} />
     <Button appearance="link" color="white" text="White" bordered={$bordered} />
   </div>
-  <div>
+  <div class="flex items-center gap-0.5">
     Icons:
     <Button text="Primary" bordered={$bordered}>
       <Icon name="mdi:pencil" />

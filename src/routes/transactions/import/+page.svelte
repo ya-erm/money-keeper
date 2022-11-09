@@ -192,9 +192,7 @@
         {$translate('transactions.import.no_category')}: {items.filter((x) => !x.categoryId).length}
       </Button>
     </div>
-    <div class="flex">
-      <Button on:click={handleFinishClick} text={$translate('transactions.import.finish')} />
-    </div>
+    <Button on:click={handleFinishClick} text={$translate('transactions.import.finish')} />
   </div>
   <SelectCategoryModal
     type={categoriesType}
