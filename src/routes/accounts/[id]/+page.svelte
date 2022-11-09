@@ -10,6 +10,7 @@
   import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
 
   import type { PageData } from './$types';
+  import DeleteAccountModal from './DeleteAccountModal.svelte';
 
   export let data: PageData;
 
@@ -27,14 +28,7 @@
     next(result);
   };
 
-  const onDelete = (result: ActionResult, next: (result: ActionResult) => void) => {
-    if (result.type === 'redirect') {
-      showSuccessToast($translate('accounts.delete_account_success'));
-    } else if (result.type === 'invalid') {
-      showErrorToast($translate('accounts.delete_account_failure'));
-    }
-    next(result);
-  };
+  let deleteAccountModalOpened = false;
 </script>
 
 {#if !!account}
@@ -44,8 +38,12 @@
     <Input value={account.icon} label={$translate('accounts.icon')} name="icon" optional />
     <Input value={account.color} label={$translate('accounts.color')} placeholder="#FFFFFF" name="color" optional />
     <Button text={$translate('common.save')} type="submit" />
-    <FormContainer action="?/delete" onResult={onDelete}>
-      <Button text={$translate('accounts.delete_account')} appearance="transparent" color="danger" type="submit" />
-    </FormContainer>
+    <Button
+      on:click={() => (deleteAccountModalOpened = true)}
+      text={$translate('accounts.delete_account')}
+      appearance="transparent"
+      color="danger"
+    />
   </FormContainer>
+  <DeleteAccountModal bind:opened={deleteAccountModalOpened} />
 {/if}

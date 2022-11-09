@@ -2,12 +2,7 @@ import { error, redirect } from '@sveltejs/kit';
 
 import { routes } from '$lib/routes';
 import { db, isServerError, serverError } from '$lib/server';
-import {
-  checkUserAndGroup,
-  getNumberParameterOrThrow,
-  getStringOptionalParameterOrThrow,
-  getStringParameterOrThrow,
-} from '$lib/utils';
+import { checkUserAndGroup, getStringOptionalFormParameter, getStringFormParameter } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad, RouteParams } from './$types';
 
@@ -64,8 +59,8 @@ const updateCategory: Action = async ({ params, request, locals }) => {
     const { categoryId } = await validate({ params, locals });
 
     const data = await request.formData();
-    const name = getStringParameterOrThrow(data, 'name');
-    const icon = getStringOptionalParameterOrThrow(data, 'icon');
+    const name = getStringFormParameter(data, 'name');
+    const icon = getStringOptionalFormParameter(data, 'icon');
 
     await db.category.update({
       where: { id: categoryId },

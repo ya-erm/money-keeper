@@ -18,6 +18,9 @@ export type Messages =
   | 'common.add'
   | 'common.save_changes_failure'
   | 'common.save_changes_success'
+  | 'common.search'
+  | 'common.clear'
+  | 'common.cancel'
   // Auth
   | 'auth.login.title'
   | 'auth.login'
@@ -45,6 +48,8 @@ export type Messages =
   | 'accounts.create_account_success'
   | 'accounts.edit_account'
   | 'accounts.delete_account'
+  | 'accounts.delete_account_confirm'
+  | 'accounts.delete_account_confirm_description'
   | 'accounts.delete_account_failure'
   | 'accounts.delete_account_success'
   | 'accounts.name'

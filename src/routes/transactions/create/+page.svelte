@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import dayjs from 'dayjs';
 
+  import type { CategoryType } from '$lib/interfaces';
+  import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Input from '$lib/ui/Input.svelte';
@@ -14,6 +17,9 @@
   export let data: PageData;
   $: accounts = data.accounts;
   $: categories = data.categories;
+
+  $: type = ($page.url.searchParams.get('type') as CategoryType) ?? 'OUT';
+  $: accountId = parseInt($page.url.searchParams.get('accountId') ?? '') || null;
 
   let formElement: HTMLFormElement;
   const handleSubmit = (e: SubmitEvent) => {
@@ -37,10 +43,15 @@
   <div class="flex-col gap-1 p-1">
     <TypeSwitch />
     <AccountSelect {accounts} fromUrl />
-    <CategorySelect {categories} />
+    <CategorySelect {categories} {type} />
     <Input label={$translate('transactions.date')} name="date" type="date" value={now} required />
     <Input label={$translate('transactions.amount')} name="amount" type="number" required />
     <Input label={$translate('transactions.comment')} name="comment" optional />
     <Button text={$translate('common.create')} type="submit" />
   </div>
 </form>
+<div class="flex-center mb-1">
+  <a href={routes['transactions.import'].path + (accountId ? `?accountId=${accountId}` : '')}>
+    {$translate('transactions.import')}
+  </a>
+</div>

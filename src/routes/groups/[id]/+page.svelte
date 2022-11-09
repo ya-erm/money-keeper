@@ -8,7 +8,6 @@
   import FormContainer from '$lib/ui/FormContainer.svelte';
   import { backLink, title } from '$lib/ui/header';
   import Icon from '$lib/ui/Icon.svelte';
-  import createBooleanStore from '$lib/utils/createBooleanStore';
 
   import type { PageData } from './$types';
   import GroupNameModal from './EditGroupNameModal.svelte';
@@ -21,7 +20,7 @@
 
   const group = writable(data.group);
 
-  const [modalOpened, openModal, closeModal] = createBooleanStore();
+  let groupNameModalOpened = false;
 </script>
 
 {#if !!$group}
@@ -30,12 +29,12 @@
       <div>{$translate('groups.name')}:</div>
       <div class="editable-value">
         <span>{$group.name}</span>
-        <Button on:click={openModal} appearance="transparent" color="white">
+        <Button on:click={() => (groupNameModalOpened = true)} appearance="transparent" color="white">
           <Icon name="mdi:pencil" />
         </Button>
       </div>
     </div>
-    <GroupNameModal {group} bind:opened={$modalOpened} close={closeModal} />
+    <GroupNameModal {group} bind:opened={groupNameModalOpened} />
     <GroupUsersList {group} />
     <form action="?/deleteGroup" method="POST" use:enhance class="flex-col items-center">
       <Button text={$translate('groups.delete_group')} type="submit" appearance="transparent" color="danger" />

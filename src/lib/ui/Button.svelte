@@ -4,6 +4,7 @@
   export let text: string | null = null;
   export let appearance: 'solid' | 'transparent' | 'link' = 'solid';
   export let color: 'primary' | 'secondary' | 'white' | 'success' | 'danger' = 'primary';
+  export let underlined: boolean = appearance == 'link';
   export let type: 'button' | 'submit' = 'button';
   export let bordered: boolean = false;
 
@@ -22,6 +23,7 @@
   class:transparent={appearance === 'transparent' || appearance === 'link'}
   class:border={bordered === true && appearance !== 'link'}
   class:link={appearance === 'link'}
+  class:underlined
   {type}
 >
   <slot />
@@ -36,6 +38,7 @@
     padding: 0.75rem;
     border-radius: 0.75rem;
     display: inline-flex;
+    flex: 1;
     gap: 0.5rem;
     align-items: center;
     justify-content: center;
@@ -43,6 +46,7 @@
     outline: none;
     border: none;
   }
+  button:focus,
   button:hover {
     opacity: 0.9;
   }
@@ -78,6 +82,7 @@
   button.transparent {
     background: none;
   }
+  button.transparent:focus,
   button.transparent:hover {
     opacity: 0.7;
   }
@@ -114,8 +119,10 @@
   }
 
   /** Link */
-  button.link {
+  button.underlined {
     text-decoration: underline;
+  }
+  button.link {
     padding: 0;
   }
 </style>

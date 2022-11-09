@@ -1,9 +1,9 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { onDestroy, onMount } from 'svelte';
-  import type { TransactionWithCategory } from './interfaces';
-
   import { page } from '$app/stores';
+  import { onDestroy, onMount } from 'svelte';
+
+  import type { TransactionWithCategory } from '$lib/interfaces';
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
@@ -84,9 +84,9 @@
   </a>
   {#if !!account?.transactions?.length}
     <div class="mt-1 flex-col gap-1">
-      {#each Object.entries(groups) as [date, transactions]}
+      {#each Object.entries(groups) as [date, transactions] (date)}
         <div>{date}</div>
-        {#each transactions as transaction}
+        {#each transactions as transaction (transaction.id)}
           <TransactionListItem hideSource transaction={{ ...transaction, account }} />
         {/each}
       {/each}

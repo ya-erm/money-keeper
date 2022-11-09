@@ -1,8 +1,17 @@
-import { isApiError, type ApiError, type ApiErrorCode } from '$lib/api';
-import { invalid } from '@sveltejs/kit';
+import { isApiErrorData, type ApiError, type ApiErrorData, type ApiErrorCode } from '$lib/api';
+import { error, invalid } from '@sveltejs/kit';
+
+export const serverApiError = (status: number, code: ApiErrorCode, message?: string) => {
+  const e: ApiError = {
+    status,
+    code,
+    message: message ?? code,
+  };
+  return error(status, e);
+};
 
 export const serverError = (status: number, code: ApiErrorCode, message?: string) => {
-  const data: ApiError = {
+  const data: ApiErrorData = {
     error: {
       status,
       code,
@@ -19,8 +28,8 @@ function hasStatus(e: unknown): e is { status: number } {
 function hasData(e: unknown): e is { data: unknown } {
   return !!e && typeof e === 'object' && 'data' in e;
 }
-export function isServerError(e: unknown): e is { status: number; data: ApiError } {
-  return hasStatus(e) && hasData(e) && isApiError(e.data);
+export function isServerError(e: unknown): e is { status: number; data: ApiErrorData } {
+  return hasStatus(e) && hasData(e) && isApiErrorData(e.data);
 }
 
 export function isRedirect(e: unknown): e is { status: 302; location: string } {

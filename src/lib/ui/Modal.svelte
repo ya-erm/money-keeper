@@ -6,7 +6,10 @@
   export let header: string | null = null;
 
   const dispatch = createEventDispatcher();
-  const close = () => dispatch('close');
+  const close = () => {
+    opened = false;
+    dispatch('close');
+  };
 
   let modal: HTMLDivElement;
 
@@ -20,21 +23,30 @@
 <svelte:window on:keydown={handleKeydown} />
 
 {#if opened}
-  <div class="modal-background" on:click={close} in:fade={{ duration: 300 }} out:fade={{ duration: 300 }} aria-hidden />
   <div
-    class="modal"
-    role="dialog"
-    aria-modal="true"
-    bind:this={modal}
-    in:fade={{ duration: 100 }}
-    out:fade={{ duration: 100 }}
+    class="modal-background flex-center"
+    in:fade={{ duration: 300 }}
+    out:fade={{ duration: 300 }}
+    on:click={close}
+    aria-hidden
   >
-    {#if $$slots.header}
-      <slot name="header" />
-    {:else if !!header}
-      <div class="header">{header}</div>
-    {/if}
-    <slot />
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      bind:this={modal}
+      on:click|stopPropagation
+      in:fade={{ duration: 100 }}
+      out:fade={{ duration: 100 }}
+      aria-hidden
+    >
+      {#if $$slots.header}
+        <slot name="header" />
+      {:else if !!header}
+        <div class="header">{header}</div>
+      {/if}
+      <slot />
+    </div>
   </div>
 {/if}
 
@@ -52,12 +64,8 @@
     background: rgba(0, 0, 0, 0.7);
   }
   .modal {
-    left: 50%;
-    top: 50%;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    max-width: calc(100vw - 4em);
-    max-height: calc(100vh - 4em);
+    max-width: calc(100vw - 4rem);
+    max-height: calc(100vh - 4rem);
     border-radius: 0.75em;
     background: var(--header-background-color);
     border: 1px solid var(--border-color);

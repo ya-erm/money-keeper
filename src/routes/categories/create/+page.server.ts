@@ -2,16 +2,16 @@ import { redirect } from '@sveltejs/kit';
 
 import { routes } from '$lib/routes';
 import { db, isServerError } from '$lib/server';
-import { checkUserAndGroup, getStringOptionalParameterOrThrow, getStringParameterOrThrow } from '$lib/utils';
+import { checkUserAndGroup, getStringOptionalFormParameter, getStringFormParameter } from '$lib/utils';
 
 import type { Action, Actions } from './$types';
 
 const create: Action = async ({ request, locals }) => {
   try {
     const data = await request.formData();
-    const type = getStringParameterOrThrow(data, 'type');
-    const name = getStringParameterOrThrow(data, 'name');
-    const icon = getStringOptionalParameterOrThrow(data, 'icon');
+    const type = getStringFormParameter(data, 'type');
+    const name = getStringFormParameter(data, 'name');
+    const icon = getStringOptionalFormParameter(data, 'icon');
 
     const { groupId } = checkUserAndGroup(locals);
 

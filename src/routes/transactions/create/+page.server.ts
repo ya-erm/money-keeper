@@ -4,9 +4,9 @@ import { routes } from '$lib/routes';
 import { db, isServerError, serverError } from '$lib/server';
 import {
   checkUserAndGroup,
-  getNumberParameterOrThrow,
-  getStringOptionalParameterOrThrow,
-  getStringParameterOrThrow,
+  getNumberFormParameter,
+  getStringOptionalFormParameter,
+  getStringFormParameter,
 } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad } from './$types';
@@ -33,11 +33,11 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 const create: Action = async ({ request, locals }) => {
   try {
     const data = await request.formData();
-    const accountId = getNumberParameterOrThrow(data, 'accountId');
-    const categoryId = getNumberParameterOrThrow(data, 'categoryId');
-    const amount = getNumberParameterOrThrow(data, 'amount');
-    const date = getStringParameterOrThrow(data, 'date');
-    const comment = getStringOptionalParameterOrThrow(data, 'comment');
+    const accountId = getNumberFormParameter(data, 'accountId');
+    const categoryId = getNumberFormParameter(data, 'categoryId');
+    const amount = getNumberFormParameter(data, 'amount');
+    const date = getStringFormParameter(data, 'date');
+    const comment = getStringOptionalFormParameter(data, 'comment');
 
     const { groupId } = checkUserAndGroup(locals);
 

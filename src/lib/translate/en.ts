@@ -21,6 +21,9 @@ export const enDict: Dictionary = {
   'common.add': 'Add',
   'common.save_changes_failure': 'Failed to save changes',
   'common.save_changes_success': 'Changes were saved',
+  'common.search': 'Search',
+  'common.clear': 'Clear',
+  'common.cancel': 'Cancel',
   // Auth
   'auth.login.title': 'Login',
   'auth.login': 'Login',
@@ -48,6 +51,9 @@ export const enDict: Dictionary = {
   'accounts.create_account_success': 'Account was created',
   'accounts.edit_account': 'Update account',
   'accounts.delete_account': 'Delete account',
+  'accounts.delete_account_confirm': 'Are you sure want to delete account?',
+  'accounts.delete_account_confirm_description':
+    "All account's operations also will be deleted. This action can't be undone.",
   'accounts.delete_account_failure': 'Failed to delete account',
   'accounts.delete_account_success': 'Account was deleted',
   'accounts.name': 'Name',

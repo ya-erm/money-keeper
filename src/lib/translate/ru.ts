@@ -21,6 +21,9 @@ export const ruDict: Dictionary = {
   'common.add': 'Добавить',
   'common.save_changes_failure': 'Не удалось сохранить изменения',
   'common.save_changes_success': 'Изменения сохранены',
+  'common.search': 'Поиск',
+  'common.clear': 'Очистить',
+  'common.cancel': 'Отмена',
   // Auth
   'auth.login.title': 'Вход',
   'auth.login': 'Логин',
@@ -48,6 +51,9 @@ export const ruDict: Dictionary = {
   'accounts.create_account_success': 'Счёт создан',
   'accounts.edit_account': 'Редактировать счёт',
   'accounts.delete_account': 'Удалить счёт',
+  'accounts.delete_account_confirm': 'Вы действительно хотите удалить счёт?',
+  'accounts.delete_account_confirm_description':
+    'Все связанные со счётом операции будут также удалены. Это действие будет невозможно отменить.',
   'accounts.delete_account_failure': 'Не удалось удалить счёт',
   'accounts.delete_account_success': 'Счёт удален',
   'accounts.name': 'Название',

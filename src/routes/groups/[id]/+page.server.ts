@@ -1,12 +1,12 @@
 import type { Group, User, UserToGroup } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 
+import type { GroupWithUsers } from '$lib/interfaces';
 import { routes } from '$lib/routes';
 import { db, isServerError, serverError } from '$lib/server';
-import { checkUser, getStringParameterOrThrow } from '$lib/utils';
+import { checkUser, getStringFormParameter } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad, RouteParams } from './$types';
-import type { GroupWithUsers } from './interface';
 
 type GroupDbo = Pick<Group, 'id' | 'name'> & { users: (UserToGroup & { user: Pick<User, 'id' | 'name' | 'login'> })[] };
 
@@ -85,7 +85,7 @@ const updateGroup: Action = async ({ params, request, locals }) => {
     const { groupId } = await validate(params, locals);
 
     const data = await request.formData();
-    const name = getStringParameterOrThrow(data, 'name');
+    const name = getStringFormParameter(data, 'name');
 
     const group = await db.group.update({
       where: { id: groupId },
@@ -120,7 +120,7 @@ const addUser: Action = async ({ params, request, locals }) => {
     const { groupId } = await validate(params, locals);
 
     const data = await request.formData();
-    const login = getStringParameterOrThrow(data, 'login');
+    const login = getStringFormParameter(data, 'login');
 
     const user = await db.user.findUnique({ where: { login } });
 

@@ -1,2 +1,2 @@
 export { db } from './database';
-export { serverError, isRedirect, isServerError } from './serverError';
+export { serverError, serverApiError, isRedirect, isServerError } from './serverError';

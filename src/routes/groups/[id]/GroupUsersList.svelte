@@ -1,15 +1,15 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
+  import type { GroupWithUsers } from '$lib/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
-  import createBooleanStore from '$lib/utils/createBooleanStore';
 
   import AddUserToGroupModal from './AddUserToGroupModal.svelte';
-  import type { GroupWithUsers } from './interface';
 
   export let group: Writable<GroupWithUsers>;
-  const [opened, openModal, closeModal] = createBooleanStore();
+
+  let addUserModalOpened = false;
 </script>
 
 <div>{$translate('groups.users')}:</div>
@@ -20,8 +20,8 @@
     </Button>
   {/each}
 </ul>
-<Button text={$translate('groups.add_user')} on:click={openModal} />
-<AddUserToGroupModal {group} opened={$opened} {closeModal} />
+<Button text={$translate('groups.add_user')} on:click={() => (addUserModalOpened = true)} />
+<AddUserToGroupModal {group} bind:opened={addUserModalOpened} />
 
 <style>
   .users-list {

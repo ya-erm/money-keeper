@@ -4,9 +4,9 @@ import { routes } from '$lib/routes';
 import { db, isServerError, serverError } from '$lib/server';
 import {
   checkUserAndGroup,
-  getNumberParameterOrThrow,
-  getStringOptionalParameterOrThrow,
-  getStringParameterOrThrow,
+  getNumberFormParameter,
+  getStringOptionalFormParameter,
+  getStringFormParameter,
 } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad, RouteParams } from './$types';
@@ -72,11 +72,11 @@ const updateTransaction: Action = async ({ params, request, locals }) => {
     const { groupId, transactionId } = await validate({ params, locals });
 
     const data = await request.formData();
-    const accountId = getNumberParameterOrThrow(data, 'accountId');
-    const categoryId = getNumberParameterOrThrow(data, 'categoryId');
-    const amount = getNumberParameterOrThrow(data, 'amount');
-    const date = getStringParameterOrThrow(data, 'date');
-    const comment = getStringOptionalParameterOrThrow(data, 'comment');
+    const accountId = getNumberFormParameter(data, 'accountId');
+    const categoryId = getNumberFormParameter(data, 'categoryId');
+    const amount = getNumberFormParameter(data, 'amount');
+    const date = getStringFormParameter(data, 'date');
+    const comment = getStringOptionalFormParameter(data, 'comment');
 
     await db.transaction.update({
       where: { id: transactionId },

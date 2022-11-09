@@ -19,7 +19,7 @@
       <Icon name="mdi:pencil" padding={0.5} />
     </Button>
   </div>
-  <div class="money-value flex">{account.sum} {account.currency}</div>
+  <div class="money-value flex">{account.sum.toFixed(2)} {account.currency}</div>
   <div class="flex footer" />
 </div>
 

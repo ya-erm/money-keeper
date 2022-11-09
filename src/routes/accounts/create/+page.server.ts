@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit';
 
 import { routes } from '$lib/routes';
 import { db, isServerError } from '$lib/server';
-import { checkUser, checkUserAndGroup, getStringOptionalParameterOrThrow, getStringParameterOrThrow } from '$lib/utils';
+import { checkUser, checkUserAndGroup, getStringOptionalFormParameter, getStringFormParameter } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad } from './$types';
 
@@ -13,10 +13,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 const create: Action = async ({ request, locals }) => {
   try {
     const data = await request.formData();
-    const name = getStringParameterOrThrow(data, 'name');
-    const currency = getStringParameterOrThrow(data, 'currency');
-    const icon = getStringOptionalParameterOrThrow(data, 'icon');
-    const color = getStringOptionalParameterOrThrow(data, 'color');
+    const name = getStringFormParameter(data, 'name');
+    const currency = getStringFormParameter(data, 'currency');
+    const icon = getStringOptionalFormParameter(data, 'icon');
+    const color = getStringOptionalFormParameter(data, 'color');
 
     const { groupId } = checkUserAndGroup(locals);
 
