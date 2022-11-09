@@ -7,7 +7,7 @@ import { routes } from '$lib/routes';
 
 export const load: PageServerLoad = async ({ locals }) => {
   // redirect user if logged in
-  if (locals.user) {
+  if (locals.userId) {
     throw redirect(302, routes.profile.path);
   }
 };

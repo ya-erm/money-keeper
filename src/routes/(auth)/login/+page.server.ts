@@ -8,7 +8,7 @@ import type { Action, Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
   // redirect user if logged in
-  if (locals.user) {
+  if (locals.userId) {
     throw redirect(302, routes.profile.path);
   }
 };

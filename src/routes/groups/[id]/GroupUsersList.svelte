@@ -14,7 +14,7 @@
 
 <div>{$translate('groups.users')}:</div>
 <ul class="users-list">
-  {#each $group?.users ?? [] as user}
+  {#each $group?.users ?? [] as user (user.id)}
     <Button color="white" bordered>
       {user.name} ({user.login})
     </Button>

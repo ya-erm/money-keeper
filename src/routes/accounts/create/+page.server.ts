@@ -2,12 +2,12 @@ import { redirect } from '@sveltejs/kit';
 
 import { routes } from '$lib/routes';
 import { db, isServerError } from '$lib/server';
-import { checkUser, checkUserAndGroup, getStringOptionalFormParameter, getStringFormParameter } from '$lib/utils';
+import { checkUserId, checkUserAndGroup, getStringOptionalFormParameter, getStringFormParameter } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  checkUser(locals);
+  checkUserId(locals);
 };
 
 const create: Action = async ({ request, locals }) => {

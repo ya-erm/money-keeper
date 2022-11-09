@@ -1,22 +1,23 @@
+import { Prisma } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 
 import { routes } from '$lib/routes';
 import { db, isServerError, serverError } from '$lib/server';
-import { checkUserAndGroup, getStringOptionalFormParameter, getStringFormParameter } from '$lib/utils';
+import { checkUserAndGroup, getStringFormParameter, getStringOptionalFormParameter } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad, RouteParams } from './$types';
 
-const selection = {
+const selection = Prisma.validator<Prisma.AccountSelect>()({
   id: true,
   name: true,
   currency: true,
   color: true,
   icon: true,
   ownerId: true,
-};
+});
 
 const validate = async ({ params, locals }: { params: RouteParams; locals: App.Locals }) => {
-  const { user, groupId } = checkUserAndGroup(locals);
+  const { userId, groupId } = checkUserAndGroup(locals);
 
   const accountId = parseInt(params.id);
 
@@ -38,7 +39,7 @@ const validate = async ({ params, locals }: { params: RouteParams; locals: App.L
   }
 
   return {
-    user,
+    userId,
     groupId,
     accountId,
     account,

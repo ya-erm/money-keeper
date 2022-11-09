@@ -1,16 +1,17 @@
 import type { Group, User, UserToGroup } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 
 import type { GroupWithUsers } from '$lib/interfaces';
 import { routes } from '$lib/routes';
 import { db, isServerError, serverError } from '$lib/server';
-import { checkUser, getStringFormParameter } from '$lib/utils';
+import { checkUserId, getStringFormParameter } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad, RouteParams } from './$types';
 
 type GroupDbo = Pick<Group, 'id' | 'name'> & { users: (UserToGroup & { user: Pick<User, 'id' | 'name' | 'login'> })[] };
 
-const selection = {
+const selection = Prisma.validator<Prisma.GroupSelect>()({
   id: true,
   name: true,
   users: {
@@ -24,7 +25,7 @@ const selection = {
       },
     },
   },
-};
+});
 
 const validate = async (params: RouteParams, locals: App.Locals) => {
   const groupId = parseInt(params.id);
@@ -42,10 +43,10 @@ const validate = async (params: RouteParams, locals: App.Locals) => {
     throw serverError(404, 'NOT_FOUND');
   }
 
-  const user = checkUser(locals);
+  const userId = checkUserId(locals);
 
   const userInGroup = await db.userToGroup.findUnique({
-    where: { userId_groupId: { userId: user.id, groupId } },
+    where: { userId_groupId: { userId, groupId } },
   });
 
   if (!userInGroup) {
@@ -53,7 +54,7 @@ const validate = async (params: RouteParams, locals: App.Locals) => {
   }
 
   return {
-    user,
+    userId,
     groupId,
   };
 };

@@ -4,29 +4,26 @@ import { routes } from '$lib/routes';
 import { db, serverError } from '$lib/server';
 
 import type { Action, Actions, PageServerLoad } from './$types';
+import { checkUserId } from '$lib/utils';
 
-export const load: PageServerLoad = async (e) => {
-  if (!e.locals.user) {
-    throw redirect(302, routes.login.path);
-  }
+export const load: PageServerLoad = async ({ locals }) => {
+  checkUserId(locals);
 };
 
 const create: Action = async ({ request, locals }) => {
   const data = await request.formData();
   const name = data.get('name');
 
-  if (!locals.user) {
-    throw redirect(302, routes.login.path);
-  }
-
   if (typeof name !== 'string' || !name) {
     return serverError(400, 'BAD_REQUEST', 'Name is required');
   }
 
+  const userId = checkUserId(locals);
+
   await db.userToGroup.create({
     data: {
       user: {
-        connect: { id: locals.user.id },
+        connect: { id: userId },
       },
       group: {
         create: {

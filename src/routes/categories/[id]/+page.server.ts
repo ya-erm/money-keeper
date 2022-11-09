@@ -2,20 +2,12 @@ import { error, redirect } from '@sveltejs/kit';
 
 import { routes } from '$lib/routes';
 import { db, isServerError, serverError } from '$lib/server';
-import { checkUserAndGroup, getStringOptionalFormParameter, getStringFormParameter } from '$lib/utils';
+import { checkUserAndGroup, getStringFormParameter, getStringOptionalFormParameter } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad, RouteParams } from './$types';
 
-const selection = {
-  id: true,
-  name: true,
-  icon: true,
-  order: true,
-  type: true,
-};
-
 const validate = async ({ params, locals }: { params: RouteParams; locals: App.Locals }) => {
-  const { user, groupId } = checkUserAndGroup(locals);
+  const { userId, groupId } = checkUserAndGroup(locals);
 
   const categoryId = parseInt(params.id);
 
@@ -36,7 +28,7 @@ const validate = async ({ params, locals }: { params: RouteParams; locals: App.L
   }
 
   return {
-    user,
+    userId,
     groupId,
     categoryId,
     category,
@@ -68,7 +60,6 @@ const updateCategory: Action = async ({ params, request, locals }) => {
         name,
         icon,
       },
-      select: selection,
     });
 
     throw redirect(302, routes.categories.path);

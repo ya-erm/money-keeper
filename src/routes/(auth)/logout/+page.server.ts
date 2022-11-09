@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
   }
 
   // clear locals
-  locals.user = null;
+  locals.userId = null;
   locals.groupId = null;
 
   // eat the cookies

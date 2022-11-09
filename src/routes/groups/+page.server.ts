@@ -4,13 +4,13 @@ import { routes } from '$lib/routes';
 import { db, serverError } from '$lib/server';
 
 import type { Action, Actions, PageServerLoad } from './$types';
-import { checkUser } from '$lib/utils';
+import { checkUserId } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  const user = checkUser(locals);
+  const userId = checkUserId(locals);
 
   const groups = await db.userToGroup.findMany({
-    where: { userId: user.id },
+    where: { userId },
     orderBy: { order: 'asc' },
     include: { group: true },
   });
@@ -33,19 +33,19 @@ const selectGroup: Action = async ({ request, locals, cookies }) => {
     return serverError(400, 'BAD_REQUEST', 'Parameter groupId must be a number');
   }
 
-  const user = checkUser(locals);
+  const userId = checkUserId(locals);
 
   const userInGroup = db.userToGroup.findUnique({
     where: {
       userId_groupId: {
-        userId: user.id,
+        userId,
         groupId,
       },
     },
   });
 
   if (!userInGroup) {
-    return serverError(403, 'FORBIDDEN', `User #${user.id} is not in group #${groupId}`);
+    return serverError(403, 'FORBIDDEN', `User #${userId} is not in group #${groupId}`);
   }
 
   locals.groupId = groupId;

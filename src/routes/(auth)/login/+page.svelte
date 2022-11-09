@@ -3,7 +3,7 @@
   import { invalidateAll } from '$app/navigation';
   import type { ActionResult } from '@sveltejs/kit';
 
-  import { isApiError } from '$lib/api/ApiError';
+  import { isApiErrorData } from '$lib/api/ApiError';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import FormContainer from '$lib/ui/FormContainer.svelte';
@@ -14,7 +14,7 @@
 
   export let form: ActionData;
 
-  $: if (isApiError(form)) {
+  $: if (isApiErrorData(form)) {
     switch (form.error.code) {
       case 'INCORRECT_LOGIN_OR_PASSWORD':
         showErrorToast($translate('auth.incorrect_login_or_password'));

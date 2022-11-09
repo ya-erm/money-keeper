@@ -5,4 +5,4 @@ export {
   getStringOptionalFormParameter,
   getStringFormParameter,
 } from './checkParameter';
-export { checkUser, checkUserAndGroup } from './checkUser';
+export { checkUserId, checkUserAndGroup } from './checkUser';
