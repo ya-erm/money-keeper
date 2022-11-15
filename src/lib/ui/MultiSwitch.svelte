@@ -33,7 +33,8 @@
     padding: 0.5rem 1rem;
     font-size: 1rem;
     cursor: pointer;
-    background: var(--white-color);
+    color: var(--primary-text-color);
+    background: var(--header-background-color);
     border: 1px solid var(--border-color);
   }
   .switch-item:hover {
