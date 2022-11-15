@@ -144,8 +144,8 @@
   .account-card-anchor {
     position: absolute;
     pointer-events: none;
-    top: 0;
-    bottom: 0;
+    top: -1rem;
+    bottom: -1rem;
     width: 100vw;
   }
 </style>
