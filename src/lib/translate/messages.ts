@@ -90,6 +90,8 @@ export type Messages =
   | 'transactions.account'
   | 'transactions.account_is_required'
   | 'transactions.date'
+  | 'transactions.time'
+  | 'transactions.dateTime'
   | 'transactions.amount'
   | 'transactions.category'
   | 'transactions.category_is_required'

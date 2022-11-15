@@ -1,16 +1,19 @@
 <script lang="ts">
   import dayjs from 'dayjs';
-  import type { ActionResult } from '@sveltejs/kit';
 
   import { enhance } from '$app/forms';
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import type { ActionResult } from '@sveltejs/kit';
 
   import type { CategoryType } from '$lib/interfaces';
+  import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import FormContainer from '$lib/ui/FormContainer.svelte';
   import { title } from '$lib/ui/header';
   import Input from '$lib/ui/Input.svelte';
+  import InputLabel from '$lib/ui/InputLabel.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
 
   import AccountSelect from '../AccountSelect.svelte';
@@ -18,8 +21,6 @@
   import TypeSwitch from '../TypeSwitch.svelte';
 
   import type { PageData } from './$types';
-  import { goto } from '$app/navigation';
-  import { routes } from '$lib/routes';
 
   title.set($translate('transactions.edit_transaction'));
 
@@ -58,13 +59,13 @@
     <TypeSwitch />
     <AccountSelect {accounts} accountId={transaction.account.id} />
     <CategorySelect {categories} {type} categoryId={transaction.category.id} />
-    <Input
-      label={$translate('transactions.date')}
-      value={dayjs(transaction?.date).format('YYYY-MM-DD')}
-      name="date"
-      type="date"
-      required
-    />
+    <div class="flex-col gap-0.5">
+      <InputLabel text={$translate('transactions.dateTime')} />
+      <div class="flex gap-1">
+        <Input name="date" type="date" value={dayjs(transaction?.date).format('YYYY-MM-DD')} required />
+        <Input name="time" type="time" value={dayjs(transaction?.date).format('HH:mm')} required />
+      </div>
+    </div>
     <Input
       label={$translate('transactions.amount')}
       value={`${transaction?.amount}`}

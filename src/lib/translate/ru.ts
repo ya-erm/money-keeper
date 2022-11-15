@@ -93,6 +93,8 @@ export const ruDict: Dictionary = {
   'transactions.account': 'Счёт',
   'transactions.account_is_required': 'Сначала выберите счёт',
   'transactions.date': 'Дата',
+  'transactions.time': 'Время',
+  'transactions.dateTime': 'Дата и время',
   'transactions.amount': 'Сумма',
   'transactions.category': 'Категория',
   'transactions.category_is_required': 'Сначала выберите категорию',

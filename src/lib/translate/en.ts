@@ -93,6 +93,8 @@ export const enDict: Dictionary = {
   'transactions.account': 'Account',
   'transactions.account_is_required': 'Select an account firstly',
   'transactions.date': 'Date',
+  'transactions.time': 'Time',
+  'transactions.dateTime': 'Date and time',
   'transactions.amount': 'Amount',
   'transactions.category': 'Category',
   'transactions.category_is_required': 'Select a category firstly',

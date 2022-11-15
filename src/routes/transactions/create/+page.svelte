@@ -18,6 +18,7 @@
   import TypeSwitch from '../TypeSwitch.svelte';
 
   import type { PageData } from './$types';
+  import InputLabel from '$lib/ui/InputLabel.svelte';
 
   export let data: PageData;
   $: accounts = data.accounts;
@@ -47,7 +48,6 @@
       goto(`${routes.accounts.path}#account-card-${accountId}`);
     }
   };
-  const now = dayjs().format('YYYY-MM-DD');
 </script>
 
 <form bind:this={formElement} action="?/create" method="POST" on:submit={handleSubmit} use:enhance={() => handleResult}>
@@ -55,7 +55,13 @@
     <TypeSwitch />
     <AccountSelect {accounts} fromUrl />
     <CategorySelect {categories} {type} />
-    <Input label={$translate('transactions.date')} name="date" type="date" value={now} required />
+    <div class="flex-col gap-0.5">
+      <InputLabel text={$translate('transactions.dateTime')} />
+      <div class="flex gap-1">
+        <Input name="date" type="date" value={dayjs().format('YYYY-MM-DD')} required />
+        <Input name="time" type="time" value={dayjs().format('HH:mm')} required />
+      </div>
+    </div>
     <Input label={$translate('transactions.amount')} name="amount" type="number" required />
     <Input label={$translate('transactions.comment')} name="comment" optional />
     <Button text={$translate('common.create')} type="submit" />

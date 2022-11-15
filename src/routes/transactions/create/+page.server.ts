@@ -38,6 +38,7 @@ const create: Action = async ({ request, locals }) => {
     const categoryId = getNumberFormParameter(data, 'categoryId');
     const amount = getNumberFormParameter(data, 'amount');
     const date = getStringFormParameter(data, 'date');
+    const time = getStringFormParameter(data, 'time');
     const comment = getStringOptionalFormParameter(data, 'comment');
 
     const { groupId } = checkUserAndGroup(locals);
@@ -59,7 +60,7 @@ const create: Action = async ({ request, locals }) => {
         owner: { connect: { id: groupId } },
         account: { connect: { id: accountId } },
         category: { connect: { id: categoryId } },
-        date: new Date(date),
+        date: new Date(`${date}T${time}`),
         amount,
         comment,
       },

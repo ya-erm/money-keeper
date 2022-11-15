@@ -1,11 +1,13 @@
 <script lang="ts">
   import { translate } from '$lib/translate';
+
   import Button from './Button.svelte';
   import Icon from './Icon.svelte';
+  import InputLabel from './InputLabel.svelte';
 
   export let name: string | null = null;
   export let label: string | null = null;
-  export let type: 'text' | 'password' | 'date' | 'number' = 'text';
+  export let type: 'text' | 'password' | 'date' | 'time' | 'number' = 'text';
   export let placeholder: string | null = null;
   export let required: boolean = false;
   export let optional: boolean = false;
@@ -33,12 +35,7 @@
 
 <label class="input-label">
   {#if label}
-    <span class="label-text" class:error={!!error}>
-      <span>{label}</span>
-      {#if optional}
-        <span class="optional">({$translate('common.optional')})</span>
-      {/if}
-    </span>
+    <InputLabel text={label} {optional} {error} />
   {/if}
   <div class="input-container flex-col">
     <input
@@ -71,6 +68,7 @@
 
 <style>
   .input-label {
+    flex: 1;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -79,17 +77,6 @@
   .input-container {
     position: relative;
   }
-  .label-text {
-    font-size: 0.9rem;
-  }
-  .label-text.error {
-    color: var(--red-color);
-  }
-  .optional {
-    font-size: 0.9em;
-    opacity: 0.5;
-  }
-
   input {
     font-size: 1rem;
     border-radius: 0.75rem;
@@ -105,6 +92,9 @@
   input.error {
     color: var(--red-color);
     border: 1px solid var(--red-color);
+  }
+  :global(body.dark-mode input) {
+    color-scheme: dark;
   }
   .clear-input {
     position: absolute;
