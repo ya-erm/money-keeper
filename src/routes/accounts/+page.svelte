@@ -116,6 +116,7 @@
     flex-shrink: 0;
     height: 15rem;
     width: 25rem;
+    max-width: 100%;
     border-radius: 2rem;
     box-sizing: border-box;
     border: 1px solid var(--border-color);
@@ -132,11 +133,13 @@
   .account-card:hover {
     box-shadow: 4px 4px 8px 0px rgba(127, 127, 127, 0.2);
   }
-  .account-card:first-child {
-    margin-left: calc((100% - 25rem) / 2);
-  }
-  .account-card:last-child {
-    margin-right: calc((100% - 25rem) / 2);
+  @media (min-width: 27rem) {
+    .account-card:first-child {
+      margin-left: calc((100% - 25rem) / 2);
+    }
+    .account-card:last-child {
+      margin-right: calc((100% - 25rem) / 2);
+    }
   }
   .account-card-anchor {
     position: absolute;
