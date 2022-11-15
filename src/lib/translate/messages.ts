@@ -85,6 +85,8 @@ export type Messages =
   | 'transactions.create_transaction'
   | 'transactions.new_transaction'
   | 'transactions.title'
+  | 'transactions.incoming'
+  | 'transactions.outgoing'
   | 'transactions.account'
   | 'transactions.account_is_required'
   | 'transactions.date'

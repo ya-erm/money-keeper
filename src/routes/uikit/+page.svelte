@@ -7,6 +7,7 @@
   import Colors from './Colors.svelte';
   import Inputs from './Inputs.svelte';
   import Modals from './Modals.svelte';
+  import Switches from './Switches.svelte';
   import Toasts from './Toasts.svelte';
 
   title.set('UI Kit');
@@ -25,4 +26,5 @@
   <Inputs />
   <Toasts />
   <Modals />
+  <Switches />
 </div>

@@ -1,6 +1,10 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import dayjs from 'dayjs';
+
+  import { enhance } from '$app/forms';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import type { ActionResult } from '@sveltejs/kit';
 
   import type { CategoryType } from '$lib/interfaces';
   import { routes } from '$lib/routes';
@@ -11,8 +15,9 @@
 
   import AccountSelect from '../AccountSelect.svelte';
   import CategorySelect from '../CategorySelect.svelte';
+  import TypeSwitch from '../TypeSwitch.svelte';
+
   import type { PageData } from './$types';
-  import TypeSwitch from './TypeSwitch.svelte';
 
   export let data: PageData;
   $: accounts = data.accounts;
@@ -36,10 +41,16 @@
     }
   };
 
+  const handleResult = async ({ result }: { result: ActionResult }) => {
+    // TODO: replace to fetch api
+    if (result.type === 'redirect') {
+      goto(`${routes.accounts.path}#account-card-${accountId}`);
+    }
+  };
   const now = dayjs().format('YYYY-MM-DD');
 </script>
 
-<form bind:this={formElement} action="?/create" method="POST" on:submit={handleSubmit}>
+<form bind:this={formElement} action="?/create" method="POST" on:submit={handleSubmit} use:enhance={() => handleResult}>
   <div class="flex-col gap-1 p-1">
     <TypeSwitch />
     <AccountSelect {accounts} fromUrl />

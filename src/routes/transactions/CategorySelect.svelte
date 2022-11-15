@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { invalidateAll } from '$app/navigation';
+  import { invalidate } from '$app/navigation';
   import type { Category } from '@prisma/client';
 
+  import { deps } from '$lib/deps';
   import type { CategoryType } from '$lib/interfaces';
   import { translate } from '$lib/translate';
   import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
@@ -32,7 +33,7 @@
     </label>
   {/if}
   <div class="grid">
-    {#each categories as category}
+    {#each categories as category (category.id)}
       <GridCircleItem
         selected={categoryId === category.id}
         onClick={handleChange(category.id)}
@@ -48,7 +49,7 @@
   </div>
 </div>
 
-<CreateCategoryModal bind:opened={createCategoryModalOpened} {type} onCreate={invalidateAll} />
+<CreateCategoryModal bind:opened={createCategoryModalOpened} {type} onCreate={() => invalidate(deps.categories)} />
 
 <style>
   .label {

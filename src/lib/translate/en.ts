@@ -88,6 +88,8 @@ export const enDict: Dictionary = {
   'transactions.title': 'Operations',
   'transactions.create_transaction': 'Create operation',
   'transactions.new_transaction': 'New operation',
+  'transactions.incoming': 'Incoming',
+  'transactions.outgoing': 'Outgoing',
   'transactions.account': 'Account',
   'transactions.account_is_required': 'Select an account firstly',
   'transactions.date': 'Date',

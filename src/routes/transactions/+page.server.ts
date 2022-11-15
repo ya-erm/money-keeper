@@ -8,6 +8,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   const transactions = await db.transaction.findMany({
     where: { ownerId: groupId },
+    orderBy: { date: 'desc' },
     include: {
       account: true,
       category: true,

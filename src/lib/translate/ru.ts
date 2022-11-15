@@ -88,6 +88,8 @@ export const ruDict: Dictionary = {
   'transactions.title': 'Операции',
   'transactions.create_transaction': 'Создать операцию',
   'transactions.new_transaction': 'Новая операция',
+  'transactions.incoming': 'Доход',
+  'transactions.outgoing': 'Расход',
   'transactions.account': 'Счёт',
   'transactions.account_is_required': 'Сначала выберите счёт',
   'transactions.date': 'Дата',

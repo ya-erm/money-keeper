@@ -1,23 +1,28 @@
 <script lang="ts">
-  import { goto, invalidateAll } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { createEventDispatcher } from 'svelte';
 
-  $: type = $page.url.searchParams.get('type') ?? 'OUT';
+  export let options: { id: string; title: string }[];
+  export let selected: { id: string; title: string } | undefined;
 
-  const handleClick = (value: string) => async () => {
-    $page.url.searchParams.set('type', value);
-    await goto($page.url);
-    await invalidateAll();
+  const dispatch = createEventDispatcher<{ change: { id: string; title: string } }>();
+  export let change = (value: { id: string; title: string }) => dispatch('change', value);
+
+  const handleClick = (value: { id: string; title: string }) => async () => {
+    selected = value;
+    change(value);
   };
 </script>
 
-<div class="type-switch">
-  <button on:click={handleClick('IN')} class="switch-item" class:active={type === 'IN'} type="button">Доход</button>
-  <button on:click={handleClick('OUT')} class="switch-item" class:active={type === 'OUT'} type="button">Расход</button>
+<div class="multi-switch">
+  {#each options as option (option.id)}
+    <button on:click={handleClick(option)} class:active={selected?.id === option.id} class="switch-item" type="button">
+      {option.title}
+    </button>
+  {/each}
 </div>
 
 <style>
-  .type-switch {
+  .multi-switch {
     display: flex;
     margin: 0 auto;
     border-radius: 1rem;

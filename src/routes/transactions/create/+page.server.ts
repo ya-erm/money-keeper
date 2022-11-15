@@ -10,16 +10,17 @@ import {
 } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad } from './$types';
+import { deps } from '$lib/deps';
 
-export const load: PageServerLoad = async ({ url, locals }) => {
+export const load: PageServerLoad = async ({ url, locals, depends }) => {
   const { groupId } = checkUserAndGroup(locals);
-
-  const type = url.searchParams.get('type') ?? 'OUT';
 
   const accounts = await db.account.findMany({
     where: { ownerId: groupId },
   });
 
+  depends(deps.categories);
+  const type = url.searchParams.get('type') ?? 'OUT';
   const categories = await db.category.findMany({
     where: { ownerId: groupId, type },
   });

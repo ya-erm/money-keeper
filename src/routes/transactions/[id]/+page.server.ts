@@ -1,18 +1,19 @@
 import { error, redirect } from '@sveltejs/kit';
 
+import { deps } from '$lib/deps';
 import { routes } from '$lib/routes';
 import { db, isServerError, serverError } from '$lib/server';
 import {
   checkUserAndGroup,
   getNumberFormParameter,
-  getStringOptionalFormParameter,
   getStringFormParameter,
+  getStringOptionalFormParameter,
 } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad, RouteParams } from './$types';
 
 const validate = async ({ params, locals }: { params: RouteParams; locals: App.Locals }) => {
-  const { user, groupId } = checkUserAndGroup(locals);
+  const { userId, groupId } = checkUserAndGroup(locals);
 
   const transactionId = parseInt(params.id);
 
@@ -37,14 +38,14 @@ const validate = async ({ params, locals }: { params: RouteParams; locals: App.L
   }
 
   return {
-    user,
+    userId,
     groupId,
     transactionId,
     transaction,
   };
 };
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params, url, locals, depends }) => {
   try {
     const { groupId, transaction } = await validate({ params, locals });
 
@@ -52,8 +53,10 @@ export const load: PageServerLoad = async ({ params, locals }) => {
       where: { ownerId: groupId },
     });
 
+    depends(deps.categories);
+    const type = url.searchParams.get('type') ?? 'OUT';
     const categories = await db.category.findMany({
-      where: { ownerId: groupId },
+      where: { ownerId: groupId, type },
     });
 
     return {
