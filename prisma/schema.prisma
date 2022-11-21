@@ -40,10 +40,12 @@ model AuthToken {
   id          Int       @id @default(autoincrement())
   value       String    @unique
   userId      Int
+  groupId     Int?
   lastUsage   DateTime?
   invalidated Boolean   @default(false)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group? @relation(fields: [groupId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
 }
@@ -93,6 +95,7 @@ model Group {
   accounts     Account[]
   categories   Category[]
   transactions Transaction[]
+  tokens       AuthToken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
