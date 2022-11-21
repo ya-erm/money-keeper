@@ -21,7 +21,7 @@ export function checkParameter<T>(parameter: unknown, name: string, options: Che
     let value: unknown = null;
     switch (options.type) {
       case 'number': {
-        value = parseInt(parameter as string);
+        value = parseFloat(parameter as string);
         failed = Number.isNaN(value);
         break;
       }
