@@ -23,6 +23,7 @@
     "@iconify/utils": "^2.0.1",
     "@playwright/test": "^1.25.0",
     "@sveltejs/adapter-auto": "next",
+    "@sveltejs/adapter-node": "^1.0.0-next.100",
     "@sveltejs/kit": "next",
     "@types/bcrypt": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^5.27.0",

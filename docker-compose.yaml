@@ -11,3 +11,28 @@ services:
       - ./data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+  front:
+    build: .
+    environment:
+      PORT: 5173
+      ORIGIN: ${ORIGIN}
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - "5173:5173"
+
+  # front:
+  #   image: node:16
+  #   volumes:
+  #     - ./build:/app/build
+  #     - ./package.json:/app/package.json
+  #     - ./package-lock.json:/app/package-lock.json
+  #     - ./prisma/schema.prisma:/app/prisma/schema.prisma
+  #   working_dir: /app
+  #   command: bash -c "npm ci --omit=dev && npx prisma generate && node build"
+  #   environment:
+  #     PORT: 5173
+  #     ORIGIN: ${ORIGIN}
+  #     DATABASE_URL: ${DATABASE_URL}
+  #   ports:
+  #     - "5173:5173"

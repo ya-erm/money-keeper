@@ -1,0 +1,6 @@
+.DS_Store
+.svelte-kit
+node_modules
+build
+prisma/dev.db
+data
