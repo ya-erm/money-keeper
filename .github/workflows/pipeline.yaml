@@ -24,7 +24,7 @@ jobs:
 
       - name: Deploy via SSH
         run: |
-          ssh -i ~/.ssh/private.key $SERVER_USERNAME@$SERVER_HOST 'cd ./apps/money-keeper; git pull; docker compose up --force-recreate --build -d;'
+          ssh -i ~/.ssh/private.key $SERVER_USERNAME@$SERVER_HOST 'cd ./apps/money-keeper; git pull; docker compose up front --build --force-recreate -d;'
         env:
           SERVER_USERNAME: ${{secrets.DEPLOY_SERVER_USERNAME}}
           SERVER_HOST: ${{secrets.DEPLOY_SERVER_HOST}}
