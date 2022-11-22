@@ -86,6 +86,10 @@
     color: var(--text-color);
     outline: none;
   }
+  input[type='date'],
+  input[type='time'] {
+    -webkit-appearance: none;
+  }
   input:focus {
     border: 1px solid var(--active-color);
   }
