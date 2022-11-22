@@ -5,9 +5,12 @@
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
+  import { backLink } from '$lib/ui/header';
   import NoItems from '$lib/ui/NoItems.svelte';
 
   import type { PageData } from './$types';
+
+  backLink.set(null);
 
   export let data: PageData;
 

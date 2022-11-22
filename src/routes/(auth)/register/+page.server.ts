@@ -1,9 +1,11 @@
 import { redirect } from '@sveltejs/kit';
-import bcrypt from 'bcrypt';
 
-import { db, serverError } from '$lib/server';
-import type { Action, Actions, PageServerLoad } from './$types';
 import { routes } from '$lib/routes';
+import { withActionMiddleware } from '$lib/server';
+import { register } from '$lib/server/api/auth';
+import { getStringFormParameter } from '$lib/utils/checkParameter';
+
+import type { Action, Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
   // redirect user if logged in
@@ -12,44 +14,17 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
 };
 
-const register: Action = async ({ request }) => {
+const registerAction: Action = async ({ request }) => {
   const data = await request.formData();
-  const name = data.get('name');
-  const login = data.get('login');
-  const password = data.get('password');
+  const name = getStringFormParameter(data, 'name');
+  const login = getStringFormParameter(data, 'login');
+  const password = getStringFormParameter(data, 'password');
 
-  if (
-    typeof name !== 'string' ||
-    typeof login !== 'string' ||
-    typeof password !== 'string' ||
-    !name ||
-    !login ||
-    !password
-  ) {
-    return serverError(400, 'BAD_REQUEST');
-  }
-
-  const user = await db.user.findUnique({
-    where: { login },
-  });
-
-  if (user) {
-    return serverError(400, 'USER_ALREADY_EXISTS');
-  }
-
-  await db.user.create({
-    data: {
-      name,
-      login,
-      password: {
-        create: { hash: await bcrypt.hash(password, 10) },
-      },
-    },
-  });
+  await register({ name, login, password });
 
   throw redirect(302, routes.login.path);
 };
 
 export const actions: Actions = {
-  register,
+  register: withActionMiddleware(registerAction),
 };

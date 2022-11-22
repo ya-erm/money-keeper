@@ -12,6 +12,7 @@
   import type { PageData } from './$types';
   import GroupNameModal from './EditGroupNameModal.svelte';
   import GroupUsersList from './GroupUsersList.svelte';
+  import DeleteGroupModal from './DeleteGroupModal.svelte';
 
   export let data: PageData;
 
@@ -21,6 +22,7 @@
   const group = writable(data.group);
 
   let groupNameModalOpened = false;
+  let deleteGroupModalOpened = false;
 </script>
 
 {#if !!$group}
@@ -36,10 +38,16 @@
     </div>
     <GroupNameModal {group} bind:opened={groupNameModalOpened} />
     <GroupUsersList {group} />
-    <form action="?/deleteGroup" method="POST" use:enhance class="flex-col items-center">
-      <Button text={$translate('groups.delete_group')} type="submit" appearance="transparent" color="danger" />
-    </form>
+    <Button
+      slot="footer"
+      type="button"
+      text={$translate('groups.delete_group')}
+      on:click={() => (deleteGroupModalOpened = true)}
+      appearance="transparent"
+      color="danger"
+    />
   </FormContainer>
+  <DeleteGroupModal groupId={$group.id} bind:opened={deleteGroupModalOpened} />
 {/if}
 
 <style>

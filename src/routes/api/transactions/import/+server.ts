@@ -1,11 +1,9 @@
 import type { ImportedTransaction } from '$lib/interfaces';
-import { db } from '$lib/server';
-import { serverApiError } from '$lib/server/serverError';
-import { checkUserAndGroup } from '$lib/utils';
-import { checkParameter, getNumberUrlParameter } from '$lib/utils/checkParameter';
+import { db, withRequestHandlerMiddleware, serverApiError } from '$lib/server';
+import { checkUserAndGroup, checkParameter, getNumberUrlParameter } from '$lib/utils';
 import type { RequestHandler } from './$types';
 
-export const POST: RequestHandler = async ({ url, request, locals }) => {
+export const POST = withRequestHandlerMiddleware<RequestHandler>(async ({ url, request, locals }) => {
   const { groupId } = checkUserAndGroup(locals, { noRedirect: true });
 
   const accountId = getNumberUrlParameter(url, 'accountId');
@@ -50,4 +48,4 @@ export const POST: RequestHandler = async ({ url, request, locals }) => {
       count: filteredItems.length,
     }),
   );
-};
+});

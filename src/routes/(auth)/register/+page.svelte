@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { isApiError } from '$lib/api/ApiError';
+  import { isApiErrorData } from '$lib/api/ApiError';
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import FormContainer from '$lib/ui/FormContainer.svelte';
   import Input from '$lib/ui/Input.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
+
   import type { ActionData } from './$types';
 
   export let form: ActionData;
@@ -20,7 +21,7 @@
     }
   };
 
-  $: if (isApiError(form)) {
+  $: if (isApiErrorData(form)) {
     switch (form.error.code) {
       case 'USER_ALREADY_EXISTS':
         showErrorToast($translate('auth.user_already_exists'));

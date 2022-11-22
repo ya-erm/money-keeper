@@ -1,5 +1,5 @@
-import { isApiError } from '$lib/api/ApiError';
-import { serverApiError, serverError } from '$lib/server';
+import { ApiError, isApiError } from '$lib/api/ApiError';
+import { serverError } from '$lib/server';
 
 type CheckParameterOptions = {
   type?: 'string' | 'number' | 'boolean' | 'object' | 'array';
@@ -7,13 +7,13 @@ type CheckParameterOptions = {
 };
 
 /**
- * @throws {ValidationError<ApiError>} if parameter is invalid
+ * @throws {ApiError} if parameter is invalid
  */
 export function checkParameter<T>(parameter: unknown, name: string, options: CheckParameterOptions): T {
   const hasValue = parameter !== null && parameter !== undefined && parameter !== '';
 
   if (options.required && !hasValue) {
-    throw serverApiError(400, 'BAD_REQUEST', `Parameter '${name}' is required`);
+    throw new ApiError(400, 'BAD_REQUEST', `Parameter '${name}' is required`);
   }
 
   if (hasValue && options.type) {
@@ -41,12 +41,28 @@ export function checkParameter<T>(parameter: unknown, name: string, options: Che
       }
     }
     if (failed) {
-      throw serverApiError(400, 'BAD_REQUEST', `Parameter '${name}' must be ${options.type}`);
+      throw new ApiError(400, 'BAD_REQUEST', `Parameter '${name}' must be ${options.type}`);
     }
     return value as T;
   }
 
   return parameter as T;
+}
+
+export function checkStringParameter(parameter: unknown, name: string) {
+  return checkParameter<string>(parameter, name, { type: 'string', required: true });
+}
+
+export function checkStringOptionalParameter(parameter: unknown, name: string) {
+  return checkParameter<string | null>(parameter, name, { type: 'string', required: false });
+}
+
+export function checkNumberParameter(parameter: unknown, name: string) {
+  return checkParameter<number>(parameter, name, { type: 'number', required: true });
+}
+
+export function checkNumberOptionalParameter(parameter: unknown, name: string) {
+  return checkParameter<number | null>(parameter, name, { type: 'number', required: false });
 }
 
 export function getNumberUrlParameter(url: URL, name: string) {
@@ -58,6 +74,10 @@ export function getNumberOptionalUrlParameter(url: URL, name: string) {
   return checkParameter<number | null>(parameter, name, { type: 'number' });
 }
 
+/**
+ * Extract parameter from FormData and validate it
+ * @throws {ValidationError<ApiError>} if parameter is invalid
+ * */
 export function checkFormDataParameter<T = FormDataEntryValue | null>(
   data: FormData,
   name: string,

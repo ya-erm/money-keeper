@@ -17,7 +17,7 @@ const selection = Prisma.validator<Prisma.AccountSelect>()({
 });
 
 const validate = async ({ params, locals }: { params: RouteParams; locals: App.Locals }) => {
-  const { userId, groupId } = checkUserAndGroup(locals);
+  const { userId, groupId } = checkUserAndGroup(locals, { redirect: true });
 
   const accountId = parseInt(params.id);
 

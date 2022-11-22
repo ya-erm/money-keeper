@@ -51,7 +51,7 @@ export const ruDict: Dictionary = {
   'accounts.create_account_success': 'Счёт создан',
   'accounts.edit_account': 'Редактировать счёт',
   'accounts.delete_account': 'Удалить счёт',
-  'accounts.delete_account_confirm': 'Вы действительно хотите удалить счёт?',
+  'accounts.delete_account_confirm': 'Вы уверены, что хотите удалить счёт?',
   'accounts.delete_account_confirm_description':
     'Все связанные со счётом операции будут также удалены. Это действие будет невозможно отменить.',
   'accounts.delete_account_failure': 'Не удалось удалить счёт',
@@ -83,7 +83,16 @@ export const ruDict: Dictionary = {
   'groups.add_user': 'Добавить пользователя',
   'groups.failed_to_add_user': 'Не удалось добавить пользователя',
   'groups.username': 'Имя пользователя',
+  'groups.delete_user_confirm': 'Исключить пользователя из группы?',
+  'groups.delete_user_confirm_description':
+    'Пользователь потеряет доступ к счетам, категориям и операциям этого рабочего пространства.',
+  'groups.delete_user': 'Исключить',
+  'groups.failed_to_delete_user': 'Не удалось исключить пользователя из группы',
   'groups.delete_group': 'Удалить группу',
+  'groups.delete_group_confirm': 'Вы уверены, что хотите удалить группу?',
+  'groups.delete_group_confirm_description':
+    'Будут удалены все связанные с этой группой счета, категории и операции. Это действие будет невозможно отменить.',
+  'groups.failed_to_delete_group': 'Не удалось удалить группу',
   // Transactions
   'transactions.title': 'Операции',
   'transactions.create_transaction': 'Создать операцию',

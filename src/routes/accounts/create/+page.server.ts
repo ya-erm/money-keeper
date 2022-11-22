@@ -7,7 +7,7 @@ import { checkUserId, checkUserAndGroup, getStringOptionalFormParameter, getStri
 import type { Action, Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  checkUserId(locals);
+  checkUserId(locals, { redirect: true });
 };
 
 const create: Action = async ({ request, locals }) => {

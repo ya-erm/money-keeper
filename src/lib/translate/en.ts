@@ -83,7 +83,17 @@ export const enDict: Dictionary = {
   'groups.add_user': 'Add user',
   'groups.failed_to_add_user': 'Failed to add user',
   'groups.username': 'Username',
+  'groups.delete_user_confirm': 'Are you sure want to exclude user?',
+  'groups.delete_user_confirm_description':
+    'User will loss access to accounts, categories and operations in this group.',
+  'groups.delete_user': 'Exclude',
+  'groups.failed_to_delete_user': 'Failed to exclude user from group',
   'groups.delete_group': 'Delete group',
+  'groups.delete_group_confirm': 'Are you sure want to delete group?',
+  'groups.delete_group_confirm_description':
+    "All accounts, categories and operations will be deleted. This action can' be undone.",
+  'groups.failed_to_delete_group': 'Failed to delete group',
+  // Transactions
   // Transactions
   'transactions.title': 'Operations',
   'transactions.create_transaction': 'Create operation',

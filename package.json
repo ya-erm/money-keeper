@@ -15,7 +15,8 @@
     "format": "prettier --plugin-search-dir . --write .",
     "generate:icons": "node ./pack-icons.js && prettier --write ./src/lib/icons.ts",
     "generate:prisma": "npx prisma generate",
-    "generate": "npm run generate:icons && npm run generate:prisma"
+    "generate": "npm run generate:icons && npm run generate:prisma",
+    "seed": "ts-node prisma/seed.ts"
   },
   "devDependencies": {
     "@iconify/json": "^2.1.130",
@@ -47,6 +48,9 @@
     "@prisma/client": "^4.5.0",
     "bcrypt": "^5.1.0",
     "dayjs": "^1.11.6"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "type": "module"
 }

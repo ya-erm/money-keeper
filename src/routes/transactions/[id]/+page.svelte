@@ -31,9 +31,8 @@
 
   $: type = ($page.url.searchParams.get('type') as CategoryType) ?? 'OUT';
 
-  let formElement: HTMLFormElement;
   const handleSubmit = (e: SubmitEvent) => {
-    const formData = new FormData(formElement);
+    const formData = new FormData(e.target as HTMLFormElement);
     if (!formData.get('accountId')) {
       showErrorToast($translate('transactions.account_is_required'));
       e.preventDefault();
@@ -54,7 +53,7 @@
   };
 </script>
 
-<form bind:this={formElement} action="?/update" method="POST" on:submit={handleSubmit} use:enhance={() => handleResult}>
+<form action="?/update" method="POST" on:submit={handleSubmit} use:enhance={() => handleResult}>
   <div class="flex-col gap-1 p-1">
     <TypeSwitch />
     <AccountSelect {accounts} accountId={transaction.account.id} />

@@ -4,7 +4,7 @@ import { checkUserAndGroup } from '$lib/utils';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  const { groupId } = checkUserAndGroup(locals);
+  const { groupId } = checkUserAndGroup(locals, { redirect: true });
 
   const accounts = await db.account.findMany({
     where: { ownerId: groupId },

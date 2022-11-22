@@ -1,8 +1,13 @@
-export type ApiError = {
+export class ApiError extends Error {
   status: number;
   code: ApiErrorCode;
-  message: string;
-};
+
+  constructor(status: number, code: ApiErrorCode, message?: string | undefined) {
+    super(message ?? code);
+    this.status = status;
+    this.code = code;
+  }
+}
 
 export function isApiError(e: unknown): e is ApiError {
   return !!e && typeof e === 'object' && 'status' in e && 'code' in e && 'message' in e;

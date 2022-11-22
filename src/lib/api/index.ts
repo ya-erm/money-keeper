@@ -1,2 +1,3 @@
-export type { ApiError, ApiErrorData, ApiErrorCode } from './ApiError';
+export { ApiError } from './ApiError';
+export type { ApiErrorData, ApiErrorCode } from './ApiError';
 export { isApiErrorData } from './ApiError';

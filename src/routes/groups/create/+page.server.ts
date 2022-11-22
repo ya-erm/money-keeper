@@ -1,41 +1,25 @@
 import { redirect } from '@sveltejs/kit';
 
 import { routes } from '$lib/routes';
-import { db, serverError } from '$lib/server';
+import { withActionMiddleware } from '$lib/server';
+import { createGroup } from '$lib/server/api/groups';
+import { checkUserId, getStringFormParameter } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad } from './$types';
-import { checkUserId } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  checkUserId(locals);
+  checkUserId(locals, { redirect: true });
 };
 
 const create: Action = async ({ request, locals }) => {
   const data = await request.formData();
-  const name = data.get('name');
+  const name = getStringFormParameter(data, 'name');
 
-  if (typeof name !== 'string' || !name) {
-    return serverError(400, 'BAD_REQUEST', 'Name is required');
-  }
-
-  const userId = checkUserId(locals);
-
-  await db.userToGroup.create({
-    data: {
-      user: {
-        connect: { id: userId },
-      },
-      group: {
-        create: {
-          name,
-        },
-      },
-    },
-  });
+  await createGroup({ name }, locals);
 
   throw redirect(302, routes.groups.path);
 };
 
 export const actions: Actions = {
-  create,
+  create: withActionMiddleware(create),
 };
