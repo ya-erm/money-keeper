@@ -29,6 +29,7 @@
   }
   .switch-item {
     border: 0;
+    margin: 0;
     outline: 0;
     padding: 0.5rem 1rem;
     font-size: 1rem;
@@ -46,6 +47,9 @@
   .switch-item:first-child {
     border-bottom-left-radius: 1rem;
     border-top-left-radius: 1rem;
+  }
+  .switch-item:not(:last-child) {
+    border-right: none;
   }
   .switch-item:last-child {
     border-bottom-right-radius: 1rem;
