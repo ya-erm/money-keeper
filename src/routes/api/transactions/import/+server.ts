@@ -4,7 +4,7 @@ import { checkUserAndGroup, checkParameter, getNumberUrlParameter } from '$lib/u
 import type { RequestHandler } from './$types';
 
 export const POST = withRequestHandlerMiddleware<RequestHandler>(async ({ url, request, locals }) => {
-  const { groupId } = checkUserAndGroup(locals, { noRedirect: true });
+  const { groupId } = checkUserAndGroup(locals);
 
   const accountId = getNumberUrlParameter(url, 'accountId');
 
