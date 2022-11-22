@@ -7,7 +7,7 @@ import { checkUserAndGroup, getStringFormParameter, getStringOptionalFormParamet
 import type { Action, Actions, PageServerLoad, RouteParams } from './$types';
 
 const validate = async ({ params, locals }: { params: RouteParams; locals: App.Locals }) => {
-  const { userId, groupId } = checkUserAndGroup(locals);
+  const { userId, groupId } = checkUserAndGroup(locals, { redirect: true });
 
   const categoryId = parseInt(params.id);
 
