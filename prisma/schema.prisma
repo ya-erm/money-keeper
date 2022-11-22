@@ -37,12 +37,11 @@ model UserPassword {
 }
 
 model AuthToken {
-  id          Int       @id @default(autoincrement())
-  value       String    @unique
+  id          Int     @id @default(autoincrement())
+  value       String  @unique
   userId      Int
   groupId     Int?
-  lastUsage   DateTime?
-  invalidated Boolean   @default(false)
+  invalidated Boolean @default(false)
 
   user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   group Group? @relation(fields: [groupId], references: [id], onDelete: SetNull)
