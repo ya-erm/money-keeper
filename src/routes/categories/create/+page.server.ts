@@ -13,7 +13,7 @@ const create: Action = async ({ request, locals }) => {
     const name = getStringFormParameter(data, 'name');
     const icon = getStringOptionalFormParameter(data, 'icon');
 
-    const { groupId } = checkUserAndGroup(locals);
+    const { groupId } = checkUserAndGroup(locals, { redirect: true });
 
     await db.category.create({
       data: {

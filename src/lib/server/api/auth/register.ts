@@ -30,6 +30,15 @@ export async function register(data: RegisterRequestData) {
       password: {
         create: { hash: await bcrypt.hash(password, 10) },
       },
+      groups: {
+        create: {
+          group: {
+            create: {
+              name: `${name}'s group`,
+            },
+          },
+        },
+      },
     },
   });
 }

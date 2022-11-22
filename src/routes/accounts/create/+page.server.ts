@@ -18,7 +18,7 @@ const create: Action = async ({ request, locals }) => {
     const icon = getStringOptionalFormParameter(data, 'icon');
     const color = getStringOptionalFormParameter(data, 'color');
 
-    const { groupId } = checkUserAndGroup(locals);
+    const { groupId } = checkUserAndGroup(locals, { redirect: true });
 
     const account = await db.account.create({
       data: {

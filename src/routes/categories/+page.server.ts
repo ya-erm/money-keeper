@@ -5,7 +5,7 @@ import { checkUserAndGroup } from '$lib/utils';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, depends }) => {
-  const { groupId } = checkUserAndGroup(locals);
+  const { groupId } = checkUserAndGroup(locals, { redirect: true });
 
   depends(deps.categories);
   const categories = await db.category.findMany({

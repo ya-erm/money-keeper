@@ -13,7 +13,7 @@ import type { Action, Actions, PageServerLoad } from './$types';
 import { deps } from '$lib/deps';
 
 export const load: PageServerLoad = async ({ url, locals, depends }) => {
-  const { groupId } = checkUserAndGroup(locals);
+  const { groupId } = checkUserAndGroup(locals, { redirect: true });
 
   const accounts = await db.account.findMany({
     where: { ownerId: groupId },
@@ -41,7 +41,7 @@ const create: Action = async ({ request, locals }) => {
     const time = getStringFormParameter(data, 'time');
     const comment = getStringOptionalFormParameter(data, 'comment');
 
-    const { groupId } = checkUserAndGroup(locals);
+    const { groupId } = checkUserAndGroup(locals, { redirect: true });
 
     const account = await db.account.findUnique({ where: { id: accountId } });
 
