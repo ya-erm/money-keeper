@@ -35,6 +35,7 @@
 <style>
   button {
     font-size: 1rem;
+    font-weight: normal;
     padding: 0.75rem;
     border-radius: 0.75rem;
     display: inline-flex;
