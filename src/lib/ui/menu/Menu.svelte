@@ -32,6 +32,7 @@
     border-top: 1px solid var(--border-color);
     background-color: var(--header-background-color);
     height: 60px;
+    padding-bottom: env(safe-area-inset-bottom);
   }
   .menu-bar.hidden {
     display: none;
