@@ -1,4 +1,4 @@
-import { db } from '$lib/server/database';
+import { db } from '$lib/server';
 import { checkStringParameter, checkUserId } from '$lib/utils';
 import { groupSelection, mapGroup } from './interfaces';
 

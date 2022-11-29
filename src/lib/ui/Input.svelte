@@ -18,6 +18,7 @@
 
   export let value: string | null = null;
   export let onChange: ((value: string) => void) | null = null;
+  export let endText: string | null = null;
   export let clearable = false;
 
   let input: HTMLInputElement;
@@ -44,6 +45,7 @@
       autocomplete={autocomplete ? 'on' : undefined}
       step={type === 'number' ? '0.01' : undefined}
       class:error={!!error}
+      class:clearable
       {placeholder}
       {minlength}
       {maxlength}
@@ -52,13 +54,18 @@
       {type}
       {name}
     />
-    {#if clearable && !!value}
-      <div class="clear-input flex-center" title={$translate('common.clear')}>
-        <Button on:click={clearValue} appearance="link" color={error ? 'danger' : 'secondary'}>
-          <Icon name="mdi:close" size={1.25} padding={0.5} />
-        </Button>
-      </div>
-    {/if}
+    <div class="end-slot flex items-center">
+      {#if endText}
+        <span class="end-text" class:mr-1={!clearable || !value}>{endText}</span>
+      {/if}
+      {#if clearable && !!value}
+        <div class="flex-center" title={$translate('common.clear')}>
+          <Button on:click={clearValue} appearance="link" color={error ? 'danger' : 'secondary'}>
+            <Icon name="mdi:close" size={1.25} padding={0.5} />
+          </Button>
+        </div>
+      {/if}
+    </div>
   </div>
 
   {#if error}
@@ -86,6 +93,11 @@
     color: var(--text-color);
     outline: none;
   }
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
   input[type='date'],
   input[type='time'] {
     -webkit-appearance: none;
@@ -97,14 +109,20 @@
     color: var(--red-color);
     border: 1px solid var(--red-color);
   }
+  input.clearable {
+    padding-right: 1.75rem;
+  }
   :global(body.dark-mode input) {
     color-scheme: dark;
   }
-  .clear-input {
+  .end-slot {
     position: absolute;
     right: 0;
     bottom: 0;
     top: 0;
+  }
+  .end-text {
+    color: var(--secondary-text-color);
   }
   .error-text {
     font-size: 0.8rem;

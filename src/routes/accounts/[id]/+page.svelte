@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { invalidate } from '$app/navigation';
   import type { ActionResult } from '@sveltejs/kit';
 
+  import { deps } from '$lib/deps';
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
@@ -19,13 +21,14 @@
   title.set($translate('accounts.edit_account'));
   $: backLink.set(routes.accounts.path + (account ? `#account-card-${account.id}` : ''));
 
-  const onSave = (result: ActionResult, next: (result: ActionResult) => void) => {
+  const onSave = async (result: ActionResult, next: (result: ActionResult) => void) => {
     if (result.type === 'redirect') {
       showSuccessToast($translate('common.save_changes_success'));
+      await invalidate(deps.accounts);
     } else if (result.type === 'invalid') {
       showErrorToast($translate('common.save_changes_failure'));
     }
-    next(result);
+    await next(result);
   };
 
   let deleteAccountModalOpened = false;

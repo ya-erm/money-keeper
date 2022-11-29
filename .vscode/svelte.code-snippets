@@ -1,0 +1,81 @@
+{
+  "Svelte component": {
+    "scope": "svelte",
+    "prefix": "sc",
+    "body": ["<script lang=\"ts\">", "", "</script>", "", "<div>${0:$TM_FILENAME_BASE}</div>", ""]
+  },
+  "Api function with params": {
+    "scope": "typescript",
+    "prefix": "fnp",
+    "body": [
+      "import { db } from '$$lib/server';",
+      "",
+      "export type ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}Params = {",
+      " $1",
+      "};",
+      "",
+      "export async function ${TM_FILENAME_BASE}(params: ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}Params, locals: App.Locals) {",
+      "  $2",
+      "};",
+      ""
+    ]
+  },
+
+  "Api function with request data": {
+    "scope": "typescript",
+    "prefix": "fnd",
+    "body": [
+      "import { db } from '$$lib/server';",
+      "",
+      "export type ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}RequestData = {",
+      "  $1",
+      "};",
+      "",
+      "",
+      "export async function ${TM_FILENAME_BASE}(data: ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}RequestData, locals: App.Locals) {",
+      "  $2",
+      "};",
+      ""
+    ]
+  },
+  "Api function with params and request data": {
+    "scope": "typescript",
+    "prefix": "fnpd",
+    "body": [
+      "import { db } from '$$lib/server';",
+      "",
+      "export type ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}Params = {",
+      " $1",
+      "};",
+      "",
+      "export type ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}RequestData = {",
+      "  $2",
+      "};",
+      "",
+      "export async function ${TM_FILENAME_BASE}(params: ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}Params, data: ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}RequestData, locals: App.Locals) {",
+      "  $3",
+      "};",
+      ""
+    ]
+  },
+  "export": {
+    "scope": "typescript",
+    "prefix": "ex",
+    "body": ["export { $2 } from './$1';"]
+  },
+  "useState": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "us",
+    "body": ["const [$1, set${1/(.*)/${1:/capitalize}/}] = useState($2);", "$3"]
+  },
+  "useCallback": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "uc",
+    "body": ["const $1 = useCallback(() => { $2 },[]);", "$3"]
+  },
+  "fm": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "fm",
+    "body": ["const { formatMessage } = useIntl();", ""]
+  }
+}

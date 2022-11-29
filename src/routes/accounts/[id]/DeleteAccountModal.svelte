@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { invalidate } from '$app/navigation';
   import type { ActionResult } from '@sveltejs/kit';
+
+  import { deps } from '$lib/deps';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import FormContainer from '$lib/ui/FormContainer.svelte';
@@ -8,13 +11,14 @@
 
   export let opened: boolean;
 
-  const onDelete = (result: ActionResult, next: (result: ActionResult) => void) => {
+  const onDelete = async (result: ActionResult, next: (result: ActionResult) => void) => {
     if (result.type === 'redirect') {
       showSuccessToast($translate('accounts.delete_account_success'));
+      await invalidate(deps.accounts);
     } else if (result.type === 'invalid') {
       showErrorToast($translate('accounts.delete_account_failure'));
     }
-    next(result);
+    await next(result);
   };
 </script>
 

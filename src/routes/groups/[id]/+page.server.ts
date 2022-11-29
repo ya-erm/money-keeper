@@ -4,7 +4,8 @@ import { isApiError } from '$lib/api/ApiError';
 import { routes } from '$lib/routes';
 import { withActionMiddleware } from '$lib/server';
 import { addUserToGroup, deleteGroup, deleteUserFromGroup, getGroupById, updateGroup } from '$lib/server/api/groups';
-import { checkUserId, getNumberFormParameter, getStringFormParameter } from '$lib/utils';
+import { checkNumberFormParameter, checkStringFormParameter } from '$lib/server/utils';
+import { checkUserId } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad } from './$types';
 
@@ -23,7 +24,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 const updateGroupAction: Action = async ({ params, request, locals }) => {
   const { id } = params;
   const data = await request.formData();
-  const name = getStringFormParameter(data, 'name');
+  const name = checkStringFormParameter(data, 'name');
   const group = await updateGroup({ id: parseInt(id) }, { name }, locals);
   return { group };
 };
@@ -37,7 +38,7 @@ const deleteGroupAction: Action = async ({ params, locals }) => {
 const addUserAction: Action = async ({ params, request, locals }) => {
   const { id } = params;
   const data = await request.formData();
-  const login = getStringFormParameter(data, 'login');
+  const login = checkStringFormParameter(data, 'login');
   const group = await addUserToGroup({ id: parseInt(id) }, { login }, locals);
   return { group };
 };
@@ -45,7 +46,7 @@ const addUserAction: Action = async ({ params, request, locals }) => {
 const deleteUserAction: Action = async ({ params, request, locals }) => {
   const { id } = params;
   const data = await request.formData();
-  const userId = getNumberFormParameter(data, 'userId');
+  const userId = checkNumberFormParameter(data, 'userId');
   const group = await deleteUserFromGroup({ id: parseInt(id) }, { userId }, locals);
   return { group };
 };

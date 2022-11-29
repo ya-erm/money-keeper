@@ -1,62 +1,33 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
+import { isApiError } from '$lib/api/ApiError';
 import { deps } from '$lib/deps';
-import { routes } from '$lib/routes';
-import { db, isServerError, serverError } from '$lib/server';
+import { db, withActionMiddleware } from '$lib/server';
+import { deleteTransaction, getTransaction, updateTransaction } from '$lib/server/api/transactions';
 import {
-  checkUserAndGroup,
-  getNumberFormParameter,
-  getStringFormParameter,
-  getStringOptionalFormParameter,
-} from '$lib/utils';
+  checkNumberFormParameter,
+  checkStringFormParameter,
+  checkStringOptionalFormParameter,
+} from '$lib/server/utils';
+import { serialize } from '$lib/utils';
+import { checkGroupId } from '$lib/utils/checkUser';
 
-import type { Action, Actions, PageServerLoad, RouteParams } from './$types';
+import type { Action, Actions, PageServerLoad } from './$types';
+import { updateTransfer } from '$lib/server/api/transactions/updateTransfer';
 
-const validate = async ({ params, locals }: { params: RouteParams; locals: App.Locals }) => {
-  const { userId, groupId } = checkUserAndGroup(locals, { redirect: true });
-
-  const transactionId = parseInt(params.id);
-
-  if (Number.isNaN(transactionId)) {
-    throw serverError(400, 'BAD_REQUEST');
-  }
-
-  const transaction = await db.transaction.findUnique({
-    where: { id: transactionId },
-    include: {
-      account: true,
-      category: true,
-    },
-  });
-
-  if (!transaction) {
-    throw serverError(404, 'NOT_FOUND');
-  }
-
-  if (transaction.ownerId !== groupId) {
-    throw serverError(403, 'FORBIDDEN');
-  }
-
-  return {
-    userId,
-    groupId,
-    transactionId,
-    transaction,
-  };
-};
-
-export const load: PageServerLoad = async ({ params, url, locals, depends }) => {
+export const load: PageServerLoad = async ({ params, locals, depends }) => {
   try {
-    const { groupId, transaction } = await validate({ params, locals });
+    const groupId = checkGroupId(locals);
+    const transaction = getTransaction({ id: parseInt(params.id) }, locals);
 
+    // TODO: use API
     const accounts = await db.account.findMany({
       where: { ownerId: groupId },
     });
 
     depends(deps.categories);
-    const type = url.searchParams.get('type') ?? 'OUT';
     const categories = await db.category.findMany({
-      where: { ownerId: groupId, type },
+      where: { ownerId: groupId },
     });
 
     return {
@@ -65,62 +36,60 @@ export const load: PageServerLoad = async ({ params, url, locals, depends }) => 
       transaction,
     };
   } catch (e) {
-    if (isServerError(e)) throw error(e.status, e.data.error.code);
+    if (isApiError(e)) throw error(e.status, e.code);
     throw e;
   }
 };
 
-const updateTransaction: Action = async ({ params, request, locals }) => {
-  try {
-    const { groupId, transactionId } = await validate({ params, locals });
+const updateTransactionAction: Action = async ({ params, request, locals }) => {
+  const data = await request.formData();
 
-    const data = await request.formData();
-    const accountId = getNumberFormParameter(data, 'accountId');
-    const categoryId = getNumberFormParameter(data, 'categoryId');
-    const amount = getNumberFormParameter(data, 'amount');
-    const date = getStringFormParameter(data, 'date');
-    const time = getStringFormParameter(data, 'time');
-    const comment = getStringOptionalFormParameter(data, 'comment');
-
-    await db.transaction.update({
-      where: { id: transactionId },
-      data: {
-        owner: { connect: { id: groupId } },
-        account: { connect: { id: accountId } },
-        category: { connect: { id: categoryId } },
-        date: new Date(`${date}T${time}`),
-        amount,
-        comment,
+  if (data.get('destinationAccountId')) {
+    const { t1, t2 } = await updateTransfer(
+      { id: parseInt(params.id) },
+      {
+        source: {
+          accountId: checkNumberFormParameter(data, 'accountId'),
+          amount: checkNumberFormParameter(data, 'amount'),
+        },
+        destination: {
+          accountId: checkNumberFormParameter(data, 'destinationAccountId'),
+          amount: checkNumberFormParameter(data, 'destinationAmount'),
+        },
+        date: checkStringFormParameter(data, 'date'),
+        time: checkStringFormParameter(data, 'time'),
+        comment: checkStringOptionalFormParameter(data, 'comment'),
       },
-      include: {
-        account: true,
-        category: true,
-      },
-    });
-
-    throw redirect(302, routes.transactions.path);
-  } catch (e) {
-    if (isServerError(e)) return e;
-    throw e;
+      locals,
+    );
+    return {
+      t1: serialize(t1),
+      t2: serialize(t2),
+    };
   }
+
+  const updatedTransaction = await updateTransaction(
+    { id: parseInt(params.id) },
+    {
+      accountId: checkNumberFormParameter(data, 'accountId'),
+      categoryId: checkNumberFormParameter(data, 'categoryId'),
+      amount: checkNumberFormParameter(data, 'amount'),
+      date: checkStringFormParameter(data, 'date'),
+      time: checkStringFormParameter(data, 'time'),
+      comment: checkStringOptionalFormParameter(data, 'comment'),
+    },
+    locals,
+  );
+
+  return { transaction: serialize(updatedTransaction) };
 };
 
-const deleteTransaction: Action = async ({ params, locals }) => {
-  try {
-    const { transactionId } = await validate({ params, locals });
-
-    await db.transaction.delete({
-      where: { id: transactionId },
-    });
-
-    throw redirect(302, routes.transactions.path);
-  } catch (e) {
-    if (isServerError(e)) return e;
-    throw e;
-  }
+const deleteTransactionAction: Action = async ({ params, locals }) => {
+  await deleteTransaction({ id: parseInt(params.id) }, locals);
+  return null;
 };
 
 export const actions: Actions = {
-  update: updateTransaction,
-  delete: deleteTransaction,
+  update: withActionMiddleware(updateTransactionAction),
+  delete: withActionMiddleware(deleteTransactionAction),
 };

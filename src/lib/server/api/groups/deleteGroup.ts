@@ -1,5 +1,5 @@
 import { ApiError } from '$lib/api';
-import { db } from '$lib/server/database';
+import { db } from '$lib/server';
 import { checkNumberParameter, checkUserId } from '$lib/utils';
 
 export type DeleteGroupRequestParams = {

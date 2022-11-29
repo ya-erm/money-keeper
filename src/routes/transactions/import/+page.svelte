@@ -154,7 +154,7 @@
           <div class="flex gap-1 items-cetner">
             <Checkbox bind:checked={item.checked} />
             <TransactionListItem
-              hideSource
+              hideAccount
               onClick={handleOperationClick}
               transaction={{
                 id: new Date(item.date).getTime(),

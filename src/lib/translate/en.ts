@@ -94,14 +94,18 @@ export const enDict: Dictionary = {
     "All accounts, categories and operations will be deleted. This action can' be undone.",
   'groups.failed_to_delete_group': 'Failed to delete group',
   // Transactions
-  // Transactions
   'transactions.title': 'Operations',
   'transactions.create_transaction': 'Create operation',
   'transactions.new_transaction': 'New operation',
   'transactions.incoming': 'Incoming',
   'transactions.outgoing': 'Outgoing',
+  'transactions.transfer': 'Transfer',
+  'transactions.from': 'From',
+  'transactions.to': 'To',
   'transactions.account': 'Account',
   'transactions.account_is_required': 'Select an account firstly',
+  'transactions.destination_account_is_required': 'Select an destination account firstly',
+  'transactions.accounts_must_be_different': 'Select different accounts',
   'transactions.date': 'Date',
   'transactions.time': 'Time',
   'transactions.dateTime': 'Date and time',
@@ -110,7 +114,11 @@ export const enDict: Dictionary = {
   'transactions.category_is_required': 'Select a category firstly',
   'transactions.comment': 'Comment',
   'transactions.edit_transaction': 'Edit operation',
+  'transactions.create_transaction_success': 'Operation was created',
+  'transactions.create_transaction_failure': 'Failed to create operation',
   'transactions.delete_transaction': 'Delete operation',
+  'transactions.delete_transaction_success': 'Operation was deleted',
+  'transactions.delete_transaction_failure': 'Failed to delete operation',
   'transactions.import': 'Import',
   'transactions.import.title': 'Import operations',
   'transactions.import.invalid_expression': 'Enter search request to filter operations of one category',
@@ -125,7 +133,9 @@ export const enDict: Dictionary = {
   'transactions.import.select_category_for_all_operations': 'Select categories for all operations',
   'transactions.import.finish': 'Finish import',
   'transactions.import.finished': '{count, plural, one {# operation was imported} other {# operations were imported}}',
-
+  // System
+  'system.category.transfer_in': 'Transfer from other account',
+  'system.category.transfer_out': 'Transfer to other account',
   // Settings
   'settings.title': 'Settings',
   'settings.language': 'Language',
