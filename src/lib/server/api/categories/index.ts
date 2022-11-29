@@ -1,0 +1,1 @@
+export { checkCategory } from './utils';

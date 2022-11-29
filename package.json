@@ -11,7 +11,7 @@
     "test:headed": "playwright test --headed",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "prettier --plugin-search-dir . --check . && eslint .",
+    "lint": "tsc --noemit && prettier --plugin-search-dir . --check . && eslint .",
     "format": "prettier --plugin-search-dir . --write .",
     "generate:icons": "node ./pack-icons.js && prettier --write ./src/lib/icons.ts",
     "generate:prisma": "npx prisma generate",

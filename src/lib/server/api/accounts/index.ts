@@ -1,0 +1,1 @@
+export { checkAccount } from './utils';

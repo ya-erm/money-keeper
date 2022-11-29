@@ -3,11 +3,13 @@
 
   export let options: { id: string; title: string }[];
   export let selected: { id: string; title: string } | undefined;
+  export let disabled: boolean = false;
 
   const dispatch = createEventDispatcher<{ change: { id: string; title: string } }>();
   export let change = (value: { id: string; title: string }) => dispatch('change', value);
 
   const handleClick = (value: { id: string; title: string }) => async () => {
+    if (disabled) return;
     selected = value;
     change(value);
   };
@@ -15,7 +17,13 @@
 
 <div class="multi-switch">
   {#each options as option (option.id)}
-    <button on:click={handleClick(option)} class:active={selected?.id === option.id} class="switch-item" type="button">
+    <button
+      on:click={handleClick(option)}
+      class:active={selected?.id === option.id}
+      class="switch-item"
+      type="button"
+      {disabled}
+    >
       {option.title}
     </button>
   {/each}

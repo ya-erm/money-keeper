@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { invalidate } from '$app/navigation';
   import type { ActionResult } from '@sveltejs/kit';
 
+  import { deps } from '$lib/deps';
   import type { CategoryType } from '$lib/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
@@ -11,15 +13,16 @@
   export let type: CategoryType;
   export let onCreate: (() => void) | null = null;
 
-  const handleCreate = (result: ActionResult, next: (result: ActionResult) => void) => {
+  const handleCreate = async (result: ActionResult, next: (result: ActionResult) => void) => {
     if (result.type === 'success' || result.type === 'redirect') {
       showSuccessToast($translate('categories.create_category_success'));
+      await invalidate(deps.categories);
       onCreate?.();
     } else if (result.type === 'invalid') {
       showErrorToast($translate('categories.create_category_failure'));
     }
     if (!onCreate) {
-      next(result);
+      await next(result);
     }
   };
 </script>

@@ -1,21 +1,7 @@
-import { db } from '$lib/server';
-import { checkUserAndGroup } from '$lib/utils';
+import { getTransactions } from '$lib/server/api/transactions';
 
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  const { groupId } = checkUserAndGroup(locals, { redirect: true });
-
-  const transactions = await db.transaction.findMany({
-    where: { ownerId: groupId },
-    orderBy: { date: 'desc' },
-    include: {
-      account: true,
-      category: true,
-    },
-  });
-
-  return {
-    transactions,
-  };
+  return await getTransactions({}, locals);
 };

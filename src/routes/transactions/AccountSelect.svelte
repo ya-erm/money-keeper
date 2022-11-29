@@ -5,18 +5,21 @@
 
   import { translate } from '$lib/translate';
   import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
+  import { getNumberSearchParam } from '$lib/utils';
 
+  export let name = 'accountId';
+  export let label = $translate('transactions.account');
   export let accounts: Account[];
   export let fromUrl: boolean = false;
   export let accountId: number | null = null;
 
-  $: accountIdFromUrl = parseInt($page.url.searchParams.get('accountId') ?? '') || null;
+  $: accountIdFromUrl = getNumberSearchParam($page, name);
 
   $: _accountId = fromUrl ? accountIdFromUrl : accountId;
 
   const setAccountId = (value: number) => {
     if (fromUrl) {
-      $page.url.searchParams.set('accountId', `${value}`);
+      $page.url.searchParams.set(name, `${value}`);
       goto($page.url, { replaceState: true });
     } else {
       accountId = value;
@@ -26,8 +29,8 @@
 
 <div class="flex-col gap-0.5">
   <label class="label">
-    <span>{$translate('transactions.account')}</span>
-    <input name="accountId" value={_accountId} class="hidden" readonly required />
+    <span>{label}</span>
+    <input {name} value={_accountId} class="hidden" readonly required />
   </label>
   <div class="grid">
     {#each accounts as account}

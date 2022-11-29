@@ -3,7 +3,8 @@ import { redirect } from '@sveltejs/kit';
 import { routes } from '$lib/routes';
 import { withActionMiddleware } from '$lib/server';
 import { getGroups, selectGroup } from '$lib/server/api/groups';
-import { checkUserId, getNumberFormParameter } from '$lib/utils';
+import { checkNumberFormParameter } from '$lib/server/utils';
+import { checkUserId } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad } from './$types';
 
@@ -14,7 +15,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 const selectGroupAction: Action = async ({ request, locals, cookies }) => {
   const data = await request.formData();
-  const groupId = getNumberFormParameter(data, 'groupId');
+  const groupId = checkNumberFormParameter(data, 'groupId');
 
   await selectGroup({ groupId }, locals, cookies);
 

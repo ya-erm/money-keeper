@@ -11,6 +11,10 @@ export type TransactionWithCategory = Transaction & {
 export type TransactionWithAccountAndCategory = Transaction & {
   account: Account;
   category: Category;
+  linkedTransaction?: Transaction & {
+    account: Account;
+    category: Category;
+  };
 };
 
 export type CategoryType = 'IN' | 'OUT';

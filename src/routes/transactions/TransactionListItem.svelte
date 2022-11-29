@@ -1,14 +1,20 @@
 <script lang="ts">
   import type { TransactionWithAccountAndCategory } from '$lib/interfaces';
   import { routes } from '$lib/routes';
+  import { translate, type Messages } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
 
   export let transaction: TransactionWithAccountAndCategory;
-  export let hideSource: boolean = false;
+  export let hideAccount: boolean = false;
   export let onClick: ((transaction: TransactionWithAccountAndCategory) => void) | null = null;
 
   const incoming = transaction.category.type === 'IN';
   const outgoing = transaction.category.type === 'OUT';
+  const isTransfer = !!transaction.linkedTransaction;
+
+  const categoryName = transaction.category.name.startsWith('system.category')
+    ? $translate(transaction.category.name as Messages)
+    : transaction.category.name;
 
   const handleClick = (e: MouseEvent) => {
     if (onClick) {
@@ -29,11 +35,29 @@
     </div>
     <div class="text flex-col flex-grow">
       <div class="flex items-center">
-        {#if !hideSource}
-          <span class="source">{transaction.account.name}</span>
+        {#if isTransfer}
+          <span class="source">
+            {outgoing ? transaction.account.name : transaction.linkedTransaction?.account.name}
+          </span>
           <Icon name="mdi:chevron-right" size={1.25} />
+          <span class="destination">
+            {incoming ? transaction.account.name : transaction.linkedTransaction?.account.name}
+          </span>
+        {:else}
+          {#if (outgoing && !hideAccount) || incoming}
+            <span class="source">
+              {outgoing ? transaction.account.name : categoryName}
+            </span>
+          {/if}
+          {#if !hideAccount}
+            <Icon name="mdi:chevron-right" size={1.25} />
+          {/if}
+          {#if (incoming && !hideAccount) || outgoing}
+            <span class="destination">
+              {incoming ? transaction.account.name : categoryName}
+            </span>
+          {/if}
         {/if}
-        <span class="destination">{transaction.category.name}</span>
       </div>
       <div class="small-text">{transaction.comment}</div>
     </div>
@@ -64,11 +88,7 @@
   .small-text {
     font-size: 0.9rem;
   }
-  .source {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-  }
+  .source,
   .destination {
     text-overflow: ellipsis;
     white-space: nowrap;

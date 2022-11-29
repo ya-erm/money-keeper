@@ -1,12 +1,12 @@
 import type { ImportedTransaction } from '$lib/interfaces';
 import { db, withRequestHandlerMiddleware, serverApiError } from '$lib/server';
-import { checkUserAndGroup, checkParameter, getNumberUrlParameter } from '$lib/utils';
+import { checkUserAndGroup, checkParameter, checkNumberUrlParameter } from '$lib/utils';
 import type { RequestHandler } from './$types';
 
 export const POST = withRequestHandlerMiddleware<RequestHandler>(async ({ url, request, locals }) => {
   const { groupId } = checkUserAndGroup(locals);
 
-  const accountId = getNumberUrlParameter(url, 'accountId');
+  const accountId = checkNumberUrlParameter(url, 'accountId');
 
   const account = await db.account.findUnique({ where: { id: accountId } });
 

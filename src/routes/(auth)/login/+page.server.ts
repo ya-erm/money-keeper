@@ -3,7 +3,7 @@ import { redirect } from '@sveltejs/kit';
 import { routes } from '$lib/routes';
 import { withActionMiddleware } from '$lib/server';
 import { login } from '$lib/server/api/auth/login';
-import { getStringFormParameter } from '$lib/utils';
+import { checkStringFormParameter } from '$lib/server/utils';
 
 import type { Action, Actions, PageServerLoad } from './$types';
 
@@ -17,8 +17,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 const loginAction: Action = async ({ request, cookies }) => {
   const formData = await request.formData();
   const data = {
-    login: getStringFormParameter(formData, 'login'),
-    password: getStringFormParameter(formData, 'password'),
+    login: checkStringFormParameter(formData, 'login'),
+    password: checkStringFormParameter(formData, 'password'),
   };
 
   await login(data, cookies);

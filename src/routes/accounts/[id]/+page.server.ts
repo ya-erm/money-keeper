@@ -3,7 +3,8 @@ import { error, redirect } from '@sveltejs/kit';
 
 import { routes } from '$lib/routes';
 import { db, isServerError, serverError } from '$lib/server';
-import { checkUserAndGroup, getStringFormParameter, getStringOptionalFormParameter } from '$lib/utils';
+import { checkUserAndGroup } from '$lib/utils';
+import { checkStringFormParameter, checkStringOptionalFormParameter } from '$lib/server/utils';
 
 import type { Action, Actions, PageServerLoad, RouteParams } from './$types';
 
@@ -62,10 +63,10 @@ const updateAccount: Action = async ({ request, params, locals }) => {
     const { accountId } = await validate({ params, locals });
 
     const data = await request.formData();
-    const name = getStringFormParameter(data, 'name');
-    const currency = getStringFormParameter(data, 'currency');
-    const icon = getStringOptionalFormParameter(data, 'icon');
-    const color = getStringOptionalFormParameter(data, 'color');
+    const name = checkStringFormParameter(data, 'name');
+    const currency = checkStringFormParameter(data, 'currency');
+    const icon = checkStringOptionalFormParameter(data, 'icon');
+    const color = checkStringOptionalFormParameter(data, 'color');
 
     await db.account.update({
       where: { id: accountId },

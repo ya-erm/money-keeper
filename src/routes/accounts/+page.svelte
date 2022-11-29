@@ -87,7 +87,7 @@
       {#each Object.entries(groups) as [date, transactions] (date)}
         <div>{date}</div>
         {#each transactions as transaction (transaction.id)}
-          <TransactionListItem hideSource transaction={{ ...transaction, account }} />
+          <TransactionListItem hideAccount transaction={{ ...transaction, account }} />
         {/each}
       {/each}
     </div>

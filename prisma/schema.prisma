@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -117,14 +118,14 @@ model Account {
 
 model Category {
   id      Int     @id @default(autoincrement())
-  ownerId Int
+  ownerId Int?
   name    String
   icon    String?
   color   String?
   type    String
   order   Int     @default(0)
 
-  owner        Group         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner        Group?        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   transactions Transaction[]
 
   createdAt DateTime @default(now())
@@ -132,13 +133,14 @@ model Category {
 }
 
 model Transaction {
-  id         Int      @id @default(autoincrement())
-  ownerId    Int
-  accountId  Int
-  categoryId Int
-  date       DateTime
-  amount     Float
-  comment    String?
+  id                  Int      @id @default(autoincrement())
+  ownerId             Int
+  accountId           Int
+  categoryId          Int
+  linkedTransactionId Int?     @unique
+  date                DateTime
+  amount              Float
+  comment             String?
 
   owner    Group    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   account  Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
