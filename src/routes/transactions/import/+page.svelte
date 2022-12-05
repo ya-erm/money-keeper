@@ -101,8 +101,8 @@
   };
 
   const changeOperationCategory = (categoryId: number) => {
-    const idnex = items.findIndex((item) => new Date(item.date).getTime() === selectedOperation?.id);
-    items[idnex].categoryId = categoryId;
+    const index = items.findIndex((item) => `${item.id}` === `${selectedOperation?.id}`);
+    items[index].categoryId = categoryId;
     items = [...items];
   };
 
@@ -148,18 +148,20 @@
       <Button on:click={handleSetCategoryClick} text={$translate('transactions.import.set_category')} />
     </div>
     <div class="list flex-grow flex-col gap-1">
-      {#each Object.entries(groups) as [date, items]}
+      {#each Object.entries(groups) as [date, items] (`${date}`)}
         <div>{date}</div>
-        {#each items as item (`${item.date} ${item.amount}`)}
-          <div class="flex gap-1 items-cetner">
+        {#each items as item (`${item.id} ${item.date} ${item.amount}`)}
+          <div class="flex gap-1 items-cetner" id={item.id}>
             <Checkbox bind:checked={item.checked} />
             <TransactionListItem
               hideAccount
               onClick={handleOperationClick}
               transaction={{
-                id: new Date(item.date).getTime(),
+                // @ts-ignore
+                id: item.id,
                 comment: item.comment ?? null,
                 amount: item.amount,
+                date: new Date(item.date),
                 // @ts-ignore
                 category: item.categoryId
                   ? categories.find((c) => c.id === item.categoryId)
@@ -176,7 +178,7 @@
       {/each}
     </div>
     <div class="category-filters">
-      {#each categories as category}
+      {#each categories as category (category.id)}
         {@const categoryItems = items.filter((x) => x.categoryId === category.id)}
         {#if categoryItems.length > 0}
           <Button

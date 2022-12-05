@@ -1,5 +1,5 @@
 <script>
-  import { title } from '$lib/ui/header';
+  import { useTitle } from '$lib/ui/header';
   import Switch from '$lib/ui/Switch.svelte';
   import { darkMode } from '$lib/ui/theme';
 
@@ -10,7 +10,7 @@
   import Switches from './Switches.svelte';
   import Toasts from './Toasts.svelte';
 
-  title.set('UI Kit');
+  useTitle('UI Kit');
 </script>
 
 <div class="p-1">
