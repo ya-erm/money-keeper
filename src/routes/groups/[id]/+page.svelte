@@ -6,7 +6,7 @@
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import FormContainer from '$lib/ui/FormContainer.svelte';
-  import { backLink, title } from '$lib/ui/header';
+  import { backLink, useTitle } from '$lib/ui/header';
   import Icon from '$lib/ui/Icon.svelte';
 
   import type { PageData } from './$types';
@@ -16,7 +16,7 @@
 
   export let data: PageData;
 
-  title.set($translate('groups.edit_group'));
+  useTitle($translate('groups.edit_group'));
   backLink.set(routes.groups.path);
 
   const group = writable(data.group);

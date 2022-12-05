@@ -7,7 +7,7 @@
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import FormContainer from '$lib/ui/FormContainer.svelte';
-  import { backLink, title } from '$lib/ui/header';
+  import { backLink, useTitle } from '$lib/ui/header';
   import Input from '$lib/ui/Input.svelte';
   import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
 
@@ -18,7 +18,7 @@
 
   $: account = data.account;
 
-  title.set($translate('accounts.edit_account'));
+  useTitle($translate('accounts.edit_account'));
   $: backLink.set(routes.accounts.path + (account ? `#account-card-${account.id}` : ''));
 
   const onSave = async (result: ActionResult, next: (result: ActionResult) => void) => {

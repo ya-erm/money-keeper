@@ -5,13 +5,13 @@
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import FormContainer from '$lib/ui/FormContainer.svelte';
-  import { title } from '$lib/ui/header';
+  import { useTitle } from '$lib/ui/header';
   import { showSuccessToast } from '$lib/ui/toasts';
 
   import TransactionForm from '../TransactionForm.svelte';
   import type { PageData } from './$types';
 
-  title.set($translate('transactions.edit_transaction'));
+  useTitle($translate('transactions.edit_transaction'));
 
   export let data: PageData;
   $: accounts = data?.accounts;

@@ -20,6 +20,7 @@ export type TransactionWithAccountAndCategory = Transaction & {
 export type CategoryType = 'IN' | 'OUT';
 
 export type ImportTransactionItem = {
+  id: string;
   date: string;
   type: CategoryType;
   amount: number;

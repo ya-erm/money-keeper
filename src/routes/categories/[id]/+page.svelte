@@ -7,7 +7,7 @@
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import FormContainer from '$lib/ui/FormContainer.svelte';
-  import { backLink, title } from '$lib/ui/header';
+  import { backLink, useTitle } from '$lib/ui/header';
   import Input from '$lib/ui/Input.svelte';
   import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
 
@@ -17,7 +17,7 @@
 
   let category = data?.category;
 
-  title.set($translate('categories.edit_category'));
+  useTitle($translate('categories.edit_category'));
   backLink.set(routes.categories.path);
 
   const onUpdate = async (result: ActionResult, next: (result: ActionResult) => void) => {

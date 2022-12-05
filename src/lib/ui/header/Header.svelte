@@ -7,8 +7,9 @@
   import { backLink, rightButton, title } from './header';
 
   const titleText = derived([page, translate, title], ([page, translate, title]) => {
+    if (title) return title;
     const route = findRoute(page.url.pathname);
-    return route ? translate(route.title) : title ?? '';
+    return route ? translate(route.title) : '';
   });
 </script>
 

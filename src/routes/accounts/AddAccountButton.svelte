@@ -4,5 +4,5 @@
 </script>
 
 <a href={routes['accounts.create'].path}>
-  <Icon name="mdi:plus" padding={1} />
+  <Icon name="mdi:credit-card-plus-outline" padding={1} />
 </a>
