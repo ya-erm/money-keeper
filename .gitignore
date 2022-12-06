@@ -7,4 +7,5 @@ node_modules
 .env.*
 !.env.example
 /prisma/dev.db
-data
+/data
+/backups
