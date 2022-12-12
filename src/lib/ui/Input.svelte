@@ -15,6 +15,7 @@
   export let minlength: number | null = null;
   export let maxlength: number | null = null;
   export let error: string | null = null;
+  export let testId: string | null = 'Input';
 
   export let value: string | null = null;
   export let onChange: ((value: string) => void) | null = null;
@@ -34,9 +35,9 @@
   };
 </script>
 
-<label class="input-label">
+<label class="input-label" data-testId={`${testId}.Container`}>
   {#if label}
-    <InputLabel text={label} {optional} {error} />
+    <InputLabel text={label} {optional} {error} testId={`${testId}.Label`} />
   {/if}
   <div class="input-container flex-col">
     <input
@@ -44,6 +45,7 @@
       on:input={handleChange}
       autocomplete={autocomplete ? 'on' : undefined}
       step={type === 'number' ? '0.01' : undefined}
+      data-testId={testId}
       class:error={!!error}
       class:clearable
       {placeholder}
@@ -56,11 +58,18 @@
     />
     <div class="end-slot flex items-center">
       {#if endText}
-        <span class="end-text" class:mr-1={!clearable || !value}>{endText}</span>
+        <span class="end-text" class:mr-1={!clearable || !value} data-testId={`${testId}.EndText`}>
+          {endText}
+        </span>
       {/if}
       {#if clearable && !!value}
         <div class="flex-center" title={$translate('common.clear')}>
-          <Button on:click={clearValue} appearance="link" color={error ? 'danger' : 'secondary'}>
+          <Button
+            on:click={clearValue}
+            appearance="link"
+            color={error ? 'danger' : 'secondary'}
+            testId={`${testId}.ClearButton`}
+          >
             <Icon name="mdi:close" size={1.25} padding={0.5} />
           </Button>
         </div>
@@ -69,7 +78,7 @@
   </div>
 
   {#if error}
-    <span class="error-text">{error}</span>
+    <span class="error-text" data-testId={`${testId}.Error`}>{error}</span>
   {/if}
 </label>
 

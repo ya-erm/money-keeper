@@ -7,6 +7,7 @@ export type ToastOptions = {
   type?: ToastType;
   dismissible?: boolean;
   timeout?: number;
+  testId?: string;
 };
 
 export type Toast = Required<ToastOptions> & {
@@ -23,6 +24,7 @@ export const showToast = (options: ToastOptions) => {
     type: 'info',
     dismissible: true,
     timeout: 3000,
+    testId: 'Toast',
   };
   const toast = { ...defaults, ...options };
 
