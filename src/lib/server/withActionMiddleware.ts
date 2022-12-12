@@ -5,7 +5,7 @@ import type { Action } from '@sveltejs/kit';
 import { isServerError, serverError } from './serverError';
 
 /** Wrapper to add error handler */
-export function withActionMiddleware<T extends Action<any>>(action: T): T {
+export function withActionMiddleware<T extends Action<any, any, any>>(action: T): T {
   return (async (event) => {
     try {
       return await action(event);
