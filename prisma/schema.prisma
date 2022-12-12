@@ -108,6 +108,7 @@ model Account {
   currency String
   icon     String?
   color    String?
+  order    Int     @default(0)
 
   owner        Group         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   transactions Transaction[]
