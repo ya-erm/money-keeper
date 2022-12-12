@@ -14,6 +14,7 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
   depends(deps.accounts);
   const accounts = await db.account.findMany({
     where: { ownerId: groupId },
+    orderBy: { order: 'asc' },
   });
 
   return {

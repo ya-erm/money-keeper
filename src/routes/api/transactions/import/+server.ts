@@ -1,6 +1,6 @@
 import type { ImportedTransaction } from '$lib/interfaces';
 import { db, withRequestHandlerMiddleware, serverApiError } from '$lib/server';
-import { checkUserAndGroup, checkParameter, checkNumberUrlParameter } from '$lib/utils';
+import { checkUserAndGroup, checkParameter, checkNumberUrlParameter, keyTransactions } from '$lib/utils';
 import type { RequestHandler } from './$types';
 
 export const POST = withRequestHandlerMiddleware<RequestHandler>(async ({ url, request, locals }) => {
@@ -14,17 +14,29 @@ export const POST = withRequestHandlerMiddleware<RequestHandler>(async ({ url, r
     throw serverApiError(403, 'FORBIDDEN');
   }
 
+  const ignoredItems: ImportedTransaction[] = [];
+
   const data = await request.json();
 
   const items = checkParameter<Array<ImportedTransaction>>(data.items, 'items', { required: true, type: 'array' });
+  const itemsWithCategory = items.filter((item) => {
+    const hasCategory = !!item.categoryId;
+    if (!hasCategory) ignoredItems.push(item);
+    return hasCategory;
+  });
+  const { keyedItems } = keyTransactions(itemsWithCategory);
 
   const transactions = await db.transaction.findMany({
     where: { accountId },
   });
 
-  const filteredItems = items.filter(
-    (item) => !!item.categoryId && !transactions.some((t) => t.date.getTime() === new Date(item.date).getTime()),
-  );
+  const { keyedItemsMap: keyedTransactionsMap } = keyTransactions(transactions);
+
+  const filteredItems = keyedItems.filter((item) => {
+    const alreadyExists = keyedTransactionsMap.has(item.uniqueKey);
+    if (alreadyExists) ignoredItems.push(item);
+    return !alreadyExists;
+  });
 
   if (filteredItems.length > 0) {
     await db.account.update({
@@ -46,6 +58,7 @@ export const POST = withRequestHandlerMiddleware<RequestHandler>(async ({ url, r
   return new Response(
     JSON.stringify({
       count: filteredItems.length,
+      ignoredItems,
     }),
   );
 });
