@@ -18,7 +18,7 @@ import { updateTransfer } from '$lib/server/api/transactions/updateTransfer';
 export const load: PageServerLoad = async ({ params, locals, depends }) => {
   try {
     const groupId = checkGroupId(locals);
-    const transaction = getTransaction({ id: parseInt(params.id) }, locals);
+    const transaction = await getTransaction({ id: parseInt(params.id) }, locals);
 
     // TODO: use API
     const accounts = await db.account.findMany({

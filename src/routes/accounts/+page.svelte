@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
   import { onDestroy, onMount } from 'svelte';
 
-  import type { TransactionWithAccountAndCategory } from '$lib/interfaces';
+  import type { TransactionFullDto } from '$lib/interfaces';
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import { backLink, rightButton, title } from '$lib/ui/header';
@@ -15,6 +15,7 @@
   import AccountCard from './AccountCard.svelte';
   import AddAccountButton from './AddAccountButton.svelte';
   import AddOperationButton from './AddOperationButton.svelte';
+  import { t } from 'svelte-i18n';
 
   backLink.set(null);
   rightButton.set(AddAccountButton);
@@ -22,7 +23,12 @@
 
   export let data: PageData;
   $: accounts = data.accounts;
-  $: transactions = data.transactions;
+  $: categories = data.categories;
+  $: transactions = data.transactions.map((t) => ({
+    ...t,
+    account: accounts.find((x) => x.id === t.accountId)!,
+    category: categories.find((x) => x.id === t.categoryId)!,
+  }));
 
   let accountsContainerElement: Element;
   let accountListElement: Element;
@@ -37,21 +43,22 @@
 
   $: cardId = $page.url.hash.match(/\#account-card-(\d+)/)?.[1];
   $: account = accounts.find((x) => x.id.toString() === cardId);
+  $: accountTransactions = !!account ? transactions.filter((t) => t.accountId === account?.id) : null;
   $: filteredTransactions =
-    (account?.transactions ?? transactions).filter(
+    (accountTransactions ?? transactions).filter(
       (t) =>
         !search ||
         t.comment?.toLowerCase().includes(search.toLowerCase()) ||
-        t.category.name.toLowerCase().includes(search.toLowerCase()) ||
-        t.date.toISOString().substring(0, 10).includes(search) ||
+        t.category?.name.toLowerCase().includes(search.toLowerCase()) ||
+        t.date.substring(0, 10).includes(search) ||
         `${t.amount} ${account?.currency}`.toLowerCase().includes(search.toLowerCase()),
     ) ?? [];
   $: groups = filteredTransactions.reduce((res, t) => {
-    const date = t.date.toISOString().substring(0, 10);
+    const date = t.date.substring(0, 10);
     if (!res[date]) res[date] = [];
     res[date].push(t);
     return res;
-  }, {} as { [key: string]: TransactionWithAccountAndCategory[] });
+  }, {} as { [key: string]: TransactionFullDto[] });
 
   onMount(() => {
     if (cardId) {

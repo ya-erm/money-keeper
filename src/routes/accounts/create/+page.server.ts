@@ -21,6 +21,11 @@ const create: Action = async ({ request, locals }) => {
 
     const { groupId } = checkUserAndGroup(locals, { redirect: true });
 
+    const { _max } = await db.account.aggregate({
+      where: { ownerId: groupId },
+      _max: { order: true },
+    });
+
     const account = await db.account.create({
       data: {
         name,
@@ -28,6 +33,7 @@ const create: Action = async ({ request, locals }) => {
         icon,
         color,
         owner: { connect: { id: groupId } },
+        order: (_max.order ?? 0) + 1,
       },
     });
 

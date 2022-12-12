@@ -1,20 +1,29 @@
-import type { Account, Category, Group, Transaction, User } from '@prisma/client';
+import type { Account, Category, Group, User } from '@prisma/client';
 
 export type GroupWithUsers = Pick<Group, 'id' | 'name'> & {
   users: Pick<User, 'id' | 'name' | 'login'>[];
 };
 
-export type TransactionWithCategory = Transaction & {
+export type TransactionDto = {
+  id: number;
+  accountId: number;
+  linkedTransactionId?: number | null;
+  date: string;
+  amount: number;
+  comment: string | null;
+  categoryId: number;
+};
+
+export type TransactionWithCategory = TransactionDto & {
   category: Category;
 };
 
-export type TransactionWithAccountAndCategory = Transaction & {
+export type TransactionWithAccountAndCategory = TransactionWithCategory & {
   account: Account;
-  category: Category;
-  linkedTransaction?: Transaction & {
-    account: Account;
-    category: Category;
-  };
+};
+
+export type TransactionFullDto = TransactionWithAccountAndCategory & {
+  linkedTransaction?: TransactionWithAccountAndCategory;
 };
 
 export type CategoryType = 'IN' | 'OUT';

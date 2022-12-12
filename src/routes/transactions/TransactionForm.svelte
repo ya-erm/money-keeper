@@ -15,14 +15,14 @@
   import { showErrorToast } from '$lib/ui/toasts';
   import { getNumberSearchParam, getSearchParam } from '$lib/utils/getSearchParam';
 
-  import type { TransactionWithAccountAndCategory } from '$lib/interfaces';
+  import type { TransactionFullDto } from '$lib/interfaces';
   import AccountSelect from './AccountSelect.svelte';
   import CategorySelect from './CategorySelect.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
 
   export let accounts: Account[];
   export let categories: Category[];
-  export let transaction: TransactionWithAccountAndCategory | null = null;
+  export let transaction: TransactionFullDto | null = null;
 
   export let action: string;
   export let onSuccess: ((result: ActionResult) => void | Promise<void>) | null = null;
