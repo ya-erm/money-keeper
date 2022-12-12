@@ -21,7 +21,7 @@
   export let endText: string | null = null;
   export let clearable = false;
 
-  let input: HTMLInputElement;
+  export let ref: HTMLInputElement | null = null;
 
   const handleChange = (e: Event) => {
     value = (e.target as HTMLInputElement).value;
@@ -40,7 +40,7 @@
   {/if}
   <div class="input-container flex-col">
     <input
-      bind:this={input}
+      bind:this={ref}
       on:input={handleChange}
       autocomplete={autocomplete ? 'on' : undefined}
       step={type === 'number' ? '0.01' : undefined}

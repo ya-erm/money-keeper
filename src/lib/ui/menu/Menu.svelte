@@ -31,7 +31,7 @@
     align-items: center;
     border-top: 1px solid var(--border-color);
     background-color: var(--header-background-color);
-    padding-bottom: calc(env(safe-area-inset-bottom) / 3);
+    padding-bottom: env(safe-area-inset-bottom);
   }
   .menu-bar.hidden {
     display: none;
@@ -46,9 +46,13 @@
     align-items: center;
     padding: 10px;
   }
-  .menu-item:hover,
   .menu-item.active {
     color: var(--active-color);
+  }
+  @media (hover: hover) {
+    .menu-item:hover {
+      color: var(--active-color);
+    }
   }
   .menu-item:active {
     opacity: 0.7;

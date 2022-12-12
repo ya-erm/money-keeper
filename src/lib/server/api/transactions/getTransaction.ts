@@ -1,17 +1,18 @@
 import { ApiError } from '$lib/api';
-import type { TransactionWithAccountAndCategory } from '$lib/interfaces';
+import type { TransactionFullDto } from '$lib/interfaces';
 import { db } from '$lib/server';
 import { checkNumberParameter, checkUserAndGroup } from '$lib/utils';
+import { mapTransaction } from './interfaces';
 
 export type GetTransactionParams = {
   id: number;
 };
 
-export async function getTransaction(params: GetTransactionParams, locals: App.Locals) {
+export async function getTransaction(params: GetTransactionParams, locals: App.Locals): Promise<TransactionFullDto> {
   const { groupId } = checkUserAndGroup(locals);
   const transactionId = checkNumberParameter(params.id, 'id');
 
-  const transaction: TransactionWithAccountAndCategory | null = await db.transaction.findUnique({
+  const transaction = await db.transaction.findUnique({
     where: { id: transactionId },
     include: {
       account: true,
@@ -27,16 +28,14 @@ export async function getTransaction(params: GetTransactionParams, locals: App.L
     throw new ApiError(403, 'FORBIDDEN', `You have no access to transaction #${transactionId}`);
   }
 
-  if (transaction.linkedTransactionId) {
-    transaction.linkedTransaction =
-      (await db.transaction.findUnique({
-        where: { id: transaction.linkedTransactionId },
-        include: {
-          account: true,
-          category: true,
-        },
-      })) ?? undefined;
-  }
-
-  return transaction;
+  return {
+    ...mapTransaction(
+      transaction,
+      transaction.linkedTransactionId
+        ? await db.transaction.findUnique({ where: { id: transaction.linkedTransactionId } })
+        : null,
+    ),
+    category: transaction.category,
+    account: transaction.account,
+  };
 }

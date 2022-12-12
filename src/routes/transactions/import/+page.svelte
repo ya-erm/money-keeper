@@ -170,7 +170,7 @@
                 id: item.id,
                 comment: item.comment ?? null,
                 amount: item.amount,
-                date: new Date(item.date),
+                date: item.date,
                 // @ts-ignore
                 category: item.categoryId
                   ? categories.find((c) => c.id === item.categoryId)

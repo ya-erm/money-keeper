@@ -9,7 +9,7 @@
       "name": "Launch Vite DEV",
       "request": "launch",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["vite"],
+      "runtimeArgs": ["vite", "dev", "--host"],
       "type": "node",
       "serverReadyAction": {
         "action": "debugWithChrome",

@@ -15,14 +15,14 @@
   import { showErrorToast } from '$lib/ui/toasts';
   import { getNumberSearchParam, getSearchParam } from '$lib/utils/getSearchParam';
 
-  import type { TransactionWithAccountAndCategory } from '$lib/interfaces';
+  import type { TransactionFullDto } from '$lib/interfaces';
   import AccountSelect from './AccountSelect.svelte';
   import CategorySelect from './CategorySelect.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
 
   export let accounts: Account[];
   export let categories: Category[];
-  export let transaction: TransactionWithAccountAndCategory | null = null;
+  export let transaction: TransactionFullDto | null = null;
 
   export let action: string;
   export let onSuccess: ((result: ActionResult) => void | Promise<void>) | null = null;
@@ -77,58 +77,56 @@
 
 <form method="POST" {action} use:enhance={() => handleResult}>
   <div class="flex-col gap-1 p-1">
-    <div class="flex-col gap-1 p-1">
-      <TypeSwitch bind:type disabled={isTransfer} />
-      {#if type === 'OUT'}
-        <AccountSelect {accounts} bind:accountId />
-      {/if}
-      {#if type === 'TRANSFER'}
-        <AccountSelect name="accountId" label={$translate('transactions.from')} bind:accountId {accounts} />
-        <AccountSelect
-          name="destinationAccountId"
-          label={$translate('transactions.to')}
-          bind:accountId={destinationAccountId}
-          {accounts}
-        />
-      {/if}
-      {#if type === 'IN' || type === 'OUT'}
-        <CategorySelect categories={categories.filter((c) => c.type === type)} {type} bind:categoryId />
-      {/if}
-      {#if type === 'IN'}
-        <AccountSelect {accounts} bind:accountId />
-      {/if}
-      <div class="flex-col gap-0.5">
-        <InputLabel text={$translate('transactions.dateTime')} />
-        <div class="flex gap-1">
-          <Input name="date" type="date" value={dayjs(transaction?.date).format('YYYY-MM-DD')} required />
-          <Input name="time" type="time" value={dayjs(transaction?.date).format('HH:mm')} required />
-        </div>
+    <TypeSwitch bind:type disabled={isTransfer} />
+    {#if type === 'OUT'}
+      <AccountSelect {accounts} bind:accountId />
+    {/if}
+    {#if type === 'TRANSFER'}
+      <AccountSelect name="accountId" label={$translate('transactions.from')} bind:accountId {accounts} />
+      <AccountSelect
+        name="destinationAccountId"
+        label={$translate('transactions.to')}
+        bind:accountId={destinationAccountId}
+        {accounts}
+      />
+    {/if}
+    {#if type === 'IN' || type === 'OUT'}
+      <CategorySelect {type} bind:categoryId categories={categories.filter((c) => c.type === type)} />
+    {/if}
+    {#if type === 'IN'}
+      <AccountSelect {accounts} bind:accountId />
+    {/if}
+    <div class="flex-col gap-0.5">
+      <InputLabel text={$translate('transactions.dateTime')} />
+      <div class="flex gap-1">
+        <Input name="date" type="date" value={dayjs(transaction?.date).format('YYYY-MM-DD')} required />
+        <Input name="time" type="time" value={dayjs(transaction?.date).format('HH:mm')} required />
       </div>
-      <div class="flex-col gap-0.5">
-        <InputLabel text={$translate('transactions.amount')} />
-        <div class="flex gap-1">
+    </div>
+    <div class="flex-col gap-0.5">
+      <InputLabel text={$translate('transactions.amount')} />
+      <div class="flex gap-1">
+        <Input
+          type="number"
+          name="amount"
+          value={(isTransfer ? sourceTransaction?.amount : transaction?.amount)?.toString()}
+          endText={accounts.find(({ id }) => id === accountId)?.currency}
+          required
+        />
+        {#if type === 'TRANSFER'}
           <Input
             type="number"
-            name="amount"
-            value={(isTransfer ? sourceTransaction?.amount : transaction?.amount)?.toString()}
-            endText={accounts.find(({ id }) => id === accountId)?.currency}
+            name="destinationAmount"
+            value={destinationTransaction?.amount.toString()}
+            endText={accounts.find(({ id }) => id === destinationAccountId)?.currency}
             required
           />
-          {#if type === 'TRANSFER'}
-            <Input
-              type="number"
-              name="destinationAmount"
-              value={destinationTransaction?.amount.toString()}
-              endText={accounts.find(({ id }) => id === destinationAccountId)?.currency}
-              required
-            />
-          {/if}
-        </div>
+        {/if}
       </div>
-      <Input label={$translate('transactions.comment')} name="comment" value={transaction?.comment} optional />
-      <slot />
-      <slot name="button" />
-      <slot name="footer" />
     </div>
+    <Input label={$translate('transactions.comment')} name="comment" value={transaction?.comment} optional />
+    <slot />
+    <slot name="button" />
+    <slot name="footer" />
   </div>
 </form>

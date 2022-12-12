@@ -1,12 +1,21 @@
+import type { TransactionDto } from '$lib/interfaces';
 import { db } from '$lib/server';
 import { checkNumberOptionalParameter, checkUserAndGroup } from '$lib/utils';
 import { checkAccount } from '../accounts';
+import { mapTransaction, transactionSelection } from './interfaces';
 
 export type GetTransactionsParams = {
   accountId?: number | null;
 };
 
-export async function getTransactions(params: GetTransactionsParams, locals: App.Locals) {
+type GetTransactionsReturn = {
+  transactions: TransactionDto[];
+};
+
+export async function getTransactions(
+  params: GetTransactionsParams,
+  locals: App.Locals,
+): Promise<GetTransactionsReturn> {
   const { groupId } = checkUserAndGroup(locals);
 
   const accountId = checkNumberOptionalParameter(params.accountId, 'accountId') ?? undefined;
@@ -16,18 +25,12 @@ export async function getTransactions(params: GetTransactionsParams, locals: App
   const transactions = await db.transaction.findMany({
     where: { ownerId: groupId, accountId },
     orderBy: { date: 'desc' },
-    include: {
-      account: true,
-      category: true,
-    },
+    select: transactionSelection,
   });
 
   return {
-    transactions: transactions.map((t) => ({
-      linkedTransaction: t.linkedTransactionId
-        ? transactions.find(({ id }) => id === t.linkedTransactionId)
-        : undefined,
-      ...t,
-    })),
+    transactions: transactions.map((t) =>
+      mapTransaction(t, transactions.find((x) => x.id === t.linkedTransactionId) ?? null),
+    ),
   };
 }

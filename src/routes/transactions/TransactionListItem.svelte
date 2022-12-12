@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { TransactionWithAccountAndCategory } from '$lib/interfaces';
+  import type { TransactionFullDto } from '$lib/interfaces';
   import { routes } from '$lib/routes';
   import { translate, type Messages } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
 
-  export let transaction: TransactionWithAccountAndCategory;
+  export let transaction: TransactionFullDto;
   export let hideAccount: boolean = false;
-  export let onClick: ((transaction: TransactionWithAccountAndCategory) => void) | null = null;
+  export let onClick: ((transaction: TransactionFullDto) => void) | null = null;
 
   const incoming = transaction.category.type === 'IN';
   const outgoing = transaction.category.type === 'OUT';
@@ -73,10 +73,12 @@
     text-decoration: none;
     color: inherit;
   }
-  a:hover .icon,
-  a:hover .text,
-  a:hover .amount {
-    color: var(--active-color);
+  @media (hover: hover) {
+    a:hover .icon,
+    a:hover .text,
+    a:hover .amount {
+      color: var(--active-color);
+    }
   }
   .icon {
     border-radius: 100%;
