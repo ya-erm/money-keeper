@@ -27,6 +27,7 @@ export type ImportTransactionItem = {
   comment?: string | null;
   checked: boolean;
   categoryId?: number;
+  uniqueKey: string;
 };
 
 export type ImportedTransaction = {

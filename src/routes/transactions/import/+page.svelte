@@ -15,10 +15,12 @@
 
   import type { PageData } from './$types';
   import SelectCategoryModal from './SelectCategoryModal.svelte';
+  import { keyTransactions } from '$lib/utils';
 
   export let data: PageData;
   $: accounts = data.accounts;
   $: categories = data.categories;
+  $: transactionKeys = new Set(data.transactionKeys);
 
   $: accountId = parseInt($page.url.searchParams.get('accountId') ?? '') || null;
   $: account = accounts.find(({ id }) => id === accountId);
@@ -37,7 +39,14 @@
         showErrorToast('Failed to read file');
         return;
       }
-      items = JSON.parse(content).map((item: any) => ({ ...item, checked: true, categoryId: null }));
+      const { keyedItems } = keyTransactions(JSON.parse(content));
+      items = keyedItems
+        .filter((item) => !transactionKeys.has(item.uniqueKey))
+        .map((item: any) => ({
+          ...item,
+          checked: true,
+          categoryId: null,
+        }));
     };
   };
 
@@ -63,13 +72,13 @@
 
   const handleSetCategoryClick = () => {
     const checkedFilteredItems = filteredItems.filter((item) => item.checked);
-    const incommings = checkedFilteredItems.some((item) => item.type === 'IN');
+    const incomings = checkedFilteredItems.some((item) => item.type === 'IN');
     const outgoings = checkedFilteredItems.some((item) => item.type === 'OUT');
-    if (incommings && outgoings) {
+    if (incomings && outgoings) {
       showErrorToast($translate('transactions.import.invalid_expression'));
       return;
     }
-    categoriesType = incommings ? 'IN' : 'OUT';
+    categoriesType = incomings ? 'IN' : 'OUT';
     applyCategoryModalOpened = true;
   };
 
@@ -151,7 +160,7 @@
       {#each Object.entries(groups) as [date, items] (`${date}`)}
         <div>{date}</div>
         {#each items as item (`${item.id} ${item.date} ${item.amount}`)}
-          <div class="flex gap-1 items-cetner" id={item.id}>
+          <div class="flex gap-1 items-cetner" id={item.id} data-uniqueKey={item.uniqueKey}>
             <Checkbox bind:checked={item.checked} />
             <TransactionListItem
               hideAccount
