@@ -73,10 +73,12 @@
     text-decoration: none;
     color: inherit;
   }
-  a:hover .icon,
-  a:hover .text,
-  a:hover .amount {
-    color: var(--active-color);
+  @media (hover: hover) {
+    a:hover .icon,
+    a:hover .text,
+    a:hover .amount {
+      color: var(--active-color);
+    }
   }
   .icon {
     border-radius: 100%;

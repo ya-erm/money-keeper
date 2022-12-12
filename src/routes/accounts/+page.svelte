@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
   import { onDestroy, onMount } from 'svelte';
 
-  import type { TransactionWithCategory } from '$lib/interfaces';
+  import type { TransactionWithAccountAndCategory } from '$lib/interfaces';
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import { backLink, rightButton, title } from '$lib/ui/header';
@@ -22,6 +22,7 @@
 
   export let data: PageData;
   $: accounts = data.accounts;
+  $: transactions = data.transactions;
 
   let accountsContainerElement: Element;
   let accountListElement: Element;
@@ -37,7 +38,7 @@
   $: cardId = $page.url.hash.match(/\#account-card-(\d+)/)?.[1];
   $: account = accounts.find((x) => x.id.toString() === cardId);
   $: filteredTransactions =
-    account?.transactions.filter(
+    (account?.transactions ?? transactions).filter(
       (t) =>
         !search ||
         t.comment?.toLowerCase().includes(search.toLowerCase()) ||
@@ -50,7 +51,7 @@
     if (!res[date]) res[date] = [];
     res[date].push(t);
     return res;
-  }, {} as { [key: string]: TransactionWithCategory[] });
+  }, {} as { [key: string]: TransactionWithAccountAndCategory[] });
 
   onMount(() => {
     if (cardId) {
@@ -63,10 +64,14 @@
   const handleScroll = () => {
     const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
     const index = accountListElement.scrollLeft / Math.min(26 * rem, accountsContainerElement.clientWidth - 1 * rem);
-    if (Number.isInteger(index) && !!accounts[index]) {
-      const id = accounts[index]?.id;
-      if (`${id}` !== cardId) {
-        goto(`${routes.accounts.path}#account-card-${id}`, { noscroll: true });
+    if (Number.isInteger(index)) {
+      if (index === accounts.length) {
+        goto(`${routes.accounts.path}#create-account`, { noscroll: true });
+      } else if (!!accounts[index]) {
+        const id = accounts[index].id;
+        if (`${id}` !== cardId) {
+          goto(`${routes.accounts.path}#account-card-${id}`, { noscroll: true });
+        }
       }
     }
   };
@@ -97,7 +102,7 @@
           <div id={`account-card-${account.id}`} class="account-card-anchor" />
         </div>
       {/each}
-      <a class="account-card" href={routes['accounts.create'].path}>
+      <a id="create-account" class="account-card" href={routes['accounts.create'].path}>
         {$translate('accounts.create_account')}
       </a>
     </div>
@@ -116,16 +121,14 @@
       <Icon size={1.25} name="mdi:filter" />
     </Button> -->
     </div>
-    {#if !!account?.transactions?.length}
-      <div class="mt-1 flex-col gap-1">
-        {#each Object.entries(groups) as [date, transactions] (date)}
-          <div>{date}</div>
-          {#each transactions as transaction (transaction.id)}
-            <TransactionListItem hideAccount transaction={{ ...transaction, account }} />
-          {/each}
+    <div class="mt-1 flex-col gap-1">
+      {#each Object.entries(groups) as [date, transactions] (date)}
+        <div>{date}</div>
+        {#each transactions as transaction (transaction.id)}
+          <TransactionListItem hideAccount={!!account} {transaction} />
         {/each}
-      </div>
-    {/if}
+      {/each}
+    </div>
   </div>
 </div>
 
@@ -169,8 +172,10 @@
     transition: box-shadow 0.2s;
     box-shadow: 4px 4px 8px 0px rgba(127, 127, 127, 0.1);
   }
-  .account-card:hover {
-    box-shadow: 4px 4px 8px 0px rgba(127, 127, 127, 0.2);
+  @media (hover: hover) {
+    .account-card:hover {
+      box-shadow: 4px 4px 8px 0px rgba(127, 127, 127, 0.2);
+    }
   }
   @media (min-width: 27rem) {
     .account-card:first-child {
@@ -191,8 +196,7 @@
   .operations-search-container {
     padding: 1rem 0;
     background: var(--background-color);
-    position: sticky;
-    top: 0;
+    position: relative;
   }
 
   .operations-search-container::before {

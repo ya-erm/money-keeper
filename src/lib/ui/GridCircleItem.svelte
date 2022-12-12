@@ -25,10 +25,14 @@
     color: var(--primary-text-color);
     text-decoration: none;
   }
-  .grid-item:hover,
   .grid-item:focus,
   .grid-item.selected {
     color: var(--active-color);
+  }
+  @media (hover: hover) {
+    .grid-item:hover {
+      color: var(--active-color);
+    }
   }
   .grid-item .text {
     font-size: 0.8rem;
@@ -49,9 +53,13 @@
     height: 4rem;
     background: var(--header-background-color);
   }
-  .grid-item:hover .circle,
   .grid-item:focus .circle,
   .grid-item.selected .circle {
     border: 2px solid var(--active-color);
+  }
+  @media (hover: hover) {
+    .grid-item:hover .circle {
+      border: 2px solid var(--active-color);
+    }
   }
 </style>

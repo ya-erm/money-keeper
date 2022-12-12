@@ -26,5 +26,6 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
         sum: accountTransactions.reduce((acc, t) => acc + t.amount * (t.category.type === 'IN' ? 1 : -1), 0),
       };
     }),
+    transactions,
   };
 };
