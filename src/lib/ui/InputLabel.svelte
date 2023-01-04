@@ -4,9 +4,10 @@
   export let text: string;
   export let optional: boolean = false;
   export let error: string | boolean | null = false;
+  export let testId: string | null = 'InputLabel';
 </script>
 
-<span class="label-text" class:error={!!error}>
+<span class="label-text" class:error={!!error} data-testId={testId}>
   <span>{text}</span>
   {#if optional}
     <span class="optional">({$translate('common.optional')})</span>

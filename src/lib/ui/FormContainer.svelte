@@ -4,6 +4,7 @@
 
   export let width: number = 18;
   export let action: string | undefined = undefined;
+  export let testId: string = 'Form';
   export let onSubmit: (e: SubmitEvent) => void | Promise<void> = () => {};
   export let onResult: ((result: ActionResult<any>, next: (result: ActionResult<any>) => void) => void) | null = null;
 </script>
@@ -14,6 +15,7 @@
     method="POST"
     class="form-container"
     style:width={`${width}rem`}
+    data-testId={testId}
     on:submit={onSubmit}
     use:enhance={() =>
       async ({ result }) => {

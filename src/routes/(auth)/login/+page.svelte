@@ -17,7 +17,7 @@
   $: if (isApiErrorData(form)) {
     switch (form.error.code) {
       case 'INCORRECT_LOGIN_OR_PASSWORD':
-        showErrorToast($translate('auth.incorrect_login_or_password'));
+        showErrorToast($translate('auth.incorrect_login_or_password'), { testId: 'IncorrectLoginOrPasswordToast' });
         break;
       default:
         showErrorToast($translate('auth.failed_to_login'));
@@ -31,9 +31,16 @@
   };
 </script>
 
-<FormContainer action="?/login" onResult={handleResult}>
-  <Input label={$translate('auth.login')} name="login" required />
-  <Input label={$translate('auth.password')} name="password" type="password" required autocomplete />
-  <Button text={$translate('auth.sign_in')} type="submit" />
+<FormContainer action="?/login" onResult={handleResult} testId="LoginForm">
+  <Input label={$translate('auth.login')} name="login" testId="LoginInput" required />
+  <Input
+    label={$translate('auth.password')}
+    testId="PasswordInput"
+    name="password"
+    type="password"
+    autocomplete
+    required
+  />
+  <Button text={$translate('auth.sign_in')} type="submit" testId="SignInButton" />
   <a slot="footer" href="/register">{$translate('auth.register')}</a>
 </FormContainer>

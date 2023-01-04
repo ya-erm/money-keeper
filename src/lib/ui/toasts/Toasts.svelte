@@ -9,7 +9,12 @@
   <section>
     {#each $toasts as toast (toast.id)}
       <div in:fly={{ y: -256 }} out:fade animate:flip={{ duration: 200 }}>
-        <Toast type={toast.type} dismissible={toast.dismissible} on:dismiss={() => hideToast(toast.id)}>
+        <Toast
+          type={toast.type}
+          testId={toast.testId}
+          dismissible={toast.dismissible}
+          on:dismiss={() => hideToast(toast.id)}
+        >
           {toast.message}
         </Toast>
       </div>

@@ -7,6 +7,7 @@
   export let underlined: boolean = appearance == 'link';
   export let type: 'button' | 'submit' = 'button';
   export let bordered: boolean = false;
+  export let testId: string | null = 'Button';
 
   const dispatch = createEventDispatcher();
   export let click = (e: MouseEvent) => dispatch('click', e);
@@ -24,6 +25,7 @@
   class:border={bordered === true && appearance !== 'link'}
   class:link={appearance === 'link'}
   class:underlined
+  data-testId={testId}
   {type}
 >
   <slot />

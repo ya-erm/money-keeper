@@ -7,6 +7,7 @@
 
   export let type: ToastType = 'error';
   export let dismissible = true;
+  export let testId = 'Toast';
 
   const icon = (() => {
     switch (type) {
@@ -20,7 +21,7 @@
   })();
 </script>
 
-<article class={type} role="alert">
+<article class={type} role="alert" data-testId={testId}>
   <Icon name={icon} size={1.5} />
   <div class="text">
     <slot />

@@ -6,7 +6,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   // get cookies from browser
   const session = event.cookies.get('session');
 
-  if (!session || event.routeId?.endsWith('/logout')) {
+  if (!session || event.route.id?.endsWith('/logout')) {
     // if there is no session load page as normal
     return await resolve(event);
   }

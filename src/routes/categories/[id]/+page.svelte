@@ -24,7 +24,7 @@
     if (result.type === 'redirect') {
       showSuccessToast($translate('common.save_changes_success'));
       await invalidate(deps.categories);
-    } else if (result.type === 'invalid') {
+    } else if (result.type === 'failure') {
       showErrorToast($translate('common.save_changes_failure'));
     }
     await next(result);
@@ -34,7 +34,7 @@
     if (result.type === 'redirect') {
       showSuccessToast($translate('categories.delete_category_success'));
       await invalidate(deps.categories);
-    } else if (result.type === 'invalid') {
+    } else if (result.type === 'failure') {
       showErrorToast($translate('categories.delete_category_failure'));
     }
     await next(result);

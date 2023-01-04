@@ -15,16 +15,16 @@
 
   const onCreate = async (result: ActionResult, next: (result: ActionResult) => void) => {
     if (result.type === 'redirect') {
-      showSuccessToast($translate('accounts.create_account_success'));
+      showSuccessToast($translate('accounts.create_account_success'), { testId: 'CreateAccountSuccessToast' });
       await invalidate(deps.accounts);
-    } else if (result.type === 'invalid') {
+    } else if (result.type === 'failure') {
       showErrorToast($translate('accounts.create_account_failure'));
     }
     await next(result);
   };
 </script>
 
-<FormContainer action="?/create" onResult={onCreate}>
+<FormContainer action="?/create" onResult={onCreate} testId="CreateAccountForm">
   <Input label={$translate('accounts.name')} name="name" required />
   <Input label={$translate('accounts.currency')} name="currency" required />
   <Input label={$translate('accounts.icon')} name="icon" optional />

@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "rootDir": "/",
+    "baseUrl": ".",
+    "paths": {
+      "@tests/*": ["./*"]
+    }
+  }
+}

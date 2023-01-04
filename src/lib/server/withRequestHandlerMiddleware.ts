@@ -7,7 +7,7 @@ import { isApiError } from '$lib/api/ApiError';
 import { serverErrorResponse } from './serverError';
 
 /** Wrapper to add error handler */
-export function withRequestHandlerMiddleware<T extends RequestHandler<any>>(handler: T): T {
+export function withRequestHandlerMiddleware<T extends RequestHandler<any, any>>(handler: T): T {
   return (async (event) => {
     try {
       return await handler(event);

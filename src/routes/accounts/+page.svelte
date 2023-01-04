@@ -15,7 +15,6 @@
   import AccountCard from './AccountCard.svelte';
   import AddAccountButton from './AddAccountButton.svelte';
   import AddOperationButton from './AddOperationButton.svelte';
-  import { t } from 'svelte-i18n';
 
   backLink.set(null);
   rightButton.set(AddAccountButton);
@@ -28,6 +27,16 @@
     ...t,
     account: accounts.find((x) => x.id === t.accountId)!,
     category: categories.find((x) => x.id === t.categoryId)!,
+    linkedTransaction: (() => {
+      const linkedTransaction = data.transactions.find((x) => x.id === t.linkedTransactionId);
+      return linkedTransaction
+        ? {
+            ...linkedTransaction,
+            account: accounts.find((x) => x.id === linkedTransaction?.accountId)!,
+            category: categories.find((x) => x.id === linkedTransaction?.categoryId)!,
+          }
+        : undefined;
+    })(),
   }));
 
   let accountsContainerElement: Element;
@@ -64,7 +73,7 @@
     if (cardId) {
       scrollToCard(cardId);
     } else if (!!accounts.length) {
-      goto(`${routes.accounts.path}#account-card-${accounts[0].id}`, { noscroll: true });
+      goto(`${routes.accounts.path}#account-card-${accounts[0].id}`, { noScroll: true });
     }
   });
 
@@ -73,11 +82,11 @@
     const index = accountListElement.scrollLeft / Math.min(26 * rem, accountsContainerElement.clientWidth - 1 * rem);
     if (Number.isInteger(index)) {
       if (index === accounts.length) {
-        goto(`${routes.accounts.path}#create-account`, { noscroll: true });
+        goto(`${routes.accounts.path}#create-account`, { noScroll: true });
       } else if (!!accounts[index]) {
         const id = accounts[index].id;
         if (`${id}` !== cardId) {
-          goto(`${routes.accounts.path}#account-card-${id}`, { noscroll: true });
+          goto(`${routes.accounts.path}#account-card-${id}`, { noScroll: true });
         }
       }
     }

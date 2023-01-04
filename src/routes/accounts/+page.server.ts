@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
 
   depends(deps.categories);
   const categories = await db.category.findMany({
-    where: { ownerId: groupId },
+    where: { OR: [{ ownerId: groupId }, { ownerId: null }] },
   });
 
   const _categories = new Map<number, Category>(categories.map((c) => [c.id, c]));

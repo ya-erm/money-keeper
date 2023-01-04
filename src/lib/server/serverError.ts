@@ -1,6 +1,6 @@
 import { isApiErrorData, ApiError, type ApiErrorData, type ApiErrorCode } from '$lib/api';
 import { isApiError } from '$lib/api/ApiError';
-import { error, invalid } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 
 type ApiErrorArgs = [status: number, code: ApiErrorCode, message?: string | undefined] | [error: ApiError];
 
@@ -35,7 +35,7 @@ export const serverError = (...args: ApiErrorArgs) => {
   const data: ApiErrorData = {
     error: { name: 'ApiError', status, code, message },
   };
-  return invalid(status, data);
+  return fail(status, data);
 };
 
 function hasStatus(e: unknown): e is { status: number } {
