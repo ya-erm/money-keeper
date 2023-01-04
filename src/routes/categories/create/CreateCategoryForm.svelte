@@ -18,7 +18,7 @@
       showSuccessToast($translate('categories.create_category_success'));
       await invalidate(deps.categories);
       onCreate?.();
-    } else if (result.type === 'invalid') {
+    } else if (result.type === 'failure') {
       showErrorToast($translate('categories.create_category_failure'));
     }
     if (!onCreate) {

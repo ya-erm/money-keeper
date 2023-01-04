@@ -45,7 +45,7 @@
     : getNumberSearchParam($page, 'destinationAccountId');
 
   const handleResult = async ({ form, result }: { form: HTMLFormElement; result: ActionResult }) => {
-    if (result.type === 'invalid') {
+    if (result.type === 'failure') {
       const formData = new FormData(form);
       if (!formData.get('accountId')) {
         showErrorToast($translate('transactions.account_is_required'));

@@ -37,11 +37,11 @@
       <div class="flex items-center">
         {#if isTransfer}
           <span class="source">
-            {outgoing ? transaction.account.name : transaction.linkedTransaction?.account.name}
+            {outgoing ? transaction.account.name : transaction.linkedTransaction?.account?.name}
           </span>
           <Icon name="mdi:chevron-right" size={1.25} />
           <span class="destination">
-            {incoming ? transaction.account.name : transaction.linkedTransaction?.account.name}
+            {incoming ? transaction.account.name : transaction.linkedTransaction?.account?.name}
           </span>
         {:else}
           {#if (outgoing && !hideAccount) || incoming}

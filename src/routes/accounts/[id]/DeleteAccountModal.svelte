@@ -15,7 +15,7 @@
     if (result.type === 'redirect') {
       showSuccessToast($translate('accounts.delete_account_success'));
       await invalidate(deps.accounts);
-    } else if (result.type === 'invalid') {
+    } else if (result.type === 'failure') {
       showErrorToast($translate('accounts.delete_account_failure'));
     }
     await next(result);
