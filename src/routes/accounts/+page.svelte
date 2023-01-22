@@ -23,6 +23,7 @@
   export let data: PageData;
   $: accounts = data.accounts;
   $: categories = data.categories;
+  $: tags = data.tags;
   $: transactions = data.transactions.map((t) => ({
     ...t,
     account: accounts.find((x) => x.id === t.accountId)!,

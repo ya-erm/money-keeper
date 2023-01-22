@@ -1,5 +1,11 @@
 import { db } from '$lib/server';
-import { checkNumberParameter, checkStringOptionalParameter, checkStringParameter, join } from '$lib/utils';
+import {
+  checkArrayOptionalParameter,
+  checkNumberParameter,
+  checkStringOptionalParameter,
+  checkStringParameter,
+  join,
+} from '$lib/utils';
 import { checkGroupId } from '$lib/utils/checkUser';
 
 import { checkAccount } from '../accounts';
@@ -12,6 +18,7 @@ export type CreateTransactionRequestData = {
   date: string;
   time: string;
   comment?: string | null;
+  tags?: number[] | null;
 };
 
 export async function createTransaction(data: CreateTransactionRequestData, locals: App.Locals) {
@@ -21,6 +28,7 @@ export async function createTransaction(data: CreateTransactionRequestData, loca
   const date = checkStringParameter(data.date, 'date');
   const time = checkStringParameter(data.time, 'time');
   const comment = checkStringOptionalParameter(data.comment, 'comment');
+  const tags = checkArrayOptionalParameter<number>(data.tags, 'tags', { type: 'number', required: true });
 
   const groupId = checkGroupId(locals);
 
@@ -35,6 +43,7 @@ export async function createTransaction(data: CreateTransactionRequestData, loca
       date: new Date(join([date, time], 'T')),
       amount,
       comment,
+      tags: { connect: tags?.map((tagId) => ({ id: tagId })) },
     },
   });
 

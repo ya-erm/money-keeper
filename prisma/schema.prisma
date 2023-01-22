@@ -95,6 +95,7 @@ model Group {
   categories   Category[]
   transactions Transaction[]
   tokens       AuthToken[]
+  tags         Tag[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -146,6 +147,18 @@ model Transaction {
   account  Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   category Category @relation(fields: [categoryId], references: [id])
 
+  tags Tag[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Tag {
+  id      Int    @id @default(autoincrement())
+  ownerId Int
+  name    String
+
+  owner Group @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  transactions Transaction[]
 }

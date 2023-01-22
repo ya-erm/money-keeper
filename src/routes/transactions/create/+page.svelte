@@ -14,6 +14,7 @@
   export let data: PageData;
   $: accounts = data.accounts;
   $: categories = data.categories;
+  $: tags = data.tags;
   $: accountId = getNumberSearchParam($page, 'accountId');
 
   const onSuccess = async () => {
@@ -22,7 +23,7 @@
   };
 </script>
 
-<TransactionForm {accounts} {categories} action="?/create" {onSuccess}>
+<TransactionForm {accounts} {categories} {tags} action="?/create" {onSuccess}>
   <Button text={$translate('common.create')} type="submit" />
   <div slot="footer" class="flex-center mb-1">
     <a href={routes['transactions.import'].path + (accountId ? `?accountId=${accountId}` : '')}>

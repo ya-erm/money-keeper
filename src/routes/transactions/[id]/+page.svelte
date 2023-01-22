@@ -17,6 +17,7 @@
   $: accounts = data?.accounts;
   $: categories = data?.categories;
   $: transaction = data?.transaction;
+  $: tags = data?.tags;
 
   const onSuccess = () => {
     showSuccessToast($translate('common.save_changes_success'));
@@ -29,7 +30,7 @@
   };
 </script>
 
-<TransactionForm action="?/update" {accounts} {categories} {transaction} {onSuccess}>
+<TransactionForm action="?/update" {accounts} {categories} {tags} {transaction} {onSuccess}>
   <Button text={$translate('common.save')} type="submit" />
   <FormContainer slot="footer" action="?/delete" onResult={handleDelete}>
     <Button

@@ -1,5 +1,10 @@
 import { db } from '$lib/server';
-import { checkNumberParameter, checkStringOptionalParameter, checkStringParameter } from '$lib/utils';
+import {
+  checkArrayOptionalParameter,
+  checkNumberParameter,
+  checkStringOptionalParameter,
+  checkStringParameter,
+} from '$lib/utils';
 import { checkGroupId } from '$lib/utils/checkUser';
 import { checkAccount } from '../accounts';
 import { checkCategory } from '../categories';
@@ -27,10 +32,13 @@ export async function updateTransaction(
   const date = checkStringParameter(data.date, 'date');
   const time = checkStringParameter(data.time, 'time');
   const comment = checkStringOptionalParameter(data.comment, 'comment');
+  const tags = checkArrayOptionalParameter<number>(data.tags, 'tags', { type: 'number', required: true });
 
   const transaction = await checkTransaction(transactionId, locals);
   const account = await checkAccount(accountId, locals);
   const category = await checkCategory(categoryId, locals);
+
+  const tagsToRemove = transaction.tags.filter((t) => !tags?.includes(t.id));
 
   const updatedTransaction = await db.transaction.update({
     where: { id: transaction.id },
@@ -38,6 +46,10 @@ export async function updateTransaction(
       owner: { connect: { id: groupId } },
       account: { connect: { id: account.id } },
       category: { connect: { id: category.id } },
+      tags: {
+        connect: tags?.map((tagId) => ({ id: tagId })),
+        disconnect: tagsToRemove?.map((tag) => ({ id: tag.id })),
+      },
       date: new Date(`${date}T${time}`),
       amount,
       comment,

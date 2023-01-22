@@ -21,6 +21,9 @@ export type Messages =
   | 'common.search'
   | 'common.clear'
   | 'common.cancel'
+  | 'common.tags.modal_header'
+  | 'common.tags.title'
+  | 'common.tags.add_tag_failure'
   // Auth
   | 'auth.login.title'
   | 'auth.login'
@@ -108,6 +111,7 @@ export type Messages =
   | 'transactions.category'
   | 'transactions.category_is_required'
   | 'transactions.comment'
+  | 'transactions.tags'
   | 'transactions.create_transaction_success'
   | 'transactions.create_transaction_failure'
   | 'transactions.edit_transaction'

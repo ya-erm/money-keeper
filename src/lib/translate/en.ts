@@ -24,6 +24,9 @@ export const enDict: Dictionary = {
   'common.search': 'Search',
   'common.clear': 'Clear',
   'common.cancel': 'Cancel',
+  'common.tags.modal_header': 'Add tag',
+  'common.tags.title': 'Title',
+  'common.tags.add_tag_failure': 'Failed to add tag',
   // Auth
   'auth.login.title': 'Login',
   'auth.login': 'Login',
@@ -113,6 +116,7 @@ export const enDict: Dictionary = {
   'transactions.category': 'Category',
   'transactions.category_is_required': 'Select a category firstly',
   'transactions.comment': 'Comment',
+  'transactions.tags': 'Tags',
   'transactions.edit_transaction': 'Edit operation',
   'transactions.create_transaction_success': 'Operation was created',
   'transactions.create_transaction_failure': 'Failed to create operation',

@@ -4,7 +4,7 @@
   import { applyAction, enhance } from '$app/forms';
   import { invalidate } from '$app/navigation';
   import { page } from '$app/stores';
-  import type { Account, Category } from '@prisma/client';
+  import type { Account, Category, Tag } from '@prisma/client';
   import type { ActionResult } from '@sveltejs/kit';
 
   import { isApiErrorData } from '$lib/api';
@@ -19,9 +19,12 @@
   import AccountSelect from './AccountSelect.svelte';
   import CategorySelect from './CategorySelect.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
+  import Tags from '$lib/ui/Tags.svelte';
 
   export let accounts: Account[];
   export let categories: Category[];
+  export let tags: Tag[];
+
   export let transaction: TransactionFullDto | null = null;
 
   export let action: string;
@@ -43,6 +46,28 @@
   let destinationAccountId = isTransfer
     ? destinationTransaction?.accountId
     : getNumberSearchParam($page, 'destinationAccountId');
+
+  const addTag = async (name: string) => {
+    const response = await fetch('/api/tags', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    if (response.status === 200) {
+      const data = await response.json();
+      tags = [...tags, data];
+      selectedTags = [...selectedTags, data.id];
+      // await invalidate(deps.tags);
+    } else {
+      showErrorToast($translate('common.tags.add_tag_failure'));
+    }
+  };
+
+  let selectedTags = transaction?.tags.map((t) => `${t.id}`) ?? [];
+
+  const toggleTag = async (tagId: string, selected: boolean) => {
+    selectedTags = selected ? [...selectedTags, tagId] : selectedTags.filter((t) => t !== tagId);
+  };
 
   const handleResult = async ({ form, result }: { form: HTMLFormElement; result: ActionResult }) => {
     if (result.type === 'failure') {
@@ -125,6 +150,16 @@
       </div>
     </div>
     <Input label={$translate('transactions.comment')} name="comment" value={transaction?.comment} optional />
+    <div class="flex-col gap-0.5">
+      <InputLabel text={$translate('transactions.tags')} optional />
+      <Tags
+        tags={tags?.map((t) => ({ id: `${t.id}`, title: t.name })) ?? []}
+        selected={selectedTags}
+        onChange={toggleTag}
+        onAdd={addTag}
+      />
+      <input name="tags" class="hidden" multiple value={selectedTags} />
+    </div>
     <slot />
     <slot name="button" />
     <slot name="footer" />

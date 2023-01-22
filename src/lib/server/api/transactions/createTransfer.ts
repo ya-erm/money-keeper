@@ -1,6 +1,12 @@
 import { ApiError } from '$lib/api';
 import { db } from '$lib/server';
-import { checkNumberParameter, checkStringOptionalParameter, checkStringParameter, join } from '$lib/utils';
+import {
+  checkArrayOptionalParameter,
+  checkNumberParameter,
+  checkStringOptionalParameter,
+  checkStringParameter,
+  join,
+} from '$lib/utils';
 import { checkGroupId } from '$lib/utils/checkUser';
 import { checkAccount } from '../accounts';
 import { getOrCreateTransferInSystemCategory, getOrCreateTransferOutSystemCategory } from './utils';
@@ -17,6 +23,7 @@ export type CreateTransferRequestData = {
   date: string;
   time: string;
   comment?: string | null;
+  tags?: number[] | null;
 };
 
 export async function createTransfer(data: CreateTransferRequestData, locals: App.Locals) {
@@ -27,6 +34,7 @@ export async function createTransfer(data: CreateTransferRequestData, locals: Ap
   const date = checkStringParameter(data.date, 'date');
   const time = checkStringParameter(data.time, 'time');
   const comment = checkStringOptionalParameter(data.comment, 'comment');
+  const tags = checkArrayOptionalParameter<number>(data.tags, 'tags', { type: 'number', required: true });
 
   const groupId = checkGroupId(locals);
 
@@ -49,6 +57,7 @@ export async function createTransfer(data: CreateTransferRequestData, locals: Ap
         date: new Date(join([date, time], 'T')),
         amount: sourceAmount,
         comment,
+        tags: { connect: tags?.map((tagId) => ({ id: tagId })) },
       },
     });
     const t2 = await tx.transaction.create({
@@ -59,6 +68,7 @@ export async function createTransfer(data: CreateTransferRequestData, locals: Ap
         date: new Date(join([date, time], 'T')),
         amount: destinationAmount,
         comment,
+        tags: { connect: tags?.map((tagId) => ({ id: tagId })) },
         linkedTransactionId: t1.id,
       },
     });

@@ -4,4 +4,6 @@ export {
   checkNumberOptionalFormParameter,
   checkStringFormParameter,
   checkStringOptionalFormParameter,
+  checkArrayFormParameter,
+  checkArrayOptionalFormParameter,
 } from './checkFormParams';

@@ -1,19 +1,22 @@
+import { deps } from '$lib/deps';
 import { db, withActionMiddleware } from '$lib/server';
+import { getTags } from '$lib/server/api/tags';
+import { createTransaction } from '$lib/server/api/transactions';
+import { createTransfer } from '$lib/server/api/transactions/createTransfer';
 import {
+  checkArrayOptionalFormParameter,
   checkNumberFormParameter,
   checkStringFormParameter,
   checkStringOptionalFormParameter,
 } from '$lib/server/utils';
 import { checkUserAndGroup, serialize } from '$lib/utils';
 
-import { deps } from '$lib/deps';
-import { createTransaction } from '$lib/server/api/transactions';
-import { createTransfer } from '$lib/server/api/transactions/createTransfer';
 import type { Action, Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, depends }) => {
   const { groupId } = checkUserAndGroup(locals, { redirect: true });
 
+  depends(deps.accounts);
   const accounts = await db.account.findMany({
     where: { ownerId: groupId },
   });
@@ -23,9 +26,13 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
     where: { ownerId: groupId },
   });
 
+  depends(deps.tags);
+  const tags = await getTags(locals);
+
   return {
     accounts,
     categories,
+    tags,
   };
 };
 
@@ -46,6 +53,7 @@ const create: Action = async ({ request, locals }) => {
         date: checkStringFormParameter(data, 'date'),
         time: checkStringFormParameter(data, 'time'),
         comment: checkStringOptionalFormParameter(data, 'comment'),
+        tags: checkArrayOptionalFormParameter<number>(data, 'tags'),
       },
       locals,
     );
@@ -63,6 +71,7 @@ const create: Action = async ({ request, locals }) => {
       date: checkStringFormParameter(data, 'date'),
       time: checkStringFormParameter(data, 'time'),
       comment: checkStringOptionalFormParameter(data, 'comment'),
+      tags: checkArrayOptionalFormParameter<number>(data, 'tags'),
     },
     locals,
   );

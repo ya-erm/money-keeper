@@ -6,6 +6,8 @@ export {
   checkParameter,
   checkStringOptionalParameter,
   checkStringParameter,
+  checkArrayParameter,
+  checkArrayOptionalParameter,
   type CheckParameterOptions,
 } from './checkParameter';
 export { checkUserAndGroup, checkUserId } from './checkUser';

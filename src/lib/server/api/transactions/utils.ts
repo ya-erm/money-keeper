@@ -2,6 +2,7 @@ import { ApiError } from '$lib/api';
 import { db } from '$lib/server/database';
 import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/server/database/system';
 import { checkGroupId } from '$lib/utils/checkUser';
+import { transactionSelection } from './interfaces';
 
 export async function getOrCreateTransferInSystemCategory() {
   let transferInCategory = await db.category.findFirst({
@@ -30,7 +31,12 @@ export async function getOrCreateTransferOutSystemCategory() {
 export async function checkTransaction(transactionId: number, locals: App.Locals) {
   const groupId = checkGroupId(locals);
 
-  const transaction = await db.transaction.findUnique({ where: { id: transactionId } });
+  const transaction = await db.transaction.findUnique({
+    where: { id: transactionId },
+    include: {
+      tags: true,
+    },
+  });
 
   if (!transaction) {
     throw new ApiError(404, 'NOT_FOUND', `Transaction #${transactionId} not found`);
