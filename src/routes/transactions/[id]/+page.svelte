@@ -31,10 +31,11 @@
 </script>
 
 <TransactionForm action="?/update" {accounts} {categories} {tags} {transaction} {onSuccess}>
-  <Button text={$translate('common.save')} type="submit" />
+  <Button text={$translate('common.save')} type="submit" testId="SaveTransactionButton" />
   <FormContainer slot="footer" action="?/delete" onResult={handleDelete}>
     <Button
       text={$translate('transactions.delete_transaction')}
+      testId="DeleteTransactionButton"
       appearance="transparent"
       color="danger"
       type="submit"

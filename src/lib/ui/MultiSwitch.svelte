@@ -4,6 +4,7 @@
   export let options: { id: string; title: string }[];
   export let selected: { id: string; title: string } | undefined;
   export let disabled: boolean = false;
+  export let testId: string | undefined = 'MultiSwitch';
 
   const dispatch = createEventDispatcher<{ change: { id: string; title: string } }>();
   export let change = (value: { id: string; title: string }) => dispatch('change', value);
@@ -15,11 +16,12 @@
   };
 </script>
 
-<div class="multi-switch">
+<div class="multi-switch" data-testId={testId}>
   {#each options as option (option.id)}
     <button
       on:click={handleClick(option)}
       class:active={selected?.id === option.id}
+      data-testId={`${testId}.Button.${option.id}`}
       class="switch-item"
       type="button"
       {disabled}

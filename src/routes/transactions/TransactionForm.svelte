@@ -73,19 +73,23 @@
     if (result.type === 'failure') {
       const formData = new FormData(form);
       if (!formData.get('accountId')) {
-        showErrorToast($translate('transactions.account_is_required'));
+        showErrorToast($translate('transactions.account_is_required'), { testId: 'AccountIsRequiredErrorToast' });
         return;
       }
       if ((type === 'IN' || type === 'OUT') && !formData.get('categoryId')) {
-        showErrorToast($translate('transactions.category_is_required'));
+        showErrorToast($translate('transactions.category_is_required'), { testId: 'CategoryIsRequiredErrorToast' });
         return;
       }
       if (type === 'TRANSFER' && !formData.get('destinationAccountId')) {
-        showErrorToast($translate('transactions.destination_account_is_required'));
+        showErrorToast($translate('transactions.destination_account_is_required'), {
+          testId: 'DestinationAccountIsRequiredErrorToast',
+        });
         return;
       }
       if (type === 'TRANSFER' && formData.get('accountId') === formData.get('destinationAccountId')) {
-        showErrorToast($translate('transactions.accounts_must_be_different'));
+        showErrorToast($translate('transactions.accounts_must_be_different'), {
+          testId: 'AccountsMustBeDifferentErrorToast',
+        });
         return;
       }
       if (isApiErrorData(result.data)) {
@@ -100,16 +104,23 @@
   };
 </script>
 
-<form method="POST" {action} use:enhance={() => handleResult}>
+<form method="POST" {action} use:enhance={() => handleResult} data-testId="TransactionForm">
   <div class="flex-col gap-1 p-1">
     <TypeSwitch bind:type disabled={isTransfer} />
     {#if type === 'OUT'}
-      <AccountSelect {accounts} bind:accountId />
+      <AccountSelect {accounts} bind:accountId testId="SourceAccountSelect" />
     {/if}
     {#if type === 'TRANSFER'}
-      <AccountSelect name="accountId" label={$translate('transactions.from')} bind:accountId {accounts} />
+      <AccountSelect
+        name="accountId"
+        testId="SourceAccountSelect"
+        label={$translate('transactions.from')}
+        bind:accountId
+        {accounts}
+      />
       <AccountSelect
         name="destinationAccountId"
+        testId="DestinationAccountSelect"
         label={$translate('transactions.to')}
         bind:accountId={destinationAccountId}
         {accounts}
@@ -119,7 +130,7 @@
       <CategorySelect {type} bind:categoryId categories={categories.filter((c) => c.type === type)} />
     {/if}
     {#if type === 'IN'}
-      <AccountSelect {accounts} bind:accountId />
+      <AccountSelect {accounts} bind:accountId testId="DestinationAccountSelect" />
     {/if}
     <div class="flex-col gap-0.5">
       <InputLabel text={$translate('transactions.dateTime')} />

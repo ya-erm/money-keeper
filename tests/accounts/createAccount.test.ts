@@ -11,7 +11,7 @@ const getLocators = (page: Page) => {
   };
 };
 
-test.describe('Accounts. Create', () => {
+test.describe('Accounts > Create', () => {
   test('name and currency are required', async ({ page, context }) => {
     await useAuthAsync(page, context);
     await page.goto('/accounts/create');

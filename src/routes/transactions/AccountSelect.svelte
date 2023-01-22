@@ -12,6 +12,7 @@
   export let accounts: Account[];
   export let fromUrl: boolean = false;
   export let accountId: number | null = null;
+  export let testId: string | undefined = 'AccountSelect';
 
   $: accountIdFromUrl = getNumberSearchParam($page, name);
 
@@ -27,17 +28,18 @@
   };
 </script>
 
-<div class="flex-col gap-0.5">
+<div class="flex-col gap-0.5" data-testId={testId}>
   <label class="label">
-    <span>{label}</span>
+    <span data-testId={`${testId}.Label`}>{label}</span>
     <input {name} value={_accountId} class="hidden" readonly required />
   </label>
-  <div class="grid">
-    {#each accounts as account}
+  <div class="grid" data-testId={`${testId}.Grid`}>
+    {#each accounts as account (account.id)}
       <GridCircleItem
         selected={_accountId === account.id}
         onClick={() => setAccountId(account.id)}
         icon={account.icon || 'mdi:briefcase-outline'}
+        testId={`${testId}.Item.${account.id}`}
         text={account.name}
       />
     {/each}
