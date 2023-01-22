@@ -17,7 +17,7 @@ export function checkFormDataParameter<T = FormDataEntryValue | null>(
   }
   try {
     if (options.type === 'array') {
-      return checkParameter(parameter?.split(','), name, options);
+      return checkParameter(parameter ? parameter.split(',') : null, name, options);
     }
     return checkParameter(parameter, name, options);
   } catch (e) {
