@@ -53,13 +53,38 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     });
-    if (response.status === 200) {
+    if (response.ok) {
       const data = await response.json();
       tags = [...tags, data];
       selectedTags = [...selectedTags, data.id];
       // await invalidate(deps.tags);
     } else {
-      showErrorToast($translate('common.tags.add_tag_failure'));
+      showErrorToast($translate('tags.add_tag_failure'));
+    }
+  };
+
+  const editTag = async (id: string, name: string) => {
+    const response = await fetch(`/api/tags/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      tags = tags.map((tag) => (tag.id === Number(id) ? data : tag));
+    } else {
+      showErrorToast($translate('tags.edit_tag_failure'));
+    }
+  };
+
+  const deleteTag = async (id: string) => {
+    const response = await fetch(`/api/tags/${id}`, {
+      method: 'DELETE',
+    });
+    if (response.ok) {
+      tags = tags.filter((tag) => tag.id !== Number(id));
+    } else {
+      showErrorToast($translate('tags.delete_tag_failure'));
     }
   };
 
@@ -168,6 +193,8 @@
         selected={selectedTags}
         onChange={toggleTag}
         onAdd={addTag}
+        onEdit={editTag}
+        onDelete={deleteTag}
       />
       <input name="tags" class="hidden" multiple value={selectedTags} />
     </div>

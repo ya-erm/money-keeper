@@ -3,20 +3,38 @@
   import Button from './Button.svelte';
   import Input from './Input.svelte';
   import Modal from './Modal.svelte';
+  import { longPress } from '$lib/utils';
 
   export let tags: { id: string; title: string }[];
   export let selected: string[];
   export let onChange: (id: string, selected: boolean) => void;
   export let onAdd: (title: string) => Promise<void> | void;
+  export let onEdit: (id: string, title: string) => Promise<void> | void;
+  export let onDelete: (id: string) => Promise<void> | void;
 
+  let id = '';
   let title = '';
   let opened = false;
-  const handleOpenModal = () => {
-    title = '';
+  let mode: 'add' | 'edit' = 'add';
+
+  const handleOpenModal = (item: { id: string; title: string } | null) => {
+    mode = item ? 'edit' : 'add';
+    title = item?.title ?? '';
+    id = item?.id ?? '';
     opened = true;
   };
-  const handleAdd = async () => {
-    await onAdd(title);
+
+  const handleSubmit = async () => {
+    if (mode === 'add') {
+      await onAdd(title);
+    } else {
+      await onEdit(id, title);
+    }
+    opened = false;
+  };
+
+  const handleDelete = async () => {
+    await onDelete(id);
     opened = false;
   };
 </script>
@@ -24,24 +42,43 @@
 <div class="flex flex-wrap gap-0.5" data-testId="TagsContainer">
   {#each tags as tag (tag.id)}
     {@const isSelected = selected.includes(tag.id)}
-    <button class="tag" class:selected={isSelected} type="button" on:click={() => onChange(tag.id, !isSelected)}>
+    <button
+      class="tag"
+      type="button"
+      class:selected={isSelected}
+      on:click={() => onChange(tag.id, !isSelected)}
+      use:longPress={() => handleOpenModal(tag)}
+    >
       {tag.title}
     </button>
   {/each}
-  <button class="tag add" type="button" on:click={handleOpenModal} data-testId="AddTagButton">
+  <button class="tag add" type="button" on:click={() => handleOpenModal(null)} data-testId="AddTagButton">
     {$translate('common.add')}
   </button>
 </div>
 
-<Modal {opened} header={$translate('common.tags.modal_header')}>
-  <form on:submit|preventDefault={handleAdd} class="flex-col gap-1" data-testId="AddTagForm">
-    <Input label={$translate('common.tags.title')} bind:value={title} name="title" required />
+<Modal
+  {opened}
+  header={$translate(mode === 'add' ? 'tags.add_modal_header' : 'tags.edit_modal_header')}
+  on:close={() => (opened = false)}
+>
+  <form on:submit|preventDefault={handleSubmit} class="flex-col gap-1" data-testId="AddTagForm">
+    <Input label={$translate('tags.title')} bind:value={title} name="title" required />
+    {#if mode === 'edit'}
+      <Button
+        color="danger"
+        appearance="link"
+        underlined={false}
+        text={$translate('tags.delete_tag')}
+        on:click={handleDelete}
+      />
+    {/if}
     <div class="flex gap-1">
       <div class="flex-col flex-1">
         <Button color="secondary" on:click={() => (opened = false)} text={$translate('common.cancel')} />
       </div>
       <div class="flex-col flex-1">
-        <Button text={$translate('common.add')} type="submit" />
+        <Button text={$translate(mode === 'add' ? 'common.add' : 'common.save')} type="submit" />
       </div>
     </div>
   </form>

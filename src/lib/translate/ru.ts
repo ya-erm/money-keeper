@@ -24,9 +24,14 @@ export const ruDict: Dictionary = {
   'common.search': 'Поиск',
   'common.clear': 'Очистить',
   'common.cancel': 'Отмена',
-  'common.tags.modal_header': 'Добавить тег',
-  'common.tags.title': 'Название',
-  'common.tags.add_tag_failure': 'Не удалось добавить тег',
+  // Tags
+  'tags.add_modal_header': 'Добавить тег',
+  'tags.edit_modal_header': 'Редактировать тег',
+  'tags.title': 'Название',
+  'tags.delete_tag': 'Удалить тег',
+  'tags.add_tag_failure': 'Не удалось добавить тег',
+  'tags.edit_tag_failure': 'Не удалось изменить тег',
+  'tags.delete_tag_failure': 'Не удалось удалить тег',
   // Auth
   'auth.login.title': 'Вход',
   'auth.login': 'Логин',

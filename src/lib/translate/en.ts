@@ -24,9 +24,14 @@ export const enDict: Dictionary = {
   'common.search': 'Search',
   'common.clear': 'Clear',
   'common.cancel': 'Cancel',
-  'common.tags.modal_header': 'Add tag',
-  'common.tags.title': 'Title',
-  'common.tags.add_tag_failure': 'Failed to add tag',
+  // Tags
+  'tags.add_modal_header': 'Add tag',
+  'tags.edit_modal_header': 'Edit tag',
+  'tags.title': 'Title',
+  'tags.delete_tag': 'Delete tag',
+  'tags.add_tag_failure': 'Failed to add tag',
+  'tags.edit_tag_failure': 'Failed to edit tag',
+  'tags.delete_tag_failure': 'Failed to delete tag',
   // Auth
   'auth.login.title': 'Login',
   'auth.login': 'Login',

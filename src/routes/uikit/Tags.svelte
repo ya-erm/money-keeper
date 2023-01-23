@@ -20,7 +20,15 @@
     tags = [...tags, { id, title }];
     selected = [...selected, id];
   };
+
+  const onEdit = (id: string, title: string) => {
+    tags = tags.map((tag) => (tag.id === id ? { id, title } : tag));
+  };
+
+  const onDelete = (id: string) => {
+    tags = tags.filter((tag) => tag.id !== id);
+  };
 </script>
 
 <h2>Tags</h2>
-<Tags {tags} {selected} {onChange} {onAdd} />
+<Tags {tags} {selected} {onChange} {onAdd} {onEdit} {onDelete} />
