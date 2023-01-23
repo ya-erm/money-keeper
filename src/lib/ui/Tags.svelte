@@ -39,7 +39,7 @@
   };
 </script>
 
-<div class="flex flex-wrap gap-0.5" data-testId="TagsContainer">
+<div class="flex flex-wrap container" data-testId="TagsContainer">
   {#each tags as tag (tag.id)}
     {@const isSelected = selected.includes(tag.id)}
     <button
@@ -64,18 +64,14 @@
 >
   <form on:submit|preventDefault={handleSubmit} class="flex-col gap-1" data-testId="AddTagForm">
     <Input label={$translate('tags.title')} bind:value={title} name="title" required />
-    {#if mode === 'edit'}
-      <Button
-        color="danger"
-        appearance="link"
-        underlined={false}
-        text={$translate('tags.delete_tag')}
-        on:click={handleDelete}
-      />
-    {/if}
+
     <div class="flex gap-1">
       <div class="flex-col flex-1">
-        <Button color="secondary" on:click={() => (opened = false)} text={$translate('common.cancel')} />
+        {#if mode === 'edit'}
+          <Button color="danger" text={$translate('common.delete')} on:click={handleDelete} />
+        {:else}
+          <Button color="secondary" on:click={() => (opened = false)} text={$translate('common.cancel')} />
+        {/if}
       </div>
       <div class="flex-col flex-1">
         <Button text={$translate(mode === 'add' ? 'common.add' : 'common.save')} type="submit" />
@@ -85,6 +81,14 @@
 </Modal>
 
 <style>
+  .container {
+    gap: 0.5rem;
+  }
+  @media (max-width: 400px) {
+    .container {
+      gap: 0.25rem;
+    }
+  }
   .tag {
     font-size: 1rem;
     cursor: pointer;
@@ -92,6 +96,8 @@
     padding: 0.25rem 0.5rem;
     background: var(--header-background-color);
     border: 1px solid var(--border-color);
+    color: var(--primary-text-color);
+    user-select: none;
   }
   .tag:focus,
   .tag:hover {

@@ -24,6 +24,7 @@ export const ruDict: Dictionary = {
   'common.search': 'Поиск',
   'common.clear': 'Очистить',
   'common.cancel': 'Отмена',
+  'common.delete': 'Удалить',
   // Tags
   'tags.add_modal_header': 'Добавить тег',
   'tags.edit_modal_header': 'Редактировать тег',

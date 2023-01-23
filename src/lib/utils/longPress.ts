@@ -7,12 +7,17 @@ export function longPress(node: HTMLButtonElement, callback: () => void) {
     }, 500);
   };
 
+  const handleMouseMove = () => {
+    clearTimeout(timer);
+  };
+
   const handleMouseup = () => {
     clearTimeout(timer);
   };
 
-  node.addEventListener('mousedown', handleMousedown);
-  node.addEventListener('mouseup', handleMouseup);
+  node.addEventListener('pointerdown', handleMousedown);
+  node.addEventListener('pointermove', handleMouseMove);
+  node.addEventListener('pointerup', handleMouseup);
 
   return {
     update: (newCallback: () => void) => {
@@ -20,8 +25,9 @@ export function longPress(node: HTMLButtonElement, callback: () => void) {
     },
     destroy: () => {
       clearTimeout(timer);
-      node.removeEventListener('mousedown', handleMousedown);
-      node.removeEventListener('mouseup', handleMouseup);
+      node.removeEventListener('pointerdown', handleMousedown);
+      node.removeEventListener('pointermove', handleMouseMove);
+      node.removeEventListener('pointerup', handleMouseup);
     },
   };
 }

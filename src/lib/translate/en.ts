@@ -24,6 +24,7 @@ export const enDict: Dictionary = {
   'common.search': 'Search',
   'common.clear': 'Clear',
   'common.cancel': 'Cancel',
+  'common.delete': 'Delete',
   // Tags
   'tags.add_modal_header': 'Add tag',
   'tags.edit_modal_header': 'Edit tag',

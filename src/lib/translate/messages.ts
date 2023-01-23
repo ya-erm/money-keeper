@@ -21,9 +21,15 @@ export type Messages =
   | 'common.search'
   | 'common.clear'
   | 'common.cancel'
-  | 'common.tags.modal_header'
-  | 'common.tags.title'
-  | 'common.tags.add_tag_failure'
+  | 'common.delete'
+  // Tags
+  | 'tags.add_modal_header'
+  | 'tags.edit_modal_header'
+  | 'tags.title'
+  | 'tags.delete_tag'
+  | 'tags.add_tag_failure'
+  | 'tags.edit_tag_failure'
+  | 'tags.delete_tag_failure'
   // Auth
   | 'auth.login.title'
   | 'auth.login'
