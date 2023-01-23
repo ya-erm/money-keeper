@@ -74,6 +74,9 @@ a {
   align-items: center;
   justify-content: center;
 }
+.flex-wrap {
+  flex-wrap: wrap;
+}
 
 /* Align items */
 .items-center {
@@ -109,6 +112,9 @@ a {
 }
 
 /* Gap */
+.gap-0\.25 {
+  gap: 0.25rem;
+}
 .gap-0\.5 {
   gap: 0.5rem;
 }

@@ -16,6 +16,9 @@ export function checkFormDataParameter<T = FormDataEntryValue | null>(
     throw serverError(400, 'BAD_REQUEST', 'File is not supported');
   }
   try {
+    if (options.type === 'array') {
+      return checkParameter(parameter ? parameter.split(',') : null, name, options);
+    }
     return checkParameter(parameter, name, options);
   } catch (e) {
     if (isApiError(e)) {
@@ -39,4 +42,12 @@ export function checkNumberFormParameter(data: FormData, name: string) {
 
 export function checkNumberOptionalFormParameter(data: FormData, name: string) {
   return checkFormDataParameter<number | null>(data, name, { type: 'number' });
+}
+
+export function checkArrayFormParameter<T>(data: FormData, name: string) {
+  return checkFormDataParameter<Array<T>>(data, name, { type: 'array', required: true });
+}
+
+export function checkArrayOptionalFormParameter<T>(data: FormData, name: string) {
+  return checkFormDataParameter<Array<T> | null>(data, name, { type: 'array' });
 }

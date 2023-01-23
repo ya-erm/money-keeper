@@ -25,6 +25,11 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
     orderBy: { order: 'asc' },
   });
 
+  depends(deps.tags);
+  const tags = await db.tag.findMany({
+    where: { ownerId: groupId },
+  });
+
   return {
     accounts: accounts.map((account) => ({
       ...account,
@@ -34,5 +39,6 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
     })),
     categories,
     transactions,
+    tags,
   };
 };

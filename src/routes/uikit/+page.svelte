@@ -8,6 +8,7 @@
   import Inputs from './Inputs.svelte';
   import Modals from './Modals.svelte';
   import Switches from './Switches.svelte';
+  import Tags from './Tags.svelte';
   import Toasts from './Toasts.svelte';
 
   useTitle('UI Kit');
@@ -27,4 +28,5 @@
   <Toasts />
   <Modals />
   <Switches />
+  <Tags />
 </div>

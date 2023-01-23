@@ -5,7 +5,7 @@
   let modalOpened = false;
 </script>
 
-<h2>Modals</h2>
+<h2>Modal</h2>
 <Button text="Open" on:click={() => (modalOpened = true)} />
 <Modal header="Modal header" bind:opened={modalOpened}>
   <div class="flex-col gap-1">

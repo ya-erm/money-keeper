@@ -24,6 +24,15 @@ export const ruDict: Dictionary = {
   'common.search': 'Поиск',
   'common.clear': 'Очистить',
   'common.cancel': 'Отмена',
+  'common.delete': 'Удалить',
+  // Tags
+  'tags.add_modal_header': 'Добавить тег',
+  'tags.edit_modal_header': 'Редактировать тег',
+  'tags.title': 'Название',
+  'tags.delete_tag': 'Удалить тег',
+  'tags.add_tag_failure': 'Не удалось добавить тег',
+  'tags.edit_tag_failure': 'Не удалось изменить тег',
+  'tags.delete_tag_failure': 'Не удалось удалить тег',
   // Auth
   'auth.login.title': 'Вход',
   'auth.login': 'Логин',
@@ -113,6 +122,7 @@ export const ruDict: Dictionary = {
   'transactions.category': 'Категория',
   'transactions.category_is_required': 'Сначала выберите категорию',
   'transactions.comment': 'Комментарий',
+  'transactions.tags': 'Теги',
   'transactions.edit_transaction': 'Редактировать операцию',
   'transactions.create_transaction_success': 'Операция создана',
   'transactions.create_transaction_failure': 'Не удалось создать операцию',

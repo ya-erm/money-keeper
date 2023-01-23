@@ -1,10 +1,14 @@
 import type { TransactionDto } from '$lib/interfaces';
-import { Prisma, type Transaction } from '@prisma/client';
+import { Prisma, type Tag, type Transaction } from '@prisma/client';
 
 type TransactionDbo = Pick<
   Transaction,
   'id' | 'accountId' | 'categoryId' | 'linkedTransactionId' | 'date' | 'amount' | 'comment'
 >;
+
+type TransactionWithTagsDbo = TransactionDbo & {
+  tags: Tag[];
+};
 
 export const transactionSelection = Prisma.validator<Prisma.TransactionSelect>()({
   id: true,
@@ -14,15 +18,20 @@ export const transactionSelection = Prisma.validator<Prisma.TransactionSelect>()
   date: true,
   amount: true,
   comment: true,
+  tags: true,
 });
 
-export const mapTransaction = (t: TransactionDbo, linkedTransaction: TransactionDbo | null): TransactionDto => ({
+export const mapTransaction = (
+  t: TransactionWithTagsDbo,
+  linkedTransaction: TransactionDbo | null,
+): TransactionDto => ({
   id: t.id,
   accountId: t.accountId,
   categoryId: t.categoryId,
   amount: t.amount,
   comment: t.comment,
   date: t.date.toISOString(),
+  tags: t.tags,
   ...(linkedTransaction
     ? {
         linkedTransactionId: t.linkedTransactionId,

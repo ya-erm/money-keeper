@@ -8,50 +8,159 @@ const db = new PrismaClient();
 async function createTestUser() {
   const { TEST_LOGIN, TEST_PASSWORD, TEST_SESSION } = process.env;
 
-  const existingUser = await db.user.findUnique({
+  console.log('--- TEST USER ---');
+
+  let testUser = await db.user.findUnique({
     where: { login: TEST_LOGIN },
   });
 
-  if (existingUser != null) {
+  if (testUser != null) {
     console.log('Test user already exists in database. Skip creating');
-    return;
+  } else {
+    testUser = await db.user.create({
+      data: {
+        login: TEST_LOGIN,
+        password: {
+          create: {
+            hash: await bcrypt.hash(TEST_PASSWORD, 10),
+          },
+        },
+        name: 'Test user',
+      },
+    });
+    console.log(`Test user #${testUser.id} created`);
   }
 
-  const testUser = await db.user.create({
-    data: {
-      login: TEST_LOGIN,
-      password: {
-        create: {
-          hash: await bcrypt.hash(TEST_PASSWORD, 10),
-        },
-      },
-      name: 'Test user',
-    },
-  });
-
-  const testGroup = await db.group.create({
-    data: {
+  let testGroup = await db.group.findFirst({
+    where: {
       name: 'Test group',
-      users: {
-        create: {
-          userId: testUser.id,
+      users: { some: { userId: testUser.id } },
+    },
+  });
+
+  if (testGroup != null) {
+    console.log('Test group already exists in database. Skip creating');
+  } else {
+    testGroup = await db.group.create({
+      data: {
+        name: 'Test group',
+        users: {
+          create: {
+            userId: testUser.id,
+          },
         },
       },
+    });
+    console.log(`Test group #${testGroup.id} created`);
+  }
+
+  const token = await db.authToken.findUnique({
+    where: { value: TEST_SESSION },
+  });
+
+  if (token != null) {
+    console.log('Test token already exists in database. Skip creating');
+  } else {
+    await db.authToken.create({
+      data: {
+        userId: testUser.id,
+        groupId: testGroup.id,
+        value: TEST_SESSION,
+      },
+    });
+    console.log('Test token created');
+  }
+}
+
+async function createTestCategories(ownerId) {
+  const existingCategories = await db.category.findMany({
+    where: { ownerId },
+  });
+  const existingCategoriesNames = existingCategories.map((category) => category.name);
+  const { count } = await db.category.createMany({
+    data: [
+      {
+        type: 'IN',
+        name: 'T_Work',
+        ownerId,
+      },
+      {
+        type: 'OUT',
+        name: 'T_Shop',
+        ownerId,
+      },
+    ].filter((item) => !existingCategoriesNames.includes(item.name)),
+  });
+  console.log(`Created ${count} test categories`);
+}
+
+async function createTestAccounts(ownerId) {
+  const existingAccounts = await db.account.findMany({
+    where: { ownerId },
+  });
+  const existingAccountsNames = existingAccounts.map((account) => account.name);
+  const { count } = await db.account.createMany({
+    data: [
+      {
+        name: 'T_TST',
+        currency: 'TST',
+        ownerId,
+      },
+      {
+        name: 'T_USD',
+        currency: 'USD',
+        ownerId,
+      },
+    ].filter((item) => !existingAccountsNames.includes(item.name)),
+  });
+  console.log(`Created ${count} test account`);
+}
+async function createTestTags(ownerId) {
+  const existingTags = await db.tag.findMany({
+    where: { ownerId },
+  });
+  const existingTagsNames = existingTags.map((tag) => tag.name);
+  const { count } = await db.tag.createMany({
+    data: [
+      {
+        name: 'T_Tag',
+        ownerId,
+      },
+      {
+        name: 'T_Oil',
+        ownerId,
+      },
+    ].filter((item) => !existingTagsNames.includes(item.name)),
+  });
+  console.log(`Created ${count} test categories`);
+}
+
+async function createTestData() {
+  const { TEST_LOGIN } = process.env;
+
+  console.log('--- TEST DATA ---');
+
+  const testUser = await db.user.findUnique({
+    where: { login: TEST_LOGIN },
+    include: {
+      groups: true,
     },
   });
 
-  await db.authToken.create({
-    data: {
-      userId: testUser.id,
-      groupId: testGroup.id,
-      value: TEST_SESSION,
-    },
+  const groups = await db.group.findMany({
+    where: { users: { some: { userId: testUser.id } } },
   });
 
-  console.log(`Test user #${testUser.id} created`);
+  const testGroup = groups.find((group) => group.name === 'Test group');
+
+  await createTestCategories(testGroup.id);
+  await createTestAccounts(testGroup.id);
+  await createTestTags(testGroup.id);
 }
 
 async function createDemoUser() {
+  console.log('--- DEMO USER ---');
+
   const existingUser = await db.user.findUnique({
     where: { login: 'demo' },
   });
@@ -152,6 +261,7 @@ async function createDemoUser() {
 
 async function main() {
   await createTestUser();
+  await createTestData();
   await createDemoUser();
 }
 

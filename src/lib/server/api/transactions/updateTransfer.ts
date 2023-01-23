@@ -1,6 +1,12 @@
 import { ApiError } from '$lib/api';
 import { db } from '$lib/server/database';
-import { checkNumberParameter, checkStringOptionalParameter, checkStringParameter, join } from '$lib/utils';
+import {
+  checkArrayOptionalParameter,
+  checkNumberParameter,
+  checkStringOptionalParameter,
+  checkStringParameter,
+  join,
+} from '$lib/utils';
 import { checkGroupId } from '$lib/utils/checkUser';
 import { checkAccount } from '../accounts';
 import type { CreateTransferRequestData } from './createTransfer';
@@ -28,11 +34,14 @@ export async function updateTransfer(
   const date = checkStringParameter(data.date, 'date');
   const time = checkStringParameter(data.time, 'time');
   const comment = checkStringOptionalParameter(data.comment, 'comment');
+  const tags = checkArrayOptionalParameter<number>(data.tags, 'tags', { type: 'number', required: true });
 
   if (sourceAccountId === destinationAccountId) {
     throw new ApiError(400, 'BAD_REQUEST', 'Source and destination accounts must be different');
   }
   const transaction = await checkTransaction(transactionId, locals);
+
+  const tagsToRemove = transaction.tags.filter((t) => !tags?.includes(t.id));
 
   const sourceAccount = await checkAccount(sourceAccountId, locals);
   const destinationAccount = await checkAccount(destinationAccountId, locals);
@@ -49,6 +58,10 @@ export async function updateTransfer(
         amount: sourceAmount,
         date: new Date(join([date, time], 'T')),
         comment,
+        tags: {
+          connect: tags?.map((tagId) => ({ id: tagId })),
+          disconnect: tagsToRemove?.map((tag) => ({ id: tag.id })),
+        },
       },
     });
     if (transaction.linkedTransactionId) {
@@ -60,6 +73,10 @@ export async function updateTransfer(
           amount: destinationAmount,
           date: new Date(join([date, time], 'T')),
           comment,
+          tags: {
+            connect: tags?.map((tagId) => ({ id: tagId })),
+            disconnect: tagsToRemove?.map((tag) => ({ id: tag.id })),
+          },
         },
       });
       return { t1, t2 };

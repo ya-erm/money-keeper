@@ -8,3 +8,4 @@ export {
   type UpdateTransactionParams,
   type UpdateTransactionRequestData,
 } from './updateTransaction';
+export { updateTransfer, type UpdateTransferParams, type UpdateTransferRequestData } from './updateTransfer';

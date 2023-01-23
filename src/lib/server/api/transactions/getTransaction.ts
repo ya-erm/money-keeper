@@ -17,6 +17,7 @@ export async function getTransaction(params: GetTransactionParams, locals: App.L
     include: {
       account: true,
       category: true,
+      tags: true,
     },
   });
 

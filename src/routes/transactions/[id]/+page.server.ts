@@ -3,8 +3,10 @@ import { error } from '@sveltejs/kit';
 import { isApiError } from '$lib/api/ApiError';
 import { deps } from '$lib/deps';
 import { db, withActionMiddleware } from '$lib/server';
-import { deleteTransaction, getTransaction, updateTransaction } from '$lib/server/api/transactions';
+import { getTags } from '$lib/server/api/tags';
+import { deleteTransaction, getTransaction, updateTransaction, updateTransfer } from '$lib/server/api/transactions';
 import {
+  checkArrayOptionalFormParameter,
   checkNumberFormParameter,
   checkStringFormParameter,
   checkStringOptionalFormParameter,
@@ -13,7 +15,6 @@ import { serialize } from '$lib/utils';
 import { checkGroupId } from '$lib/utils/checkUser';
 
 import type { Action, Actions, PageServerLoad } from './$types';
-import { updateTransfer } from '$lib/server/api/transactions/updateTransfer';
 
 export const load: PageServerLoad = async ({ params, locals, depends }) => {
   try {
@@ -21,6 +22,7 @@ export const load: PageServerLoad = async ({ params, locals, depends }) => {
     const transaction = await getTransaction({ id: parseInt(params.id) }, locals);
 
     // TODO: use API
+    depends(deps.accounts);
     const accounts = await db.account.findMany({
       where: { ownerId: groupId },
     });
@@ -30,10 +32,14 @@ export const load: PageServerLoad = async ({ params, locals, depends }) => {
       where: { ownerId: groupId },
     });
 
+    depends(deps.tags);
+    const tags = await getTags(locals);
+
     return {
       accounts,
       categories,
       transaction,
+      tags,
     };
   } catch (e) {
     if (isApiError(e)) throw error(e.status, e.code);
@@ -59,6 +65,7 @@ const updateTransactionAction: Action = async ({ params, request, locals }) => {
         date: checkStringFormParameter(data, 'date'),
         time: checkStringFormParameter(data, 'time'),
         comment: checkStringOptionalFormParameter(data, 'comment'),
+        tags: checkArrayOptionalFormParameter<number>(data, 'tags'),
       },
       locals,
     );
@@ -77,6 +84,7 @@ const updateTransactionAction: Action = async ({ params, request, locals }) => {
       date: checkStringFormParameter(data, 'date'),
       time: checkStringFormParameter(data, 'time'),
       comment: checkStringOptionalFormParameter(data, 'comment'),
+      tags: checkArrayOptionalFormParameter<number>(data, 'tags'),
     },
     locals,
   );

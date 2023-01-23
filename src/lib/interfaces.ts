@@ -1,4 +1,4 @@
-import type { Account, Category, Group, User } from '@prisma/client';
+import type { Account, Category, Group, Tag, User } from '@prisma/client';
 
 export type GroupWithUsers = Pick<Group, 'id' | 'name'> & {
   users: Pick<User, 'id' | 'name' | 'login'>[];
@@ -12,6 +12,7 @@ export type TransactionDto = {
   amount: number;
   comment: string | null;
   categoryId: number;
+  tags: Tag[];
 };
 
 export type TransactionWithCategory = TransactionDto & {

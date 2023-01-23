@@ -4,7 +4,7 @@
   import { applyAction, enhance } from '$app/forms';
   import { invalidate } from '$app/navigation';
   import { page } from '$app/stores';
-  import type { Account, Category } from '@prisma/client';
+  import type { Account, Category, Tag } from '@prisma/client';
   import type { ActionResult } from '@sveltejs/kit';
 
   import { isApiErrorData } from '$lib/api';
@@ -19,9 +19,12 @@
   import AccountSelect from './AccountSelect.svelte';
   import CategorySelect from './CategorySelect.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
+  import Tags from '$lib/ui/Tags.svelte';
 
   export let accounts: Account[];
   export let categories: Category[];
+  export let tags: Tag[];
+
   export let transaction: TransactionFullDto | null = null;
 
   export let action: string;
@@ -44,23 +47,74 @@
     ? destinationTransaction?.accountId
     : getNumberSearchParam($page, 'destinationAccountId');
 
+  const addTag = async (name: string) => {
+    const response = await fetch('/api/tags', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      tags = [...tags, data];
+      selectedTags = [...selectedTags, data.id];
+      // await invalidate(deps.tags);
+    } else {
+      showErrorToast($translate('tags.add_tag_failure'));
+    }
+  };
+
+  const editTag = async (id: string, name: string) => {
+    const response = await fetch(`/api/tags/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      tags = tags.map((tag) => (tag.id === Number(id) ? data : tag));
+    } else {
+      showErrorToast($translate('tags.edit_tag_failure'));
+    }
+  };
+
+  const deleteTag = async (id: string) => {
+    const response = await fetch(`/api/tags/${id}`, {
+      method: 'DELETE',
+    });
+    if (response.ok) {
+      tags = tags.filter((tag) => tag.id !== Number(id));
+    } else {
+      showErrorToast($translate('tags.delete_tag_failure'));
+    }
+  };
+
+  let selectedTags = transaction?.tags.map((t) => `${t.id}`) ?? [];
+
+  const toggleTag = async (tagId: string, selected: boolean) => {
+    selectedTags = selected ? [...selectedTags, tagId] : selectedTags.filter((t) => t !== tagId);
+  };
+
   const handleResult = async ({ form, result }: { form: HTMLFormElement; result: ActionResult }) => {
     if (result.type === 'failure') {
       const formData = new FormData(form);
       if (!formData.get('accountId')) {
-        showErrorToast($translate('transactions.account_is_required'));
+        showErrorToast($translate('transactions.account_is_required'), { testId: 'AccountIsRequiredErrorToast' });
         return;
       }
       if ((type === 'IN' || type === 'OUT') && !formData.get('categoryId')) {
-        showErrorToast($translate('transactions.category_is_required'));
+        showErrorToast($translate('transactions.category_is_required'), { testId: 'CategoryIsRequiredErrorToast' });
         return;
       }
       if (type === 'TRANSFER' && !formData.get('destinationAccountId')) {
-        showErrorToast($translate('transactions.destination_account_is_required'));
+        showErrorToast($translate('transactions.destination_account_is_required'), {
+          testId: 'DestinationAccountIsRequiredErrorToast',
+        });
         return;
       }
       if (type === 'TRANSFER' && formData.get('accountId') === formData.get('destinationAccountId')) {
-        showErrorToast($translate('transactions.accounts_must_be_different'));
+        showErrorToast($translate('transactions.accounts_must_be_different'), {
+          testId: 'AccountsMustBeDifferentErrorToast',
+        });
         return;
       }
       if (isApiErrorData(result.data)) {
@@ -75,16 +129,23 @@
   };
 </script>
 
-<form method="POST" {action} use:enhance={() => handleResult}>
+<form method="POST" {action} use:enhance={() => handleResult} data-testId="TransactionForm">
   <div class="flex-col gap-1 p-1">
     <TypeSwitch bind:type disabled={isTransfer} />
     {#if type === 'OUT'}
-      <AccountSelect {accounts} bind:accountId />
+      <AccountSelect {accounts} bind:accountId testId="SourceAccountSelect" />
     {/if}
     {#if type === 'TRANSFER'}
-      <AccountSelect name="accountId" label={$translate('transactions.from')} bind:accountId {accounts} />
+      <AccountSelect
+        name="accountId"
+        testId="SourceAccountSelect"
+        label={$translate('transactions.from')}
+        bind:accountId
+        {accounts}
+      />
       <AccountSelect
         name="destinationAccountId"
+        testId="DestinationAccountSelect"
         label={$translate('transactions.to')}
         bind:accountId={destinationAccountId}
         {accounts}
@@ -94,7 +155,7 @@
       <CategorySelect {type} bind:categoryId categories={categories.filter((c) => c.type === type)} />
     {/if}
     {#if type === 'IN'}
-      <AccountSelect {accounts} bind:accountId />
+      <AccountSelect {accounts} bind:accountId testId="DestinationAccountSelect" />
     {/if}
     <div class="flex-col gap-0.5">
       <InputLabel text={$translate('transactions.dateTime')} />
@@ -125,6 +186,18 @@
       </div>
     </div>
     <Input label={$translate('transactions.comment')} name="comment" value={transaction?.comment} optional />
+    <div class="flex-col gap-0.5">
+      <InputLabel text={$translate('transactions.tags')} optional />
+      <Tags
+        tags={tags?.map((t) => ({ id: `${t.id}`, title: t.name })) ?? []}
+        selected={selectedTags}
+        onChange={toggleTag}
+        onAdd={addTag}
+        onEdit={editTag}
+        onDelete={deleteTag}
+      />
+      <input name="tags" class="hidden" multiple value={selectedTags} />
+    </div>
     <slot />
     <slot name="button" />
     <slot name="footer" />

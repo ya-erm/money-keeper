@@ -1,4 +1,4 @@
-import { expect, type BrowserContext, type Page } from '@playwright/test';
+import { expect, type BrowserContext, type Page, type Locator } from '@playwright/test';
 
 export async function useAuthAsync(page: Page, context: BrowserContext) {
   const { TEST_SESSION } = process.env;
@@ -13,4 +13,9 @@ export async function useAuthAsync(page: Page, context: BrowserContext) {
       sameSite: 'Strict',
     },
   ]);
+}
+
+export async function hasLocatorClassAsync(locator: Locator, className: string) {
+  const classes = (await locator.getAttribute('class'))?.split(' ');
+  return classes.includes(className);
 }

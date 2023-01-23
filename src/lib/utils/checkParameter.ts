@@ -1,7 +1,9 @@
 import { ApiError } from '$lib/api/ApiError';
 
+export type CheckParameterType = 'string' | 'number' | 'boolean' | 'object' | 'array';
+
 export type CheckParameterOptions = {
-  type?: 'string' | 'number' | 'boolean' | 'object' | 'array';
+  type?: CheckParameterType;
   required?: boolean;
 };
 
@@ -62,6 +64,22 @@ export function checkNumberParameter(parameter: unknown, name: string) {
 
 export function checkNumberOptionalParameter(parameter: unknown, name: string) {
   return checkParameter<number | null>(parameter, name, { type: 'number', required: false });
+}
+
+export function checkArrayParameter<T>(parameter: unknown, name: string, options?: CheckParameterOptions) {
+  let items = checkParameter<Array<T>>(parameter, name, { type: 'array', required: true });
+  if (options) {
+    items = items.map((item, i) => checkParameter(item, `name.${i}`, options));
+  }
+  return items;
+}
+
+export function checkArrayOptionalParameter<T>(parameter: unknown, name: string, options?: CheckParameterOptions) {
+  let items = checkParameter<Array<T> | null>(parameter, name, { type: 'array', required: false });
+  if (options && items) {
+    items = items?.map((item, i) => checkParameter(item, `name.${i}`, options));
+  }
+  return items;
 }
 
 // URL parameters

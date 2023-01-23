@@ -17,6 +17,8 @@
   export let categoryId: number | null = null;
   export let onChange: ((value: number) => void) | null = null;
 
+  export let testId: string = 'CategorySelect';
+
   const handleChange = (value: number) => () => {
     categoryId = value;
     onChange?.(value);
@@ -25,23 +27,25 @@
   let createCategoryModalOpened = false;
 </script>
 
-<div class="flex-col gap-0.5">
+<div class="flex-col gap-0.5" data-testId={testId}>
   {#if !withoutHeader}
     <label class="label">
-      <span>{$translate('transactions.category')}</span>
+      <span data-testId={`${testId}.Label`}>{$translate('transactions.category')}</span>
       <input name="categoryId" value={categoryId} class="hidden" readonly required />
     </label>
   {/if}
-  <div class="grid">
+  <div class="grid" data-testId={`${testId}.Grid`}>
     {#each categories as category (category.id)}
       <GridCircleItem
         selected={categoryId === category.id}
         onClick={handleChange(category.id)}
+        testId={`${testId}.Item.${category.id}`}
         icon={category.icon || 'mdi:briefcase-outline'}
         text={category.name}
       />
     {/each}
     <GridCircleItem
+      testId={`${testId}.Item.Add`}
       onClick={() => (createCategoryModalOpened = true)}
       text={$translate('common.add')}
       icon="mdi:plus"

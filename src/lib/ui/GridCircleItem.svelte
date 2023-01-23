@@ -5,9 +5,16 @@
   export let text: string;
   export let onClick: () => void;
   export let selected: boolean = false;
+  export let testId: string | undefined = undefined;
 </script>
 
-<button on:click={onClick} class:selected class="grid-item flex-col flex-center gap-0.5 cursor-pointer" type="button">
+<button
+  on:click={onClick}
+  class:selected
+  data-testId={testId}
+  class="grid-item flex-col flex-center gap-0.5 cursor-pointer"
+  type="button"
+>
   <div class="circle mx-0.5">
     <Icon name={icon} size={2} />
   </div>

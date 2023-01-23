@@ -59,7 +59,12 @@
           {/if}
         {/if}
       </div>
-      <div class="small-text">{transaction.comment}</div>
+      <div class="small-text">
+        {transaction.comment}
+      </div>
+      <div class="tags">
+        {transaction.tags.map((t) => `#${t.name}`).join(' ')}
+      </div>
     </div>
     <span class="amount" class:incoming class:outgoing>
       <span>{incoming ? '+' : outgoing ? '-' : ''}{transaction.amount}</span>
@@ -76,6 +81,7 @@
   @media (hover: hover) {
     a:hover .icon,
     a:hover .text,
+    a:hover .tags,
     a:hover .amount {
       color: var(--active-color);
     }
@@ -89,6 +95,10 @@
   }
   .small-text {
     font-size: 0.9rem;
+  }
+  .tags {
+    font-size: 0.85rem;
+    color: var(--secondary-text-color);
   }
   .source,
   .destination {
