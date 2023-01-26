@@ -19,7 +19,7 @@
   $: account = data.account;
 
   useTitle($translate('accounts.edit_account'));
-  $: backLink.set(routes.accounts.path + (account ? `#account-card-${account.id}` : ''));
+  $: backLink.set(routes.accounts.path + (account ? `?account-card=${account.id}` : ''));
 
   const onSave = async (result: ActionResult, next: (result: ActionResult) => void) => {
     if (result.type === 'redirect') {

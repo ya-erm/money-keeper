@@ -79,7 +79,7 @@ const updateAccount: Action = async ({ request, params, locals }) => {
       select: selection,
     });
 
-    throw redirect(302, `${routes.accounts.path}#account-card-${accountId}`);
+    throw redirect(302, `${routes.accounts.path}?account-card=${accountId}`);
   } catch (e) {
     if (isServerError(e)) return e;
     throw e;

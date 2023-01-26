@@ -21,7 +21,7 @@
     showSuccessToast($translate('transactions.create_transaction_success'), {
       testId: 'CreateTransactionSuccessToast',
     });
-    await goto(`${routes.accounts.path}#account-card-${accountId}`);
+    await goto(`${routes.accounts.path}?account-card=${accountId}`);
   };
 </script>
 

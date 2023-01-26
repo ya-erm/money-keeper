@@ -37,7 +37,7 @@ const create: Action = async ({ request, locals }) => {
       },
     });
 
-    throw redirect(302, `${routes.accounts.path}#account-card-${account.id}`);
+    throw redirect(302, `${routes.accounts.path}?account-card=${account.id}`);
   } catch (e) {
     if (isServerError(e)) return e;
     throw e;
