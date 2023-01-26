@@ -3,8 +3,9 @@
 
   import { routes } from '$lib/routes';
   import Icon from '$lib/ui/Icon.svelte';
+  import { getSearchParam } from '$lib/utils';
 
-  $: cardId = $page.url.hash.match(/\#account-card-(\d+)/)?.[1];
+  $: cardId = getSearchParam($page, 'account-card');
 </script>
 
 <a href={`${routes['transactions.create'].path}?accountId=${cardId}`}>

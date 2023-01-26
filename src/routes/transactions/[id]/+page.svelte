@@ -21,12 +21,12 @@
 
   const onSuccess = () => {
     showSuccessToast($translate('common.save_changes_success'));
-    goto(`${routes.accounts.path}#account-card-${transaction.account.id}`);
+    goto(`${routes.accounts.path}?account-card=${transaction.account.id}`);
   };
 
   const handleDelete = () => {
     showSuccessToast($translate('transactions.delete_transaction_success'));
-    goto(`${routes.accounts.path}#account-card-${transaction.account.id}`);
+    goto(`${routes.accounts.path}?account-card=${transaction.account.id}`);
   };
 </script>
 

@@ -8,6 +8,7 @@
   import { translate } from '$lib/translate';
   import { backLink, rightButton, title } from '$lib/ui/header';
   import Input from '$lib/ui/Input.svelte';
+  import { getSearchParam } from '$lib/utils';
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
 
@@ -51,7 +52,7 @@
 
   let search: string = '';
 
-  $: cardId = $page.url.hash.match(/\#account-card-(\d+)/)?.[1];
+  $: cardId = getSearchParam($page, 'account-card');
   $: account = accounts.find((x) => x.id.toString() === cardId);
   $: accountTransactions = !!account ? transactions.filter((t) => t.accountId === account?.id) : null;
   $: filteredTransactions =
@@ -74,7 +75,7 @@
     if (cardId) {
       scrollToCard(cardId);
     } else if (!!accounts.length) {
-      goto(`${routes.accounts.path}#account-card-${accounts[0].id}`, { noScroll: true });
+      goto(`${routes.accounts.path}?account-card=${accounts[0].id}`, { noScroll: true });
     }
   });
 
@@ -87,7 +88,7 @@
       } else if (!!accounts[index]) {
         const id = accounts[index].id;
         if (`${id}` !== cardId) {
-          goto(`${routes.accounts.path}#account-card-${id}`, { noScroll: true });
+          goto(`${routes.accounts.path}?account-card=${id}`, { noScroll: true });
         }
       }
     }
