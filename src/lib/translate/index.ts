@@ -22,12 +22,12 @@ type MessageFormatter = (id: Messages, options?: FormatOptions) => string;
 
 export const translate = format as Readable<MessageFormatter>;
 
-export const languages: { [key in Locales]: string } = {
-  'ru-RU': 'Русский',
-  'en-US': 'English',
+export const languages: { [key in Locales]: { name: string; icon: string } } = {
+  'ru-RU': { name: 'Русский', icon: 'circle-flags:ru' },
+  'en-US': { name: 'English', icon: 'circle-flags:gb' },
 };
 
 export const activeLocale = storable<Locales>('ru-RU', 'locale');
 activeLocale.subscribe((value) => locale.set(value));
 
-export const activeLocaleName = derived(activeLocale, (value) => languages[value]);
+export const activeLocaleName = derived(activeLocale, (value) => languages[value].name);

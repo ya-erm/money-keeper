@@ -5,6 +5,7 @@ export const ruDict: Dictionary = {
   // Common
   'common.back': 'Назад',
   'common.select': 'Выбрать',
+  'common.accept': 'Принять',
   'common.available_variants': 'Доступные варианты',
   'common.optional': 'опционально',
   'common.loading': 'Загрузка...',
@@ -25,6 +26,7 @@ export const ruDict: Dictionary = {
   'common.clear': 'Очистить',
   'common.cancel': 'Отмена',
   'common.delete': 'Удалить',
+  'common.ok': 'OK',
   // Tags
   'tags.add_modal_header': 'Добавить тег',
   'tags.edit_modal_header': 'Редактировать тег',
@@ -33,6 +35,8 @@ export const ruDict: Dictionary = {
   'tags.add_tag_failure': 'Не удалось добавить тег',
   'tags.edit_tag_failure': 'Не удалось изменить тег',
   'tags.delete_tag_failure': 'Не удалось удалить тег',
+  // Language
+  'language.select_language': 'Выберите язык',
   // Auth
   'auth.login.title': 'Вход',
   'auth.login': 'Логин',

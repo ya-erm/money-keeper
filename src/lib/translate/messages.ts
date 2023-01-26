@@ -2,6 +2,7 @@ export type Messages =
   // Common
   | 'common.back'
   | 'common.select'
+  | 'common.accept'
   | 'common.available_variants'
   | 'common.optional'
   | 'common.loading'
@@ -22,6 +23,7 @@ export type Messages =
   | 'common.clear'
   | 'common.cancel'
   | 'common.delete'
+  | 'common.ok'
   // Tags
   | 'tags.add_modal_header'
   | 'tags.edit_modal_header'
@@ -30,6 +32,8 @@ export type Messages =
   | 'tags.add_tag_failure'
   | 'tags.edit_tag_failure'
   | 'tags.delete_tag_failure'
+  // Language
+  | 'language.select_language'
   // Auth
   | 'auth.login.title'
   | 'auth.login'
