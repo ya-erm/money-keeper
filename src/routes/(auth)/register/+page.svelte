@@ -1,9 +1,13 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
+
   import { isApiErrorData } from '$lib/api/ApiError';
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
+  import LanguageButton from '$lib/translate/LanguageButton.svelte';
   import Button from '$lib/ui/Button.svelte';
   import FormContainer from '$lib/ui/FormContainer.svelte';
+  import { rightButton } from '$lib/ui/header';
   import Input from '$lib/ui/Input.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
 
@@ -31,6 +35,9 @@
         break;
     }
   }
+
+  rightButton.set(LanguageButton);
+  onDestroy(() => rightButton.set(null));
 </script>
 
 <FormContainer action="?/register" onSubmit={handleSubmit}>

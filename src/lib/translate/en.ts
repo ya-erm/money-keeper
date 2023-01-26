@@ -5,6 +5,7 @@ export const enDict: Dictionary = {
   // Common
   'common.back': 'Back',
   'common.select': 'Select',
+  'common.accept': 'Accept',
   'common.available_variants': 'Available variants',
   'common.optional': 'optional',
   'common.loading': 'Loading...',
@@ -25,6 +26,7 @@ export const enDict: Dictionary = {
   'common.clear': 'Clear',
   'common.cancel': 'Cancel',
   'common.delete': 'Delete',
+  'common.ok': 'OK',
   // Tags
   'tags.add_modal_header': 'Add tag',
   'tags.edit_modal_header': 'Edit tag',
@@ -33,6 +35,8 @@ export const enDict: Dictionary = {
   'tags.add_tag_failure': 'Failed to add tag',
   'tags.edit_tag_failure': 'Failed to edit tag',
   'tags.delete_tag_failure': 'Failed to delete tag',
+  // Language
+  'language.select_language': 'Select language',
   // Auth
   'auth.login.title': 'Login',
   'auth.login': 'Login',

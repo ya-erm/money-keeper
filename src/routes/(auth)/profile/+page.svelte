@@ -1,9 +1,17 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
+
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
+  import LanguageButton from '$lib/translate/LanguageButton.svelte';
+  import { rightButton } from '$lib/ui/header';
+
   import type { PageData } from './$types';
 
   export let data: PageData;
+
+  rightButton.set(LanguageButton);
+  onDestroy(() => rightButton.set(null));
 </script>
 
 <div class="content">
