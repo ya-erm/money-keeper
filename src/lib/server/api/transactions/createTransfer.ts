@@ -5,7 +5,6 @@ import {
   checkNumberParameter,
   checkStringOptionalParameter,
   checkStringParameter,
-  join,
 } from '$lib/utils';
 import { checkGroupId } from '$lib/utils/checkUser';
 import { checkAccount } from '../accounts';
@@ -20,8 +19,7 @@ export type CreateTransferRequestData = {
     accountId: number;
     amount: number;
   };
-  date: string;
-  time: string;
+  dateTime: string;
   comment?: string | null;
   tags?: number[] | null;
 };
@@ -31,8 +29,7 @@ export async function createTransfer(data: CreateTransferRequestData, locals: Ap
   const sourceAmount = checkNumberParameter(data.source.amount, 'sourceAmount');
   const destinationAccountId = checkNumberParameter(data.destination.accountId, 'destinationAccountId');
   const destinationAmount = checkNumberParameter(data.destination.amount, 'destinationAmount');
-  const date = checkStringParameter(data.date, 'date');
-  const time = checkStringParameter(data.time, 'time');
+  const dateTime = checkStringParameter(data.dateTime, 'dateTime');
   const comment = checkStringOptionalParameter(data.comment, 'comment');
   const tags = checkArrayOptionalParameter<number>(data.tags, 'tags', { type: 'number', required: true });
 
@@ -54,7 +51,7 @@ export async function createTransfer(data: CreateTransferRequestData, locals: Ap
         ownerId: groupId,
         accountId: sourceAccount.id,
         categoryId: transferOutCategory.id,
-        date: new Date(join([date, time], 'T')),
+        date: dateTime,
         amount: sourceAmount,
         comment,
         tags: { connect: tags?.map((tagId) => ({ id: tagId })) },
@@ -65,7 +62,7 @@ export async function createTransfer(data: CreateTransferRequestData, locals: Ap
         ownerId: groupId,
         accountId: destinationAccount.id,
         categoryId: transferInCategory.id,
-        date: new Date(join([date, time], 'T')),
+        date: dateTime,
         amount: destinationAmount,
         comment,
         tags: { connect: tags?.map((tagId) => ({ id: tagId })) },

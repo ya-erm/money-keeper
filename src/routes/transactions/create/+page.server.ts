@@ -9,7 +9,7 @@ import {
   checkStringFormParameter,
   checkStringOptionalFormParameter,
 } from '$lib/server/utils';
-import { checkUserAndGroup, serialize } from '$lib/utils';
+import { checkUserAndGroup, join, serialize } from '$lib/utils';
 
 import type { Action, Actions, PageServerLoad } from './$types';
 
@@ -39,6 +39,10 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
 const create: Action = async ({ request, locals }) => {
   const data = await request.formData();
 
+  const date = checkStringFormParameter(data, 'date');
+  const time = checkStringFormParameter(data, 'time');
+  const dateTime = new Date(join([date, time], 'T')).toISOString();
+
   if (data.get('destinationAccountId')) {
     const { t1, t2 } = await createTransfer(
       {
@@ -50,10 +54,9 @@ const create: Action = async ({ request, locals }) => {
           accountId: checkNumberFormParameter(data, 'destinationAccountId'),
           amount: checkNumberFormParameter(data, 'destinationAmount'),
         },
-        date: checkStringFormParameter(data, 'date'),
-        time: checkStringFormParameter(data, 'time'),
         comment: checkStringOptionalFormParameter(data, 'comment'),
         tags: checkArrayOptionalFormParameter<number>(data, 'tags'),
+        dateTime,
       },
       locals,
     );
@@ -68,10 +71,9 @@ const create: Action = async ({ request, locals }) => {
       accountId: checkNumberFormParameter(data, 'accountId'),
       categoryId: checkNumberFormParameter(data, 'categoryId'),
       amount: checkNumberFormParameter(data, 'amount'),
-      date: checkStringFormParameter(data, 'date'),
-      time: checkStringFormParameter(data, 'time'),
       comment: checkStringOptionalFormParameter(data, 'comment'),
       tags: checkArrayOptionalFormParameter<number>(data, 'tags'),
+      dateTime,
     },
     locals,
   );
