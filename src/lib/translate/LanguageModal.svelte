@@ -61,7 +61,9 @@
   li.active {
     color: var(--active-color);
   }
-  li:hover {
-    background: var(--hover-background-color);
+  @media (hover: hover) {
+    li:hover {
+      background: var(--hover-background-color);
+    }
   }
 </style>
