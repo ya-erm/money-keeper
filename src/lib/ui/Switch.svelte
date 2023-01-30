@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
-
-  export let checked = writable(false);
+  export let checked: boolean = false;
 </script>
 
-<label class="switch" class:active={$checked}>
-  <input type="checkbox" bind:checked={$checked} />
+<label class="switch" class:active={checked}>
+  <input type="checkbox" bind:checked />
   <div class="indicator" />
 </label>
 
@@ -34,6 +32,6 @@
     display: none;
   }
   input:checked + .indicator {
-    transform: translate(18px);
+    transform: translate(14px);
   }
 </style>

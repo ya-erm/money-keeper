@@ -17,7 +17,7 @@
 <div class="p-1">
   <h1>Theme</h1>
   <div class="flex gap-1 items-center">
-    <Switch checked={darkMode} />
+    <Switch bind:checked={$darkMode} />
     <span>Dark mode</span>
   </div>
   <Colors />

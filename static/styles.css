@@ -103,6 +103,13 @@ a {
   justify-content: center;
 }
 
+/* Grid */
+.grid-col-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+
 /* Width, height */
 .w-full {
   width: 100%;
@@ -206,4 +213,12 @@ a {
 /* Cursor */
 .cursor-pointer {
   cursor: pointer;
+}
+
+/* Text decoration */
+.text-decoration-none {
+  text-decoration: none;
+}
+.text-underline {
+  text-decoration: underline;
 }
