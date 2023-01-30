@@ -44,7 +44,7 @@
       </li>
     {/each}
   </ul>
-  <div class="modal-buttons flex gap-1">
+  <div class="grid-col-2 gap-1">
     <Button text={$translate('common.cancel')} color="secondary" on:click={handleCancel} />
     <Button text={$translate('common.accept')} color="primary" on:click={handleAccept} />
   </div>
@@ -63,9 +63,5 @@
   }
   li:hover {
     background: var(--hover-background-color);
-  }
-  .modal-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
   }
 </style>

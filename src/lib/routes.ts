@@ -21,7 +21,8 @@ type RouteKey =
   | 'transactions.create'
   | 'transactions.import'
   | 'settings'
-  | 'settings.language';
+  | 'settings.language'
+  | 'uikit';
 
 export const routes: { [key in RouteKey]: Route } = {
   root: {
@@ -45,11 +46,11 @@ export const routes: { [key in RouteKey]: Route } = {
     title: 'auth.profile',
   },
   groups: {
-    path: '/groups',
+    path: '/settings/groups',
     title: 'groups.title',
   },
   'groups.create': {
-    path: '/groups/create',
+    path: '/settings/groups/create',
     title: 'groups.create_group',
   },
   accounts: {
@@ -87,6 +88,10 @@ export const routes: { [key in RouteKey]: Route } = {
   'settings.language': {
     path: '/settings/language',
     title: 'settings.select_language',
+  },
+  uikit: {
+    path: '/uikit',
+    title: 'settings.uikit',
   },
 };
 

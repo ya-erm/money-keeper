@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
-  import { goto, invalidateAll } from '$app/navigation';
-
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
@@ -10,15 +7,11 @@
 
   import type { PageData } from './$types';
 
-  backLink.set(null);
+  backLink.set(routes.settings.path);
 
   export let data: PageData;
 
   const { groups, groupId } = data;
-
-  const addGroup = () => {
-    goto(routes['groups.create'].path);
-  };
 </script>
 
 <div class="groups-container">
@@ -26,22 +19,14 @@
     {#if !groups.length}
       <NoItems />
     {/if}
-    {#each groups as group}
-      <form
-        class="flex-col"
-        action="?/selectGroup"
-        method="POST"
-        use:enhance={() =>
-          async ({ result }) => {
-            await invalidateAll();
-            await applyAction(result);
-          }}
-      >
-        <input class="hidden" name="groupId" value={group.id} type="number" />
-        <Button color={group.id === groupId ? 'success' : 'white'} type="submit" bordered>{group.name}</Button>
-      </form>
+    {#each groups as group (group.id)}
+      <a href={`${routes.groups.path}/${group.id}`} class="flex-col text-decoration-none">
+        <Button color={group.id === groupId ? 'success' : 'white'} bordered text={group.name} />
+      </a>
     {/each}
-    <Button on:click={addGroup}>{$translate('common.add')}</Button>
+    <a href={routes['groups.create'].path} class="flex-col text-decoration-none">
+      <Button text={$translate('common.add')} />
+    </a>
   </div>
 </div>
 

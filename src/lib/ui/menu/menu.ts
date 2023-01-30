@@ -11,14 +11,9 @@ export type MenuItem = {
 
 export const menu = readable<MenuItem[]>([
   {
-    icon: 'mdi:account',
-    title: 'auth.profile',
-    path: routes.login.path,
-  },
-  {
-    icon: 'mdi:account-group',
-    title: 'groups.title',
-    path: routes.groups.path,
+    icon: 'mdi:shape-outline',
+    title: 'categories.title',
+    path: routes.categories.path,
   },
   {
     icon: 'mdi:briefcase-outline',
@@ -26,14 +21,9 @@ export const menu = readable<MenuItem[]>([
     path: routes.accounts.path,
   },
   {
-    icon: 'mdi:shape-outline',
-    title: 'categories.title',
-    path: routes.categories.path,
-  },
-  {
     icon: 'mdi:cog-outline',
     title: 'settings.title',
-    path: '/uikit',
+    path: routes.settings.path,
   },
 ]);
 
