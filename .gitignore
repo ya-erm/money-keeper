@@ -9,3 +9,5 @@ node_modules
 /prisma/dev.db
 /data
 /backups
+screenshots/raw
+.ipynb_checkpoints
