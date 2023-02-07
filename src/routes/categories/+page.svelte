@@ -7,13 +7,13 @@
   import type { PageData } from './$types';
 
   export let data: PageData;
-  $: incommings = data.categories.filter((c) => c.type === 'IN');
+  $: incomings = data.categories.filter((c) => c.type === 'IN');
   $: outgoings = data.categories.filter((c) => c.type === 'OUT');
 </script>
 
 <h2>{$translate('categories.incomings')}</h2>
 <div class="grid px-1 mb-1">
-  {#each incommings as category (category.id)}
+  {#each incomings as category (category.id)}
     <GridCircleItem
       onClick={() => goto(`${routes.categories.path}/${category.id}`)}
       icon={category.icon || 'mdi:folder-outline'}
