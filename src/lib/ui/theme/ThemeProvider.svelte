@@ -12,3 +12,7 @@
     });
   });
 </script>
+
+<svelte:head>
+  <meta name="theme-color" content={$darkMode ? '#121212' : 'white'} />
+</svelte:head>
