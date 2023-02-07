@@ -17,6 +17,7 @@ export const enDict: Dictionary = {
   'common.descending': 'Descending',
   'common.grouping': 'Grouping',
   'common.no_items': 'No items yet',
+  'common.nothing_found': 'Nothing found',
   'common.create': 'Create',
   'common.save': 'Save',
   'common.add': 'Add',
@@ -136,6 +137,7 @@ export const enDict: Dictionary = {
   'transactions.delete_transaction': 'Delete operation',
   'transactions.delete_transaction_success': 'Operation was deleted',
   'transactions.delete_transaction_failure': 'Failed to delete operation',
+  // Transactions import
   'transactions.import': 'Import',
   'transactions.import.title': 'Import operations',
   'transactions.import.invalid_expression': 'Enter search request to filter operations of one category',
@@ -150,6 +152,22 @@ export const enDict: Dictionary = {
   'transactions.import.select_category_for_all_operations': 'Select categories for all operations',
   'transactions.import.finish': 'Finish import',
   'transactions.import.finished': '{count, plural, one {# operation was imported} other {# operations were imported}}',
+  // Import rules
+  'transactions.import.rules.title': 'Rules of import',
+  'transactions.import.rules.create': 'Create rule',
+  'transactions.import.rules.edit_rule': 'Edit rule',
+  'transactions.import.rules.how_does_it_work': 'How does it work?',
+  'transactions.import.rules.how_does_it_work.description':
+    'If the description of the operation satisfies the search condition, then the selected category will be assigned to the operation and the selected tags will be added to it',
+  'transactions.import.rules.condition': 'Search condition',
+  'transactions.import.rules.category': 'Category',
+  'transactions.import.rules.tags': 'Tags',
+  'transactions.import.rules.category_or_tags_required': 'Select category or/and tags firstly',
+  'transactions.import.rules.save_rule_success': 'Rule was saved',
+  'transactions.import.rules.save_rule_failure': 'Failed to save rule',
+  'transactions.import.rules.delete': 'Delete rule',
+  'transactions.import.rules.delete_success': 'Rule was deleted',
+  'transactions.import.rules.delete_failure': 'Failed to delete rule',
   // System
   'system.category.transfer_in': 'Transfer from other account',
   'system.category.transfer_out': 'Transfer to other account',

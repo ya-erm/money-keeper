@@ -14,12 +14,12 @@
   import InputLabel from '$lib/ui/InputLabel.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
   import { getNumberSearchParam, getSearchParam } from '$lib/utils/getSearchParam';
-
   import type { TransactionFullDto } from '$lib/interfaces';
+
   import AccountSelect from './AccountSelect.svelte';
   import CategorySelect from './CategorySelect.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
-  import Tags from '$lib/ui/Tags.svelte';
+  import TagsList from './TagsList.svelte';
 
   export let accounts: Account[];
   export let categories: Category[];
@@ -51,52 +51,7 @@
   let time = dayjs(transaction?.date).format('HH:mm');
   $: datetime = new Date([date, time].join('T')).toISOString();
 
-  const addTag = async (name: string) => {
-    const response = await fetch('/api/tags', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      tags = [...tags, data];
-      selectedTags = [...selectedTags, data.id];
-      // await invalidate(deps.tags);
-    } else {
-      showErrorToast($translate('tags.add_tag_failure'));
-    }
-  };
-
-  const editTag = async (id: string, name: string) => {
-    const response = await fetch(`/api/tags/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      tags = tags.map((tag) => (tag.id === Number(id) ? data : tag));
-    } else {
-      showErrorToast($translate('tags.edit_tag_failure'));
-    }
-  };
-
-  const deleteTag = async (id: string) => {
-    const response = await fetch(`/api/tags/${id}`, {
-      method: 'DELETE',
-    });
-    if (response.ok) {
-      tags = tags.filter((tag) => tag.id !== Number(id));
-    } else {
-      showErrorToast($translate('tags.delete_tag_failure'));
-    }
-  };
-
   let selectedTags = transaction?.tags.map((t) => `${t.id}`) ?? [];
-
-  const toggleTag = async (tagId: string, selected: boolean) => {
-    selectedTags = selected ? [...selectedTags, tagId] : selectedTags.filter((t) => t !== tagId);
-  };
 
   const handleResult = async ({ form, result }: { form: HTMLFormElement; result: ActionResult }) => {
     if (result.type === 'failure') {
@@ -193,15 +148,7 @@
     <Input label={$translate('transactions.comment')} name="comment" value={transaction?.comment} optional />
     <div class="flex-col gap-0.5">
       <InputLabel text={$translate('transactions.tags')} optional />
-      <Tags
-        tags={tags?.map((t) => ({ id: `${t.id}`, title: t.name })) ?? []}
-        selected={selectedTags}
-        onChange={toggleTag}
-        onAdd={addTag}
-        onEdit={editTag}
-        onDelete={deleteTag}
-      />
-      <input name="tags" class="hidden" multiple value={selectedTags} />
+      <TagsList bind:tags bind:selectedTags />
     </div>
     <slot />
     <slot name="button" />

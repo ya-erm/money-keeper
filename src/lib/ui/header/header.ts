@@ -12,3 +12,9 @@ export function useTitle(value: string) {
   title.set(value);
   onDestroy(() => title.set(null));
 }
+
+/** Set right button and clear it on destroy */
+export function useRightButton(value: typeof SvelteComponent) {
+  rightButton.set(value);
+  onDestroy(() => rightButton.set(null));
+}

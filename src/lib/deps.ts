@@ -5,5 +5,6 @@ export const deps = {
   accounts: 'accounts',
   categories: 'categories',
   transactions: 'transactions',
+  importRules: 'importRules',
   tags: 'tags',
 };

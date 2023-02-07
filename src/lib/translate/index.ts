@@ -7,9 +7,11 @@ import './ru';
 
 export type { Locales, Messages } from './messages';
 
+const initialLocale = getLocaleFromNavigator();
+
 init({
   fallbackLocale: 'en-US',
-  initialLocale: getLocaleFromNavigator(),
+  initialLocale,
 });
 
 type FormatOptions = {
@@ -27,7 +29,7 @@ export const languages: { [key in Locales]: { name: string; icon: string } } = {
   'en-US': { name: 'English', icon: 'circle-flags:gb' },
 };
 
-export const activeLocale = storable<Locales>('ru-RU', 'locale');
+export const activeLocale = storable<Locales>((initialLocale as Locales) ?? 'ru-RU', 'locale');
 activeLocale.subscribe((value) => locale.set(value));
 
 export const activeLocaleName = derived(activeLocale, (value) => languages[value].name);

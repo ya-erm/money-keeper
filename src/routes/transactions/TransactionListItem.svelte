@@ -62,9 +62,11 @@
       <div class="small-text">
         {transaction.comment}
       </div>
-      <div class="tags">
-        {transaction.tags.map((t) => `#${t.name}`).join(' ')}
-      </div>
+      {#if transaction.tags?.length}
+        <div class="tags">
+          {transaction.tags.map((t) => `#${t.name}`).join(' ')}
+        </div>
+      {/if}
     </div>
     <span class="amount" class:incoming class:outgoing>
       <span>{incoming ? '+' : outgoing ? '-' : ''}{transaction.amount}</span>

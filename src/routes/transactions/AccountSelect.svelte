@@ -18,10 +18,10 @@
 
   $: _accountId = fromUrl ? accountIdFromUrl : accountId;
 
-  const setAccountId = (value: number) => {
+  const setAccountId = async (value: number) => {
     if (fromUrl) {
       $page.url.searchParams.set(name, `${value}`);
-      goto($page.url, { replaceState: true });
+      await goto($page.url, { replaceState: true, invalidateAll: true });
     } else {
       accountId = value;
     }

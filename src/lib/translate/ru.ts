@@ -17,6 +17,7 @@ export const ruDict: Dictionary = {
   'common.descending': 'По убыванию',
   'common.grouping': 'Группировка',
   'common.no_items': 'Здесь пока ничего нет',
+  'common.nothing_found': 'Ничего не найдено',
   'common.create': 'Создать',
   'common.save': 'Сохранить',
   'common.add': 'Добавить',
@@ -151,6 +152,22 @@ export const ruDict: Dictionary = {
   'transactions.import.finish': 'Завершить импорт',
   'transactions.import.finished':
     '{count, plural, one {Импортирована # операция} few {Импортировано # операций} other {Импортировано # операций}}',
+  // Import rules
+  'transactions.import.rules.title': 'Правила импорта',
+  'transactions.import.rules.create': 'Создать правило',
+  'transactions.import.rules.edit_rule': 'Редактировать правило',
+  'transactions.import.rules.how_does_it_work': 'Как это работает?',
+  'transactions.import.rules.how_does_it_work.description':
+    'Если описание операции удовлетворит условию поиска, то операции будет назначена выбранная категория и добавлены выбранные теги',
+  'transactions.import.rules.condition': 'Условие поиска',
+  'transactions.import.rules.category': 'Категория',
+  'transactions.import.rules.tags': 'Теги',
+  'transactions.import.rules.category_or_tags_required': 'Сначала выберите категорию и/или теги',
+  'transactions.import.rules.save_rule_success': 'Правило импорта сохранено',
+  'transactions.import.rules.save_rule_failure': 'Не удалось сохранить правило',
+  'transactions.import.rules.delete': 'Удалить правило',
+  'transactions.import.rules.delete_success': 'Правило удалено',
+  'transactions.import.rules.delete_failure': 'Не удалось удалить правило',
   // System
   'system.category.transfer_in': 'Перевод c другого счёта',
   'system.category.transfer_out': 'Перевод на другой счёт',

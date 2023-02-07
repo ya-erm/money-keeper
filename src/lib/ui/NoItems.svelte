@@ -1,9 +1,11 @@
 <script lang="ts">
   import { translate } from '$lib/translate';
+
+  export let type: 'NoItems' | 'NothingFound' = 'NoItems';
 </script>
 
 <div class="no-items">
-  <span>{$translate('common.no_items')}</span>
+  <span>{$translate(type === 'NoItems' ? 'common.no_items' : 'common.nothing_found')}</span>
 </div>
 
 <style>

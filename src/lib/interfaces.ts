@@ -37,6 +37,7 @@ export type ImportTransactionItem = {
   comment?: string | null;
   checked: boolean;
   categoryId?: number;
+  tags: Tag[];
   uniqueKey: string;
 };
 
@@ -45,4 +46,5 @@ export type ImportedTransaction = {
   amount: number;
   comment?: string | null;
   categoryId: number;
+  tags?: number[];
 };

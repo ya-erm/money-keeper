@@ -20,6 +20,8 @@ type RouteKey =
   | 'transactions'
   | 'transactions.create'
   | 'transactions.import'
+  | 'transactions.import.rules'
+  | 'transactions.import.rules.create'
   | 'settings'
   | 'settings.language'
   | 'uikit';
@@ -80,6 +82,14 @@ export const routes: { [key in RouteKey]: Route } = {
   'transactions.import': {
     path: '/transactions/import',
     title: 'transactions.import.title',
+  },
+  'transactions.import.rules': {
+    path: '/transactions/import/rules',
+    title: 'transactions.import.rules.title',
+  },
+  'transactions.import.rules.create': {
+    path: '/transactions/import/rules/create',
+    title: 'transactions.import.rules.create',
   },
   settings: {
     path: '/settings',

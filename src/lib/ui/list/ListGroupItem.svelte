@@ -8,7 +8,6 @@
 <style>
   .settings-group-item {
     min-height: 36px;
-    font-size: 14px;
     display: flex;
     align-items: center;
     position: relative;
