@@ -47,6 +47,10 @@
     ? destinationTransaction?.accountId
     : getNumberSearchParam($page, 'destinationAccountId');
 
+  let date = dayjs(transaction?.date).format('YYYY-MM-DD');
+  let time = dayjs(transaction?.date).format('HH:mm');
+  $: datetime = new Date([date, time].join('T')).toISOString();
+
   const addTag = async (name: string) => {
     const response = await fetch('/api/tags', {
       method: 'POST',
@@ -160,9 +164,10 @@
     <div class="flex-col gap-0.5">
       <InputLabel text={$translate('transactions.dateTime')} />
       <div class="flex gap-1">
-        <Input name="date" type="date" value={dayjs(transaction?.date).format('YYYY-MM-DD')} required />
-        <Input name="time" type="time" value={dayjs(transaction?.date).format('HH:mm')} required />
+        <Input name="date" type="date" bind:value={date} required />
+        <Input name="time" type="time" bind:value={time} required />
       </div>
+      <input name="datetime" value={datetime} class="hidden" readonly />
     </div>
     <div class="flex-col gap-0.5">
       <InputLabel text={$translate('transactions.amount')} />

@@ -29,8 +29,7 @@ export async function updateTransaction(
   const accountId = checkNumberParameter(data.accountId, 'accountId');
   const categoryId = checkNumberParameter(data.categoryId, 'categoryId');
   const amount = checkNumberParameter(data.amount, 'amount');
-  const date = checkStringParameter(data.date, 'date');
-  const time = checkStringParameter(data.time, 'time');
+  const dateTime = checkStringParameter(data.dateTime, 'dateTime');
   const comment = checkStringOptionalParameter(data.comment, 'comment');
   const tags = checkArrayOptionalParameter<number>(data.tags, 'tags', { type: 'number', required: true });
 
@@ -50,7 +49,7 @@ export async function updateTransaction(
         connect: tags?.map((tagId) => ({ id: tagId })),
         disconnect: tagsToRemove?.map((tag) => ({ id: tag.id })),
       },
-      date: new Date(`${date}T${time}`),
+      date: dateTime,
       amount,
       comment,
     },
