@@ -6,8 +6,6 @@
   import Menu from '$lib/ui/menu/Menu.svelte';
   import ThemeProvider from '$lib/ui/theme/ThemeProvider.svelte';
   import Toasts from '$lib/ui/toasts/Toasts.svelte';
-
-  // export const ssr = false;
 </script>
 
 <Toasts />
