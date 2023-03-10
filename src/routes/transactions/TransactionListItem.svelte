@@ -3,6 +3,7 @@
   import { routes } from '$lib/routes';
   import { translate, type Messages } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
+  import { formatMoney } from '$lib/utils/formatMoney';
 
   export let transaction: TransactionFullDto;
   export let hideAccount: boolean = false;
@@ -67,7 +68,7 @@
       </div>
     </div>
     <span class="amount" class:incoming class:outgoing>
-      <span>{incoming ? '+' : outgoing ? '-' : ''}{transaction.amount}</span>
+      <span>{incoming ? '+' : outgoing ? '-' : ''}{formatMoney(transaction.amount)}</span>
       <span class="small-text">{transaction.account.currency}</span>
     </span>
   </div>

@@ -29,10 +29,7 @@
 
 <div class="flex-col gap-0.5" data-testId={testId}>
   {#if !withoutHeader}
-    <label class="label">
-      <span data-testId={`${testId}.Label`}>{$translate('transactions.category')}</span>
-      <input name="categoryId" value={categoryId} class="hidden" readonly required />
-    </label>
+    <span class="flex-center" data-testId={`${testId}.Label`}>{$translate('transactions.category')}</span>
   {/if}
   <div class="grid" data-testId={`${testId}.Grid`}>
     {#each categories as category (category.id)}

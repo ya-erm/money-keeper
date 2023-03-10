@@ -5,6 +5,7 @@
   import { routes } from '$lib/routes';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
+  import { formatMoney } from '$lib/utils/formatMoney';
 
   export let account: Account & { sum: number };
 </script>
@@ -19,7 +20,7 @@
       <Icon name="mdi:pencil" padding={0.5} />
     </Button>
   </div>
-  <div class="money-value flex">{account.sum.toFixed(2)} {account.currency}</div>
+  <div class="money-value flex">{formatMoney(account.sum, account.currency)}</div>
   <div class="flex footer" />
 </div>
 
