@@ -29,7 +29,7 @@
 
 <div class="flex-col gap-0.5" data-testId={testId}>
   {#if !withoutHeader}
-    <span data-testId={`${testId}.Label`}>{$translate('transactions.category')}</span>
+    <span class="flex-center" data-testId={`${testId}.Label`}>{$translate('transactions.category')}</span>
   {/if}
   <input name="categoryId" value={categoryId} class="hidden" readonly required />
   <div class="grid" data-testId={`${testId}.Grid`}>
