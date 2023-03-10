@@ -39,7 +39,8 @@
     <Input value={account.name} label={$translate('accounts.name')} name="name" required />
     <Input value={account.currency} label={$translate('accounts.currency')} name="currency" required />
     <Input value={account.icon} label={$translate('accounts.icon')} name="icon" optional />
-    <Input value={account.color} label={$translate('accounts.color')} placeholder="#FFFFFF" name="color" optional />
+    <Input value={`${account.order}`} label={$translate('accounts.order')} name="order" type="number" />
+    <!-- <Input value={account.color} label={$translate('accounts.color')} placeholder="#FFFFFF" name="color" optional /> -->
     <Button text={$translate('common.save')} type="submit" />
     <Button
       on:click={() => (deleteAccountModalOpened = true)}

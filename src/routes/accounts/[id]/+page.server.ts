@@ -3,8 +3,12 @@ import { error, redirect } from '@sveltejs/kit';
 
 import { routes } from '$lib/routes';
 import { db, isServerError, serverError } from '$lib/server';
+import {
+  checkNumberFormParameter,
+  checkStringFormParameter,
+  checkStringOptionalFormParameter,
+} from '$lib/server/utils';
 import { checkUserAndGroup } from '$lib/utils';
-import { checkStringFormParameter, checkStringOptionalFormParameter } from '$lib/server/utils';
 
 import type { Action, Actions, PageServerLoad, RouteParams } from './$types';
 
@@ -15,6 +19,7 @@ const selection = Prisma.validator<Prisma.AccountSelect>()({
   color: true,
   icon: true,
   ownerId: true,
+  order: true,
 });
 
 const validate = async ({ params, locals }: { params: RouteParams; locals: App.Locals }) => {
@@ -67,6 +72,7 @@ const updateAccount: Action = async ({ request, params, locals }) => {
     const currency = checkStringFormParameter(data, 'currency');
     const icon = checkStringOptionalFormParameter(data, 'icon');
     const color = checkStringOptionalFormParameter(data, 'color');
+    const order = checkNumberFormParameter(data, 'order');
 
     await db.account.update({
       where: { id: accountId },
@@ -75,6 +81,7 @@ const updateAccount: Action = async ({ request, params, locals }) => {
         currency,
         color,
         icon,
+        order,
       },
       select: selection,
     });

@@ -72,6 +72,7 @@ export type Messages =
   | 'accounts.currency'
   | 'accounts.icon'
   | 'accounts.color'
+  | 'accounts.order'
   // Categories
   | 'categories.title'
   | 'categories.incomings'

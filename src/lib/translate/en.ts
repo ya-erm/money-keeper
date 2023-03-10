@@ -76,6 +76,7 @@ export const enDict: Dictionary = {
   'accounts.currency': 'Currency',
   'accounts.icon': 'Icon',
   'accounts.color': 'Color',
+  'accounts.order': 'Order number',
   // Categories
   'categories.title': 'Categories',
   'categories.incomings': 'Incomings',

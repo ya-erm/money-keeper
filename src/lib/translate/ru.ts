@@ -76,6 +76,7 @@ export const ruDict: Dictionary = {
   'accounts.currency': 'Валюта',
   'accounts.icon': 'Значок',
   'accounts.color': 'Цвет',
+  'accounts.order': 'Порядковый номер',
   // Categories
   'categories.title': 'Категории',
   'categories.incomings': 'Доходы',
