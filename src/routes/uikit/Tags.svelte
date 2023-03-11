@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Checkbox from '$lib/ui/Checkbox.svelte';
   import Tags from '$lib/ui/Tags.svelte';
 
   let tags = [
@@ -14,6 +15,8 @@
   const onChange = (id: string, checked: boolean) => {
     selected = checked ? [...selected, id] : selected.filter((item) => item !== id);
   };
+
+  let readOnly = false;
 
   const onAdd = (title: string) => {
     const id = title;
@@ -31,4 +34,7 @@
 </script>
 
 <h2>Tags</h2>
-<Tags {tags} {selected} {onChange} {onAdd} {onEdit} {onDelete} />
+<div class="flex-col gap-1">
+  <Checkbox bind:checked={readOnly} label="readOnly" />
+  <Tags {tags} {selected} {onChange} {onAdd} {onEdit} {onDelete} {readOnly} />
+</div>

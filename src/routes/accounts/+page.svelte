@@ -7,6 +7,7 @@
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import { backLink, rightButton, title } from '$lib/ui/header';
+  import { useRightButton } from '$lib/ui/header/header';
   import Input from '$lib/ui/Input.svelte';
   import { getSearchParam } from '$lib/utils';
 
@@ -18,8 +19,7 @@
   import AddOperationButton from './AddOperationButton.svelte';
 
   backLink.set(null);
-  rightButton.set(AddAccountButton);
-  onDestroy(() => rightButton.set(null));
+  useRightButton(AddAccountButton);
 
   export let data: PageData;
   $: accounts = data.accounts;

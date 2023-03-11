@@ -1,12 +1,14 @@
 import { deps } from '$lib/deps';
 import { db } from '$lib/server';
-import { checkNumberUrlParameter, checkUserAndGroup, keyTransactions } from '$lib/utils';
+import { getImportRules } from '$lib/server/api/importRules';
+import { checkNumberOptionalUrlParameter, checkUserAndGroup, keyTransactions } from '$lib/utils';
 
-import type { Action, Actions, PageServerLoad } from './$types';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, locals, depends }) => {
   const { groupId } = checkUserAndGroup(locals, { redirect: true });
 
+  depends(deps.accounts);
   const accounts = await db.account.findMany({
     where: { ownerId: groupId },
   });
@@ -16,10 +18,13 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
     where: { ownerId: groupId },
   });
 
-  const accountId = checkNumberUrlParameter(url, 'accountId');
+  depends(deps.importRules);
+  const rules = await getImportRules(locals);
+
+  const accountId = checkNumberOptionalUrlParameter(url, 'accountId');
 
   let transactionKeys: string[] = [];
-  if (accounts.find((x) => x.id === accountId)) {
+  if (accountId && accounts.find((x) => x.id === accountId)) {
     const transactions = await db.transaction.findMany({
       where: { accountId },
     });
@@ -31,5 +36,6 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
     accounts,
     categories,
     transactionKeys,
+    rules,
   };
 };

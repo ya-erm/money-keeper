@@ -7,10 +7,11 @@
 
   export let tags: { id: string; title: string }[];
   export let selected: string[];
+  export let readOnly: boolean = false;
   export let onChange: (id: string, selected: boolean) => void;
-  export let onAdd: (title: string) => Promise<void> | void;
-  export let onEdit: (id: string, title: string) => Promise<void> | void;
-  export let onDelete: (id: string) => Promise<void> | void;
+  export let onAdd: ((title: string) => Promise<void> | void) | null = null;
+  export let onEdit: ((id: string, title: string) => Promise<void> | void) | null = null;
+  export let onDelete: ((id: string) => Promise<void> | void) | null = null;
 
   let id = '';
   let title = '';
@@ -18,6 +19,7 @@
   let mode: 'add' | 'edit' = 'add';
 
   const handleOpenModal = (item: { id: string; title: string } | null) => {
+    if (readOnly) return;
     mode = item ? 'edit' : 'add';
     title = item?.title ?? '';
     id = item?.id ?? '';
@@ -26,15 +28,15 @@
 
   const handleSubmit = async () => {
     if (mode === 'add') {
-      await onAdd(title);
+      await onAdd?.(title);
     } else {
-      await onEdit(id, title);
+      await onEdit?.(id, title);
     }
     opened = false;
   };
 
   const handleDelete = async () => {
-    await onDelete(id);
+    await onDelete?.(id);
     opened = false;
   };
 </script>
@@ -52,33 +54,37 @@
       {tag.title}
     </button>
   {/each}
-  <button class="tag add" type="button" on:click={() => handleOpenModal(null)} data-testId="AddTagButton">
-    {$translate('common.add')}
-  </button>
+  {#if !readOnly}
+    <button class="tag add" type="button" on:click={() => handleOpenModal(null)} data-testId="AddTagButton">
+      {$translate('common.add')}
+    </button>
+  {/if}
 </div>
 
-<Modal
-  {opened}
-  header={$translate(mode === 'add' ? 'tags.add_modal_header' : 'tags.edit_modal_header')}
-  on:close={() => (opened = false)}
->
-  <form on:submit|preventDefault={handleSubmit} class="flex-col gap-1" data-testId="AddTagForm">
-    <Input label={$translate('tags.title')} bind:value={title} name="title" required />
+{#if !readOnly}
+  <Modal
+    {opened}
+    header={$translate(mode === 'add' ? 'tags.add_modal_header' : 'tags.edit_modal_header')}
+    on:close={() => (opened = false)}
+  >
+    <form on:submit|preventDefault={handleSubmit} class="flex-col gap-1" data-testId="AddTagForm">
+      <Input label={$translate('tags.title')} bind:value={title} name="title" required />
 
-    <div class="flex gap-1">
-      <div class="flex-col flex-1">
-        {#if mode === 'edit'}
-          <Button color="danger" text={$translate('common.delete')} on:click={handleDelete} />
-        {:else}
-          <Button color="secondary" on:click={() => (opened = false)} text={$translate('common.cancel')} />
-        {/if}
+      <div class="flex gap-1">
+        <div class="flex-col flex-1">
+          {#if mode === 'edit'}
+            <Button color="danger" text={$translate('common.delete')} on:click={handleDelete} />
+          {:else}
+            <Button color="secondary" on:click={() => (opened = false)} text={$translate('common.cancel')} />
+          {/if}
+        </div>
+        <div class="flex-col flex-1">
+          <Button text={$translate(mode === 'add' ? 'common.add' : 'common.save')} type="submit" />
+        </div>
       </div>
-      <div class="flex-col flex-1">
-        <Button text={$translate(mode === 'add' ? 'common.add' : 'common.save')} type="submit" />
-      </div>
-    </div>
-  </form>
-</Modal>
+    </form>
+  </Modal>
+{/if}
 
 <style>
   .container {

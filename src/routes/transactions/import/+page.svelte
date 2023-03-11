@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
+  import { goto, invalidate } from '$app/navigation';
   import { page } from '$app/stores';
   import dayjs from 'dayjs';
 
@@ -7,22 +7,29 @@
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Checkbox from '$lib/ui/Checkbox.svelte';
+  import { useRightButton } from '$lib/ui/header/header';
   import Input from '$lib/ui/Input.svelte';
   import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
+  import { getNumberSearchParam, keyTransactions } from '$lib/utils';
 
   import AccountSelect from '../AccountSelect.svelte';
   import TransactionListItem from '../TransactionListItem.svelte';
 
   import type { PageData } from './$types';
+  import RulesButton from './RulesButton.svelte';
   import SelectCategoryModal from './SelectCategoryModal.svelte';
-  import { keyTransactions } from '$lib/utils';
+  import type { Tag } from '@prisma/client';
+  import { deps } from '$lib/deps';
+
+  useRightButton(RulesButton);
 
   export let data: PageData;
   $: accounts = data.accounts;
   $: categories = data.categories;
   $: transactionKeys = new Set(data.transactionKeys);
+  $: rules = data.rules;
 
-  $: accountId = parseInt($page.url.searchParams.get('accountId') ?? '') || null;
+  $: accountId = getNumberSearchParam($page, 'accountId');
   $: account = accounts.find(({ id }) => id === accountId);
 
   let items: Array<ImportTransactionItem> = [];
@@ -42,18 +49,32 @@
       const { keyedItems } = keyTransactions(JSON.parse(content));
       items = keyedItems
         .filter((item) => !transactionKeys.has(item.uniqueKey))
-        .map((item: any) => ({
-          ...item,
-          checked: true,
-          categoryId: null,
-        }));
+        .map((item: any) => {
+          const text = item.comment as string;
+          const rulesResult = rules.reduce(
+            (acc: { tags: Tag[]; categoryId: number | null }, rule) => {
+              if (text.toLowerCase().includes(rule.text.toLowerCase())) {
+                acc.tags.push(...(rule.tags ?? []));
+                if (rule.categoryId) {
+                  acc.categoryId = rule.categoryId;
+                }
+              }
+              return acc;
+            },
+            { tags: [], categoryId: null },
+          );
+          return {
+            ...item,
+            checked: true,
+            categoryId: rulesResult.categoryId,
+            tags: rulesResult.tags,
+          };
+        });
     };
   };
 
   let search: string = '';
-
-  $: categoryIdParam = $page.url.searchParams.get('categoryId');
-  $: categoryId = categoryIdParam ? parseInt(categoryIdParam) || null : undefined;
+  let categoryId: number | null | undefined = undefined;
 
   $: filteredItems = items
     .filter((x) => categoryId === undefined || x.categoryId === categoryId)
@@ -82,7 +103,7 @@
     applyCategoryModalOpened = true;
   };
 
-  const setCategoryForFilteredItems = (categoryId: number) => {
+  const setCategoryForFilteredItems = async (categoryId: number, createRule: boolean) => {
     // TODO: show confirmation modal when override categories
     const checkedFilteredItems = filteredItems.filter((item) => item.checked);
     checkedFilteredItems.forEach((item) => {
@@ -97,6 +118,19 @@
         },
       }),
     );
+    if (createRule) {
+      const result = await fetch('/api/transactions/import/rules', {
+        method: 'POST',
+        body: JSON.stringify({
+          text: search,
+          categoryId,
+        }),
+      });
+      if (result.ok) {
+        showSuccessToast($translate('transactions.import.rules.save_rule_success'));
+        invalidate(deps.importRules);
+      }
+    }
   };
 
   let changeCategoryModalOpened = false;
@@ -116,12 +150,7 @@
   };
 
   const filterByCategory = (value: number | null) => {
-    if (categoryId !== value) {
-      $page.url.searchParams.set('categoryId', `${value}`);
-    } else {
-      $page.url.searchParams.delete('categoryId');
-    }
-    goto($page.url, { replaceState: true });
+    categoryId = categoryId !== value ? value : undefined;
   };
 
   const handleFinishClick = async () => {
@@ -133,7 +162,12 @@
 
     const response = await fetch(`/api/transactions/import?accountId=${accountId}`, {
       method: 'POST',
-      body: JSON.stringify({ items: checkedItems }),
+      body: JSON.stringify({
+        items: checkedItems.map((item) => ({
+          ...item,
+          tags: item.tags.map((t) => t.id),
+        })),
+      }),
     });
 
     if (response.status === 200) {
@@ -144,7 +178,9 @@
 </script>
 
 {#if !account}
-  <AccountSelect {accounts} fromUrl />
+  <div class="p-1">
+    <AccountSelect {accounts} fromUrl />
+  </div>
 {:else}
   <div class="container p-1 flex-col gap-1">
     <div>
@@ -179,6 +215,7 @@
                       name: $translate('transactions.import.no_category'),
                       icon: 'bi:question-lg',
                     },
+                tags: item.tags,
                 account,
               }}
             />
@@ -210,6 +247,7 @@
     header={$translate('transactions.import.select_category_multi_title', { values: { count: filteredItems.length } })}
     bind:opened={applyCategoryModalOpened}
     onSave={setCategoryForFilteredItems}
+    canCreateRule
     {categories}
   />
   <SelectCategoryModal

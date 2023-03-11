@@ -11,7 +11,7 @@
 
   export let withoutHeader = false;
 
-  export let type: CategoryType;
+  export let type: CategoryType | null = null;
   export let categories: Category[];
 
   export let categoryId: number | null = null;
@@ -31,6 +31,7 @@
   {#if !withoutHeader}
     <span class="flex-center" data-testId={`${testId}.Label`}>{$translate('transactions.category')}</span>
   {/if}
+  <input name="categoryId" value={categoryId} class="hidden" readonly required />
   <div class="grid" data-testId={`${testId}.Grid`}>
     {#each categories as category (category.id)}
       <GridCircleItem
@@ -41,21 +42,22 @@
         text={category.name}
       />
     {/each}
-    <GridCircleItem
-      testId={`${testId}.Item.Add`}
-      onClick={() => (createCategoryModalOpened = true)}
-      text={$translate('common.add')}
-      icon="mdi:plus"
-    />
+    {#if !!type}
+      <GridCircleItem
+        testId={`${testId}.Item.Add`}
+        onClick={() => (createCategoryModalOpened = true)}
+        text={$translate('common.add')}
+        icon="mdi:plus"
+      />
+    {/if}
   </div>
 </div>
 
-<CreateCategoryModal bind:opened={createCategoryModalOpened} {type} onCreate={() => invalidate(deps.categories)} />
+{#if !!type}
+  <CreateCategoryModal bind:opened={createCategoryModalOpened} {type} onCreate={() => invalidate(deps.categories)} />
+{/if}
 
 <style>
-  .label {
-    text-align: center;
-  }
   .grid {
     display: flex;
     flex-wrap: wrap;

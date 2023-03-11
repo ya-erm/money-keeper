@@ -49,6 +49,7 @@ export const POST = withRequestHandlerMiddleware<RequestHandler>(async ({ url, r
             comment: item.comment,
             categoryId: item.categoryId,
             ownerId: groupId,
+            tags: { connect: item.tags?.map((id) => ({ id })) },
           })),
         },
       },
