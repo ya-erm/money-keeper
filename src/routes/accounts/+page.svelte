@@ -74,9 +74,9 @@
   }, {} as { [key: string]: TransactionFullDto[] });
 
   const findCurrencyRate = (currency: string) =>
-    settings.currency !== currency
+    settings?.currency !== currency
       ? currencyRates.find(
-          ({ cur1, cur2 }) => [cur1, cur2].includes(settings.currency) && [cur1, cur2].includes(currency),
+          ({ cur1, cur2 }) => [cur1, cur2].includes(settings?.currency) && [cur1, cur2].includes(currency),
         ) ?? null
       : null;
 
