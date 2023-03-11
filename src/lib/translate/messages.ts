@@ -164,6 +164,16 @@ export type Messages =
   // System
   | 'system.category.transfer_out'
   | 'system.category.transfer_in'
+  // Currency rates
+  | 'currency_rates.title'
+  | 'currency_rates.default_currency'
+  | 'currency_rates.new_currency_rate'
+  | 'currency_rates.currency1'
+  | 'currency_rates.currency2'
+  | 'currency_rates.rate'
+  | 'currency_rates.delete_currency_rate'
+  | 'currency_rates.delete_currency_rate_success'
+  | 'currency_rates.delete_currency_rate_failure'
   // Settings
   | 'settings.title'
   | 'settings.common'

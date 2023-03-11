@@ -4,6 +4,7 @@
 
   export let opened: boolean;
   export let header: string | null = null;
+  export let width: string | number | null = null;
 
   const dispatch = createEventDispatcher();
   const close = () => {
@@ -38,6 +39,7 @@
       on:click|stopPropagation
       in:fade={{ duration: 100 }}
       out:fade={{ duration: 100 }}
+      style:width={typeof width === 'string' ? width : `${width}rem`}
       aria-hidden
     >
       {#if $$slots.header}

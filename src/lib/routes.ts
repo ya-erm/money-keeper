@@ -24,6 +24,7 @@ type RouteKey =
   | 'transactions.import.rules.create'
   | 'settings'
   | 'settings.language'
+  | 'settings.currency_rates'
   | 'uikit';
 
 export const routes: { [key in RouteKey]: Route } = {
@@ -98,6 +99,10 @@ export const routes: { [key in RouteKey]: Route } = {
   'settings.language': {
     path: '/settings/language',
     title: 'settings.select_language',
+  },
+  'settings.currency_rates': {
+    path: '/settings/currency-rates',
+    title: 'currency_rates.title',
   },
   uikit: {
     path: '/uikit',

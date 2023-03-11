@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { CurrencyRate } from '@prisma/client';
+
   import type { TransactionFullDto } from '$lib/interfaces';
   import { routes } from '$lib/routes';
   import { translate, type Messages } from '$lib/translate';
@@ -6,6 +8,7 @@
   import { formatMoney } from '$lib/utils/formatMoney';
 
   export let transaction: TransactionFullDto;
+  export let currencyRate: CurrencyRate | null = null;
   export let hideAccount: boolean = false;
   export let onClick: ((transaction: TransactionFullDto) => void) | null = null;
 
@@ -23,6 +26,9 @@
       onClick(transaction);
     }
   };
+
+  const rate = currencyRate?.cur1 === transaction.account.currency ? currencyRate.rate : 1 / (currencyRate?.rate ?? 1);
+  const otherCurrency = currencyRate?.cur1 === transaction.account.currency ? currencyRate.cur2 : currencyRate?.cur1;
 </script>
 
 <a
@@ -69,10 +75,17 @@
         </div>
       {/if}
     </div>
-    <span class="amount" class:incoming class:outgoing>
-      <span>{incoming ? '+' : outgoing ? '-' : ''}{formatMoney(transaction.amount)}</span>
-      <span class="small-text">{transaction.account.currency}</span>
-    </span>
+    <div class="flex-col items-end">
+      <span class="amount" class:incoming class:outgoing>
+        <span>{incoming ? '+' : outgoing ? '-' : ''}{formatMoney(transaction.amount)}</span>
+        <span class="small-text">{transaction.account.currency}</span>
+      </span>
+      {#if currencyRate}
+        <span class="other-money-value">
+          {formatMoney(transaction.amount * rate, otherCurrency)}
+        </span>
+      {/if}
+    </div>
   </div>
 </a>
 
@@ -111,6 +124,11 @@
   }
   .amount {
     white-space: nowrap;
+  }
+  .other-money-value {
+    opacity: 0.8;
+    font-size: 0.75rem;
+    color: var(--secondary-text-color);
   }
   .incoming {
     color: var(--green-color);

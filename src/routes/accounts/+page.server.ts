@@ -7,7 +7,17 @@ import type { Category } from '@prisma/client';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, depends }) => {
-  const { groupId } = checkUserAndGroup(locals, { redirect: true });
+  const { userId, groupId } = checkUserAndGroup(locals, { redirect: true });
+
+  depends(deps.settings);
+  const settings = await db.userSettings.findUnique({
+    where: { userId },
+  });
+
+  depends(deps.currencyRates);
+  const currencyRates = await db.currencyRate.findMany({
+    where: { ownerId: groupId },
+  });
 
   depends(deps.categories);
   const categories = await db.category.findMany({
@@ -31,6 +41,8 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
   });
 
   return {
+    settings,
+    currencyRates,
     accounts: accounts.map((account) => ({
       ...account,
       sum: transactions

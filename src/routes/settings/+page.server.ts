@@ -2,6 +2,7 @@ import { deps } from '$lib/deps';
 import { db } from '$lib/server';
 import { getGroups } from '$lib/server/api/groups';
 import { checkUserAndGroup } from '$lib/utils';
+
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, depends }) => {

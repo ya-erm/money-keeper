@@ -7,4 +7,6 @@ export const deps = {
   transactions: 'transactions',
   importRules: 'importRules',
   tags: 'tags',
+  settings: 'settings',
+  currencyRates: 'currencyRates',
 };

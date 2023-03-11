@@ -172,6 +172,16 @@ export const ruDict: Dictionary = {
   // System
   'system.category.transfer_in': 'Перевод c другого счёта',
   'system.category.transfer_out': 'Перевод на другой счёт',
+  // Currency rates
+  'currency_rates.title': 'Курсы валют',
+  'currency_rates.default_currency': 'Основная валюта',
+  'currency_rates.new_currency_rate': 'Новый курс валют',
+  'currency_rates.currency1': 'Валюта 1',
+  'currency_rates.currency2': 'Валюта 2',
+  'currency_rates.rate': 'Курс',
+  'currency_rates.delete_currency_rate': 'Удалить курс валют',
+  'currency_rates.delete_currency_rate_success': 'Курс валют удалён',
+  'currency_rates.delete_currency_rate_failure': 'Не удалось удалить курс валют',
   // Settings
   'settings.title': 'Настройки',
   'settings.language': 'Язык',

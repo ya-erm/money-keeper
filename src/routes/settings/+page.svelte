@@ -30,6 +30,11 @@
 <ListGroup title={$translate('settings.common')}>
   <ListSelectItem title={$translate('settings.language')} value={$activeLocaleName} on:click={openLanguageModal} />
   <ListSwitchItem title={$translate('settings.darkMode')} bind:checked={$darkMode} />
+  <ListSelectItem
+    title={$translate('currency_rates.title')}
+    value=""
+    on:click={() => goto(routes['settings.currency_rates'].path)}
+  />
 </ListGroup>
 
 <ListGroup title={$translate('settings.profile')}>
