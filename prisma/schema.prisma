@@ -16,6 +16,7 @@ model User {
   name  String?
 
   password UserPassword?
+  settings UserSettings?
   tokens   AuthToken[]
   groups   UserToGroup[]
 
@@ -32,6 +33,16 @@ model User {
 model UserPassword {
   userId Int    @id
   hash   String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserSettings {
+  userId Int @id
+
+  theme    String?
+  language String?
+  currency String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -90,13 +101,14 @@ model Group {
   id   Int    @id @default(autoincrement())
   name String
 
-  users        UserToGroup[]
-  accounts     Account[]
-  categories   Category[]
-  transactions Transaction[]
-  tokens       AuthToken[]
-  tags         Tag[]
-  importRules  ImportRule[]
+  users         UserToGroup[]
+  accounts      Account[]
+  categories    Category[]
+  transactions  Transaction[]
+  tokens        AuthToken[]
+  tags          Tag[]
+  importRules   ImportRule[]
+  currencyRates CurrencyRate[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -175,4 +187,15 @@ model ImportRule {
   owner    Group     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   category Category? @relation(fields: [categoryId], references: [id])
   tags     Tag[]
+}
+
+model CurrencyRate {
+  id      Int @id @default(autoincrement())
+  ownerId Int
+
+  cur1 String
+  cur2 String
+  rate Float
+
+  owner Group @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 }

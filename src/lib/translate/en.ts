@@ -172,6 +172,16 @@ export const enDict: Dictionary = {
   // System
   'system.category.transfer_in': 'Transfer from other account',
   'system.category.transfer_out': 'Transfer to other account',
+  // Currency rates
+  'currency_rates.title': 'Currency rates',
+  'currency_rates.default_currency': 'Main currency',
+  'currency_rates.new_currency_rate': 'New currency rate',
+  'currency_rates.currency1': 'Currency 1',
+  'currency_rates.currency2': 'Currency 2',
+  'currency_rates.rate': 'Rate',
+  'currency_rates.delete_currency_rate': 'Delete currency rate',
+  'currency_rates.delete_currency_rate_success': 'Currency rate was deleted',
+  'currency_rates.delete_currency_rate_failure': 'Failed to delete currency rate',
   // Settings
   'settings.title': 'Settings',
   'settings.language': 'Language',

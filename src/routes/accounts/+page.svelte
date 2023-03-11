@@ -22,6 +22,8 @@
   useRightButton(AddAccountButton);
 
   export let data: PageData;
+  $: settings = data.settings;
+  $: currencyRates = data.currencyRates;
   $: accounts = data.accounts;
   $: categories = data.categories;
   $: tags = data.tags;
@@ -71,6 +73,15 @@
     return res;
   }, {} as { [key: string]: TransactionFullDto[] });
 
+  const findCurrencyRate = (currency: string) =>
+    settings?.currency !== currency
+      ? currencyRates.find(
+          ({ cur1, cur2 }) => [cur1, cur2].includes(settings?.currency) && [cur1, cur2].includes(currency),
+        ) ?? null
+      : null;
+
+  $: currencyRate = findCurrencyRate(account?.currency ?? '');
+
   onMount(() => {
     if (cardId) {
       scrollToCard(cardId);
@@ -116,7 +127,7 @@
     <div class="accounts-list" bind:this={accountListElement} on:scroll={handleScroll}>
       {#each accounts as account}
         <div class="account-card" on:click={() => scrollToCard(account.id)} aria-hidden>
-          <AccountCard {account} />
+          <AccountCard {account} currencyRate={findCurrencyRate(account.currency)} />
           <div id={`account-card-${account.id}`} class="account-card-anchor" />
         </div>
       {/each}
@@ -143,7 +154,7 @@
       {#each Object.entries(groups) as [date, transactions] (date)}
         <div>{date}</div>
         {#each transactions as transaction (transaction.id)}
-          <TransactionListItem hideAccount={!!account} {transaction} />
+          <TransactionListItem hideAccount={!!account} {transaction} {currencyRate} />
         {/each}
       {/each}
     </div>

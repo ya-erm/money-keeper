@@ -32,4 +32,4 @@ export const languages: { [key in Locales]: { name: string; icon: string } } = {
 export const activeLocale = storable<Locales>((initialLocale as Locales) ?? 'ru-RU', 'locale');
 activeLocale.subscribe((value) => locale.set(value));
 
-export const activeLocaleName = derived(activeLocale, (value) => languages[value].name);
+export const activeLocaleName = derived(activeLocale, (value) => languages[value]?.name ?? languages['en-US'].name);
