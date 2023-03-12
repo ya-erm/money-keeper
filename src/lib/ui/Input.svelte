@@ -9,6 +9,7 @@
   export let label: string | null = null;
   export let type: 'text' | 'password' | 'date' | 'time' | 'number' = 'text';
   export let placeholder: string | null = null;
+  export let step: string | number | null = 0.01;
   export let required: boolean = false;
   export let optional: boolean = false;
   export let autocomplete: boolean = false;
@@ -44,7 +45,7 @@
       bind:this={ref}
       on:input={handleChange}
       autocomplete={autocomplete ? 'on' : undefined}
-      step={type === 'number' ? '0.01' : undefined}
+      step={type === 'number' ? step : undefined}
       data-testId={testId}
       class:error={!!error}
       class:clearable

@@ -20,8 +20,8 @@
   };
 </script>
 
-<Modal header={$translate('groups.delete_group_confirm')} bind:opened>
-  <FormContainer width={20} action="?/deleteGroup" onResult={handleResult}>
+<Modal width={22} header={$translate('groups.delete_group_confirm')} bind:opened>
+  <FormContainer width="100%" action="?/deleteGroup" onResult={handleResult}>
     <span>{$translate('groups.delete_group_confirm_description')}</span>
     <input value={groupId} name="groupId" class="hidden" type="number" required readonly />
     <div class="actions gap-1">
