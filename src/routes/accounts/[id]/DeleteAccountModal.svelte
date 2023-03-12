@@ -22,8 +22,8 @@
   };
 </script>
 
-<Modal header={$translate('accounts.delete_account_confirm')} bind:opened>
-  <FormContainer width={20} action="?/delete" onResult={onDelete}>
+<Modal width={22} header={$translate('accounts.delete_account_confirm')} bind:opened>
+  <FormContainer width="100%" action="?/delete" onResult={onDelete}>
     <span>{$translate('accounts.delete_account_confirm_description')}</span>
     <div class="actions gap-1">
       <Button text={$translate('accounts.delete_account')} color="danger" type="submit" />

@@ -2,7 +2,7 @@
   import { applyAction, enhance } from '$app/forms';
   import type { ActionResult } from '@sveltejs/kit';
 
-  export let width: number = 18;
+  export let width: string | number | null = 15;
   export let action: string | undefined = undefined;
   export let testId: string = 'Form';
   export let onSubmit: (e: SubmitEvent) => void | Promise<void> = () => {};
@@ -14,7 +14,7 @@
     {action}
     method="POST"
     class="form-container"
-    style:width={`${width}rem`}
+    style:width={typeof width === 'number' ? `${width}rem` : width}
     data-testId={testId}
     on:submit={onSubmit}
     use:enhance={() =>
@@ -42,7 +42,7 @@
     gap: 0.5rem;
   }
   .form-container {
-    max-width: calc(100vw - 4rem);
+    max-width: min(100%, calc(100vw - 4rem));
     margin: 0 auto;
     display: flex;
     flex-direction: column;

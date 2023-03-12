@@ -44,34 +44,32 @@
   bind:opened
   width={20}
 >
-  <div class="flex-col gap-1">
-    <FormContainer action={!item ? '?/create' : '?/update'} onResult={onSave}>
-      <input name="id" value={item?.id} readonly class="hidden" />
-      <Input name="cur1" label={$translate('currency_rates.currency1')} bind:value={cur1} />
-      <Input name="cur2" label={$translate('currency_rates.currency2')} bind:value={cur2} />
-      <Input name="rate" label={$translate('currency_rates.rate')} type="number" bind:value={rate} />
+  <FormContainer width="100%" action={!item ? '?/create' : '?/update'} onResult={onSave}>
+    <input name="id" value={item?.id} readonly class="hidden" />
+    <Input name="cur1" label={$translate('currency_rates.currency1')} bind:value={cur1} />
+    <Input name="cur2" label={$translate('currency_rates.currency2')} bind:value={cur2} />
+    <Input name="rate" label={$translate('currency_rates.rate')} type="number" step="any" bind:value={rate} />
 
-      {#if cur1 && cur2}
-        <div>1 {cur1} = {rate} {cur2}</div>
-        <div>1 {cur2} = {(1 / Number(rate)).toFixed(4)} {cur1}</div>
-      {/if}
+    {#if cur1 && cur2}
+      <div>1 {cur1} = {rate} {cur2}</div>
+      <div>1 {cur2} = {(1 / Number(rate)).toFixed(4)} {cur1}</div>
+    {/if}
 
-      {#if !!item}
-        <FormContainer action="?/delete" onResult={onDelete}>
-          <input name="id" value={item?.id} readonly class="hidden" />
-          <Button
-            text={$translate('currency_rates.delete_currency_rate')}
-            appearance="transparent"
-            color="danger"
-            type="submit"
-          />
-        </FormContainer>
-      {/if}
+    {#if !!item}
+      <FormContainer action="?/delete" onResult={onDelete}>
+        <input name="id" value={item?.id} readonly class="hidden" />
+        <Button
+          text={$translate('currency_rates.delete_currency_rate')}
+          appearance="transparent"
+          color="danger"
+          type="submit"
+        />
+      </FormContainer>
+    {/if}
 
-      <div class="grid-col-2 gap-1">
-        <Button text={$translate('common.cancel')} color="secondary" on:click={() => (opened = false)} />
-        <Button text={$translate('common.save')} color="primary" type="submit" />
-      </div>
-    </FormContainer>
-  </div>
+    <div class="grid-col-2 gap-1">
+      <Button text={$translate('common.cancel')} color="secondary" on:click={() => (opened = false)} />
+      <Button text={$translate('common.save')} color="primary" type="submit" />
+    </div>
+  </FormContainer>
 </Modal>

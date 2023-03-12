@@ -41,7 +41,7 @@
   };
 </script>
 
-<FormContainer action={'?/update'} onResult={onUpdate}>
+<FormContainer action="?/update" onResult={onUpdate}>
   <Input label={$translate('categories.name')} name="name" value={category?.name} required />
   <Input label={$translate('categories.icon')} name="icon" value={category?.icon} optional />
   <Button text={$translate('common.save')} type="submit" />
