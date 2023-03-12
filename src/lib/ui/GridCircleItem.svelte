@@ -6,11 +6,13 @@
   export let onClick: () => void;
   export let selected: boolean = false;
   export let testId: string | undefined = undefined;
+  export let dashed: boolean = false;
 </script>
 
 <button
   on:click={onClick}
   class:selected
+  class:dashed
   data-testId={testId}
   class="grid-item flex-col flex-center gap-0.5 cursor-pointer"
   type="button"
@@ -48,6 +50,9 @@
     white-space: nowrap;
     overflow: hidden;
   }
+  .grid-item.dashed .text {
+    color: var(--active-color);
+  }
   .grid-item .circle {
     display: flex;
     flex-direction: column;
@@ -59,6 +64,12 @@
     width: 4rem;
     height: 4rem;
     background: var(--header-background-color);
+  }
+  .grid-item.dashed .circle {
+    border-style: dashed;
+    background-color: transparent;
+    border-color: var(--active-color);
+    color: var(--active-color);
   }
   .grid-item:focus .circle,
   .grid-item.selected .circle {

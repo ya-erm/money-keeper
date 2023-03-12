@@ -10,6 +10,7 @@
   import { useRightButton } from '$lib/ui/header/header';
   import Input from '$lib/ui/Input.svelte';
   import { getSearchParam } from '$lib/utils';
+  import Icon from '$lib/ui/Icon.svelte';
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
 
@@ -73,14 +74,14 @@
     return res;
   }, {} as { [key: string]: TransactionFullDto[] });
 
-  const findCurrencyRate = (currency: string) =>
-    settings?.currency !== currency
+  const findCurrencyRate = (mainCurrency?: string | null, currency?: string | null) =>
+    mainCurrency && currency && mainCurrency !== currency
       ? currencyRates.find(
-          ({ cur1, cur2 }) => [cur1, cur2].includes(settings?.currency) && [cur1, cur2].includes(currency),
+          ({ cur1, cur2 }) => [cur1, cur2].includes(mainCurrency) && [cur1, cur2].includes(currency),
         ) ?? null
       : null;
 
-  $: currencyRate = findCurrencyRate(account?.currency ?? '');
+  $: currencyRate = findCurrencyRate(settings?.currency, account?.currency ?? '');
 
   onMount(() => {
     if (cardId) {
@@ -127,12 +128,15 @@
     <div class="accounts-list" bind:this={accountListElement} on:scroll={handleScroll}>
       {#each accounts as account}
         <div class="account-card" on:click={() => scrollToCard(account.id)} aria-hidden>
-          <AccountCard {account} currencyRate={findCurrencyRate(account.currency)} />
+          <AccountCard {account} currencyRate={findCurrencyRate(settings?.currency, account.currency)} />
           <div id={`account-card-${account.id}`} class="account-card-anchor" />
         </div>
       {/each}
-      <a id="create-account" class="account-card" href={routes['accounts.create'].path}>
-        {$translate('accounts.create_account')}
+      <a id="create-account" class="account-card dashed text-decoration-none" href={routes['accounts.create'].path}>
+        <span class="flex items-center gap-0.25">
+          <Icon name="mdi:plus" />
+          {$translate('accounts.create_account')}
+        </span>
       </a>
     </div>
   </div>
@@ -154,7 +158,11 @@
       {#each Object.entries(groups) as [date, transactions] (date)}
         <div>{date}</div>
         {#each transactions as transaction (transaction.id)}
-          <TransactionListItem hideAccount={!!account} {transaction} {currencyRate} />
+          <TransactionListItem
+            hideAccount={!!account}
+            currencyRate={currencyRate ?? findCurrencyRate(settings?.currency, transaction.account.currency)}
+            {transaction}
+          />
         {/each}
       {/each}
     </div>
@@ -200,6 +208,12 @@
     cursor: pointer;
     transition: box-shadow 0.2s;
     box-shadow: 4px 4px 8px 0px rgba(127, 127, 127, 0.1);
+  }
+  .account-card.dashed {
+    border-style: dashed;
+    background-color: transparent;
+    border-color: var(--active-color);
+    color: var(--active-color);
   }
   @media (hover: hover) {
     .account-card:hover {

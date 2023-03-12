@@ -24,6 +24,7 @@
     onClick={() => goto(`${routes['categories.create'].path}?type=IN`)}
     text={$translate('common.add')}
     icon="mdi:plus"
+    dashed
   />
 </div>
 
@@ -40,6 +41,7 @@
     onClick={() => goto(`${routes['categories.create'].path}?type=OUT`)}
     text={$translate('common.add')}
     icon="mdi:plus"
+    dashed
   />
 </div>
 

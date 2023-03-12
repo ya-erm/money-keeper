@@ -18,7 +18,7 @@
   .label-text {
     font-size: 0.9rem;
   }
-  .label-text.error {
+  .error {
     color: var(--red-color);
   }
   .optional {

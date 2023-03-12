@@ -9,17 +9,18 @@
 
   import { isApiErrorData } from '$lib/api';
   import { deps } from '$lib/deps';
+  import type { TransactionFullDto } from '$lib/interfaces';
   import { translate } from '$lib/translate';
   import Input from '$lib/ui/Input.svelte';
   import InputLabel from '$lib/ui/InputLabel.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
+  import { formatMoney } from '$lib/utils/formatMoney';
   import { getNumberSearchParam, getSearchParam } from '$lib/utils/getSearchParam';
-  import type { TransactionFullDto } from '$lib/interfaces';
 
   import AccountSelect from './AccountSelect.svelte';
   import CategorySelect from './CategorySelect.svelte';
-  import TypeSwitch from './TypeSwitch.svelte';
   import TagsList from './TagsList.svelte';
+  import TypeSwitch from './TypeSwitch.svelte';
 
   export let accounts: Account[];
   export let categories: Category[];
@@ -40,6 +41,12 @@
 
   let categoryId = transaction?.categoryId ?? getNumberSearchParam($page, 'categoryId');
 
+  let date = dayjs(transaction?.date).format('YYYY-MM-DD');
+  let time = dayjs(transaction?.date).format('HH:mm');
+  $: datetime = new Date([date, time].join('T')).toISOString();
+
+  let inputRef: HTMLInputElement | null = null;
+
   let accountId = isTransfer
     ? sourceTransaction?.accountId
     : transaction?.accountId ?? getNumberSearchParam($page, 'accountId');
@@ -47,9 +54,12 @@
     ? destinationTransaction?.accountId
     : getNumberSearchParam($page, 'destinationAccountId');
 
-  let date = dayjs(transaction?.date).format('YYYY-MM-DD');
-  let time = dayjs(transaction?.date).format('HH:mm');
-  $: datetime = new Date([date, time].join('T')).toISOString();
+  $: accountCurrency = accounts.find(({ id }) => id === accountId)?.currency;
+  $: destinationAccountCurrency = accounts.find(({ id }) => id === destinationAccountId)?.currency;
+
+  let _value1 = (isTransfer ? sourceTransaction?.amount : transaction?.amount)?.toString() ?? '';
+  let _value2 = destinationTransaction?.amount?.toString() ?? '';
+  $: _rate = Number(_value1) / Number(_value2);
 
   let selectedTags = transaction?.tags.map((t) => `${t.id}`) ?? [];
 
@@ -111,7 +121,15 @@
       />
     {/if}
     {#if type === 'IN' || type === 'OUT'}
-      <CategorySelect {type} bind:categoryId categories={categories.filter((c) => c.type === type)} />
+      <CategorySelect
+        {type}
+        bind:categoryId
+        categories={categories.filter((c) => c.type === type)}
+        onChange={() => {
+          inputRef?.focus({ preventScroll: true });
+          inputRef?.scrollIntoView({ behavior: 'smooth' });
+        }}
+      />
     {/if}
     {#if type === 'IN'}
       <AccountSelect {accounts} bind:accountId testId="DestinationAccountSelect" />
@@ -130,20 +148,30 @@
         <Input
           type="number"
           name="amount"
-          value={(isTransfer ? sourceTransaction?.amount : transaction?.amount)?.toString()}
-          endText={accounts.find(({ id }) => id === accountId)?.currency}
+          bind:ref={inputRef}
+          bind:value={_value1}
+          endText={accountCurrency}
           required
         />
         {#if type === 'TRANSFER'}
           <Input
             type="number"
             name="destinationAmount"
-            value={destinationTransaction?.amount.toString()}
-            endText={accounts.find(({ id }) => id === destinationAccountId)?.currency}
+            bind:value={_value2}
+            endText={destinationAccountCurrency}
             required
           />
         {/if}
       </div>
+      {#if type === 'TRANSFER' && Number(_value1) && Number(_value2)}
+        <div class="currency-rate-info">
+          {`1 ${accountCurrency} = ${formatMoney(1 / _rate, {
+            maxPrecision: 4,
+            currency: destinationAccountCurrency,
+          })}`}
+          {`(1 ${destinationAccountCurrency} = ${formatMoney(_rate, { maxPrecision: 4, currency: accountCurrency })})`}
+        </div>
+      {/if}
     </div>
     <Input label={$translate('transactions.comment')} name="comment" value={transaction?.comment} optional />
     <div class="flex-col gap-0.5">
@@ -155,3 +183,11 @@
     <slot name="footer" />
   </div>
 </form>
+
+<style>
+  .currency-rate-info {
+    font-size: 0.9rem;
+    text-align: right;
+    color: var(--secondary-text-color);
+  }
+</style>

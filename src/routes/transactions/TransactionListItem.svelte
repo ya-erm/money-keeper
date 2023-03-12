@@ -27,8 +27,8 @@
     }
   };
 
-  const rate = currencyRate?.cur1 === transaction.account.currency ? currencyRate.rate : 1 / (currencyRate?.rate ?? 1);
-  const otherCurrency = currencyRate?.cur1 === transaction.account.currency ? currencyRate.cur2 : currencyRate?.cur1;
+  $: rate = currencyRate?.cur1 === transaction.account.currency ? currencyRate.rate : 1 / (currencyRate?.rate ?? 1);
+  $: otherCurrency = currencyRate?.cur1 === transaction.account.currency ? currencyRate.cur2 : currencyRate?.cur1;
 </script>
 
 <a
@@ -82,7 +82,7 @@
       </span>
       {#if currencyRate}
         <span class="other-money-value">
-          {formatMoney(transaction.amount * rate, otherCurrency)}
+          {formatMoney(transaction.amount * rate, { currency: otherCurrency })}
         </span>
       {/if}
     </div>

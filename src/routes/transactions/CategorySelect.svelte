@@ -48,6 +48,7 @@
         onClick={() => (createCategoryModalOpened = true)}
         text={$translate('common.add')}
         icon="mdi:plus"
+        dashed
       />
     {/if}
   </div>

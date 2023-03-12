@@ -26,11 +26,11 @@
   </div>
   <div class="flex-col items-center gap-0.25">
     <div class="money-value">
-      {formatMoney(account.sum, account.currency)}
+      {formatMoney(account.sum, { currency: account.currency })}
     </div>
     {#if currencyRate}
       <div class="other-money-value">
-        {formatMoney(account.sum * rate, otherCurrency)}
+        {formatMoney(account.sum * rate, { currency: otherCurrency })}
       </div>
     {/if}
   </div>
