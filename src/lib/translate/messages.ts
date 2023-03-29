@@ -78,6 +78,7 @@ export type Messages =
   | 'categories.title'
   | 'categories.incomings'
   | 'categories.outgoings'
+  | 'categories.new_category'
   | 'categories.create_category'
   | 'categories.create_category_success'
   | 'categories.create_category_failure'

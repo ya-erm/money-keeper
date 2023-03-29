@@ -199,3 +199,25 @@ model CurrencyRate {
 
   owner Group @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 }
+
+// Version 2
+
+model Member {
+  uuid  String  @id @default(uuid())
+  login String?
+
+  publicKey   String
+  ecryptedKey String?
+
+  journal JournalOperation[]
+}
+
+model JournalOperation {
+  ownerUuid String
+  order     Int
+  data      String
+
+  owner Member @relation(fields: [ownerUuid], references: [uuid], onDelete: Cascade)
+
+  @@id([ownerUuid, order])
+}

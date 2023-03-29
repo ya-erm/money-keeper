@@ -82,6 +82,7 @@ export const enDict: Dictionary = {
   'categories.title': 'Categories',
   'categories.incomings': 'Incomings',
   'categories.outgoings': 'Outgoings',
+  'categories.new_category': 'New category',
   'categories.create_category': 'Create category',
   'categories.create_category_success': 'Category was created',
   'categories.create_category_failure': 'Failed to create category',
