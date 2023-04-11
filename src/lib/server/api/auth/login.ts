@@ -33,13 +33,21 @@ export async function login(data: LoginRequestData, cookies: Cookies) {
     throw new ApiError(403, 'INCORRECT_LOGIN_OR_PASSWORD', 'Incorrect login or password');
   }
 
-  const token = await db.authToken.create({
-    data: {
-      value: crypto.randomUUID(),
-      userId: user.id,
-      groupId: user.groups[0]?.groupId,
-    },
-  });
+  let token = (
+    await db.authToken.findMany({
+      where: { userId: user.id, invalidated: false },
+    })
+  )[0];
+
+  if (!token) {
+    token = await db.authToken.create({
+      data: {
+        value: crypto.randomUUID(),
+        userId: user.id,
+        groupId: user.groups[0]?.groupId,
+      },
+    });
+  }
 
   cookies.set('session', token.value, {
     // send cookie for every page

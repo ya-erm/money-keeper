@@ -12,6 +12,7 @@ datasource db {
 
 model User {
   id    Int     @id @default(autoincrement())
+  uuid  String? @unique
   login String  @unique
   name  String?
 
@@ -52,6 +53,7 @@ model AuthToken {
   value       String  @unique
   userId      Int
   groupId     Int?
+  uuid        String?
   invalidated Boolean @default(false)
 
   user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -98,7 +100,8 @@ model BlockList {
 }
 
 model Group {
-  id   Int    @id @default(autoincrement())
+  id   Int     @id @default(autoincrement())
+  uuid String? @unique
   name String
 
   users         UserToGroup[]
@@ -198,4 +201,37 @@ model CurrencyRate {
   rate Float
 
   owner Group @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+}
+
+// Version 2
+
+model Member {
+  uuid  String  @id @default(uuid())
+  login String?
+
+  publicKey    String
+  encryptedKey String?
+
+  journal Journal[]
+  tokens  MemberToken[]
+}
+
+model MemberToken {
+  value String @id @default(uuid())
+
+  memberUuid  String
+  invalidated Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  member Member @relation(fields: [memberUuid], references: [uuid], onDelete: Cascade)
+}
+
+model Journal {
+  ownerUuid String
+  order     Int
+  data      String
+
+  owner Member @relation(fields: [ownerUuid], references: [uuid], onDelete: Cascade)
+
+  @@id([ownerUuid, order])
 }

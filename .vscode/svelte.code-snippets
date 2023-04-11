@@ -17,6 +17,8 @@
       "export async function ${TM_FILENAME_BASE}(params: ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}Params, locals: App.Locals) {",
       "  $2",
       "};",
+      "",
+      "export type ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}Response = Awaitable<ReturnType<typeof ${TM_FILENAME_BASE}>>",
       ""
     ]
   },
@@ -35,6 +37,8 @@
       "export async function ${TM_FILENAME_BASE}(data: ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}RequestData, locals: App.Locals) {",
       "  $2",
       "};",
+      "",
+      "export type ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}Response = Awaitable<ReturnType<typeof ${TM_FILENAME_BASE}>>",
       ""
     ]
   },
@@ -55,6 +59,8 @@
       "export async function ${TM_FILENAME_BASE}(params: ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}Params, data: ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}RequestData, locals: App.Locals) {",
       "  $3",
       "};",
+      "",
+      "export type ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}Response = Awaitable<ReturnType<typeof ${TM_FILENAME_BASE}>>",
       ""
     ]
   },
