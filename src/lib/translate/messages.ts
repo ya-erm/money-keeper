@@ -61,6 +61,7 @@ export type Messages =
   | 'auth.not_logged_in'
   // Accounts
   | 'accounts.title'
+  | 'accounts.new_account'
   | 'accounts.create_account'
   | 'accounts.create_account_failure'
   | 'accounts.create_account_success'

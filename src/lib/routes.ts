@@ -107,7 +107,7 @@ export const routes: { [key in RouteKey]: Route } = {
   },
   'settings.encryption': {
     path: '/settings/encryption',
-    title: 'settings.encryption.title',
+    title: 'settings.encryption',
   },
   uikit: {
     path: '/uikit',

@@ -8,6 +8,9 @@ import { useDB } from './useDB';
 export class CategoriesService implements Initialisable, JournalSubscriber {
   private _categories = store<Category[]>([]);
 
+  /** Constructor */
+  constructor(private _journalService: JournalService, private _membersService: MembersService) {}
+
   /** List of all categories */
   get categories() {
     return this._categories.value;
@@ -17,9 +20,6 @@ export class CategoriesService implements Initialisable, JournalSubscriber {
   get $categories() {
     return this._categories.readable;
   }
-
-  /** Constructor */
-  constructor(private _journalService: JournalService, private _membersService: MembersService) {}
 
   /** Service name */
   get name() {
@@ -46,6 +46,7 @@ export class CategoriesService implements Initialisable, JournalSubscriber {
     await db.put('categories', { ...item, owner: member.uuid });
   }
 
+  /** Apply journal updates and optional save to DB */
   async applyChanges(changes: JournalItem[], saveToDB = false) {
     const updates = new Map<string, Category>();
     changes.forEach((item) => item.data.category && updates.set(item.data.category.id, item.data.category));
@@ -55,7 +56,7 @@ export class CategoriesService implements Initialisable, JournalSubscriber {
       const dict = new Map<string, Category>();
       prev.forEach((item) => dict.set(item.id, item));
       items.forEach((item) => dict.set(item.id, item));
-      return Array.from(dict.values());
+      return Array.from(dict.values()).filter((x) => !x.deleted);
     });
 
     if (saveToDB) {
