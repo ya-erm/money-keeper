@@ -25,6 +25,7 @@ type RouteKey =
   | 'settings'
   | 'settings.language'
   | 'settings.currency_rates'
+  | 'settings.encryption'
   | 'uikit';
 
 export const routes: { [key in RouteKey]: Route } = {
@@ -103,6 +104,10 @@ export const routes: { [key in RouteKey]: Route } = {
   'settings.currency_rates': {
     path: '/settings/currency-rates',
     title: 'currency_rates.title',
+  },
+  'settings.encryption': {
+    path: '/settings/encryption',
+    title: 'settings.encryption.title',
   },
   uikit: {
     path: '/uikit',

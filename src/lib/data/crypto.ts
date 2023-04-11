@@ -2,11 +2,49 @@ const RSA_ALG = 'RSA-OAEP';
 const AES_ALG = 'AES-CBC';
 
 function arrayBufferToBase64(arrayBuffer: ArrayBuffer) {
-  return btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+  let binary = '';
+  const bytes = new Uint8Array(arrayBuffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
 }
 
 function base64ToArrayBuffer(base64: string) {
-  return Uint8Array.from(Buffer.from(base64, 'base64'));
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
+/* Create CryptoKey from password */
+export async function createKeyFromPassword(password: string, saltData: string | null = null) {
+  const encoder = new TextEncoder();
+  const salt = saltData ?? arrayBufferToBase64(crypto.getRandomValues(new Uint8Array(16)));
+  const keyMaterial = await crypto.subtle.importKey('raw', encoder.encode(password), { name: 'PBKDF2' }, false, [
+    'deriveBits',
+    'deriveKey',
+  ]);
+  const cryptoKey = await crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: base64ToArrayBuffer(salt),
+      iterations: 150000,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    { name: AES_ALG, length: 256 },
+    true,
+    ['encrypt', 'decrypt'],
+  );
+  return {
+    jwk: await crypto.subtle.exportKey('jwk', cryptoKey),
+    salt,
+  };
 }
 
 /**
@@ -14,7 +52,7 @@ function base64ToArrayBuffer(base64: string) {
  * @returns private and public keys in jwk
  */
 export async function generateRsaKeys() {
-  const { privateKey, publicKey } = await window.crypto.subtle.generateKey(
+  const { privateKey, publicKey } = await crypto.subtle.generateKey(
     {
       name: RSA_ALG,
       modulusLength: 2048,
@@ -26,8 +64,8 @@ export async function generateRsaKeys() {
   );
 
   return {
-    privateKey: await window.crypto.subtle.exportKey('jwk', privateKey),
-    publicKey: await window.crypto.subtle.exportKey('jwk', publicKey),
+    privateKey: await crypto.subtle.exportKey('jwk', privateKey),
+    publicKey: await crypto.subtle.exportKey('jwk', publicKey),
   };
 }
 
@@ -36,7 +74,7 @@ export async function generateRsaKeys() {
  * @returns AES key in jwk
  */
 export async function generateAesKey() {
-  const aesKey = await window.crypto.subtle.generateKey(
+  const aesKey = await crypto.subtle.generateKey(
     {
       name: AES_ALG,
       length: 256,
@@ -45,19 +83,19 @@ export async function generateAesKey() {
     ['encrypt', 'decrypt'],
   );
 
-  return await window.crypto.subtle.exportKey('jwk', aesKey);
+  return await crypto.subtle.exportKey('jwk', aesKey);
 }
 
 /**
- * Encrypt ARS
+ * Encrypt AES
  * @param aesKey key in jwk
  * @param message data
  */
 export async function encryptAes(aesKey: JsonWebKey, message: string) {
   const textEncoder = new TextEncoder();
-  const cryptoKey = await window.crypto.subtle.importKey('jwk', aesKey, AES_ALG, true, ['encrypt']);
-  const initialVector = window.crypto.getRandomValues(new Uint8Array(16));
-  const encryptedMessage = await window.crypto.subtle.encrypt(
+  const cryptoKey = await crypto.subtle.importKey('jwk', aesKey, AES_ALG, true, ['encrypt']);
+  const initialVector = crypto.getRandomValues(new Uint8Array(16));
+  const encryptedMessage = await crypto.subtle.encrypt(
     {
       name: AES_ALG,
       iv: initialVector,
@@ -79,10 +117,10 @@ export async function encryptAes(aesKey: JsonWebKey, message: string) {
  */
 export async function decryptAes(aesKey: JsonWebKey, encryptedMessage: string, initialVector: string) {
   const textDecoder = new TextDecoder();
-  const cryptoKey = await window.crypto.subtle.importKey('jwk', aesKey, AES_ALG, true, ['decrypt']);
+  const cryptoKey = await crypto.subtle.importKey('jwk', aesKey, AES_ALG, true, ['decrypt']);
   const arrayBuffer = base64ToArrayBuffer(encryptedMessage);
   const iv = base64ToArrayBuffer(initialVector);
-  const decryptedMessage = await window.crypto.subtle.decrypt(
+  const decryptedMessage = await crypto.subtle.decrypt(
     {
       name: AES_ALG,
       iv,
@@ -100,7 +138,7 @@ export async function decryptAes(aesKey: JsonWebKey, encryptedMessage: string, i
  */
 export async function encryptRsa(publicKey: JsonWebKey, message: string) {
   const textEncoder = new TextEncoder();
-  const cryptoKey = await window.crypto.subtle.importKey(
+  const cryptoKey = await crypto.subtle.importKey(
     'jwk',
     publicKey,
     {
@@ -110,7 +148,7 @@ export async function encryptRsa(publicKey: JsonWebKey, message: string) {
     true,
     ['encrypt'],
   );
-  const encryptedMessage = await window.crypto.subtle.encrypt(
+  const encryptedMessage = await crypto.subtle.encrypt(
     {
       name: RSA_ALG,
     },
@@ -129,7 +167,7 @@ export async function encryptRsa(publicKey: JsonWebKey, message: string) {
  */
 export async function decryptRsa(privateKey: JsonWebKey, encryptedMessage: string) {
   const textDecoder = new TextDecoder();
-  const cryptoKey = await window.crypto.subtle.importKey(
+  const cryptoKey = await crypto.subtle.importKey(
     'jwk',
     privateKey,
     { name: RSA_ALG, hash: { name: 'SHA-256' } },
@@ -137,7 +175,7 @@ export async function decryptRsa(privateKey: JsonWebKey, encryptedMessage: strin
     ['decrypt'],
   );
   const arrayBuffer = base64ToArrayBuffer(encryptedMessage);
-  const decryptedMessage = await window.crypto.subtle.decrypt(
+  const decryptedMessage = await crypto.subtle.decrypt(
     {
       name: 'RSA-OAEP',
     },

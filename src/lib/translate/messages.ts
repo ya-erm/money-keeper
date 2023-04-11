@@ -25,6 +25,7 @@ export type Messages =
   | 'common.cancel'
   | 'common.delete'
   | 'common.ok'
+  | 'common.continue'
   // Tags
   | 'tags.add_modal_header'
   | 'tags.edit_modal_header'
@@ -201,6 +202,7 @@ export type Messages =
   | 'settings.collaboration.workspaces'
   | 'settings.collaboration.invites'
   | 'settings.collaboration.blocklist'
+  | 'settings.encryption'
   | 'settings.report_problem'
   | 'settings.version'
   | 'settings.uikit';

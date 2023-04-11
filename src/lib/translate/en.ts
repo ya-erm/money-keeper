@@ -28,6 +28,7 @@ export const enDict: Dictionary = {
   'common.cancel': 'Cancel',
   'common.delete': 'Delete',
   'common.ok': 'OK',
+  'common.continue': 'Continue',
   // Tags
   'tags.add_modal_header': 'Add tag',
   'tags.edit_modal_header': 'Edit tag',
@@ -209,6 +210,7 @@ export const enDict: Dictionary = {
   'settings.collaboration.workspaces': 'Workspaces',
   'settings.collaboration.invites': 'Invites',
   'settings.collaboration.blocklist': 'Blocklist',
+  'settings.encryption': 'Encryption',
   'settings.report_problem': 'Report a problem',
   'settings.version': 'Version: {version}',
   'settings.uikit': 'UI Kit',

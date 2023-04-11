@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { loadAll } from '$lib/data/initialization';
+  import mainService from '$lib/data/main';
   import { onMount } from 'svelte';
 
   onMount(async () => {
-    await loadAll();
+    await mainService.init();
   });
 </script>
 

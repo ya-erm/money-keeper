@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { categories, deleteCategory, saveCategory } from '$lib/data/categories';
   import type { Category, CategoryType } from '$lib/data/interfaces';
+  import { categoriesService } from '$lib/data/main';
   import { translate } from '$lib/translate';
   import CategoryList from './CategoryList.svelte';
   import CategoryModal from './CategoryModal.svelte';
+
+  const categories = categoriesService.$categories;
 
   $: incomings = $categories.filter((x) => x.type === 'IN');
   $: outgoings = $categories.filter((x) => x.type === 'OUT');
@@ -19,8 +21,17 @@
   };
 
   const handleClick = (item: Category) => {
+    categoryType = item.type;
     category = item;
     opened = true;
+  };
+
+  const onSave = (item: Category) => {
+    categoriesService.save(item);
+  };
+
+  const onDelete = (item: Category) => {
+    categoriesService.delete(item);
   };
 </script>
 
@@ -31,7 +42,7 @@
 <CategoryList items={outgoings} onClick={handleClick} onAdd={handleAdd('OUT')} />
 
 {#if opened}
-  <CategoryModal bind:opened {category} {categoryType} onSave={saveCategory} onDelete={deleteCategory} />
+  <CategoryModal bind:opened {category} {categoryType} {onSave} {onDelete} />
 {/if}
 
 <style>

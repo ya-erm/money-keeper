@@ -42,6 +42,11 @@
   <ListSelectItem title={$translate('auth.login')} value={data.user?.login ?? ''} on:click={openChangeLoginModal} />
   <ListSelectItem title={$translate('auth.password')} value="******" on:click={openChangePasswordModal} />
   <ListSelectItem
+    title={$translate('settings.encryption')}
+    value=""
+    on:click={() => goto(routes['settings.encryption'].path)}
+  />
+  <ListSelectItem
     title={$translate('settings.collaboration.workspace')}
     value={data.group?.name ?? ''}
     on:click={openSelectGroupModal}

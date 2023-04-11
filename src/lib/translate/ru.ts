@@ -28,6 +28,7 @@ export const ruDict: Dictionary = {
   'common.cancel': 'Отмена',
   'common.delete': 'Удалить',
   'common.ok': 'OK',
+  'common.continue': 'Продолжить',
   // Tags
   'tags.add_modal_header': 'Добавить тег',
   'tags.edit_modal_header': 'Редактировать тег',
@@ -209,6 +210,7 @@ export const ruDict: Dictionary = {
   'settings.collaboration.workspaces': 'Рабочие пространства',
   'settings.collaboration.invites': 'Приглашения',
   'settings.collaboration.blocklist': 'Чёрный список',
+  'settings.encryption': 'Шифрование',
   'settings.report_problem': 'Сообщить о проблеме',
   'settings.version': 'Версия: {version}',
   'settings.uikit': 'UI Kit',
