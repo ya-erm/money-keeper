@@ -64,6 +64,7 @@ export const enDict: Dictionary = {
   'auth.not_logged_in': 'You are not logged in',
   // Accounts
   'accounts.title': 'Accounts',
+  'accounts.new_account': 'New account',
   'accounts.create_account': 'Create account',
   'accounts.create_account_failure': 'Failed to create account',
   'accounts.create_account_success': 'Account was created',

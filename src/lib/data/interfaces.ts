@@ -31,6 +31,7 @@ export type JournalItem = {
 
 export type JournalOperation = {
   category?: Category;
+  account?: Account;
 };
 
 export type JournalSubscriber = {
@@ -44,6 +45,15 @@ export type Category = {
   id: string;
   name: string;
   type: CategoryType;
+  icon?: string | null;
+  deleted?: boolean;
+};
+
+export type Account = {
+  id: string;
+  name: string;
+  order: number;
+  currency: string;
   icon?: string | null;
   deleted?: boolean;
 };
@@ -70,6 +80,11 @@ export interface LocalDB extends DBSchema {
   categories: {
     key: string;
     value: WithOwner<Category>;
+    indexes: { 'by-owner': string };
+  };
+  accounts: {
+    key: string;
+    value: WithOwner<Account>;
     indexes: { 'by-owner': string };
   };
 }

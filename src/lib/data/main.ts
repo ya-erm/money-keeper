@@ -1,11 +1,12 @@
 import { Logger } from '$lib/utils/logger';
+import { v4 as uuid } from 'uuid';
 
+import { AccountsService } from './accounts';
 import { CategoriesService } from './categories';
-import { GlobalSettingsService } from './settings';
+import type { Initialisable, Service } from './interfaces';
 import { JournalService } from './journal';
 import { MembersService } from './members';
-import type { Initialisable, Service } from './interfaces';
-import { v4 as uuid } from 'uuid';
+import { GlobalSettingsService } from './settings';
 
 const logger = new Logger('MainService', { disabled: false, color: '#00cc55' });
 
@@ -17,6 +18,7 @@ class MainService implements Initialisable {
   membersService: MembersService;
   journalService: JournalService;
   categoriesService: CategoriesService;
+  accountsService: AccountsService;
 
   constructor() {
     this._id = uuid();
@@ -25,6 +27,7 @@ class MainService implements Initialisable {
     this.membersService = new MembersService(this.settingsService);
     this.journalService = new JournalService(this.membersService);
     this.categoriesService = new CategoriesService(this.journalService, this.membersService);
+    this.accountsService = new AccountsService(this.journalService, this.membersService);
   }
 
   async init() {
@@ -46,7 +49,7 @@ class MainService implements Initialisable {
   }
 
   async initServices() {
-    const services: Service[] = [this.categoriesService];
+    const services: Service[] = [this.categoriesService, this.accountsService];
 
     logger.log(`Initialise ${services.length} services to load data from local DB`);
     logger.debug(
@@ -70,3 +73,4 @@ export const settingsService = mainService.settingsService;
 export const membersService = mainService.membersService;
 export const journalService = mainService.journalService;
 export const categoriesService = mainService.categoriesService;
+export const accountsService = mainService.accountsService;

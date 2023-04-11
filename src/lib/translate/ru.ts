@@ -64,6 +64,7 @@ export const ruDict: Dictionary = {
   'auth.not_logged_in': 'Вы не авторизованы',
   // Accounts
   'accounts.title': 'Счета',
+  'accounts.new_account': 'Новый счёт',
   'accounts.create_account': 'Создать счёт',
   'accounts.create_account_failure': 'Не удалось создать счёт',
   'accounts.create_account_success': 'Счёт создан',
