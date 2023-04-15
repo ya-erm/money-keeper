@@ -1,18 +1,18 @@
-import type { Account } from './interfaces';
+import type { Transaction } from './interfaces';
 import type { JournalService } from './journal';
 import type { MembersService } from './members';
 import { BaseService } from './service';
 
-export class AccountsService extends BaseService<Account> {
+export class TransactionsService extends BaseService<Transaction> {
   constructor(journalService: JournalService, membersService: MembersService) {
-    super('AccountsService', 'accounts', 'account', journalService, membersService);
+    super('TransactionsService', 'transactions', 'transaction', journalService, membersService);
   }
 
-  get accounts() {
+  get transactions() {
     return this.items;
   }
 
-  get $accounts() {
+  get $transactions() {
     return this.$items;
   }
 }

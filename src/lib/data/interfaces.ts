@@ -1,6 +1,6 @@
 import type { DBSchema } from 'idb';
 
-type WithOwner<T> = T & { owner: string };
+export type WithOwner<T> = T & { owner: string };
 
 export type Initialisable = {
   init: () => Promise<void>;
@@ -32,6 +32,9 @@ export type JournalItem = {
 export type JournalOperation = {
   category?: Category;
   account?: Account;
+  transaction?: Transaction;
+  currencyRate?: CurrencyRate;
+  tag?: Tag;
 };
 
 export type JournalSubscriber = {
@@ -56,6 +59,43 @@ export type Account = {
   currency: string;
   icon?: string | null;
   deleted?: boolean;
+};
+
+export type Tag = {
+  id: string;
+  name: string;
+  deleted?: boolean;
+};
+
+export type CurrencyRate = {
+  id: string;
+  cur1: string;
+  cur2: string;
+  rate: number;
+  deleted?: boolean;
+};
+
+export type Transaction = {
+  id: string;
+  accountId: string;
+  categoryId: string;
+  date: string;
+  amount: number;
+  comment?: string | null;
+  description?: string | null;
+  linkedTransactionId?: string | null;
+  tagIds?: string[];
+  deleted?: boolean;
+};
+
+type TransactionWithAccountAndCategory = Transaction & {
+  account: Account;
+  category: Category;
+};
+
+export type TransactionViewModel = TransactionWithAccountAndCategory & {
+  linkedTransaction?: TransactionWithAccountAndCategory;
+  tags: Tag[];
 };
 
 export interface LocalDB extends DBSchema {
@@ -85,6 +125,25 @@ export interface LocalDB extends DBSchema {
   accounts: {
     key: string;
     value: WithOwner<Account>;
+    indexes: { 'by-owner': string };
+  };
+  transactions: {
+    key: string;
+    value: WithOwner<Transaction>;
+    indexes: {
+      'by-owner': string;
+      'by-owner-account': [string, string];
+      'by-owner-category': [string, string];
+    };
+  };
+  tags: {
+    key: string;
+    value: WithOwner<Tag>;
+    indexes: { 'by-owner': string };
+  };
+  currencyRates: {
+    key: string;
+    value: WithOwner<CurrencyRate>;
     indexes: { 'by-owner': string };
   };
 }
