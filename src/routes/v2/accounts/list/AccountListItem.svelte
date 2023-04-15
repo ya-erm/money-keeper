@@ -1,16 +1,16 @@
 <script lang="ts">
-  import type { Account } from '$lib/data/interfaces';
+  import type { Account, CurrencyRate } from '$lib/data/interfaces';
   import Icon from '$lib/ui/Icon.svelte';
   import { formatMoney } from '$lib/utils/formatMoney';
 
   export let account: Account;
   export let balance: number | null = null;
-  export let currencyRate: unknown | null = null;
+  export let currencyRate: CurrencyRate | null = null;
 
   export let onClick: (account: Account) => void = () => {};
 
-  // const rate = currencyRate?.cur1 === account.currency ? currencyRate.rate : 1 / (currencyRate?.rate ?? 1);
-  // const otherCurrency = currencyRate?.cur1 === account.currency ? currencyRate.cur2 : currencyRate?.cur1;
+  const rate = currencyRate?.cur1 === account.currency ? currencyRate.rate : 1 / (currencyRate?.rate ?? 1);
+  const otherCurrency = currencyRate?.cur1 === account.currency ? currencyRate.cur2 : currencyRate?.cur1;
 </script>
 
 <li>
@@ -25,9 +25,9 @@
       <div class="money-value flex gap-0.5">
         {formatMoney(balance ?? 0, { currency: account.currency })}
       </div>
-      {#if currencyRate}
+      {#if currencyRate && balance !== null}
         <div class="other-money-value">
-          <!-- {formatMoney(balance * rate, { currency: otherCurrency })} -->
+          {formatMoney(balance * rate, { currency: otherCurrency })}
         </div>
       {/if}
     </div>

@@ -11,7 +11,7 @@
   export let categoryType: CategoryType;
 
   export let onSave: (category: Category) => void | Promise<void>;
-  export let onDelete: (category: Category) => void | Promise<void>;
+  export let onDelete: ((category: Category) => void | Promise<void>) | null = null;
 
   let name = category?.name ?? '';
   let icon = category?.icon;
@@ -29,7 +29,7 @@
 
   const handleDelete = async () => {
     if (!category) return;
-    await onDelete(category);
+    await onDelete?.(category);
     opened = false;
   };
 </script>
@@ -39,7 +39,7 @@
     <Input label={$translate('categories.name')} name="name" bind:value={name} required />
     <Input label={$translate('categories.icon')} name="icon" bind:value={icon} optional />
     <div class="grid-col-2 gap-1">
-      {#if !!category}
+      {#if !!category && onDelete}
         <Button color="danger" text={$translate('common.delete')} on:click={handleDelete} />
       {:else}
         <Button color="secondary" text={$translate('common.cancel')} on:click={() => (opened = false)} />
