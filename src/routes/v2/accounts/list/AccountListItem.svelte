@@ -37,12 +37,14 @@
 <style>
   button {
     padding: 0.5rem;
+    font-size: 1rem;
     border-radius: 1rem;
     background-color: var(--header-background-color);
     color: var(--primary-text-color);
     cursor: pointer;
     border: none;
     width: 100%;
+    transition: box-shadow 0.2s ease-in-out;
   }
   @media (hover: hover) {
     button:hover {

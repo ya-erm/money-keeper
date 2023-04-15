@@ -84,8 +84,8 @@
 <style>
   button {
     padding: 0.5rem;
+    font-size: 1rem;
     border-radius: 1rem;
-    font-family: inherit;
     background: transparent;
     color: var(--primary-text-color);
     cursor: pointer;
