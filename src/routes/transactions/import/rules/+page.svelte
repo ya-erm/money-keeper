@@ -2,7 +2,7 @@
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
-  import { backLink, useRightButton } from '$lib/ui/header/header';
+  import { backLink, useRightButton } from '$lib/ui/header/model';
   import Input from '$lib/ui/Input.svelte';
   import NoItems from '$lib/ui/NoItems.svelte';
 

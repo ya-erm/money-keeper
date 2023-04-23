@@ -2,7 +2,7 @@
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import LanguageButton from '$lib/translate/LanguageButton.svelte';
-  import { useRightButton } from '$lib/ui/header/header';
+  import { useRightButton } from '$lib/ui/header';
 
   import type { PageData } from './$types';
 

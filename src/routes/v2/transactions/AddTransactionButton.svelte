@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import AddButton from '$lib/ui/header/AddButton.svelte';
-
-  // TODO: use routes
-  let link = '/v2/transactions/create';
+  import HeaderButton from '$lib/ui/header/HeaderButton.svelte';
 </script>
 
-<AddButton href={link} label={$translate('transactions.create_transaction')} />
+<HeaderButton
+  icon="mdi:plus"
+  href={route('transactions.create')}
+  label={$translate('transactions.create_transaction')}
+/>

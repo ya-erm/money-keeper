@@ -8,7 +8,7 @@
   import LanguageButton from '$lib/translate/LanguageButton.svelte';
   import Button from '$lib/ui/Button.svelte';
   import FormContainer from '$lib/ui/FormContainer.svelte';
-  import { useRightButton } from '$lib/ui/header/header';
+  import { useRightButton } from '$lib/ui/header';
   import Input from '$lib/ui/Input.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
 

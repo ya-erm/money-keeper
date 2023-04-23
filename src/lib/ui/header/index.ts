@@ -1,1 +1,1 @@
-export { backLink, title, rightButton, useTitle } from './header';
+export { backLink, title, rightButton, useTitle, useRightButton } from './model';

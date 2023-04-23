@@ -1,16 +1,18 @@
 <script lang="ts">
-  import { goto, invalidate } from '$app/navigation';
+  import { invalidate } from '$app/navigation';
   import { page } from '$app/stores';
   import dayjs from 'dayjs';
 
+  import { deps } from '$lib/deps';
   import type { CategoryType, ImportTransactionItem, TransactionWithAccountAndCategory } from '$lib/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Checkbox from '$lib/ui/Checkbox.svelte';
-  import { useRightButton } from '$lib/ui/header/header';
   import Input from '$lib/ui/Input.svelte';
+  import { useRightButton } from '$lib/ui/header';
   import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
   import { getNumberSearchParam, keyTransactions } from '$lib/utils';
+  import type { Tag } from '@prisma/client';
 
   import AccountSelect from '../AccountSelect.svelte';
   import TransactionListItem from '../TransactionListItem.svelte';
@@ -18,8 +20,6 @@
   import type { PageData } from './$types';
   import RulesButton from './RulesButton.svelte';
   import SelectCategoryModal from './SelectCategoryModal.svelte';
-  import type { Tag } from '@prisma/client';
-  import { deps } from '$lib/deps';
 
   useRightButton(RulesButton);
 

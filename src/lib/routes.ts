@@ -15,6 +15,7 @@ type RouteKey =
   | 'groups.create'
   | 'accounts'
   | 'accounts.create'
+  | 'accounts.list'
   | 'categories'
   | 'categories.create'
   | 'transactions'
@@ -64,6 +65,10 @@ export const routes: { [key in RouteKey]: Route } = {
   'accounts.create': {
     path: '/accounts/create',
     title: 'accounts.create_account',
+  },
+  'accounts.list': {
+    path: '/accounts/list',
+    title: 'accounts.title',
   },
   categories: {
     path: '/categories',
@@ -117,4 +122,8 @@ export const routes: { [key in RouteKey]: Route } = {
 
 export function findRoute(path: string) {
   return Object.values(routes).find((route) => route.path == path);
+}
+
+export function route(key: RouteKey) {
+  return '/v2' + routes[key].path;
 }

@@ -3,8 +3,9 @@
 
   import type { Account } from '$lib/data/interfaces';
   import { accountsService } from '$lib/data/main';
+  import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import { useRightButton, useTitle } from '$lib/ui/header/header';
+  import { backLink, useRightButton, useTitle } from '$lib/ui/header/model';
   import { deleteSearchParam, getSearchParam } from '$lib/utils';
   import { useCreateAction } from '$lib/utils/useCreateAction';
 
@@ -15,7 +16,7 @@
   const accounts = accountsService.$accounts;
   $: items = $accounts.sort((a, b) => a.order - b.order);
 
-  // @ts-ignore
+  backLink.set(route('accounts'));
   useRightButton(AddAccountButton);
   useTitle($translate('accounts.title'));
 

@@ -2,8 +2,12 @@
   import type { Category, CategoryType } from '$lib/data/interfaces';
   import { categoriesService } from '$lib/data/main';
   import { translate } from '$lib/translate';
+  import { useTitle } from '$lib/ui/header';
+
   import CategoryList from './CategoryList.svelte';
   import CategoryModal from './CategoryModal.svelte';
+
+  useTitle($translate('categories.title'));
 
   const categories = categoriesService.$categories;
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { translate } from '$lib/translate';
-  import AddButton from '$lib/ui/header/AddButton.svelte';
+  import HeaderButton from '$lib/ui/header/HeaderButton.svelte';
 </script>
 
-<AddButton label={$translate('transactions.create_transaction')} />
+<HeaderButton icon="mdi:plus" href="?action=create" label={$translate('transactions.create_transaction')} />

@@ -3,6 +3,7 @@
   import type { TransactionViewModel } from '$lib/data/interfaces';
   import TransactionListItem from './TransactionListItem.svelte';
   import { goto } from '$app/navigation';
+  import { route } from '$lib/routes';
 
   export let transactions: TransactionViewModel[];
   export let hideAccount: boolean = false;
@@ -16,8 +17,8 @@
   }, {});
 
   const onClick = ({ id }: { id: string }) => {
-    // TODO: use routes
-    goto(`/v2/transactions/${id}`);
+    // TODO: use search params instead of url
+    goto(route('transactions') + `/${id}`);
   };
 </script>
 

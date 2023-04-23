@@ -60,6 +60,7 @@ export type Messages =
   | 'auth.logged_in_as'
   | 'auth.not_logged_in'
   // Accounts
+  | 'accounts.list'
   | 'accounts.title'
   | 'accounts.new_account'
   | 'accounts.create_account'

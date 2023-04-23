@@ -4,7 +4,7 @@
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
   import { derived } from 'svelte/store';
-  import { backLink, rightButton, title } from './header';
+  import { backLink, rightButton, title } from './model';
 
   const titleText = derived([page, translate, title], ([page, translate, title]) => {
     if (title) return title;
@@ -38,6 +38,8 @@
 
 <style>
   .navigation-back-button {
+    position: absolute;
+    left: 0;
     display: flex;
   }
   .navigation-back-button:hover {
@@ -54,8 +56,7 @@
     padding: 0.5rem;
   }
   .navigation-bar {
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
+    display: flex;
     background-color: var(--header-background-color);
     border-bottom: 1px solid var(--border-color);
     align-items: center;
@@ -63,11 +64,13 @@
     height: 60px;
   }
   .navigation-title {
+    flex-grow: 1;
     font-weight: normal;
     text-align: center;
     font-size: 1.25rem;
   }
   .navigation-right-button {
-    text-align: right;
+    position: absolute;
+    right: 0;
   }
 </style>

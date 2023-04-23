@@ -9,7 +9,7 @@ export type MenuItem = {
   path: string;
 };
 
-export const menu = readable<MenuItem[]>([
+const _menu = readable<MenuItem[]>([
   {
     icon: 'mdi:shape-outline',
     title: 'categories.title',
@@ -26,5 +26,14 @@ export const menu = readable<MenuItem[]>([
     path: routes.settings.path,
   },
 ]);
+
+export const menu = derived([page, _menu], ([p, m]) =>
+  p.url.pathname.startsWith('/v2')
+    ? m.map((item) => ({
+        ...item,
+        path: '/v2' + item.path,
+      }))
+    : m,
+);
 
 export const activeMenuItem = derived([page, menu], ([p, m]) => m.find((x) => x.path == p.url.pathname));

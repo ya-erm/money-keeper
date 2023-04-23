@@ -2,7 +2,8 @@
   import { goto } from '$app/navigation';
   import Icon from '$lib/ui/Icon.svelte';
 
-  export let href = '?action=create';
+  export let href: string;
+  export let icon: string;
   export let label: string;
 
   const handleClick = () => {
@@ -11,7 +12,7 @@
 </script>
 
 <a title={label} aria-label={label} {href} on:click={handleClick}>
-  <Icon name="mdi:plus" padding={1} />
+  <Icon name={icon} padding={1} />
 </a>
 
 <style>

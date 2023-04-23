@@ -7,4 +7,12 @@ export class CurrencyRatesService extends BaseService<CurrencyRate> {
   constructor(journalService: JournalService, membersService: MembersService) {
     super('CurrencyRatesService', 'currencyRates', 'currencyRate', journalService, membersService);
   }
+
+  get currencyRates() {
+    return this.items;
+  }
+
+  get $currencyRates() {
+    return this.$items;
+  }
 }

@@ -7,7 +7,7 @@
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import { backLink, rightButton, title } from '$lib/ui/header';
-  import { useRightButton } from '$lib/ui/header/header';
+  import { useRightButton } from '$lib/ui/header';
   import Input from '$lib/ui/Input.svelte';
   import { getSearchParam } from '$lib/utils';
   import Icon from '$lib/ui/Icon.svelte';

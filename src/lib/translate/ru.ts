@@ -63,6 +63,7 @@ export const ruDict: Dictionary = {
   'auth.logged_in_as': 'Вы зашли как {name}!',
   'auth.not_logged_in': 'Вы не авторизованы',
   // Accounts
+  'accounts.list': 'Список счетов',
   'accounts.title': 'Счета',
   'accounts.new_account': 'Новый счёт',
   'accounts.create_account': 'Создать счёт',
