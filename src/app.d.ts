@@ -11,7 +11,7 @@ declare namespace App {
   interface PageData {
     userId: number | null;
     groupId: number | null;
-    uuid: string | null;
+    uuid?: string | null;
   }
   // interface Error {}
   // interface Platform {}

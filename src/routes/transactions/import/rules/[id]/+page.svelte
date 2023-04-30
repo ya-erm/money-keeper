@@ -1,13 +1,12 @@
 <script lang="ts">
-  import { goto, invalidate } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import type { ActionResult } from '@sveltejs/kit';
-  import { deps } from '$lib/deps';
 
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import FormContainer from '$lib/ui/FormContainer.svelte';
-  import { backLink, title, useTitle } from '$lib/ui/header';
+  import { backLink, useTitle } from '$lib/ui/header';
   import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
 
   import ImportRuleForm from '../ImportRuleForm.svelte';

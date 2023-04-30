@@ -44,7 +44,6 @@ class UseCreateActionResult<T> {
   }
 
   set opened(value: boolean) {
-    console.log({ value });
     this._opened.set(value);
   }
 }

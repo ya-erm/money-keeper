@@ -1,17 +1,17 @@
 <script lang="ts">
+  import { enhance } from '$app/forms';
   import type { CurrencyRate } from '@prisma/client';
-  import { applyAction, enhance } from '$app/forms';
 
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import { backLink } from '$lib/ui/header';
+  import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
+  import Input from '$lib/ui/Input.svelte';
+  import { backLink } from '$lib/ui/header';
+  import { showSuccessToast } from '$lib/ui/toasts';
 
   import type { PageData } from './$types';
   import CurrencyRateModal from './CurrencyRateModal.svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import Button from '$lib/ui/Button.svelte';
-  import { showSuccessToast } from '$lib/ui/toasts';
 
   export let data: PageData;
   $: items = data.items;

@@ -1,4 +1,4 @@
-import test, { expect, type Page } from '@playwright/test';
+import test, { expect } from '@playwright/test';
 import { hasLocatorClassAsync, useAuthAsync } from '@tests/utils';
 import { checkCommonInputs, getTransactionFormLocators } from '@tests/transactions/utils';
 

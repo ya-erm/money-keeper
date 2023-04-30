@@ -67,7 +67,7 @@
   <ListSelectItem title={$translate('settings.collaboration.blocklist')} value="" disabled />
 </ListGroup>
 
-<div class="mt-1 flex-col items-center gap-0.5 ">
+<div class="mt-1 flex-col items-center gap-0.5">
   <a class="text-decoration-none" href={routes.logout.path}>
     <Button color="danger" appearance="link" underlined={false} text={$translate('settings.profile.logout')} />
   </a>
@@ -79,7 +79,7 @@
       </span>
     </Button>
   </a>
-  <div class="build-info ">
+  <div class="build-info">
     <span>{$translate('settings.version', { values: { version } })}</span>
     <span>•</span>
     <Button appearance="link" underlined={false} text="UI Kit" on:click={() => goto(routes.uikit.path)} />
