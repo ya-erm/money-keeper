@@ -37,13 +37,13 @@
     const currencyRates = data.currencyRates.map((item) => ({ ...item, uuid: uuid() }));
     const tags = data.tags.map((item) => ({ ...item, uuid: uuid() }));
 
-    const uuids = new Map<string, any>();
+    const uuids = new Set<string>();
     [accounts, categories, transactions, currencyRates, tags].forEach((arr) =>
       arr.forEach((item) => {
         if (uuids.has(item.uuid)) {
           throw new Error(`Duplicate uuid: ${item.uuid}`);
         }
-        uuids.set(item.uuid, item);
+        uuids.add(item.uuid);
       }),
     );
 

@@ -77,7 +77,8 @@
         publicKey: member.publicKey,
         privateKey: decryptedKey,
       });
-      const privateKey = JSON.parse(decryptedKey) as JsonWebKey;
+      // eslint-disable-next-line no-undef
+      const privateKey: JsonWebKey = JSON.parse(decryptedKey);
       const decryptedToken = await decryptRsa(privateKey, encryptedToken.base64Data);
       await loginConfirmFetcher.fetch({ token: decryptedToken, uuid: member.uuid });
       // Initialize main service

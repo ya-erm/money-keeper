@@ -50,16 +50,16 @@
   </form>
   <div class:container={!!items.length}>
     {#each items as item (item.id)}
-      <div class="card" on:click={() => changeCurrencyRate(item)} role="button" on:keypress={() => {}}>
+      <button class="card" on:click={() => changeCurrencyRate(item)} on:keypress={() => {}}>
         <b>{item.cur1} / {item.cur2}</b>
         <div>1 {item.cur1} = {item.rate} {item.cur2}</div>
         <div>1 {item.cur2} = {(1 / item.rate).toFixed(4)} {item.cur1}</div>
-      </div>
+      </button>
     {/each}
-    <div class="card add flex-center" on:click={addCurrencyRate} role="button" on:keypress={() => {}}>
+    <button class="card add flex-center" on:click={addCurrencyRate} on:keypress={() => {}}>
       <Icon name="mdi:add" />
       <span>{$translate('common.add')}</span>
-    </div>
+    </button>
   </div>
 </div>
 

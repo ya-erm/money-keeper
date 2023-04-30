@@ -57,7 +57,7 @@
 
   $: cardId = getSearchParam($page, 'account-card');
   $: account = accounts.find((x) => x.id.toString() === cardId);
-  $: accountTransactions = !!account ? transactions.filter((t) => t.accountId === account?.id) : null;
+  $: accountTransactions = account ? transactions.filter((t) => t.accountId === account?.id) : null;
   $: filteredTransactions =
     (accountTransactions ?? transactions).filter(
       (t) =>
@@ -86,7 +86,7 @@
   onMount(() => {
     if (cardId) {
       scrollToCard(cardId);
-    } else if (!!accounts.length) {
+    } else if (accounts.length) {
       goto(`${routes.accounts.path}?account-card=${accounts[0].id}`, { noScroll: true });
     }
   });
@@ -97,7 +97,7 @@
     if (Number.isInteger(index)) {
       if (index === accounts.length) {
         goto(`${routes.accounts.path}#create-account`, { noScroll: true });
-      } else if (!!accounts[index]) {
+      } else if (accounts[index]) {
         const id = accounts[index].id;
         if (`${id}` !== cardId) {
           goto(`${routes.accounts.path}?account-card=${id}`, { noScroll: true });

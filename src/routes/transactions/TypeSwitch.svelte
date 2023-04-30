@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { goto, invalidate } from '$app/navigation';
+  import { invalidate } from '$app/navigation';
   import { page } from '$app/stores';
+
   import { deps } from '$lib/deps';
   import { translate } from '$lib/translate';
   import MultiSwitch from '$lib/ui/MultiSwitch.svelte';
