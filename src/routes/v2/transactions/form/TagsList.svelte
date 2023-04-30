@@ -2,7 +2,7 @@
   import { v4 as uuid } from 'uuid';
 
   import type { Tag } from '$lib/data/interfaces';
-  import { tagsService } from '$lib/data/main';
+  import { tagsService } from '$lib/data';
   import { translate } from '$lib/translate';
   import Tags from '$lib/ui/Tags.svelte';
   import { showErrorToast } from '$lib/ui/toasts';

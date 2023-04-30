@@ -1,5 +1,5 @@
 <script lang="ts">
-  import mainService from '$lib/data/main';
+  import { mainService } from '$lib/data';
   import { translate } from '$lib/translate';
   import { useRightButton, useTitle } from '$lib/ui/header/model';
   import AddTransactionButton from './AddTransactionButton.svelte';

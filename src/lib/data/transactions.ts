@@ -1,11 +1,9 @@
 import type { Transaction } from './interfaces';
-import type { JournalService } from './journal';
-import type { MembersService } from './members';
 import { BaseService } from './service';
 
 export class TransactionsService extends BaseService<Transaction> {
-  constructor(journalService: JournalService, membersService: MembersService) {
-    super('TransactionsService', 'transactions', 'transaction', journalService, membersService);
+  constructor() {
+    super('TransactionsService', 'transactions', 'transaction');
   }
 
   get transactions() {
@@ -15,4 +13,12 @@ export class TransactionsService extends BaseService<Transaction> {
   get $transactions() {
     return this.$items;
   }
+
+  deleteTransactionsByAccount(accountId: string): void {
+    this.items
+      .filter((transaction) => transaction.accountId == accountId)
+      .forEach((transaction) => this.delete(transaction));
+  }
 }
+
+export const transactionsService = new TransactionsService();

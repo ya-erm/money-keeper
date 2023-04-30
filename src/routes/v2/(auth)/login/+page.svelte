@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import { ApiError, isApiError } from '$lib/api/ApiError';
   import { createKeyFromPassword, decryptAes, decryptRsa } from '$lib/data/crypto';
-  import { mainService, membersService } from '$lib/data/main';
+  import { mainService, membersService } from '$lib/data';
   import type {
     LoginConfirmRequestData,
     LoginConfirmResponseData,

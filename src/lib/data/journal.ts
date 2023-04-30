@@ -3,9 +3,10 @@ import type { GetJournalRequest } from '$lib/server/api/v2/journal/getJournal';
 import { store } from '$lib/store';
 import { Logger } from '$lib/utils/logger';
 import { useFetch } from '$lib/utils/useFetch';
+
 import { decryptAsync, encryptAsync } from './crypto';
 import type { Initialisable, JournalItem, JournalOperation, JournalSubscriber } from './interfaces';
-import type { MembersService } from './members';
+import { membersService } from './members';
 import { useDB } from './useDB';
 
 const logger = new Logger('JournalService', { disabled: false });
@@ -16,8 +17,6 @@ export class JournalService implements Initialisable {
   private _syncNumber = store<number>(-1);
 
   private _subscribers = new Map<string, JournalSubscriber>();
-
-  constructor(private _membersService: MembersService) {}
 
   /** Incoming queue of updates */
   get updates() {
@@ -50,7 +49,7 @@ export class JournalService implements Initialisable {
 
   /** Initialisation */
   async init() {
-    this._syncNumber.subscribe((value) => value >= 0 && this._membersService.updateSyncNumber(value));
+    this._syncNumber.subscribe((value) => value >= 0 && membersService.updateSyncNumber(value));
 
     logger.log('Load outgoing queue from local DB');
     await this.loadQueueFromDB();
@@ -87,7 +86,7 @@ export class JournalService implements Initialisable {
   async fetchUpdates() {
     const fetcher = useFetch<GetJournalRequest, GetJournalResponse>('POST', '/api/v2/journal/get-updates');
     const { journal } = await fetcher.fetch({ start: this.syncNumber });
-    const member = this._membersService.tryGetSelectedMember();
+    const member = membersService.tryGetSelectedMember();
     const privateKey = JSON.parse(member.privateKey) as JsonWebKey;
     const items = await Promise.all(
       journal.map(async (item) => {
@@ -110,8 +109,8 @@ export class JournalService implements Initialisable {
 
   async loadQueueFromDB() {
     const db = await useDB();
-    const member = this._membersService.tryGetSelectedMember();
-    const settings = this._membersService.selectedMemberSettings;
+    const member = membersService.tryGetSelectedMember();
+    const settings = membersService.selectedMemberSettings;
     if (settings?.syncNumber) {
       this._syncNumber.set(settings?.syncNumber);
     }
@@ -128,7 +127,7 @@ export class JournalService implements Initialisable {
 
     // Save to DB
     const db = await useDB();
-    const member = this._membersService.tryGetSelectedMember();
+    const member = membersService.tryGetSelectedMember();
     await db.put('journal', { ...item, owner: member.uuid });
 
     // Try run upload asynchronously
@@ -155,7 +154,7 @@ export class JournalService implements Initialisable {
       this._queue.set(reorderedItems);
     }
 
-    const member = this._membersService.tryGetSelectedMember();
+    const member = membersService.tryGetSelectedMember();
     const publicKey = JSON.parse(member.publicKey) as JsonWebKey;
 
     const items = await Promise.all(
@@ -196,3 +195,5 @@ export class JournalService implements Initialisable {
     }
   }
 }
+
+export const journalService = new JournalService();

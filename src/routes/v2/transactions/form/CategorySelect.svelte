@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Category, CategoryType } from '$lib/data/interfaces';
-  import { categoriesService } from '$lib/data/main';
+  import { categoriesService } from '$lib/data';
   import { translate } from '$lib/translate';
   import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
 

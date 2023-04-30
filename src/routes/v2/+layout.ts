@@ -1,4 +1,4 @@
-import mainService from '$lib/data/main';
+import { mainService } from '$lib/data';
 
 export const load = async () => {
   try {

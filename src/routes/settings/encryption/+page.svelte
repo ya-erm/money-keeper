@@ -18,5 +18,7 @@
     <a href="/v2/categories">/v2/categories</a>
     <a href="/v2/accounts/list">/v2/accounts/list</a>
     <a href="/v2/transactions">/v2/transactions</a>
+    <br />
+    <a href="/settings/migrate">/settings/migrate</a>
   </div>
 </div>

@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
   import { onDestroy, onMount } from 'svelte';
 
-  import mainService, { accountsService, currencyRatesService } from '$lib/data/main';
+  import { mainService, accountsService, currencyRatesService } from '$lib/data';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
@@ -16,8 +16,8 @@
 
   import type { TransactionViewModel } from '$lib/data/interfaces';
   import dayjs from 'dayjs';
-  import AccountCard from './AccountCard.svelte';
   import AccountsButton from './AccountButtons.svelte';
+  import AccountCard from './AccountCard.svelte';
   import AddOperationButton from './AddOperationButton.svelte';
 
   backLink.set(null);

@@ -1,7 +1,7 @@
 import { store } from '$lib/store';
 import { Logger } from '$lib/utils/logger';
 import type { Initialisable, Member, MemberSettings } from './interfaces';
-import type { GlobalSettingsService } from './settings';
+import { settingsService } from './settings';
 import { useDB } from './useDB';
 
 const logger = new Logger('MembersService', { disabled: false, color: '#00bbbb' });
@@ -12,8 +12,6 @@ export class MembersService implements Initialisable {
   private _selectedMember = store<Member | null>(null);
   private _selectedMemberSettings = store<MemberSettings | null>(null);
   // #endregion
-
-  constructor(private _settingsService: GlobalSettingsService) {}
 
   // #region Public properties
 
@@ -99,7 +97,7 @@ export class MembersService implements Initialisable {
 
   /* Set selected member or choose first one */
   private setSelectedMember() {
-    const uuid = this._settingsService.settings.selectedMember;
+    const uuid = settingsService.settings.selectedMember;
     const member = this.members.find((x) => x.uuid === uuid);
     if (member) {
       this._selectedMember.set(member);
@@ -120,3 +118,5 @@ export class MembersService implements Initialisable {
     }
   }
 }
+
+export const membersService = new MembersService();

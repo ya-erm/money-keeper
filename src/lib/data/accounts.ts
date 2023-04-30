@@ -1,11 +1,10 @@
 import type { Account } from './interfaces';
-import type { JournalService } from './journal';
-import type { MembersService } from './members';
 import { BaseService } from './service';
+import { transactionsService } from './transactions';
 
 export class AccountsService extends BaseService<Account> {
-  constructor(journalService: JournalService, membersService: MembersService) {
-    super('AccountsService', 'accounts', 'account', journalService, membersService);
+  constructor() {
+    super('AccountsService', 'accounts', 'account');
   }
 
   get accounts() {
@@ -15,4 +14,11 @@ export class AccountsService extends BaseService<Account> {
   get $accounts() {
     return this.$items;
   }
+
+  override delete(item: Account): void {
+    super.delete(item);
+    transactionsService.deleteTransactionsByAccount(item.id);
+  }
 }
+
+export const accountsService = new AccountsService();

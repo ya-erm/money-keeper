@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { accountsService, categoriesService, mainService, tagsService, transactionsService } from '$lib/data';
   import type { Transaction } from '$lib/data/interfaces';
-  import mainService, { accountsService, categoriesService, tagsService, transactionsService } from '$lib/data/main';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
 

@@ -32,3 +32,5 @@ export class GlobalSettingsService implements Initialisable {
     await db.put('globalSettings', this.settings);
   }
 }
+
+export const settingsService = new GlobalSettingsService();

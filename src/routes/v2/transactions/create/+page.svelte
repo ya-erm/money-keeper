@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Transaction } from '$lib/data/interfaces';
-  import { accountsService, categoriesService, tagsService, transactionsService } from '$lib/data/main';
+  import { accountsService, categoriesService, tagsService, transactionsService } from '$lib/data';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import { useTitle } from '$lib/ui/header';

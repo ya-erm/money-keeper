@@ -2,12 +2,11 @@
   import { page } from '$app/stores';
 
   import type { Account } from '$lib/data/interfaces';
-  import { accountsService } from '$lib/data/main';
+  import { accountsService } from '$lib/data';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
   import { backLink, useRightButton, useTitle } from '$lib/ui/header/model';
   import { deleteSearchParam, getSearchParam } from '$lib/utils';
-  import { useCreateAction } from '$lib/utils/useCreateAction';
 
   import AccountList from './AccountList.svelte';
   import AccountModal from './AccountModal.svelte';

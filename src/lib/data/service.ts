@@ -11,8 +11,8 @@ import type {
   Transaction,
   Tag,
 } from './interfaces';
-import type { JournalService } from './journal';
-import type { MembersService } from './members';
+import { journalService } from './journal';
+import { membersService } from './members';
 import { useDB } from './useDB';
 
 type StorageName = 'categories' | 'accounts' | 'transactions' | 'tags' | 'currencyRates';
@@ -26,13 +26,7 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
   private _items = store<T[]>([]);
 
   /** Constructor */
-  constructor(
-    serviceName: string,
-    storageName: StorageName,
-    journalOperationKey: keyof JournalOperation,
-    private _journalService: JournalService,
-    private _membersService: MembersService,
-  ) {
+  constructor(serviceName: string, storageName: StorageName, journalOperationKey: keyof JournalOperation) {
     this._name = serviceName;
     this._storageName = storageName;
     this._journalKey = journalOperationKey;
@@ -61,7 +55,7 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
   /** Load items from local DB to memory */
   private async loadFromDB() {
     const db = await useDB();
-    const member = this._membersService.tryGetSelectedMember();
+    const member = membersService.tryGetSelectedMember();
     const allItems = (await db.getAllFromIndex(this._storageName, 'by-owner', member.uuid)) as unknown as T[];
     this._items.set(allItems.filter((x) => !x.deleted));
   }
@@ -69,7 +63,7 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
   /** Save one item to local DB */
   private async saveToDB(item: T) {
     const db = await useDB();
-    const member = this._membersService.tryGetSelectedMember();
+    const member = membersService.tryGetSelectedMember();
     await db.put(this._storageName, { ...item, owner: member.uuid });
   }
 
@@ -104,7 +98,7 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
   /** Save item */
   save(item: T) {
     // Add operation to queue
-    this._journalService.addOperationToQueue({ [this._journalKey]: item });
+    journalService.addOperationToQueue({ [this._journalKey]: item });
     // Apply changes in memory
     this._items.update((prev) => {
       return prev.findIndex((x) => x.id === item.id) >= 0
@@ -116,7 +110,7 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
   /** Delete item */
   delete(item: T) {
     // Add operation to queue
-    this._journalService.addOperationToQueue({ [this._journalKey]: { ...item, deleted: true } });
+    journalService.addOperationToQueue({ [this._journalKey]: { ...item, deleted: true } });
     // Apply changes in memory
     this._items.update((prev) => prev.filter((x) => x.id !== item.id));
   }
