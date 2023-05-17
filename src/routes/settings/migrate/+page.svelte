@@ -1,7 +1,9 @@
 <script lang="ts">
-  import type { Account, Category, CategoryType, CurrencyRate, Tag, Transaction } from '$lib/data/interfaces';
-  import type { PageData } from './$types';
   import { v4 as uuid } from 'uuid';
+
+  import type { Account, Category, CategoryType, CurrencyRate, Tag, Transaction } from '$lib/data/interfaces';
+
+  import type { PageData } from './$types';
 
   export let data: PageData;
 
@@ -31,11 +33,11 @@
   }
 
   function migrate() {
-    const accounts = data.accounts.map((item) => ({ ...item, uuid: uuid() }));
-    const categories = data.categories.map((item) => ({ ...item, uuid: uuid() }));
-    const transactions = data.transactions.map((item) => ({ ...item, uuid: uuid() }));
-    const currencyRates = data.currencyRates.map((item) => ({ ...item, uuid: uuid() }));
-    const tags = data.tags.map((item) => ({ ...item, uuid: uuid() }));
+    const accounts = data.accounts.map((item) => ({ uuid: uuid(), ...item }));
+    const categories = data.categories.map((item) => ({ uuid: uuid(), ...item }));
+    const transactions = data.transactions.map((item) => ({ uuid: uuid(), ...item }));
+    const currencyRates = data.currencyRates.map((item) => ({ uuid: uuid(), ...item }));
+    const tags = data.tags.map((item) => ({ uuid: uuid(), ...item }));
 
     const uuids = new Set<string>();
     [accounts, categories, transactions, currencyRates, tags].forEach((arr) =>
