@@ -27,7 +27,14 @@
     {/if}
   </div>
   <h1 class="navigation-title my-0">
-    {$titleText}
+    <span class="relative">
+      {$titleText}
+      {#if $page.url.pathname.startsWith('/v2')}
+        <sup class="beta" title="Beta version">
+          <Icon name="mdi:beta" size={1} padding={0} />
+        </sup>
+      {/if}
+    </span>
   </h1>
   <div class="navigation-right-button">
     {#if $rightButton}
@@ -68,6 +75,12 @@
     font-weight: normal;
     text-align: center;
     font-size: 1.25rem;
+  }
+  .beta {
+    color: var(--red-color);
+    position: absolute;
+    opacity: 0.75;
+    right: -1rem;
   }
   .navigation-right-button {
     position: absolute;

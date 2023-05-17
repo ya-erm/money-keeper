@@ -46,6 +46,16 @@ a {
   display: none;
 }
 
+/* Position */
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
 /* Flex */
 .flex {
   display: flex;

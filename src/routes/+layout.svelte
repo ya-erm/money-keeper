@@ -10,7 +10,7 @@
   import ThemeProvider from '$lib/ui/theme/ThemeProvider.svelte';
   import Toasts from '$lib/ui/toasts/Toasts.svelte';
 
-  inject({ mode: dev ? 'development' : 'production' });
+  inject({ mode: dev ? 'development' : 'production', debug: false });
 </script>
 
 <Toasts />
