@@ -12,6 +12,7 @@ datasource db {
 
 model User {
   id    Int     @id @default(autoincrement())
+  uuid  String  @unique @default(uuid())
   login String  @unique
   name  String?
 
@@ -49,6 +50,7 @@ model UserSettings {
 
 model AuthToken {
   id          Int     @id @default(autoincrement())
+  uuid        String  @unique @default(uuid())
   value       String  @unique
   userId      Int
   groupId     Int?
@@ -73,6 +75,7 @@ model UserToGroup {
 
 model Invite {
   id           Int     @id @default(autoincrement())
+  uuid         String  @unique @default(uuid())
   senderId     Int
   receiverId   Int?
   receiverInfo String
@@ -99,6 +102,7 @@ model BlockList {
 
 model Group {
   id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
   name String
 
   users         UserToGroup[]
@@ -116,6 +120,7 @@ model Group {
 
 model Account {
   id       Int     @id @default(autoincrement())
+  uuid     String  @unique @default(uuid())
   ownerId  Int
   name     String
   currency String
@@ -132,6 +137,7 @@ model Account {
 
 model Category {
   id      Int     @id @default(autoincrement())
+  uuid    String  @unique @default(uuid())
   ownerId Int?
   name    String
   icon    String?
@@ -149,6 +155,7 @@ model Category {
 
 model Transaction {
   id                  Int      @id @default(autoincrement())
+  uuid                String   @unique @default(uuid())
   ownerId             Int
   accountId           Int
   categoryId          Int
@@ -169,6 +176,7 @@ model Transaction {
 
 model Tag {
   id      Int    @id @default(autoincrement())
+  uuid    String @unique @default(uuid())
   ownerId Int
   name    String
 
@@ -180,6 +188,7 @@ model Tag {
 
 model ImportRule {
   id         Int    @id @default(autoincrement())
+  uuid       String @unique @default(uuid())
   ownerId    Int
   text       String
   categoryId Int?
@@ -190,7 +199,8 @@ model ImportRule {
 }
 
 model CurrencyRate {
-  id      Int @id @default(autoincrement())
+  id      Int    @id @default(autoincrement())
+  uuid    String @unique @default(uuid())
   ownerId Int
 
   cur1 String
