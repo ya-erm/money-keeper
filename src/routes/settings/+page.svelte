@@ -6,4 +6,4 @@
   const { user, userId, groups, group, groupId, version } = data;
 </script>
 
-<Settings {user} {userId} {groups} {group} {groupId} {version} />
+<Settings {user} {userId} {groups} {group} {groupId} />

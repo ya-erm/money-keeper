@@ -23,8 +23,5 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
       where: { id: groupId },
     }));
 
-  // TODO: get version from package.json
-  const version = '2.0.0';
-
-  return { user, groups, group, version };
+  return { user, groups, group };
 };

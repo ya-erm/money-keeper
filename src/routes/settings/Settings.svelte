@@ -1,19 +1,21 @@
 <script lang="ts">
+  import { version } from '$app/environment';
   import { goto } from '$app/navigation';
 
-  import { routes } from '$lib/routes';
+  import { route, routes } from '$lib/routes';
   import { activeLocaleName, translate } from '$lib/translate';
   import LanguageModal from '$lib/translate/LanguageModal.svelte';
   import Button from '$lib/ui/Button.svelte';
+  import Icon from '$lib/ui/Icon.svelte';
   import ListGroup from '$lib/ui/list/ListGroup.svelte';
+  import ListLinkItem from '$lib/ui/list/ListLinkItem.svelte';
   import ListSelectItem from '$lib/ui/list/ListSelectItem.svelte';
   import ListSwitchItem from '$lib/ui/list/ListSwitchItem.svelte';
   import { darkMode } from '$lib/ui/theme';
   import createBooleanStore from '$lib/utils/createBooleanStore';
-  import Icon from '$lib/ui/Icon.svelte';
 
-  import ChangeNameModal from './ChangeNameModal.svelte';
   import ChangeLoginModal from './ChangeLoginModal.svelte';
+  import ChangeNameModal from './ChangeNameModal.svelte';
   import ChangePasswordModal from './ChangePasswordModal.svelte';
   import SelectGroupModal from './SelectGroupModal.svelte';
 
@@ -22,7 +24,6 @@
   export let groupId: number | null;
   export let group: { id: number; name: string } | null;
   export let groups: { id: number; name: string }[];
-  export let version: string;
 
   const [languageModalOpened, openLanguageModal] = createBooleanStore();
   const [changeNameModalOpened, openChangeNameModal] = createBooleanStore();
@@ -34,11 +35,7 @@
 <ListGroup title={$translate('settings.common')}>
   <ListSelectItem title={$translate('settings.language')} value={$activeLocaleName} on:click={openLanguageModal} />
   <ListSwitchItem title={$translate('settings.darkMode')} bind:checked={$darkMode} />
-  <ListSelectItem
-    title={$translate('currency_rates.title')}
-    value=""
-    on:click={() => goto(routes['settings.currency_rates'].path)}
-  />
+  <ListLinkItem title={$translate('currency_rates.title')} href={route('settings.currency_rates')} />
 </ListGroup>
 
 <ListGroup title={$translate('settings.profile')}>
