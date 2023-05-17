@@ -40,6 +40,11 @@ export class MembersService implements Initialisable {
     return this._selectedMemberSettings.value;
   }
 
+  /** Readable store of selected member settings */
+  get $selectedMemberSettings() {
+    return this._selectedMemberSettings;
+  }
+
   // #endregion
 
   // #region Public methods
@@ -86,6 +91,20 @@ export class MembersService implements Initialisable {
   async updateSyncNumber(value: number) {
     logger.debug('SyncNumber:', value);
     this._selectedMemberSettings.update((prev) => ({ ...prev, syncNumber: value }));
+    const member = this.tryGetSelectedMember();
+    if (this.selectedMemberSettings) {
+      const db = await useDB();
+      await db.put('memberSettings', { ...this.selectedMemberSettings, owner: member.uuid });
+    }
+  }
+
+  /** Update member settings */
+  async updateSettings(settings: Partial<MemberSettings>) {
+    this._selectedMemberSettings.update((prev) => {
+      const newValue = { ...prev, ...settings } as MemberSettings;
+      logger.debug('Update member settings:', { prev, new: newValue });
+      return newValue;
+    });
     const member = this.tryGetSelectedMember();
     if (this.selectedMemberSettings) {
       const db = await useDB();

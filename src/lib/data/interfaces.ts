@@ -22,6 +22,7 @@ export type Member = {
 
 export type MemberSettings = {
   syncNumber: number;
+  currency?: string | null;
 };
 
 export type JournalItem = {
