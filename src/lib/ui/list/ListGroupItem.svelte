@@ -1,11 +1,22 @@
 <script lang="ts">
+  export let href: string | undefined = undefined;
 </script>
 
-<div class="settings-group-item">
-  <slot />
-</div>
+{#if href}
+  <a class="settings-group-item" {href}>
+    <slot />
+  </a>
+{:else}
+  <div class="settings-group-item">
+    <slot />
+  </div>
+{/if}
 
 <style>
+  a.settings-group-item {
+    text-decoration: inherit;
+    color: inherit;
+  }
   .settings-group-item {
     min-height: 36px;
     display: flex;

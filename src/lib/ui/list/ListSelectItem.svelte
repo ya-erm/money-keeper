@@ -9,12 +9,13 @@
   const dispatch = createEventDispatcher();
 
   export let title: string;
-  export let value: string | undefined;
+  export let href: string | undefined = undefined;
+  export let value: string | undefined = undefined;
   export let disabled = false;
   export let click = () => dispatch('click');
 </script>
 
-<ListGroupItem>
+<ListGroupItem {href}>
   <div class="container" class:disabled on:click={click} on:keypress={() => {}}>
     <span class="title">{title}</span>
     <div class="value-container">

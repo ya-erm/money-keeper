@@ -1,6 +1,15 @@
 <script lang="ts">
-  import Settings from '../../settings/Settings.svelte';
+  import { membersService } from '$lib/data';
+  import { translate } from '$lib/translate';
+  import { useTitle } from '$lib/ui/header';
+
+  import Settings from './Settings.svelte';
+
+  useTitle($translate('settings.title'));
+
+  const selectedMember = membersService.$selectedMember;
+  $: login = $selectedMember?.login;
+  $: user = login ? { login } : null;
 </script>
 
-<div class="flex-center p-1">TODO: page is under construction</div>
-<Settings user={null} userId={null} groups={[]} group={null} groupId={null} version="TODO" />
+<Settings {user} />
