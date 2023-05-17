@@ -1,9 +1,9 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { onDestroy, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
-  import { mainService, accountsService, currencyRatesService } from '$lib/data';
+  import { accountsService, currencyRatesService, mainService, membersService } from '$lib/data';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
@@ -27,9 +27,9 @@
   const accountsStore = accountsService.$accounts;
   const transactionsStore = mainService.$transactions;
   const currencyRatesStore = currencyRatesService.$currencyRates;
+  const settingsStore = membersService.$selectedMemberSettings;
 
-  // TODO: settings
-  const settings = { currency: 'RUB' };
+  $: settings = $settingsStore;
   $: accounts = $accountsStore;
   $: transactions = $transactionsStore;
   $: currencyRates = $currencyRatesStore;
@@ -39,6 +39,10 @@
     res[t.accountId].push(t);
     return res;
   }, {});
+
+  const calculateBalance = (transactions: TransactionViewModel[]) => {
+    return transactions.reduce((res, t) => res + (t.category.type === 'IN' ? 1 : -1) * t.amount, 0);
+  };
 
   let accountsContainerElement: Element;
   let accountListElement: Element;
@@ -117,7 +121,10 @@
       header = 'accounts';
     }
   }
-  onDestroy(() => title.set(null));
+
+  const handleTransactionClick = (id: string) => {
+    goto(route('transactions') + `/edit?id=${id}`);
+  };
 </script>
 
 <div class="container" on:scroll={handlePageScroll}>
@@ -125,7 +132,11 @@
     <div class="accounts-list" bind:this={accountListElement} on:scroll={handleScroll}>
       {#each accounts as account}
         <div class="account-card" on:click={() => scrollToCard(account.id)} aria-hidden>
-          <AccountCard {account} balance={-1} currencyRate={findCurrencyRate(settings?.currency, account.currency)} />
+          <AccountCard
+            {account}
+            balance={calculateBalance(transactionsByAccount[account.id])}
+            currencyRate={findCurrencyRate(settings?.currency, account.currency)}
+          />
           <div id={`account-card-${account.id}`} class="account-card-anchor" />
         </div>
       {/each}
@@ -147,9 +158,11 @@
       <div class="flex-grow">
         <Input bind:value={search} placeholder={$translate('common.search')} clearable />
       </div>
-      <!-- <Button appearance="transparent" bordered>
-      <Icon size={1.25} name="mdi:filter" />
-    </Button> -->
+      <!-- 
+      <Button appearance="transparent" bordered>
+        <Icon size={1.25} name="mdi:filter" />
+      </Button> 
+      -->
     </div>
     <ul class="operations-list mt-1 flex-col gap-1">
       {#each Object.entries(groups) as [date, transactions] (date)}
@@ -158,6 +171,7 @@
           <TransactionListItem
             hideAccount={!!account}
             currencyRate={currencyRate ?? findCurrencyRate(settings?.currency, transaction.account.currency)}
+            onClick={() => handleTransactionClick(transaction.id)}
             {transaction}
           />
         {/each}
