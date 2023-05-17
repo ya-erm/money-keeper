@@ -12,3 +12,4 @@ node_modules
 screenshots/raw
 .ipynb_checkpoints
 .idea
+.vercel

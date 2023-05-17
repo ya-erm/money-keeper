@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { dev } from '$app/environment';
+  import { inject } from '@vercel/analytics';
+
   import '$lib/icons';
   import '$lib/translate';
 
@@ -6,6 +9,8 @@
   import Menu from '$lib/ui/menu/Menu.svelte';
   import ThemeProvider from '$lib/ui/theme/ThemeProvider.svelte';
   import Toasts from '$lib/ui/toasts/Toasts.svelte';
+
+  inject({ mode: dev ? 'development' : 'production' });
 </script>
 
 <Toasts />
