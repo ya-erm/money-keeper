@@ -63,11 +63,13 @@
             },
             { tags: [], categoryId: null },
           );
+          const category = item.category ? categories.find((c) => c.name === item.category) : undefined;
           return {
             ...item,
-            checked: true,
-            categoryId: rulesResult.categoryId,
+            id: item.id ?? item.uniqueKey,
+            categoryId: category?.id ?? rulesResult.categoryId,
             tags: rulesResult.tags,
+            checked: true,
           };
         });
     };
@@ -144,9 +146,7 @@
   };
 
   const changeOperationCategory = (categoryId: number) => {
-    const index = items.findIndex((item) => `${item.id}` === `${selectedOperation?.id}`);
-    items[index].categoryId = categoryId;
-    items = [...items];
+    items = items.map((item) => (`${item.id}` === `${selectedOperation?.id}` ? { ...item, categoryId } : item));
   };
 
   const filterByCategory = (value: number | null) => {
@@ -195,7 +195,7 @@
     <div class="list flex-grow flex-col gap-1">
       {#each Object.entries(groups) as [date, items] (`${date}`)}
         <div>{date}</div>
-        {#each items as item (`${item.id} ${item.date} ${item.amount}`)}
+        {#each items as item (`${item.uniqueKey} ${item.categoryId}`)}
           <div class="flex gap-1 items-cetner" id={item.id} data-uniqueKey={item.uniqueKey}>
             <Checkbox bind:checked={item.checked} />
             <TransactionListItem
