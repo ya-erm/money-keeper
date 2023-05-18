@@ -3,7 +3,7 @@ import { Prisma, type Tag, type Transaction } from '@prisma/client';
 
 type TransactionDbo = Pick<
   Transaction,
-  'id' | 'accountId' | 'categoryId' | 'linkedTransactionId' | 'date' | 'amount' | 'comment'
+  'id' | 'uuid' | 'accountId' | 'categoryId' | 'linkedTransactionId' | 'date' | 'amount' | 'comment'
 >;
 
 type TransactionWithTagsDbo = TransactionDbo & {
@@ -12,6 +12,7 @@ type TransactionWithTagsDbo = TransactionDbo & {
 
 export const transactionSelection = Prisma.validator<Prisma.TransactionSelect>()({
   id: true,
+  uuid: true,
   accountId: true,
   categoryId: true,
   linkedTransactionId: true,
@@ -26,6 +27,7 @@ export const mapTransaction = (
   linkedTransaction: TransactionDbo | null,
 ): TransactionDto => ({
   id: t.id,
+  uuid: t.uuid,
   accountId: t.accountId,
   categoryId: t.categoryId,
   amount: t.amount,

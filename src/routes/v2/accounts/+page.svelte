@@ -1,24 +1,25 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import dayjs from 'dayjs';
   import { onMount } from 'svelte';
 
   import { accountsService, currencyRatesService, mainService, membersService } from '$lib/data';
+  import type { TransactionViewModel } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
   import Input from '$lib/ui/Input.svelte';
   import { backLink, rightButton, title } from '$lib/ui/header';
   import { useRightButton, useTitle } from '$lib/ui/header/model';
-  import { getSearchParam } from '$lib/utils';
+  import { getSearchParam, groupBySelector } from '$lib/utils';
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
 
-  import type { TransactionViewModel } from '$lib/data/interfaces';
-  import dayjs from 'dayjs';
   import AccountsButton from './AccountButtons.svelte';
   import AccountCard from './AccountCard.svelte';
   import AddOperationButton from './AddOperationButton.svelte';
+  import { calculateBalance } from './utils';
 
   backLink.set(null);
   useTitle($translate('accounts.title'));
@@ -34,15 +35,7 @@
   $: transactions = $transactionsStore;
   $: currencyRates = $currencyRatesStore;
 
-  $: transactionsByAccount = transactions.reduce((res: { [key: string]: TransactionViewModel[] }, t) => {
-    if (!res[t.accountId]) res[t.accountId] = [];
-    res[t.accountId].push(t);
-    return res;
-  }, {});
-
-  const calculateBalance = (transactions: TransactionViewModel[]) => {
-    return transactions.reduce((res, t) => res + (t.category.type === 'IN' ? 1 : -1) * t.amount, 0);
-  };
+  $: transactionsByAccount = groupBySelector(transactions, (t) => t.account.id);
 
   let accountsContainerElement: Element;
   let accountListElement: Element;

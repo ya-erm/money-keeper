@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { derived, type Readable } from 'svelte/store';
 import { v4 as uuid } from 'uuid';
 
@@ -46,6 +47,8 @@ class MainService implements Initialisable {
           if (!tag) throw new Error(`Tag ${id} not found`);
           return tag;
         }
+
+        transactions.sort((a, b) => dayjs(b.date).diff(dayjs(a.date)));
 
         return transactions.map((transaction) => {
           const linkedTransaction = transactions.find((t) => t.id === transaction.linkedTransactionId);

@@ -118,7 +118,7 @@ export class JournalService implements Initialisable {
     this._queue.set(items);
   }
 
-  async addOperationToQueue(operation: JournalOperation) {
+  async addOperationToQueue(operation: JournalOperation, options?: { upload: boolean }) {
     const item: JournalItem = {
       order: this.syncNumber + this._queue.value.length + 1,
       data: operation,
@@ -130,8 +130,10 @@ export class JournalService implements Initialisable {
     const member = membersService.tryGetSelectedMember();
     await db.put('journal', { ...item, owner: member.uuid });
 
-    // Try run upload asynchronously
-    this.tryUploadQueue();
+    if (options?.upload) {
+      // Try run upload asynchronously
+      this.tryUploadQueue();
+    }
   }
 
   private async clearQueue() {

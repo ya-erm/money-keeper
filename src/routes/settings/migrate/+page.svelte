@@ -1,7 +1,15 @@
 <script lang="ts">
-  import { v4 as uuid } from 'uuid';
-
+  import {
+    accountsService,
+    categoriesService,
+    currencyRatesService,
+    journalService,
+    mainService,
+    tagsService,
+    transactionsService,
+  } from '$lib/data';
   import type { Account, Category, CategoryType, CurrencyRate, Tag, Transaction } from '$lib/data/interfaces';
+  import { deepEqual } from '$lib/utils';
 
   import type { PageData } from './$types';
 
@@ -33,16 +41,17 @@
   }
 
   function migrate() {
-    const accounts = data.accounts.map((item) => ({ uuid: uuid(), ...item }));
-    const categories = data.categories.map((item) => ({ uuid: uuid(), ...item }));
-    const transactions = data.transactions.map((item) => ({ uuid: uuid(), ...item }));
-    const currencyRates = data.currencyRates.map((item) => ({ uuid: uuid(), ...item }));
-    const tags = data.tags.map((item) => ({ uuid: uuid(), ...item }));
+    const accounts = data.accounts;
+    const categories = data.categories;
+    const transactions = data.transactions;
+    const currencyRates = data.currencyRates;
+    const tags = data.tags;
 
     const uuids = new Set<string>();
     [accounts, categories, transactions, currencyRates, tags].forEach((arr) =>
       arr.forEach((item) => {
         if (uuids.has(item.uuid)) {
+          console.log('Duplicate uuid, item: ', item);
           throw new Error(`Duplicate uuid: ${item.uuid}`);
         }
         uuids.add(item.uuid);
@@ -96,6 +105,48 @@
       })),
     };
   }
+
+  let uploading = false;
+
+  async function addToJournal() {
+    function notExists<T>(items: T[]) {
+      return (item: T) =>
+        !deepEqual(
+          items.find((x) => x === item),
+          item,
+        );
+    }
+
+    try {
+      uploading = true;
+
+      await mainService.init();
+
+      v2.categories.filter(notExists(categoriesService.categories)).forEach((category) => {
+        journalService.addOperationToQueue({ category }, { upload: false });
+      });
+
+      v2.accounts.filter(notExists(accountsService.accounts)).forEach((account) => {
+        journalService.addOperationToQueue({ account }, { upload: false });
+      });
+
+      v2.tags.filter(notExists(tagsService.tags)).forEach((tag) => {
+        journalService.addOperationToQueue({ tag }, { upload: false });
+      });
+
+      v2.currencyRates.filter(notExists(currencyRatesService.currencyRates)).forEach((currencyRate) => {
+        journalService.addOperationToQueue({ currencyRate }, { upload: false });
+      });
+
+      v2.transactions.filter(notExists(transactionsService.transactions)).forEach((transaction) => {
+        journalService.addOperationToQueue({ transaction }, { upload: false });
+      });
+
+      await journalService.tryUploadQueue();
+    } finally {
+      uploading = false;
+    }
+  }
 </script>
 
 <div class="container p-1">
@@ -124,6 +175,12 @@
     <span>Transactions: <b>{v2.transactions.length}</b>,</span>
     <span>CurrencyRates: <b>{v2.currencyRates.length}</b></span>
   </p>
+
+  <button disabled={uploading} style:width="100%" on:click={addToJournal}>
+    {uploading ? 'Uploading...' : 'Add to journal'}
+  </button>
+
+  <a class="mt-1 flex-center" href="/v2/accounts">Open v2 accounts</a>
 </div>
 
 <style>
