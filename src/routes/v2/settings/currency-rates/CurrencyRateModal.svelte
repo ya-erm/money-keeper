@@ -22,6 +22,14 @@
     cur2 = tmp;
   };
 
+  const getGlobalRate = async () => {
+    const rates = await currencyRatesService.getGlobalCurrencyRates();
+    const usdToCur1 = rates[cur1];
+    const usdToCur2 = rates[cur2];
+    if (!usdToCur1 || !usdToCur2) return;
+    rate = (usdToCur2 / usdToCur1).toPrecision(4);
+  };
+
   const onSave = async () => {
     if (!item) {
       item = {
@@ -51,19 +59,23 @@
     <input name="id" value={item?.id} readonly class="hidden" />
     <Input name="cur1" label={$translate('currency_rates.currency1')} bind:value={cur1} required />
     <Input name="cur2" label={$translate('currency_rates.currency2')} bind:value={cur2} required />
-    <Input name="rate" label={$translate('currency_rates.rate')} type="number" step="any" bind:value={rate} required />
+    <Input name="rate" label={$translate('currency_rates.rate')} type="number" step="any" bind:value={rate} required>
+      <Button slot="end" on:click={getGlobalRate} appearance="transparent">
+        <Icon name="mdi:cached" />
+      </Button>
+    </Input>
 
-    <div class="flex gap-1 items-center">
-      <div class="flex-grow flex-col gap-0.5">
-        {#if cur1 && cur2}
+    {#if cur1 && cur2}
+      <div class="flex gap-1 items-center">
+        <div class="flex-grow flex-col gap-0.5">
           <div>1 {cur1} = {rate} {cur2}</div>
           <div>1 {cur2} = {(1 / Number(rate)).toFixed(4)} {cur1}</div>
-        {/if}
+        </div>
+        <Button on:click={swapCurrencies} appearance="transparent" bordered>
+          <Icon name="mdi:swap-vertical" />
+        </Button>
       </div>
-      <Button on:click={swapCurrencies} appearance="transparent" bordered>
-        <Icon name="mdi:swap-vertical" />
-      </Button>
-    </div>
+    {/if}
 
     <div class="grid-col-2 gap-1">
       {#if !!item}
