@@ -18,3 +18,4 @@ export { join } from './join';
 export { keyTransactions } from './keyTransactions';
 export { longPress } from './longPress';
 export { serialize } from './serialize';
+export { unexpectedCase } from './unexpectedCase';

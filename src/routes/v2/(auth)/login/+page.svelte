@@ -1,8 +1,8 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { ApiError, isApiError } from '$lib/api/ApiError';
-  import { createKeyFromPassword, decryptAes, decryptRsa } from '$lib/data/crypto';
   import { mainService, membersService } from '$lib/data';
+  import { createKeyFromPassword, decryptAes, decryptRsa } from '$lib/data/crypto';
   import type {
     LoginConfirmRequestData,
     LoginConfirmResponseData,
@@ -13,9 +13,13 @@
   import Button from '$lib/ui/Button.svelte';
   import Input from '$lib/ui/Input.svelte';
   import Loader from '$lib/ui/Loader.svelte';
+  import { useTitle } from '$lib/ui/header';
   import { showErrorToast } from '$lib/ui/toasts';
   import { useFetch } from '$lib/utils/useFetch';
   import { useSmartLoading } from '$lib/utils/useSmartLoading';
+  import { derived } from 'svelte/store';
+
+  useTitle($translate('auth.login'));
 
   let login = '';
   let password = '';
@@ -25,7 +29,9 @@
     'POST',
     '/api/v2/auth/login/confirm',
   );
-  const smartLoading = useSmartLoading(loginFetcher.loading);
+  const smartLoading = useSmartLoading(
+    derived([loginFetcher.loading, loginConfirmFetcher.loading], ([a, b]) => a || b),
+  );
 
   /** @throws error "Incorrect login or password" if failed to decrypt key */
   async function tryDecryptAes(...params: Parameters<typeof decryptAes>) {
@@ -81,8 +87,8 @@
       const privateKey: JsonWebKey = JSON.parse(decryptedKey);
       const decryptedToken = await decryptRsa(privateKey, encryptedToken.base64Data);
       await loginConfirmFetcher.fetch({ token: decryptedToken, uuid: member.uuid });
-      // Initialize main service
-      await mainService.initServices();
+      // Initialize main service asynchronously
+      mainService.initServices();
       // TODO: go to default route
       goto('/v2/categories');
     } catch (e) {

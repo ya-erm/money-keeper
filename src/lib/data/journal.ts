@@ -1,11 +1,16 @@
-import type { GetJournalResponse, PostManyJournalResponseData } from '$lib/server/api/v2/journal';
+import type {
+  GetJournalResponse,
+  PostManyJournalRequestData,
+  PostManyJournalResponseData,
+} from '$lib/server/api/v2/journal';
 import type { GetJournalRequest } from '$lib/server/api/v2/journal/getJournal';
 import { store } from '$lib/store';
+import { unexpectedCase } from '$lib/utils';
 import { Logger } from '$lib/utils/logger';
 import { useFetch } from '$lib/utils/useFetch';
 
 import { decryptAsync, encryptAsync } from './crypto';
-import type { Initialisable, JournalItem, JournalOperation, JournalSubscriber } from './interfaces';
+import type { EncryptionVersion, Initialisable, JournalItem, JournalOperation, JournalSubscriber } from './interfaces';
 import { membersService } from './members';
 import { useDB } from './useDB';
 
@@ -90,13 +95,27 @@ export class JournalService implements Initialisable {
     const privateKey = JSON.parse(member.privateKey) as JsonWebKey;
     const items = await Promise.all(
       journal.map(async (item) => {
-        const { encryptedMessage, encryptedAesKey } = JSON.parse(item.data);
-        const json = await decryptAsync(privateKey, encryptedMessage, encryptedAesKey);
-        const result: JournalItem = {
-          order: item.order,
-          data: JSON.parse(json) as JournalOperation,
-        };
-        return result;
+        const encryption = item.encryption as EncryptionVersion;
+        switch (encryption) {
+          case 'none': {
+            const result: JournalItem = {
+              order: item.order,
+              data: JSON.parse(item.data) as JournalOperation,
+            };
+            return result;
+          }
+          case 'aes+rsa-v1': {
+            const { encryptedMessage, encryptedAesKey } = JSON.parse(item.data);
+            const json = await decryptAsync(privateKey, encryptedMessage, encryptedAesKey);
+            const result: JournalItem = {
+              order: item.order,
+              data: JSON.parse(json) as JournalOperation,
+            };
+            return result;
+          }
+          default:
+            throw unexpectedCase(encryption);
+        }
       }),
     );
     items.sort((a, b) => a.order - b.order);
@@ -130,7 +149,7 @@ export class JournalService implements Initialisable {
     const member = membersService.tryGetSelectedMember();
     await db.put('journal', { ...item, owner: member.uuid });
 
-    if (options?.upload) {
+    if (options?.upload ?? true) {
       // Try run upload asynchronously
       this.tryUploadQueue();
     }
@@ -157,34 +176,45 @@ export class JournalService implements Initialisable {
     }
 
     const member = membersService.tryGetSelectedMember();
+    const encryption = membersService.selectedMemberSettings?.encryption ?? 'none';
     const publicKey = JSON.parse(member.publicKey) as JsonWebKey;
 
     const items = await Promise.all(
       this.queue.map(async (item) => {
         const json = JSON.stringify(item.data);
-        const { encryptedMessage, encryptedAesKey } = await encryptAsync(publicKey, json);
-        return {
-          order: item.order,
-          data: JSON.stringify({ encryptedMessage, encryptedAesKey }),
-        };
+        switch (encryption) {
+          case 'none':
+            return {
+              order: item.order,
+              encryption,
+              data: json,
+            };
+          case 'aes+rsa-v1': {
+            const { encryptedMessage, encryptedAesKey } = await encryptAsync(publicKey, json);
+            return {
+              order: item.order,
+              encryption,
+              data: JSON.stringify({ encryptedMessage, encryptedAesKey }),
+            };
+          }
+          default:
+            throw unexpectedCase(encryption);
+        }
       }),
     );
 
-    const response = await fetch('/api/v2/journal', {
-      method: 'POST',
-      body: JSON.stringify({ items }),
-    });
+    const json = await useFetch<PostManyJournalRequestData, PostManyJournalResponseData>(
+      'POST',
+      '/api/v2/journal',
+    ).fetch({ items });
 
-    if (response.ok) {
-      const json = (await response.json()) as PostManyJournalResponseData;
-      logger.log('Queue uploaded successfully.', 'New sync number:', json.syncNumber);
-      if (json.syncNumber) this._syncNumber.set(json.syncNumber);
+    logger.log('Queue uploaded successfully.', 'New sync number:', json.syncNumber);
+    if (json.syncNumber) this._syncNumber.set(json.syncNumber);
 
-      logger.log('Applying changes from queue to subscribers');
-      await this.applyChangesToSubscribers(this.queue, true);
+    logger.log('Applying changes from queue to subscribers');
+    await this.applyChangesToSubscribers(this.queue, true);
 
-      this.clearQueue();
-    }
+    this.clearQueue();
   }
 
   async tryUploadQueue() {

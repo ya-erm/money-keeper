@@ -234,9 +234,10 @@ model MemberToken {
 }
 
 model Journal {
-  ownerUuid String
-  order     Int
-  data      String
+  ownerUuid  String
+  order      Int
+  data       String
+  encryption String
 
   owner Member @relation(fields: [ownerUuid], references: [uuid], onDelete: Cascade)
 

@@ -1,13 +1,13 @@
+import type { EncryptionVersion } from '$lib/data/interfaces';
 import { db } from '$lib/server';
 import { checkUuid } from '$lib/utils/checkUser';
 
 export type PostManyJournalRequestData = {
-  items: [
-    {
-      order: number;
-      data: string;
-    },
-  ];
+  items: {
+    order: number;
+    encryption: EncryptionVersion;
+    data: string;
+  }[];
 };
 
 export async function postManyJournal(data: PostManyJournalRequestData, locals: App.Locals) {
@@ -19,6 +19,7 @@ export async function postManyJournal(data: PostManyJournalRequestData, locals: 
     data: data.items.map((item) => ({
       ownerUuid: uuid,
       order: item.order,
+      encryption: item.encryption,
       data: item.data,
     })),
   });

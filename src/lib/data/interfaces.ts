@@ -20,9 +20,12 @@ export type Member = {
   privateKey: string;
 };
 
+export type EncryptionVersion = 'none' | 'aes+rsa-v1';
+
 export type MemberSettings = {
   syncNumber: number;
   currency?: string | null;
+  encryption?: EncryptionVersion;
 };
 
 export type JournalItem = {
