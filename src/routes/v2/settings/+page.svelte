@@ -7,6 +7,7 @@
 
   useTitle($translate('settings.title'));
 
+  // TODO: selectedMember is not a user, it can be a group
   const selectedMember = membersService.$selectedMember;
   $: login = $selectedMember?.login;
   $: user = login ? { login } : null;

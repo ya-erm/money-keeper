@@ -1,31 +1,20 @@
 <script lang="ts">
   import type { Account, CurrencyRate } from '$lib/data/interfaces';
-  import { accountsService } from '$lib/data';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import { formatMoney } from '$lib/utils/formatMoney';
-
-  import AccountModal from './list/AccountModal.svelte';
 
   export let account: Account;
   export let balance: number | null = null;
   export let currencyRate: CurrencyRate | null = null;
 
+  export let onEdit: (account: Account) => void;
+
   const rate = currencyRate?.cur1 === account.currency ? currencyRate.rate : 1 / (currencyRate?.rate ?? 1);
   const otherCurrency = currencyRate?.cur1 === account.currency ? currencyRate.cur2 : currencyRate?.cur1;
 
-  let opened = false;
-
-  const onSave = (item: Account) => {
-    accountsService.save(item);
-  };
-
-  const onDelete = (item: Account) => {
-    accountsService.delete(item);
-  };
-
   const handleEdit = () => {
-    opened = true;
+    onEdit?.(account);
   };
 </script>
 
@@ -51,10 +40,6 @@
   </div>
   <div class="flex footer" />
 </div>
-
-{#if opened}
-  <AccountModal {account} bind:opened {onSave} {onDelete} />
-{/if}
 
 <style>
   .account-icon {

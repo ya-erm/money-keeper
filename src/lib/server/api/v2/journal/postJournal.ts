@@ -1,8 +1,10 @@
+import type { EncryptionVersion } from '$lib/data/interfaces';
 import { db } from '$lib/server';
 import { checkUuid } from '$lib/utils/checkUser';
 
 export type PostJournalRequestData = {
   order: number;
+  encryption: EncryptionVersion;
   data: string;
 };
 
@@ -15,6 +17,7 @@ export async function postJournal(data: PostJournalRequestData, locals: App.Loca
     data: {
       ownerUuid: uuid,
       order: data.order,
+      encryption: data.encryption,
       data: data.data,
     },
   });

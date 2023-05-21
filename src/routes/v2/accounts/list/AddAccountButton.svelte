@@ -3,4 +3,4 @@
   import HeaderButton from '$lib/ui/header/HeaderButton.svelte';
 </script>
 
-<HeaderButton icon="mdi:plus" href="?action=create" label={$translate('transactions.create_transaction')} />
+<HeaderButton icon="mdi:credit-card-plus-outline" href="?action=create" label={$translate('accounts.create_account')} />

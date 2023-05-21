@@ -22,8 +22,8 @@ const config = {
   kit: {
     adapter: adapter(),
     version: {
-      name: pkg.version
-    }
+      name: pkg.version,
+    },
   },
 };
 

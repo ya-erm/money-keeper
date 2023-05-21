@@ -1,18 +1,18 @@
 <script lang="ts">
+  import { v4 as uuid } from 'uuid';
+
+  import { accountsService } from '$lib/data';
   import type { Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Input from '$lib/ui/Input.svelte';
   import Modal from '$lib/ui/Modal.svelte';
-  import { v4 as uuid } from 'uuid';
-  import DeleteAccountModal from './DeleteAccountModal.svelte';
   import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
+
+  import DeleteAccountModal from './DeleteAccountModal.svelte';
 
   export let opened: boolean;
   export let account: Account | null = null;
-
-  export let onSave: (account: Account) => void | Promise<void>;
-  export let onDelete: (account: Account) => void | Promise<void>;
 
   let name = account?.name ?? '';
   let icon = account?.icon;
@@ -20,7 +20,7 @@
   let order = `${account?.order ?? 0}`;
 
   const handleSave = async () => {
-    await onSave({
+    accountsService.save({
       ...account,
       id: account?.id ?? uuid(),
       name,
@@ -36,7 +36,7 @@
   const handleDelete = async () => {
     if (!account) return;
     try {
-      await onDelete(account);
+      accountsService.delete(account);
       showSuccessToast($translate('accounts.delete_account_success'));
       opened = false;
     } catch {

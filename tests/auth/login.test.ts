@@ -46,8 +46,8 @@ test.describe('Login page', () => {
 
     const { loginInput, passwordInput, submitButton } = getLocators(page);
 
-    await loginInput.fill(TEST_LOGIN);
-    await passwordInput.fill(TEST_PASSWORD);
+    if (TEST_LOGIN) await loginInput.fill(TEST_LOGIN);
+    if (TEST_PASSWORD) await passwordInput.fill(TEST_PASSWORD);
     await Promise.all([submitButton.click(), page.waitForNavigation()]);
 
     const cookies = await context.cookies(page.url());

@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-
   import { accountsService } from '$lib/data';
   import type { Account } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
@@ -8,8 +8,8 @@
   import { backLink, useRightButton, useTitle } from '$lib/ui/header/model';
   import { deleteSearchParam, getSearchParam } from '$lib/utils';
 
+  import AccountModal from '../AccountModal.svelte';
   import AccountList from './AccountList.svelte';
-  import AccountModal from './AccountModal.svelte';
   import AddAccountButton from './AddAccountButton.svelte';
 
   const accountsStore = accountsService.$accounts;
@@ -19,34 +19,24 @@
   useRightButton(AddAccountButton);
   useTitle($translate('accounts.title'));
 
-  let account: Account | null = null;
   let opened = false;
 
   $: action = getSearchParam($page, 'action');
+
   $: if (action === 'create') {
-    account = null;
     opened = true;
   }
   $: if (!!action && !opened) {
     deleteSearchParam($page, 'action');
   }
 
-  const onClick = (item: Account) => {
-    account = item;
-    opened = true;
-  };
-
-  const onSave = (item: Account) => {
-    accountsService.save(item);
-  };
-
-  const onDelete = (item: Account) => {
-    accountsService.delete(item);
+  const onClick = async (item: Account) => {
+    await goto(`${route('accounts')}?account-card=${item.id}`);
   };
 </script>
 
 <AccountList {accounts} {onClick} />
 
 {#if opened}
-  <AccountModal {account} bind:opened {onSave} {onDelete} />
+  <AccountModal account={null} bind:opened />
 {/if}
