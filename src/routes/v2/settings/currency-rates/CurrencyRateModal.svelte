@@ -32,14 +32,9 @@
 
   const onSave = async () => {
     if (!item) {
-      item = {
-        id: uuid(),
-        cur1,
-        cur2,
-        rate: Number(rate),
-      };
+      item = { id: uuid(), cur1, cur2, rate: Number(rate) };
     }
-    currencyRatesService.save(item);
+    currencyRatesService.save({ ...item, cur1, cur2, rate: Number(rate) });
     opened = false;
   };
 
