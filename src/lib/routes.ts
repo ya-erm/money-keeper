@@ -33,7 +33,7 @@ type RouteKey =
 export const routes: { [key in RouteKey]: Route } = {
   root: {
     path: '/',
-    title: 'settings.title',
+    title: 'app.title',
   },
   login: {
     path: '/login',

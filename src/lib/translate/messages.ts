@@ -1,4 +1,5 @@
 export type Messages =
+  | 'app.title'
   // Common
   | 'common.back'
   | 'common.select'

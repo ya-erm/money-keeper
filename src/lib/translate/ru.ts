@@ -2,6 +2,7 @@ import { addMessages } from 'svelte-i18n';
 import type { Dictionary } from './messages';
 
 export const ruDict: Dictionary = {
+  'app.title': 'Money Keeper',
   // Common
   'common.back': 'Назад',
   'common.select': 'Выбрать',

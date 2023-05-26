@@ -2,6 +2,7 @@ import { addMessages } from 'svelte-i18n';
 import type { Dictionary } from './messages';
 
 export const enDict: Dictionary = {
+  'app.title': 'Money Keeper',
   // Common
   'common.back': 'Back',
   'common.select': 'Select',
