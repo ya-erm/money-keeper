@@ -26,7 +26,12 @@
 </script>
 
 <li>
-  <button on:click={handleClick} class="flex gap-0.5 items-center justify-between">
+  <button
+    data-testId="TransactionListItem"
+    data-id={transaction.id}
+    on:click={handleClick}
+    class="flex gap-0.5 items-center justify-between"
+  >
     <div class="icon flex-center">
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />
     </div>

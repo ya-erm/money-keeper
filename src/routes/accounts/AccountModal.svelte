@@ -28,6 +28,11 @@
       currency,
       order: Number(order),
     });
+    if (!account) {
+      showSuccessToast($translate('accounts.create_account_success'), { testId: 'CreateAccountSuccessToast' });
+    } else {
+      showSuccessToast($translate('common.save_changes_success'), { testId: 'EditAccountSuccessToast' });
+    }
     opened = false;
   };
 
@@ -46,7 +51,7 @@
 </script>
 
 <Modal width={20} header={account?.name ?? $translate('accounts.new_account')} bind:opened>
-  <form class="flex-col gap-1" on:submit|preventDefault={handleSave}>
+  <form class="flex-col gap-1" data-testId="AccountForm" on:submit|preventDefault={handleSave}>
     <Input label={$translate('accounts.name')} name="name" bind:value={name} required />
     <Input label={$translate('accounts.currency')} name="currency" bind:value={currency} required />
     <Input label={$translate('accounts.icon')} name="icon" bind:value={icon} optional />

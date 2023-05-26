@@ -16,15 +16,20 @@ export async function login(data: LoginRequestData) {
     throw new ApiError(404, 'USER_NOT_FOUND', `User with login "${login}" not found`);
   }
 
-  const publicKey = JSON.parse(member.publicKey) as JsonWebKey;
-  const token = crypto.randomUUID();
-  await db.memberToken.create({
-    data: {
-      value: token,
-      memberUuid: member.uuid,
-    },
+  let memberToken = await db.memberToken.findFirst({
+    where: { AND: { memberUuid: member.uuid, invalidated: false } },
   });
-  const encryptedToken = await encryptRsa(publicKey, token);
+  if (!memberToken) {
+    memberToken = await db.memberToken.create({
+      data: {
+        value: crypto.randomUUID(),
+        memberUuid: member.uuid,
+      },
+    });
+  }
+
+  const publicKey = JSON.parse(member.publicKey) as JsonWebKey;
+  const encryptedToken = await encryptRsa(publicKey, memberToken.value);
 
   return { member, encryptedToken };
 }

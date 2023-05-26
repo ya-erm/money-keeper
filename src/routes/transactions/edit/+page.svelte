@@ -6,6 +6,7 @@
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import { useTitle } from '$lib/ui/header';
+  import { showSuccessToast } from '$lib/ui/toasts';
   import { getSearchParam } from '$lib/utils';
 
   import TransactionForm from '../form/TransactionForm.svelte';
@@ -22,6 +23,7 @@
 
   const handleSubmit = async (transactions: Transaction[]) => {
     transactions.forEach((transaction) => transactionsService.save(transaction));
+    showSuccessToast($translate('common.save_changes_success'));
     history.back();
   };
 
@@ -29,6 +31,9 @@
     if (!transaction) return;
     const t = transactionsService.getById(transaction.id);
     t && transactionsService.delete(t);
+    showSuccessToast($translate('transactions.delete_transaction_success'), {
+      testId: 'DeleteTransactionSuccessToast',
+    });
     history.back();
   };
 </script>

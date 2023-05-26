@@ -39,7 +39,8 @@
         selected={_accountId === account.id}
         onClick={() => setAccountId(account.id)}
         icon={account.icon || 'mdi:briefcase-outline'}
-        testId={`${testId}.Item.${account.id}`}
+        testId={`${testId}.Item`}
+        dataId={account.id}
         text={account.name}
       />
     {/each}

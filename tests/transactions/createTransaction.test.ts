@@ -1,10 +1,9 @@
 import test, { expect } from '@playwright/test';
-import { hasLocatorClassAsync, useAuthAsync } from '@tests/utils';
 import { checkCommonInputs, getTransactionFormLocators } from '@tests/transactions/utils';
+import { hasLocatorClassAsync, importMockDataAsync, useAuthAsync } from '@tests/utils';
 
 test.describe('Transactions > Create', () => {
-  test('outgoing is selected by default', async ({ page, context }) => {
-    await useAuthAsync(page, context);
+  test('outgoing is selected by default', async ({ page }) => {
     await page.goto('/transactions/create');
 
     const { form, typeSwitch, typeSwitchInButton, typeSwitchOutButton, typeSwitchTransferButton } =
@@ -19,8 +18,7 @@ test.describe('Transactions > Create', () => {
   });
 
   test.describe('Incoming', () => {
-    test('page has all required inputs', async ({ page, context }) => {
-      await useAuthAsync(page, context);
+    test('page has all required inputs', async ({ page }) => {
       await page.goto('/transactions/create');
 
       const { typeSwitchInButton, sourceAccountSelect, destinationAccountSelect, categorySelect } =
@@ -38,7 +36,9 @@ test.describe('Transactions > Create', () => {
 
     test('account is required', async ({ page, context }) => {
       await useAuthAsync(page, context);
-      await page.goto('/transactions/create');
+      await importMockDataAsync(page);
+
+      await page.goto('/transactions/create', { waitUntil: 'networkidle' });
 
       const { typeSwitchInButton, amountInput, createButton } = getTransactionFormLocators(page);
 
@@ -54,7 +54,9 @@ test.describe('Transactions > Create', () => {
 
     test('category is required', async ({ page, context }) => {
       await useAuthAsync(page, context);
-      await page.goto('/transactions/create');
+      await importMockDataAsync(page);
+
+      await page.goto('/transactions/create', { waitUntil: 'networkidle' });
 
       const { typeSwitchInButton, destinationAccountSelect, amountInput, createButton } =
         getTransactionFormLocators(page);
@@ -74,7 +76,12 @@ test.describe('Transactions > Create', () => {
 
     test('create incoming transaction', async ({ page, context }) => {
       await useAuthAsync(page, context);
-      await page.goto('/transactions/create');
+      await importMockDataAsync(page);
+
+      await page.locator('a[href="/accounts"]').click();
+      await page.waitForURL(/accounts/);
+
+      await page.getByTestId('AddOperationButton').click();
 
       const { typeSwitchInButton, categorySelect, destinationAccountSelect, amountInput, commentInput, createButton } =
         getTransactionFormLocators(page);
@@ -85,22 +92,39 @@ test.describe('Transactions > Create', () => {
       await categoryButton.click();
 
       const accountButton = destinationAccountSelect.getByRole('button').filter({ hasText: 'T_TST' });
+      const accountId = await accountButton.getAttribute('data-id');
+
       await accountButton.click();
 
-      await amountInput.fill('10000');
-      await commentInput.fill(`Test ${new Date().getTime()}`);
+      await amountInput.fill('100');
+      const comment = `Test ${new Date().toISOString()}`;
+      await commentInput.fill(comment);
 
       await createButton.click();
 
-      const successToast = page.getByTestId('CreateTransactionSuccessToast');
-      await successToast.waitFor({ state: 'visible' });
+      await page.waitForURL(`/accounts?account-card=${accountId}`, { waitUntil: 'networkidle' });
+
+      const transactionListItem = page.getByTestId('TransactionListItem').filter({ hasText: comment });
+      await transactionListItem.waitFor({ state: 'visible' });
+
+      const transactionId = await transactionListItem.getAttribute('data-id');
+      await transactionListItem.click();
+
+      await page.waitForURL(`/transactions/edit?id=${transactionId}`);
+
+      await page.getByTestId('DeleteTransactionButton').click();
+
+      await page.waitForURL(`/accounts?account-card=${accountId}`);
+
+      await page.getByTestId('DeleteTransactionSuccessToast').waitFor({ state: 'visible' });
+
+      await page.waitForURL(/accounts/, { waitUntil: 'networkidle' });
     });
   });
 
   test.describe('Outgoing', () => {
-    test('page has all required inputs', async ({ page, context }) => {
-      await useAuthAsync(page, context);
-      await page.goto('/transactions/create');
+    test('page has all required inputs', async ({ page }) => {
+      await page.goto('/transactions/create', { waitUntil: 'networkidle' });
 
       const { typeSwitchOutButton, sourceAccountSelect, destinationAccountSelect, categorySelect } =
         getTransactionFormLocators(page);

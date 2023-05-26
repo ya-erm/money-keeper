@@ -29,7 +29,7 @@
         showErrorToast($translate('auth.user_already_exists'));
         break;
       default:
-        showErrorToast($translate('auth.failed_to_register'));
+        showErrorToast($translate('auth.registration_failure'));
         break;
     }
   }

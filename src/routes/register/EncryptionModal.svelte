@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { createKeyFromPassword, encryptAes, generateRsaKeys } from '$lib/data/crypto';
+  import { route } from '$lib/routes';
   import type { RegisterRequestData, RegisterResponseData } from '$lib/server/api/v2/auth';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
@@ -52,9 +54,10 @@
         encryptedKey,
       });
       opened = false;
-      showSuccessToast($translate('common.save_changes_success'));
+      showSuccessToast($translate('auth.registration_success'));
+      goto(route('login'));
     } catch (e) {
-      showErrorToast($translate('common.save_changes_failure'));
+      showErrorToast($translate('auth.registration_failure'));
     }
   };
 </script>
@@ -83,6 +86,7 @@
         Private key will be encrypted by password and stored on the server so that you can access your data from another
         device.
       </p>
+      <input class="hidden" name="login" value={login} />
       <Input label="Password" bind:value={password} type="password" required minlength={6} autocomplete />
       <Input label="Repeat password" bind:value={repeatPassword} type="password" required minlength={6} autocomplete />
       {#if $loading}

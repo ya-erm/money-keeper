@@ -52,7 +52,9 @@
 <div class="operations-container p-1">
   <div class="flex gap-1">
     <h3 style:font-weight="normal" class="m-0 flex-grow">{$translate('transactions.title')}</h3>
-    <a href={`${route('transactions.create')}?accountId=${account?.id}`}>{$translate('common.add')}</a>
+    <a href={`${route('transactions.create')}?accountId=${account?.id}`} data-testID="AddOperationButton">
+      {$translate('common.add')}
+    </a>
   </div>
   <div class="operations-search-container flex gap-0.5">
     <div class="flex-grow">

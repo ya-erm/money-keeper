@@ -1,11 +1,16 @@
-import test, { expect } from '@playwright/test';
-import { useAuthAsync } from '@tests/utils';
+import test from '@playwright/test';
 import { getTransactionFormLocators } from '@tests/transactions/utils';
+import { importMockDataAsync, useAuthAsync } from '@tests/utils';
 
 test.describe('Transactions with tags', () => {
   test('create transaction with tag', async ({ page, context }) => {
     await useAuthAsync(page, context);
-    await page.goto('/transactions/create');
+    await importMockDataAsync(page);
+
+    await page.locator('a[href="/accounts"]').click();
+    await page.waitForURL(/accounts/);
+
+    await page.getByTestId('AddOperationButton').click();
 
     const { categorySelect, sourceAccountSelect, amountInput, commentInput, createButton, tags } =
       getTransactionFormLocators(page);
@@ -18,10 +23,10 @@ test.describe('Transactions with tags', () => {
 
     await amountInput.fill('150');
 
-    const transactionComment = `T_WithTag ${new Date().getTime()}`;
-    await commentInput.fill(transactionComment);
+    const comment = `T_WithTag ${new Date().toISOString()}`;
+    await commentInput.fill(comment);
 
-    const tagButton = tags.getByRole('button').filter({ hasText: 'T_Tag' });
+    const tagButton = tags.getByRole('button').filter({ hasText: 'T_Cat' });
     const tagName = await tagButton.textContent();
     await tagButton.click();
 
@@ -30,13 +35,11 @@ test.describe('Transactions with tags', () => {
     const successToast = page.getByTestId('CreateTransactionSuccessToast');
     await successToast.waitFor({ state: 'visible' });
 
-    await page.waitForNavigation();
-    const url = new URL(page.url());
-    expect(url.pathname).toBe('/accounts');
+    await page.waitForURL(/accounts/, { waitUntil: 'networkidle' });
 
-    const transactionItem = page.getByRole('link').filter({ hasText: transactionComment });
+    const transactionItem = page.getByTestId('TransactionListItem').filter({ hasText: comment });
     const tag = transactionItem.getByText(`#${tagName}`);
 
-    expect(await tag.isVisible()).toBe(true);
+    await tag.waitFor({ state: 'visible' });
   });
 });

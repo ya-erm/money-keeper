@@ -38,7 +38,8 @@
       <GridCircleItem
         selected={categoryId === category.id}
         onClick={handleChange(category.id)}
-        testId={`${testId}.Item.${category.id}`}
+        testId={`${testId}.Item`}
+        dataId={category.id}
         icon={category.icon || 'mdi:briefcase-outline'}
         text={category.name}
       />

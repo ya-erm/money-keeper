@@ -9,6 +9,7 @@
     transactionsService,
   } from '$lib/data';
   import type { Account, Category, CurrencyRate, Tag, Transaction } from '$lib/data/interfaces';
+  import { showSuccessToast } from '$lib/ui/toasts';
   import { deepEqual } from '$lib/utils';
 
   let rawImport = '';
@@ -52,11 +53,7 @@
 
   async function addToJournal() {
     function notExists<T>(items: T[]) {
-      return (item: T) =>
-        !deepEqual(
-          items.find((x) => x === item),
-          item,
-        );
+      return (item: T) => !items.some((x) => deepEqual(x, item));
     }
 
     try {
@@ -64,27 +61,36 @@
 
       await mainService.init();
 
+      let count = 0;
+
       v2.categories.filter(notExists(categoriesService.categories)).forEach((category) => {
         journalService.addOperationToQueue({ category }, { upload: false });
+        count += 1;
       });
 
       v2.accounts.filter(notExists(accountsService.accounts)).forEach((account) => {
         journalService.addOperationToQueue({ account }, { upload: false });
+        count += 1;
       });
 
       v2.tags.filter(notExists(tagsService.tags)).forEach((tag) => {
         journalService.addOperationToQueue({ tag }, { upload: false });
+        count += 1;
       });
 
       v2.currencyRates.filter(notExists(currencyRatesService.currencyRates)).forEach((currencyRate) => {
         journalService.addOperationToQueue({ currencyRate }, { upload: false });
+        count += 1;
       });
 
       v2.transactions.filter(notExists(transactionsService.transactions)).forEach((transaction) => {
         journalService.addOperationToQueue({ transaction }, { upload: false });
+        count += 1;
       });
 
       await journalService.tryUploadQueue();
+
+      showSuccessToast(`${count} items were added`);
     } finally {
       uploading = false;
     }
@@ -95,10 +101,10 @@
   <h2>Import</h2>
   <label class="flex-col gap-0.5">
     <span>RAW Data (json):</span>
-    <textarea class="text-area-json" bind:value={rawImport} />
+    <textarea class="text-area-json" data-testId="ImportTextArea" bind:value={rawImport} />
   </label>
 
-  <button class="mt-1" style:width="100%" on:click={parseInput}>Parse json</button>
+  <button data-testId="ParseJsonButton" class="mt-1" style:width="100%" on:click={parseInput}>Parse json</button>
 
   {#if parsed}
     <p>
@@ -109,7 +115,7 @@
       <span>CurrencyRates: <b>{v2.currencyRates?.length ?? 0}</b></span>
     </p>
 
-    <button disabled={uploading} style:width="100%" on:click={addToJournal}>
+    <button data-testId="AddToJournalButton" disabled={uploading} style:width="100%" on:click={addToJournal}>
       {uploading ? 'Uploading...' : 'Add to journal'}
     </button>
   {/if}
