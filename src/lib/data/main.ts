@@ -6,6 +6,7 @@ import { Logger } from '$lib/utils/logger';
 
 import type { Initialisable, Service, TransactionViewModel } from './interfaces';
 
+import { store } from '$lib/store';
 import { accountsService } from './accounts';
 import { categoriesService, SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from './categories';
 import { currencyRatesService } from './currencyRates';
@@ -21,13 +22,22 @@ class MainService implements Initialisable {
   private _id: string;
   private _called = false;
 
+  $initialized = store(false);
   $transactions: Readable<TransactionViewModel[]>;
 
   constructor() {
     this._id = uuid();
     this.$transactions = derived(
-      [accountsService.$accounts, categoriesService.$categories, transactionsService.$transactions, tagsService.$tags],
-      ([accounts, _categories, transactions, tags]) => {
+      [
+        this.$initialized,
+        accountsService.$accounts,
+        categoriesService.$categories,
+        transactionsService.$transactions,
+        tagsService.$tags,
+      ],
+      ([initialized, accounts, _categories, transactions, tags]) => {
+        if (!initialized) return [];
+
         const categories = _categories.concat(SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT);
 
         function findAccount(id: string) {
@@ -100,6 +110,8 @@ class MainService implements Initialisable {
       tagsService,
     ];
 
+    this.$initialized.set(false);
+
     logger.log(`Initialise ${services.length} services to load data from local DB`);
     logger.debug(
       'Services:',
@@ -111,6 +123,8 @@ class MainService implements Initialisable {
 
     logger.log('Initialise journal service');
     await journalService.init();
+
+    this.$initialized.set(true);
   }
 }
 

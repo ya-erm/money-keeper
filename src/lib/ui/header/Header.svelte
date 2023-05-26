@@ -4,7 +4,7 @@
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
   import { derived } from 'svelte/store';
-  import { backLink, rightButton, title } from './model';
+  import { backLink, leftButton, rightButton, title } from './model';
 
   const titleText = derived([page, translate, title], ([page, translate, title]) => {
     if (title) return title;
@@ -24,6 +24,9 @@
         <Icon name="mdi:chevron-left" />
         {$translate(findRoute($backLink)?.title ?? 'common.back')}
       </a>
+    {/if}
+    {#if $leftButton}
+      <svelte:component this={$leftButton} />
     {/if}
   </div>
   <h1 class="navigation-title my-0">

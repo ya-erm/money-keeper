@@ -4,8 +4,9 @@
   import { accountsService } from '$lib/data';
   import type { Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
+  import ReloadPageButton from '$lib/ui/ReloadPageButton.svelte';
   import { backLink, rightButton, title } from '$lib/ui/header';
-  import { useRightButton, useTitle } from '$lib/ui/header/model';
+  import { useLeftButton, useRightButton, useTitle } from '$lib/ui/header/model';
   import { deleteSearchParam, getSearchParam } from '$lib/utils';
 
   import AccountButtons from './AccountButtons.svelte';
@@ -15,6 +16,7 @@
   import OperationsList from './OperationsList.svelte';
 
   backLink.set(null);
+  useLeftButton(ReloadPageButton);
   useTitle($translate('accounts.title'));
   useRightButton(AccountButtons);
 

@@ -60,13 +60,6 @@ export class MembersService implements Initialisable {
     await this.loadSelectedMemberSettings();
   }
 
-  /** Load all members from local DB to memory*/
-  private async loadFromDB() {
-    const db = await useDB();
-    const items = await db.getAll('members');
-    this._members.set(items);
-  }
-
   /** Save one member to local DB amd memory */
   async save(item: Member) {
     const db = await useDB();
@@ -112,7 +105,20 @@ export class MembersService implements Initialisable {
     }
   }
 
+  /** Delete member */
+  async deleteMember(member: Member) {
+    const db = await useDB();
+    await db.delete('members', member.uuid);
+  }
+
   // #endregion
+
+  /** Load all members from local DB to memory*/
+  private async loadFromDB() {
+    const db = await useDB();
+    const items = await db.getAll('members');
+    this._members.set(items);
+  }
 
   /* Set selected member or choose first one */
   private setSelectedMember() {
