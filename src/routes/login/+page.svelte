@@ -1,8 +1,11 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { derived } from 'svelte/store';
+
   import { ApiError, isApiError } from '$lib/api/ApiError';
   import { mainService, membersService } from '$lib/data';
   import { createKeyFromPassword, decryptAes, decryptRsa } from '$lib/data/crypto';
+  import { route } from '$lib/routes';
   import type {
     LoginConfirmRequestData,
     LoginConfirmResponseData,
@@ -10,16 +13,16 @@
     LoginResponseData,
   } from '$lib/server/api/v2/auth';
   import { translate } from '$lib/translate';
+  import LanguageButton from '$lib/translate/LanguageButton.svelte';
   import Button from '$lib/ui/Button.svelte';
   import Input from '$lib/ui/Input.svelte';
   import Loader from '$lib/ui/Loader.svelte';
-  import { useTitle } from '$lib/ui/header';
+  import { useRightButton, useTitle } from '$lib/ui/header';
   import { showErrorToast } from '$lib/ui/toasts';
-  import { useFetch } from '$lib/utils/useFetch';
-  import { useSmartLoading } from '$lib/utils/useSmartLoading';
-  import { derived } from 'svelte/store';
+  import { useFetch, useSmartLoading } from '$lib/utils';
 
-  useTitle($translate('auth.login'));
+  useTitle($translate('auth.login.title'));
+  useRightButton(LanguageButton);
 
   let login = '';
   let password = '';
@@ -90,7 +93,7 @@
       // Initialize main service asynchronously
       mainService.initServices();
       // TODO: go to default route
-      goto('/v2/categories');
+      goto(route('accounts'));
     } catch (e) {
       if (!tryHandleError(e)) {
         console.error(e);
@@ -113,6 +116,7 @@
       required
     />
     <Button text={$translate('auth.sign_in')} type="submit" testId="SignInButton" />
+    <a class="flex-center" href="/register">{$translate('auth.register')}</a>
     <Loader visible={$smartLoading} />
   </form>
 </div>

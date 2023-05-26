@@ -19,3 +19,5 @@ export { keyTransactions } from './keyTransactions';
 export { longPress } from './longPress';
 export { serialize } from './serialize';
 export { unexpectedCase } from './unexpectedCase';
+export { useFetch } from './useFetch';
+export { useSmartLoading } from './useSmartLoading';

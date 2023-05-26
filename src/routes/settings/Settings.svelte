@@ -27,6 +27,7 @@
   <ListSelectItem title={$translate('settings.language')} value={$activeLocaleName} on:click={openLanguageModal} />
   <ListSwitchItem title={$translate('settings.darkMode')} bind:checked={$darkMode} />
   <ListLinkItem title={$translate('currency_rates.title')} href={route('settings.currency_rates')} />
+  <ListLinkItem title={$translate('settings.import_export')} href={route('settings.import_export')} />
 </ListGroup>
 
 <ListGroup title={$translate('settings.profile')}>

@@ -196,6 +196,7 @@ export const ruDict: Dictionary = {
   'settings.theme.light': 'Светлое',
   'settings.theme.dark': 'Тёмное',
   'settings.theme.system': 'Как в системе',
+  'settings.import_export': 'Импорт / Экспорт',
   'settings.profile': 'Профиль',
   'settings.profile.change_name': 'Изменить имя',
   'settings.profile.change_name_failure': 'Не удалось изменить имя',

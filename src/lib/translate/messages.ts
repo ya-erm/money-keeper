@@ -188,6 +188,7 @@ export type Messages =
   | 'settings.theme.light'
   | 'settings.theme.dark'
   | 'settings.theme.system'
+  | 'settings.import_export'
   | 'settings.profile'
   | 'settings.profile.change_name'
   | 'settings.profile.change_name_failure'

@@ -1,10 +1,12 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { derived } from 'svelte/store';
+
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import { backLink } from '$lib/ui/header/model';
   import Icon from '$lib/ui/Icon.svelte';
-  import { derived } from 'svelte/store';
+  import { backLink } from '$lib/ui/header/model';
+
   import { menu } from './menu';
 
   const isActive = derived(page, (page) => {

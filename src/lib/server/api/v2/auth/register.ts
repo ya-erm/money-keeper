@@ -20,7 +20,7 @@ export async function register(data: RegisterRequestData) {
   const publicKey = checkStringParameter(data.publicKey, 'publicKey');
   const encryptedKey = data.encryptedKey;
 
-  const user = await db.user.findFirst({
+  const user = await db.member.findFirst({
     where: { OR: { uuid, login: login ?? undefined } },
   });
 

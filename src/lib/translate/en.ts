@@ -196,6 +196,7 @@ export const enDict: Dictionary = {
   'settings.theme.light': 'Light',
   'settings.theme.dark': 'Dark',
   'settings.theme.system': 'System',
+  'settings.import_export': 'Import / Export',
   'settings.profile': 'Profile',
   'settings.profile.change_name': 'Change name',
   'settings.profile.change_name_failure': 'Failed to change name',

@@ -45,16 +45,3 @@ export const checkUserAndGroup = (locals: App.Locals, options: CheckOptions = { 
     groupId,
   };
 };
-
-/**
- * @throws redirect or throw error if user not logged in
- */
-export const checkUuid = (locals: App.Locals, options: CheckOptions = { redirect: false }) => {
-  if (!locals.uuid) {
-    throw options.redirect
-      ? redirect(302, routes.login.path)
-      : new ApiError(401, 'UNAUTHORIZED', 'You are not logged in');
-  }
-
-  return locals.uuid;
-};

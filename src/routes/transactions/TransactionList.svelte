@@ -1,9 +1,11 @@
 <script lang="ts">
-  import dayjs from 'dayjs';
-  import type { TransactionViewModel } from '$lib/data/interfaces';
-  import TransactionListItem from './TransactionListItem.svelte';
   import { goto } from '$app/navigation';
+  import dayjs from 'dayjs';
+
+  import type { TransactionViewModel } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
+
+  import TransactionListItem from './TransactionListItem.svelte';
 
   export let transactions: TransactionViewModel[];
   export let hideAccount: boolean = false;
@@ -17,8 +19,7 @@
   }, {});
 
   const onClick = ({ id }: { id: string }) => {
-    // TODO: use search params instead of url
-    goto(route('transactions') + `/${id}`);
+    goto(route('transactions') + `/edit?id=${id}`);
   };
 </script>
 

@@ -9,6 +9,7 @@
   import Input from '$lib/ui/Input.svelte';
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
+
   import { findCurrencyRate } from './utils';
 
   export let account: Account | null = null;

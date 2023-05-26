@@ -1,9 +1,10 @@
+export { checkAuth } from './checkAuth';
 export {
+  checkArrayFormParameter,
+  checkArrayOptionalFormParameter,
   checkFormDataParameter,
   checkNumberFormParameter,
   checkNumberOptionalFormParameter,
   checkStringFormParameter,
   checkStringOptionalFormParameter,
-  checkArrayFormParameter,
-  checkArrayOptionalFormParameter,
 } from './checkFormParams';
