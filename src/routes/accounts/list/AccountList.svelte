@@ -16,7 +16,7 @@
 
 <ul class="flex-col gap-1">
   {#each accounts as account (account.id)}
-    <AccountListItem {account} {onClick} balance={calculateBalance(transactionsByAccount[account.id])} />
+    <AccountListItem {account} {onClick} balance={calculateBalance(transactionsByAccount[account.id] ?? [])} />
   {/each}
 </ul>
 
