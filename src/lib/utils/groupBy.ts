@@ -20,7 +20,7 @@ export function groupBy<T extends Record<K, PropertyKey>, K extends keyof T>(arr
 export function groupBySelector<T, K extends string | number | symbol>(
   array: T[],
   selector: (item: T) => K,
-): Record<K, T[]> {
+): Record<K, T[] | undefined> {
   return array.reduce((res, item) => {
     const group = selector(item);
     (res[group] = res[group] || []).push(item);
