@@ -31,91 +31,91 @@ type RouteKey =
 
 export const routes: { [key in RouteKey]: Route } = {
   root: {
-    path: '/',
+    path: '/v1/',
     title: 'settings.title',
   },
   login: {
-    path: '/login',
+    path: '/v1/login',
     title: 'auth.login.title',
   },
   logout: {
-    path: '/logout',
+    path: '/v1/logout',
     title: 'auth.logout.title',
   },
   register: {
-    path: '/register',
+    path: '/v1/register',
     title: 'auth.register',
   },
   profile: {
-    path: '/profile',
+    path: '/v1/profile',
     title: 'auth.profile',
   },
   groups: {
-    path: '/settings/groups',
+    path: '/v1/settings/groups',
     title: 'groups.title',
   },
   'groups.create': {
-    path: '/settings/groups/create',
+    path: '/v1/settings/groups/create',
     title: 'groups.create_group',
   },
   accounts: {
-    path: '/accounts',
+    path: '/v1/accounts',
     title: 'accounts.title',
   },
   'accounts.create': {
-    path: '/accounts/create',
+    path: '/v1/accounts/create',
     title: 'accounts.create_account',
   },
   'accounts.list': {
-    path: '/accounts/list',
+    path: '/v1/accounts/list',
     title: 'accounts.title',
   },
   categories: {
-    path: '/categories',
+    path: '/v1/categories',
     title: 'categories.title',
   },
   'categories.create': {
-    path: '/categories/create',
+    path: '/v1/categories/create',
     title: 'categories.create_category',
   },
   transactions: {
-    path: '/transactions',
+    path: '/v1/transactions',
     title: 'transactions.title',
   },
   'transactions.create': {
-    path: '/transactions/create',
+    path: '/v1/transactions/create',
     title: 'transactions.new_transaction',
   },
   'transactions.import': {
-    path: '/transactions/import',
+    path: '/v1/transactions/import',
     title: 'transactions.import.title',
   },
   'transactions.import.rules': {
-    path: '/transactions/import/rules',
+    path: '/v1/transactions/import/rules',
     title: 'transactions.import.rules.title',
   },
   'transactions.import.rules.create': {
-    path: '/transactions/import/rules/create',
+    path: '/v1/transactions/import/rules/create',
     title: 'transactions.import.rules.create',
   },
   settings: {
-    path: '/settings',
+    path: '/v1/settings',
     title: 'settings.title',
   },
   'settings.language': {
-    path: '/settings/language',
+    path: '/v1/settings/language',
     title: 'settings.select_language',
   },
   'settings.currency_rates': {
-    path: '/settings/currency-rates',
+    path: '/v1/settings/currency-rates',
     title: 'currency_rates.title',
   },
   'settings.encryption': {
-    path: '/settings/encryption',
+    path: '/v1/settings/encryption',
     title: 'settings.encryption',
   },
   uikit: {
-    path: '/uikit',
+    path: '/v1/uikit',
     title: 'settings.uikit',
   },
 };
