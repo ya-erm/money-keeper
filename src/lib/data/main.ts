@@ -4,9 +4,10 @@ import { v4 as uuid } from 'uuid';
 
 import { Logger } from '$lib/utils/logger';
 
-import type { Initialisable, Service, TransactionViewModel } from './interfaces';
+import type { Initialisable, Service, Transaction, TransactionViewModel } from './interfaces';
 
 import { store } from '$lib/store';
+import { showErrorToast } from '$lib/ui/toasts';
 import { accountsService } from './accounts';
 import { categoriesService, SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from './categories';
 import { currencyRatesService } from './currencyRates';
@@ -60,25 +61,41 @@ class MainService implements Initialisable {
 
         transactions.sort((a, b) => dayjs(b.date).diff(dayjs(a.date)));
 
-        return transactions.map((transaction) => {
-          const linkedTransaction = transactions.find((t) => t.id === transaction.linkedTransactionId);
+        const problems: Array<{ transaction: Transaction; e: unknown }> = [];
 
-          const viewModel: TransactionViewModel = {
-            ...transaction,
-            account: findAccount(transaction.accountId),
-            category: findCategory(transaction.categoryId),
-            linkedTransaction: linkedTransaction
-              ? {
-                  ...linkedTransaction,
-                  account: findAccount(linkedTransaction.accountId),
-                  category: findCategory(linkedTransaction.categoryId),
-                }
-              : undefined,
-            tags: transaction.tagIds?.map(findTag) || [],
-          };
+        const items = transactions
+          .map((transaction) => {
+            const linkedTransaction = transactions.find((t) => t.id === transaction.linkedTransactionId);
 
-          return viewModel;
-        });
+            try {
+              const viewModel: TransactionViewModel = {
+                ...transaction,
+                account: findAccount(transaction.accountId),
+                category: findCategory(transaction.categoryId),
+                linkedTransaction: linkedTransaction
+                  ? {
+                      ...linkedTransaction,
+                      account: findAccount(linkedTransaction.accountId),
+                      category: findCategory(linkedTransaction.categoryId),
+                    }
+                  : undefined,
+                tags: transaction.tagIds?.map(findTag) || [],
+              };
+              return viewModel;
+            } catch (e) {
+              console.error('problems', e);
+              problems.push({ transaction, e });
+              return null as unknown as TransactionViewModel;
+            }
+          })
+          .filter((x) => x !== null);
+
+        if (problems.length) {
+          console.error(problems);
+          showErrorToast(`Data loaded with ${problems.length} problem(s)`);
+        }
+
+        return items;
       },
     );
   }

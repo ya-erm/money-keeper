@@ -1,17 +1,28 @@
+import { derived } from 'svelte/store';
 import type { Category } from './interfaces';
 import { BaseService } from './service';
 
 export class CategoriesService extends BaseService<Category> {
+  private _categories: Category[] = [];
+  private _categoryStore;
+
   constructor() {
     super('CategoriesService', 'categories', 'category');
+
+    this._categoryStore = derived(this.$items, (items) => this.mapItems(items));
+    this._categoryStore.subscribe((items) => (this._categories = items));
   }
 
   get categories() {
-    return this.items;
+    return this._categories;
   }
 
   get $categories() {
-    return this.$items;
+    return this._categoryStore;
+  }
+
+  private mapItems(items: Category[]) {
+    return items.filter((category) => !category.system);
   }
 }
 
@@ -22,6 +33,7 @@ export const SYSTEM_CATEGORY_TRANSFER_IN: Category = {
   type: 'IN',
   name: 'system.category.transfer_in',
   icon: 'mdi:swap-horizontal',
+  system: true,
 };
 
 export const SYSTEM_CATEGORY_TRANSFER_OUT: Category = {
@@ -29,4 +41,5 @@ export const SYSTEM_CATEGORY_TRANSFER_OUT: Category = {
   type: 'OUT',
   name: 'system.category.transfer_out',
   icon: 'mdi:swap-horizontal',
+  system: true,
 };

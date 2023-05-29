@@ -53,6 +53,7 @@ export type Category = {
   name: string;
   type: CategoryType;
   icon?: string | null;
+  system?: boolean;
   deleted?: boolean;
 };
 

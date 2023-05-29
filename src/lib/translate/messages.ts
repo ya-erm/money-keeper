@@ -79,6 +79,8 @@ export type Messages =
   | 'accounts.icon'
   | 'accounts.color'
   | 'accounts.order'
+  // Analytics
+  | 'analytics.title'
   // Categories
   | 'categories.title'
   | 'categories.incomings'

@@ -83,6 +83,8 @@ export const enDict: Dictionary = {
   'accounts.icon': 'Icon',
   'accounts.color': 'Color',
   'accounts.order': 'Order number',
+  // Analytics
+  'analytics.title': 'Analytics',
   // Categories
   'categories.title': 'Categories',
   'categories.incomings': 'Incomings',
