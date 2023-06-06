@@ -10,6 +10,7 @@ export const ruDict: Dictionary = {
   'common.available_variants': 'Доступные варианты',
   'common.optional': 'опционально',
   'common.loading': 'Загрузка...',
+  'common.synchronizing': 'Синхронизация',
   'common.show_more': 'Показать ещё',
   'common.sorting': 'Сортировка',
   'common.sort_by': 'Поле для сортировки',

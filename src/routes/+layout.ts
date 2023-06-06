@@ -1,15 +1,17 @@
 import { browser } from '$app/environment';
 
-import { mainService } from '$lib/data';
+import { journalService, mainService, membersService } from '$lib/data';
+import { handleError } from '$lib/utils';
 
 export const load = async () => {
   if (!browser) {
     return;
   }
 
-  try {
-    await mainService.init();
-  } catch (e) {
-    console.error(e);
+  await mainService.init().catch(handleError);
+
+  if (membersService.selectedMember) {
+    // TODO: don't sync for non-authorized users only
+    void journalService.syncWithServer().catch(handleError);
   }
 };

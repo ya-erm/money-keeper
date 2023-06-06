@@ -111,6 +111,7 @@ class MainService implements Initialisable {
     await membersService.init();
 
     if (!membersService.selectedMember) {
+      // TODO: check is it possible to use app without authorization
       logger.log('No selected member found. Skip initialisation of other services');
       return;
     }

@@ -5,6 +5,7 @@
   import type { Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
+  import Icon from '$lib/ui/Icon.svelte';
   import Input from '$lib/ui/Input.svelte';
   import Modal from '$lib/ui/Modal.svelte';
   import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
@@ -54,7 +55,11 @@
   <form class="flex-col gap-1" data-testId="AccountForm" on:submit|preventDefault={handleSave}>
     <Input label={$translate('accounts.name')} name="name" bind:value={name} required />
     <Input label={$translate('accounts.currency')} name="currency" bind:value={currency} required />
-    <Input label={$translate('accounts.icon')} name="icon" bind:value={icon} optional />
+    <Input label={$translate('accounts.icon')} name="icon" bind:value={icon} optional>
+      <a slot="end" href="https://icon-sets.iconify.design/" target="_blank" rel="noopener noreferrer">
+        <Icon name="mdi:open-in-new" padding={0.5} />
+      </a>
+    </Input>
     <Input label={$translate('accounts.order')} name="order" bind:value={order} type="number" optional />
     <div class="grid-col-2 gap-1">
       {#if !!account}

@@ -10,6 +10,7 @@ export const enDict: Dictionary = {
   'common.available_variants': 'Available variants',
   'common.optional': 'optional',
   'common.loading': 'Loading...',
+  'common.synchronizing': 'Synchronizing',
   'common.show_more': 'Show more',
   'common.sorting': 'Sorting',
   'common.sort_by': 'Sort by',

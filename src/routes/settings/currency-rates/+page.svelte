@@ -3,6 +3,7 @@
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Input from '$lib/ui/Input.svelte';
+  import { showSuccessToast } from '$lib/ui/toasts';
 
   import CurrencyRatesList from './CurrencyRatesList.svelte';
 
@@ -11,6 +12,7 @@
 
   const handleSaveCurrency = () => {
     membersService.updateSettings({ currency });
+    showSuccessToast($translate('common.save_changes_success'));
   };
 </script>
 

@@ -16,10 +16,13 @@ import { useDB } from './useDB';
 
 const logger = new Logger('JournalService', { disabled: false });
 
+type JournalState = 'downloading' | 'uploading' | 'idle';
+
 export class JournalService implements Initialisable {
   private _updates = store<JournalItem[]>([]);
   private _queue = store<JournalItem[]>([]);
   private _syncNumber = store<number>(-1);
+  private _state = store<JournalState>('idle');
 
   private _subscribers = new Map<string, JournalSubscriber>();
 
@@ -36,6 +39,11 @@ export class JournalService implements Initialisable {
   /** Journal sync number */
   get syncNumber() {
     return this._syncNumber.value;
+  }
+
+  /** Synchronization state */
+  get $state() {
+    return this._state.readable;
   }
 
   addSubscriber(subscriber: JournalSubscriber) {
@@ -63,9 +71,12 @@ export class JournalService implements Initialisable {
       logger.log('Apply queue to subscribers');
       await this.applyChangesToSubscribers(this.queue, false);
     }
+  }
 
+  /** Synchronize updates with server */
+  async syncWithServer() {
     logger.log('Fetch updates from server, sync number:', this.syncNumber);
-    await this.fetchUpdates();
+    await this.tryFetchUpdates();
 
     if (this.queue.length > 0 && this.updates.length > 0) {
       logger.log(`Warning. Incoming: ${this.updates.length}, outgoing: ${this.queue.length}. Conflicts may be ocurred`);
@@ -88,7 +99,8 @@ export class JournalService implements Initialisable {
     await Promise.all(subscribers.map((subscriber) => subscriber.applyChanges(changes, saveToDB)));
   }
 
-  async fetchUpdates() {
+  private async fetchUpdates() {
+    // await new Promise<void>((resolve) => setTimeout(() => resolve(), 5000));
     const fetcher = useFetch<GetJournalRequest, GetJournalResponse>('POST', '/api/v2/journal/get-updates');
     const { journal } = await fetcher.fetch({ start: this.syncNumber });
     const member = membersService.tryGetSelectedMember();
@@ -126,7 +138,18 @@ export class JournalService implements Initialisable {
     this._updates.set(items);
   }
 
-  async loadQueueFromDB() {
+  private async tryFetchUpdates() {
+    try {
+      this._state.set('downloading');
+      await this.fetchUpdates();
+    } catch (e) {
+      logger.error('Failed to fetch updates', e);
+    } finally {
+      this._state.set('idle');
+    }
+  }
+
+  private async loadQueueFromDB() {
     const db = await useDB();
     const member = membersService.tryGetSelectedMember();
     const settings = membersService.selectedMemberSettings;
@@ -161,7 +184,7 @@ export class JournalService implements Initialisable {
     await db.clear('journal');
   }
 
-  async uploadQueue() {
+  private async uploadQueue() {
     // TODO: optimize queue before upload
 
     logger.log('Uploading queue: ', this.queue.length);
@@ -220,10 +243,13 @@ export class JournalService implements Initialisable {
   async tryUploadQueue() {
     try {
       if (this.queue.length > 0) {
+        this._state.set('uploading');
         await this.uploadQueue();
       }
     } catch (e) {
       logger.error('Error while uploading queue', e);
+    } finally {
+      this._state.set('idle');
     }
   }
 }

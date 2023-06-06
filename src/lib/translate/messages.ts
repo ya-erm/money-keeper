@@ -7,6 +7,7 @@ export type Messages =
   | 'common.available_variants'
   | 'common.optional'
   | 'common.loading'
+  | 'common.synchronizing'
   | 'common.show_more'
   | 'common.sorting'
   | 'common.sort_by'

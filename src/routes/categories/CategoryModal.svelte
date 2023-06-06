@@ -1,9 +1,10 @@
 <script lang="ts">
-  import Modal from '$lib/ui/Modal.svelte';
-  import Input from '$lib/ui/Input.svelte';
+  import type { Category, CategoryType } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
-  import type { Category, CategoryType } from '$lib/data/interfaces';
+  import Icon from '$lib/ui/Icon.svelte';
+  import Input from '$lib/ui/Input.svelte';
+  import Modal from '$lib/ui/Modal.svelte';
   import { v4 as uuid } from 'uuid';
 
   export let opened: boolean;
@@ -34,10 +35,14 @@
   };
 </script>
 
-<Modal width={15} header={category?.name ?? $translate('categories.new_category')} bind:opened>
+<Modal width={20} header={category?.name ?? $translate('categories.new_category')} bind:opened>
   <form class="flex-col gap-1" on:submit|preventDefault={handleSave}>
     <Input label={$translate('categories.name')} name="name" bind:value={name} required />
-    <Input label={$translate('categories.icon')} name="icon" bind:value={icon} optional />
+    <Input label={$translate('categories.icon')} name="icon" bind:value={icon} optional>
+      <a slot="end" href="https://icon-sets.iconify.design/" target="_blank" rel="noopener noreferrer">
+        <Icon name="mdi:open-in-new" padding={0.5} />
+      </a>
+    </Input>
     <div class="grid-col-2 gap-1">
       {#if !!category && onDelete}
         <Button color="danger" text={$translate('common.delete')} on:click={handleDelete} />
