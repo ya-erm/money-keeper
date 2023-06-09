@@ -11,20 +11,20 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - name: Create SSH key
-        run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/private.key
-          sudo chmod 600 ~/.ssh/private.key
-          echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-        shell: bash
-        env:
-          SSH_PRIVATE_KEY: ${{secrets.SERVER_SSH_PRIVATE_KEY}}
-          SSH_KNOWN_HOSTS: ${{secrets.SERVER_KNOWN_HOSTS}}
+      # - name: Create SSH key
+      #   run: |
+      #     mkdir -p ~/.ssh/
+      #     echo "$SSH_PRIVATE_KEY" > ~/.ssh/private.key
+      #     sudo chmod 600 ~/.ssh/private.key
+      #     echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      #   shell: bash
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{secrets.SERVER_SSH_PRIVATE_KEY}}
+      #     SSH_KNOWN_HOSTS: ${{secrets.SERVER_KNOWN_HOSTS}}
 
-      - name: Deploy via SSH
-        run: |
-          ssh -i ~/.ssh/private.key $SERVER_USERNAME@$SERVER_HOST 'cd ./apps/money-keeper; git pull; docker compose up front --build --force-recreate -d;'
-        env:
-          SERVER_USERNAME: ${{secrets.DEPLOY_SERVER_USERNAME}}
-          SERVER_HOST: ${{secrets.DEPLOY_SERVER_HOST}}
+      # - name: Deploy via SSH
+      #   run: |
+      #     ssh -i ~/.ssh/private.key $SERVER_USERNAME@$SERVER_HOST 'cd ./apps/money-keeper; git pull; docker compose up front --build --force-recreate -d;'
+      #   env:
+      #     SERVER_USERNAME: ${{secrets.DEPLOY_SERVER_USERNAME}}
+      #     SERVER_HOST: ${{secrets.DEPLOY_SERVER_HOST}}
