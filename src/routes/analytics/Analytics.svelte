@@ -1,8 +1,13 @@
 <script lang="ts">
   import dayjs from 'dayjs';
 
-  import { currencyRatesService, mainService, membersService } from '$lib/data';
-  import { categoriesService } from '$lib/data/categories';
+  import {
+    categoriesStore,
+    currencyRatesService,
+    currencyRatesStore,
+    memberSettingsStore,
+    operationsStore,
+  } from '$lib/data';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
@@ -10,15 +15,10 @@
   import { groupBy } from '$lib/utils/groupBy';
   import { findCurrencyRate } from '../accounts/utils';
 
-  const categoriesStore = categoriesService.$categories;
-  const currencyRatesStore = currencyRatesService.$currencyRates;
-  const transactionsStore = mainService.$transactions;
-  const settingsStore = membersService.$selectedMemberSettings;
-
   const categories = $categoriesStore;
   const currencyRates = $currencyRatesStore;
-  const transactions = $transactionsStore;
-  const settings = $settingsStore;
+  const transactions = $operationsStore;
+  const settings = $memberSettingsStore;
 
   const mainCurrency = settings?.currency ?? 'USD';
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { accountsService, categoriesService, tagsService, transactionsService } from '$lib/data';
+  import { accountsStore, categoriesStore, operationsService, operationTagsStore } from '$lib/data';
   import type { Transaction } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
@@ -8,14 +8,14 @@
   import { showSuccessToast } from '$lib/ui/toasts';
   import TransactionForm from '../form/TransactionForm.svelte';
 
-  const accounts = accountsService.$accounts;
-  const categories = categoriesService.$categories;
-  const tags = tagsService.$tags;
+  $: accounts = $accountsStore;
+  $: categories = $categoriesStore;
+  $: tags = $operationTagsStore;
 
   useTitle($translate('transactions.new_transaction'));
 
   const handleSubmit = async (transactions: Transaction[]) => {
-    transactions.forEach((transaction) => transactionsService.save(transaction));
+    transactions.forEach((transaction) => operationsService.save(transaction));
     showSuccessToast($translate('transactions.create_transaction_success'), {
       testId: 'CreateTransactionSuccessToast',
     });
@@ -23,6 +23,6 @@
   };
 </script>
 
-<TransactionForm accounts={$accounts} categories={$categories} tags={$tags} onSubmit={handleSubmit}>
+<TransactionForm {accounts} {categories} {tags} onSubmit={handleSubmit}>
   <Button text={$translate('common.create')} type="submit" testId="CreateTransactionButton" />
 </TransactionForm>

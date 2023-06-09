@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import { accountsService } from '$lib/data';
-  import type { Account } from '$lib/data/interfaces';
+  import { accountsStore } from '$lib/data';
+  import type { AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import ReloadPageButton from '$lib/ui/ReloadPageButton.svelte';
   import { backLink, rightButton, title } from '$lib/ui/header';
@@ -20,7 +20,6 @@
   useTitle($translate('accounts.title'));
   useRightButton(AccountButtons);
 
-  const accountsStore = accountsService.$accounts;
   $: accounts = $accountsStore;
 
   $: action = getSearchParam($page, 'action');
@@ -37,7 +36,7 @@
     deleteSearchParam($page, 'action');
   }
 
-  const handleAccountEdit = (item: Account) => {
+  const handleAccountEdit = (item: AccountViewModel) => {
     account = item;
     opened = true;
   };

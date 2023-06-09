@@ -1,9 +1,9 @@
 import type { Tag } from './interfaces';
 import { BaseService } from './service';
 
-export class TagsService extends BaseService<Tag> {
+export class AccountTagsService extends BaseService<Tag> {
   constructor() {
-    super('TagsService', 'tags', 'tag');
+    super('AccountTagsService', 'accountTags', 'accountTag');
   }
 
   get tags() {
@@ -20,4 +20,6 @@ export class TagsService extends BaseService<Tag> {
   }
 }
 
-export const tagsService = new TagsService();
+export const accountTagsService = new AccountTagsService();
+
+export const accountTagsStore = accountTagsService.$tags;

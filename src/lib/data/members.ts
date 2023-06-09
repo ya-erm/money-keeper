@@ -145,3 +145,7 @@ export class MembersService implements Initialisable {
 }
 
 export const membersService = new MembersService();
+
+export const membersStore = membersService.$members;
+export const selectedMemberStore = membersService.$selectedMember;
+export const memberSettingsStore = membersService.$selectedMemberSettings;

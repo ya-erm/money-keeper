@@ -6,10 +6,6 @@ export class CurrencyRatesService extends BaseService<CurrencyRate> {
     super('CurrencyRatesService', 'currencyRates', 'currencyRate');
   }
 
-  get currencyRates() {
-    return this.items;
-  }
-
   get $currencyRates() {
     return this.$items;
   }
@@ -33,3 +29,5 @@ export class CurrencyRatesService extends BaseService<CurrencyRate> {
 }
 
 export const currencyRatesService = new CurrencyRatesService();
+
+export const currencyRatesStore = currencyRatesService.$currencyRates;

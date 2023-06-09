@@ -2,7 +2,6 @@
   import { v4 as uuid } from 'uuid';
 
   import type { Tag } from '$lib/data/interfaces';
-  import { tagsService } from '$lib/data';
   import { translate } from '$lib/translate';
   import Tags from '$lib/ui/Tags.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
@@ -10,10 +9,14 @@
   export let tags: Tag[];
   export let selectedTags: string[] = [];
 
+  export let onAdd: (tag: Tag) => void;
+  export let onEdit: (tag: Tag) => void;
+  export let onDelete: (tag: Tag) => void;
+
   const addTag = async (name: string) => {
     try {
       const tag = { id: uuid(), name };
-      tagsService.save(tag);
+      onAdd?.(tag);
       tags = [...tags, tag];
       selectedTags = [...selectedTags, `${tag.id}`];
     } catch {
@@ -24,7 +27,7 @@
   const editTag = async (id: string, name: string) => {
     try {
       const tag = { id, name };
-      tagsService.save(tag);
+      onEdit?.(tag);
       tags = tags.map((item) => (`${item.id}` === id ? tag : item));
     } catch {
       showErrorToast($translate('tags.edit_tag_failure'));
@@ -35,7 +38,7 @@
     try {
       const tag = tags.find((t) => t.id === id);
       if (!tag) return;
-      tagsService.delete(tag);
+      onDelete?.(tag);
       tags = tags.filter((item) => `${item.id}` !== id);
       selectedTags = selectedTags.filter((item) => item !== id);
     } catch {

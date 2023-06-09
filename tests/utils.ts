@@ -3,7 +3,7 @@ import { expect, type BrowserContext, type Locator, type Page } from '@playwrigh
 import { mockData } from './mock';
 
 export async function useAuthAsync(page: Page, context: BrowserContext) {
-  const { TEST_LOGIN, TEST_PASSWORD } = process.env;
+  const { TEST_LOGIN = '', TEST_PASSWORD = '' } = process.env;
   expect(TEST_LOGIN).toBeDefined();
   expect(TEST_PASSWORD).toBeDefined();
 
@@ -35,6 +35,8 @@ export async function importMockDataAsync(page: Page) {
 
   await page.getByTestId('AddToJournalButton').waitFor({ state: 'visible' });
   await page.getByTestId('AddToJournalButton').click();
+
+  await page.getByTestId('ImportSuccessToast').waitFor({ state: 'visible' });
 }
 
 export async function hasLocatorClassAsync(locator: Locator, className: string) {

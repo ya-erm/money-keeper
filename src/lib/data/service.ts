@@ -8,14 +8,14 @@ import type {
   JournalItem,
   JournalOperation,
   JournalSubscriber,
-  Transaction,
   Tag,
+  Transaction,
 } from './interfaces';
 import { journalService } from './journal';
 import { membersService } from './members';
 import { useDB } from './useDB';
 
-type StorageName = 'categories' | 'accounts' | 'transactions' | 'tags' | 'currencyRates';
+type StorageName = 'categories' | 'accounts' | 'transactions' | 'tags' | 'accountTags' | 'currencyRates';
 
 type EntityType = Category | Account | Transaction | Tag | CurrencyRate;
 
@@ -33,7 +33,7 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
   }
 
   /** List of all items */
-  protected get items() {
+  public get items() {
     return this._items.value;
   }
 

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { Account, CurrencyRate } from '$lib/data/interfaces';
+  import type { Account, AccountViewModel, CurrencyRate } from '$lib/data/interfaces';
   import Icon from '$lib/ui/Icon.svelte';
   import { formatMoney } from '$lib/utils/formatMoney';
 
-  export let account: Account;
+  export let account: AccountViewModel;
   export let balance: number | null = null;
   export let currencyRate: CurrencyRate | null = null;
 
@@ -19,9 +19,12 @@
       <div class="account-icon">
         <Icon name={account.icon ?? 'mdi:credit-card-outline'} padding={0.5} />
       </div>
-      <div class="account-name">{account.name}</div>
+      <div class="flex-col items-start gap-0.25">
+        <div class="account-name">{account.name}</div>
+        <div class="account-tags">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
+      </div>
     </div>
-    <div>
+    <div class="flex-col items-end gap-0.25">
       <div class="money-value flex gap-0.5">
         {formatMoney(balance ?? 0, { currency: account.currency })}
       </div>
@@ -58,6 +61,10 @@
   }
   .account-name {
     font-size: 1rem;
+  }
+  .account-tags {
+    font-size: 0.9rem;
+    color: var(--secondary-text-color);
   }
   .money-value {
     font-size: 1rem;

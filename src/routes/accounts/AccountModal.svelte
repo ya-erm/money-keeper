@@ -1,16 +1,20 @@
 <script lang="ts">
   import { v4 as uuid } from 'uuid';
 
-  import { accountsService } from '$lib/data';
+  import { accountTagsService, accountTagsStore, accountsService } from '$lib/data';
   import type { Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import Input from '$lib/ui/Input.svelte';
+  import InputLabel from '$lib/ui/InputLabel.svelte';
   import Modal from '$lib/ui/Modal.svelte';
   import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
+  import TagsList from '$lib/widgets/TagsList.svelte';
 
   import DeleteAccountModal from './DeleteAccountModal.svelte';
+
+  $: accountTags = $accountTagsStore;
 
   export let opened: boolean;
   export let account: Account | null = null;
@@ -19,6 +23,7 @@
   let icon = account?.icon;
   let currency = account?.currency ?? '';
   let order = `${account?.order ?? 0}`;
+  let selectedTags = account?.tagIds;
 
   const handleSave = async () => {
     accountsService.save({
@@ -27,13 +32,9 @@
       name,
       icon,
       currency,
+      tagIds: selectedTags,
       order: Number(order),
     });
-    if (!account) {
-      showSuccessToast($translate('accounts.create_account_success'), { testId: 'CreateAccountSuccessToast' });
-    } else {
-      showSuccessToast($translate('common.save_changes_success'), { testId: 'EditAccountSuccessToast' });
-    }
     opened = false;
   };
 
@@ -61,6 +62,16 @@
       </a>
     </Input>
     <Input label={$translate('accounts.order')} name="order" bind:value={order} type="number" optional />
+    <div class="flex-col gap-0.5">
+      <InputLabel text={$translate('accounts.tags')} optional />
+      <TagsList
+        bind:selectedTags
+        tags={accountTags}
+        onAdd={(t) => accountTagsService.save(t)}
+        onEdit={(t) => accountTagsService.save(t)}
+        onDelete={(t) => accountTagsService.delete(t)}
+      />
+    </div>
     <div class="grid-col-2 gap-1">
       {#if !!account}
         <Button color="danger" text={$translate('common.delete')} on:click={() => (deleteModalOpened = true)} />

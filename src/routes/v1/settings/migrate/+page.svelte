@@ -5,8 +5,8 @@
     currencyRatesService,
     journalService,
     mainService,
-    tagsService,
-    transactionsService,
+    operationsService,
+    operationTagsService,
   } from '$lib/data';
   import type { Account, Category, CategoryType, CurrencyRate, Tag, Transaction } from '$lib/data/interfaces';
   import { deepEqual } from '$lib/utils';
@@ -122,23 +122,23 @@
 
       await mainService.init();
 
-      v2.categories.filter(notExists(categoriesService.categories)).forEach((category) => {
+      v2.categories.filter(notExists(categoriesService.items)).forEach((category) => {
         journalService.addOperationToQueue({ category }, { upload: false });
       });
 
-      v2.accounts.filter(notExists(accountsService.accounts)).forEach((account) => {
+      v2.accounts.filter(notExists(accountsService.items)).forEach((account) => {
         journalService.addOperationToQueue({ account }, { upload: false });
       });
 
-      v2.tags.filter(notExists(tagsService.tags)).forEach((tag) => {
+      v2.tags.filter(notExists(operationTagsService.items)).forEach((tag) => {
         journalService.addOperationToQueue({ tag }, { upload: false });
       });
 
-      v2.currencyRates.filter(notExists(currencyRatesService.currencyRates)).forEach((currencyRate) => {
+      v2.currencyRates.filter(notExists(currencyRatesService.items)).forEach((currencyRate) => {
         journalService.addOperationToQueue({ currencyRate }, { upload: false });
       });
 
-      v2.transactions.filter(notExists(transactionsService.transactions)).forEach((transaction) => {
+      v2.transactions.filter(notExists(operationsService.items)).forEach((transaction) => {
         journalService.addOperationToQueue({ transaction }, { upload: false });
       });
 

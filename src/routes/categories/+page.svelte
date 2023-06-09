@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { categoriesService, categoriesStore } from '$lib/data';
   import type { Category, CategoryType } from '$lib/data/interfaces';
-  import { categoriesService } from '$lib/data';
   import { translate } from '$lib/translate';
   import { useTitle } from '$lib/ui/header';
 
@@ -9,10 +9,10 @@
 
   useTitle($translate('categories.title'));
 
-  const categories = categoriesService.$categories;
+  $: categories = $categoriesStore;
 
-  $: incomings = $categories.filter((x) => x.type === 'IN');
-  $: outgoings = $categories.filter((x) => x.type === 'OUT');
+  $: incomings = categories.filter((x) => x.type === 'IN');
+  $: outgoings = categories.filter((x) => x.type === 'OUT');
 
   let opened = false;
   let category: Category | null = null;

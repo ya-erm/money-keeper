@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { accountsService } from '$lib/data';
+  import { accountsStore } from '$lib/data';
   import type { Account } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
@@ -12,7 +12,6 @@
   import AccountList from './AccountList.svelte';
   import AddAccountButton from './AddAccountButton.svelte';
 
-  const accountsStore = accountsService.$accounts;
   $: accounts = $accountsStore;
 
   backLink.set(route('accounts'));

@@ -1,14 +1,14 @@
 <script lang="ts">
-  import type { Account, CurrencyRate } from '$lib/data/interfaces';
+  import type { AccountViewModel, CurrencyRate } from '$lib/data/interfaces';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import { formatMoney } from '$lib/utils/formatMoney';
 
-  export let account: Account;
+  export let account: AccountViewModel;
   export let balance: number | null = null;
   export let currencyRate: CurrencyRate | null = null;
 
-  export let onEdit: (account: Account) => void;
+  export let onEdit: (account: AccountViewModel) => void;
 
   const rate = currencyRate?.cur1 === account.currency ? currencyRate.rate : 1 / (currencyRate?.rate ?? 1);
   const otherCurrency = currencyRate?.cur1 === account.currency ? currencyRate.cur2 : currencyRate?.cur1;
@@ -23,7 +23,10 @@
     <div class="account-icon flex items-center justify-center">
       <Icon name={account.icon || 'mdi:briefcase-outline'} padding={0.5} />
     </div>
-    <div class="flex-grow" data-testId="AccountName">{account.name}</div>
+    <div class="flex-grow">
+      <div data-testId="AccountName">{account.name}</div>
+      <div class="account-tags">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
+    </div>
     <Button appearance="link" color="white" on:click={handleEdit}>
       <Icon name="mdi:pencil" padding={0.5} />
     </Button>
@@ -45,6 +48,10 @@
   .account-icon {
     border-radius: 100%;
     background-color: var(--background-color);
+  }
+  .account-tags {
+    font-size: 0.9rem;
+    color: var(--secondary-text-color);
   }
   .money-value {
     font-size: 1.2rem;

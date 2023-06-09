@@ -79,6 +79,7 @@ export type Messages =
   | 'accounts.currency'
   | 'accounts.icon'
   | 'accounts.color'
+  | 'accounts.tags'
   | 'accounts.order'
   // Analytics
   | 'analytics.title'

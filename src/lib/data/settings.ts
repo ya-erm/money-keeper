@@ -34,3 +34,5 @@ export class GlobalSettingsService implements Initialisable {
 }
 
 export const settingsService = new GlobalSettingsService();
+
+export const settingsStore = settingsService.$settings;

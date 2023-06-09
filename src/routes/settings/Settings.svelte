@@ -1,7 +1,7 @@
 <script lang="ts">
   import { version } from '$app/environment';
   import { goto } from '$app/navigation';
-  import { membersService } from '$lib/data';
+  import { membersService, selectedMemberStore } from '$lib/data';
 
   import { route, routes } from '$lib/routes';
   import { activeLocaleName, translate } from '$lib/translate';
@@ -16,8 +16,8 @@
   import createBooleanStore from '$lib/utils/createBooleanStore';
 
   // TODO: selectedMember is not a user, it can be a group
-  const selectedMember = membersService.$selectedMember;
-  $: login = $selectedMember?.login;
+  $: selectedMember = $selectedMemberStore;
+  $: login = selectedMember?.login;
 
   const [languageModalOpened, openLanguageModal] = createBooleanStore();
   const [changeNameModalOpened, openChangeNameModal] = createBooleanStore();
@@ -26,8 +26,8 @@
   const [selectGroupModalOpened, openSelectGroupModal] = createBooleanStore();
 
   async function logout() {
-    if ($selectedMember) {
-      await membersService.deleteMember($selectedMember);
+    if (selectedMember) {
+      await membersService.deleteMember(selectedMember);
     }
     await goto(routes.login.path);
   }
@@ -40,7 +40,7 @@
 </ListGroup>
 
 <ListGroup title={$translate('settings.profile')}>
-  {#if !$selectedMember}
+  {#if !selectedMember}
     <ListLinkItem title={$translate('auth.sign_in')} href={route('login')} />
   {:else}
     <ListSelectItem title={$translate('auth.login')} value={login ?? ''} on:click={openChangeLoginModal} />
@@ -49,7 +49,7 @@
 </ListGroup>
 
 <div class="mt-1 flex-col items-center gap-0.5">
-  {#if $selectedMember}
+  {#if selectedMember}
     <Button
       color="danger"
       appearance="link"

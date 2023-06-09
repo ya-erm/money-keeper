@@ -3,9 +3,8 @@
   import { derived } from 'svelte/store';
 
   import { ApiError, isApiError } from '$lib/api/ApiError';
-  import { mainService, membersService } from '$lib/data';
+  import { journalService, mainService, membersService } from '$lib/data';
   import { createKeyFromPassword, decryptAes, decryptRsa } from '$lib/data/crypto';
-  import { route } from '$lib/routes';
   import type {
     LoginConfirmRequestData,
     LoginConfirmResponseData,
@@ -92,8 +91,10 @@
       await loginConfirmFetcher.fetch({ token: decryptedToken, uuid: member.uuid });
       // Initialize main service asynchronously
       mainService.initServices();
-      // TODO: go to default route
-      goto(route('accounts'));
+      // Fetch updates from server
+      journalService.syncWithServer();
+      // Go to default route
+      goto('/');
     } catch (e) {
       if (!tryHandleError(e)) {
         console.error(e);

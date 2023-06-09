@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import { accountsService, categoriesService, mainService, tagsService, transactionsService } from '$lib/data';
+  import { accountsStore, categoriesStore, operationsService, operationsStore, operationTagsStore } from '$lib/data';
   import type { Transaction } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
@@ -13,24 +13,24 @@
 
   useTitle($translate('transactions.edit_transaction'));
 
-  const transactions = mainService.$transactions;
-  const accounts = accountsService.$accounts;
-  const categories = categoriesService.$categories;
-  const tags = tagsService.$tags;
+  $: transactions = $operationsStore;
+  $: accounts = $accountsStore;
+  $: categories = $categoriesStore;
+  $: tags = $operationTagsStore;
 
   $: id = getSearchParam($page, 'id');
-  $: transaction = $transactions.find((t) => t.id === id);
+  $: transaction = transactions.find((t) => t.id === id);
 
   const handleSubmit = async (transactions: Transaction[]) => {
-    transactions.forEach((transaction) => transactionsService.save(transaction));
+    transactions.forEach((transaction) => operationsService.save(transaction));
     showSuccessToast($translate('common.save_changes_success'));
     history.back();
   };
 
   const handleDelete = () => {
     if (!transaction) return;
-    const t = transactionsService.getById(transaction.id);
-    t && transactionsService.delete(t);
+    const t = operationsService.getById(transaction.id);
+    t && operationsService.delete(t);
     showSuccessToast($translate('transactions.delete_transaction_success'), {
       testId: 'DeleteTransactionSuccessToast',
     });
@@ -38,7 +38,7 @@
   };
 </script>
 
-<TransactionForm {transaction} accounts={$accounts} categories={$categories} tags={$tags} onSubmit={handleSubmit}>
+<TransactionForm {transaction} {accounts} {categories} {tags} onSubmit={handleSubmit}>
   <Button text={$translate('common.save')} type="submit" testId="SaveTransactionButton" />
   <Button
     slot="footer"

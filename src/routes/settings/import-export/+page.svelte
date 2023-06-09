@@ -1,30 +1,33 @@
 <script lang="ts">
   import {
+    accountTagsService,
     accountsService,
     categoriesService,
     currencyRatesService,
     journalService,
     mainService,
-    tagsService,
-    transactionsService,
+    operationTagsService,
+    operationsService,
   } from '$lib/data';
   import type { Account, Category, CurrencyRate, Tag, Transaction } from '$lib/data/interfaces';
-  import { showSuccessToast } from '$lib/ui/toasts';
+  import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
   import { deepEqual } from '$lib/utils';
 
   let rawImport = '';
 
   let v2: {
     categories: Category[];
+    accountTags: Tag[];
     accounts: Account[];
-    tags: Tag[];
-    transactions: Transaction[];
+    operationTags: Tag[];
+    operations: Transaction[];
     currencyRates: CurrencyRate[];
   } = {
     categories: [],
+    accountTags: [],
     accounts: [],
-    tags: [],
-    transactions: [],
+    operationTags: [],
+    operations: [],
     currencyRates: [],
   };
 
@@ -37,16 +40,18 @@
 
   let current: {
     categories: Category[];
+    accountTags: Tag[];
     accounts: Account[];
-    tags: Tag[];
-    transactions: Transaction[];
+    operationTags: Tag[];
+    operations: Transaction[];
     currencyRates: CurrencyRate[];
   } = {
-    categories: categoriesService.categories,
-    accounts: accountsService.accounts,
-    tags: tagsService.tags,
-    transactions: transactionsService.transactions,
-    currencyRates: currencyRatesService.currencyRates,
+    categories: categoriesService.items,
+    accountTags: accountTagsService.items,
+    accounts: accountsService.items,
+    operationTags: operationTagsService.items,
+    operations: operationsService.items,
+    currencyRates: currencyRatesService.items,
   };
 
   let uploading = false;
@@ -63,34 +68,41 @@
 
       let count = 0;
 
-      v2.categories.filter(notExists(categoriesService.categories)).forEach((category) => {
+      v2.categories?.filter(notExists(categoriesService.items)).forEach((category) => {
         journalService.addOperationToQueue({ category }, { upload: false });
         count += 1;
       });
 
-      v2.accounts.filter(notExists(accountsService.accounts)).forEach((account) => {
+      v2.accountTags?.filter(notExists(accountTagsService.items)).forEach((accountTag) => {
+        journalService.addOperationToQueue({ accountTag }, { upload: false });
+        count += 1;
+      });
+
+      v2.accounts?.filter(notExists(accountsService.items)).forEach((account) => {
         journalService.addOperationToQueue({ account }, { upload: false });
         count += 1;
       });
 
-      v2.tags.filter(notExists(tagsService.tags)).forEach((tag) => {
+      v2.operationTags?.filter(notExists(operationTagsService.items)).forEach((tag) => {
         journalService.addOperationToQueue({ tag }, { upload: false });
         count += 1;
       });
 
-      v2.currencyRates.filter(notExists(currencyRatesService.currencyRates)).forEach((currencyRate) => {
+      v2.currencyRates?.filter(notExists(currencyRatesService.items)).forEach((currencyRate) => {
         journalService.addOperationToQueue({ currencyRate }, { upload: false });
         count += 1;
       });
 
-      v2.transactions.filter(notExists(transactionsService.transactions)).forEach((transaction) => {
+      v2.operations?.filter(notExists(operationsService.items)).forEach((transaction) => {
         journalService.addOperationToQueue({ transaction }, { upload: false });
         count += 1;
       });
 
       await journalService.tryUploadQueue();
 
-      showSuccessToast(`${count} items were added`);
+      showSuccessToast(`${count} items were added`, { testId: 'ImportSuccessToast' });
+    } catch (e) {
+      showErrorToast(`Failed to import items ${e}`);
     } finally {
       uploading = false;
     }
@@ -108,10 +120,11 @@
 
   {#if parsed}
     <p>
-      <span>Tags: <b>{v2.tags?.length ?? 0}</b>,</span>
       <span>Categories: <b>{v2.categories?.length ?? 0}</b>,</span>
+      <span>Account Tags: <b>{v2.accountTags?.length ?? 0}</b>,</span>
       <span>Accounts: <b>{v2.accounts?.length ?? 0}</b>,</span>
-      <span>Transactions: <b>{v2.transactions?.length ?? 0}</b>,</span>
+      <span>Operation Tags: <b>{v2.operationTags?.length ?? 0}</b>,</span>
+      <span>Operations: <b>{v2.operations?.length ?? 0}</b>,</span>
       <span>CurrencyRates: <b>{v2.currencyRates?.length ?? 0}</b></span>
     </p>
 
@@ -126,11 +139,12 @@
     <textarea class="text-area-json" value={JSON.stringify(current, null, 2)} />
   </label>
   <p>
-    <span>Tags: <b>{current.tags.length}</b>,</span>
-    <span>Categories: <b>{current.categories.length}</b>,</span>
-    <span>Accounts: <b>{current.accounts.length}</b>,</span>
-    <span>Transactions: <b>{current.transactions.length}</b>,</span>
-    <span>CurrencyRates: <b>{current.currencyRates.length}</b></span>
+    <span>Categories: <b>{current.categories?.length ?? 0}</b>,</span>
+    <span>Account Tags: <b>{current.accountTags?.length ?? 0}</b>,</span>
+    <span>Accounts: <b>{current.accounts?.length ?? 0}</b>,</span>
+    <span>Operation Tags: <b>{current.operationTags?.length ?? 0}</b>,</span>
+    <span>Operations: <b>{current.operations?.length ?? 0}</b>,</span>
+    <span>CurrencyRates: <b>{current.currencyRates?.length ?? 0}</b></span>
   </p>
 </div>
 

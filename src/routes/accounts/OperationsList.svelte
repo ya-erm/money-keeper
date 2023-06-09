@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import dayjs from 'dayjs';
 
-  import { currencyRatesService, mainService, membersService } from '$lib/data';
+  import { currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import type { Account, TransactionViewModel } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
@@ -14,13 +14,9 @@
 
   export let account: Account | null = null;
 
-  const transactionsStore = mainService.$transactions;
-  const currencyRatesStore = currencyRatesService.$currencyRates;
-  const settingsStore = membersService.$selectedMemberSettings;
-
-  $: transactions = $transactionsStore;
+  $: transactions = $operationsStore;
   $: currencyRates = $currencyRatesStore;
-  $: settings = $settingsStore;
+  $: settings = $memberSettingsStore;
 
   let search: string = '';
 

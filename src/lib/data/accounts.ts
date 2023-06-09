@@ -1,22 +1,18 @@
 import { derived } from 'svelte/store';
 
-import type { Account } from './interfaces';
+import { filterNotEmpty } from '$lib/utils';
+
+import { accountTagsStore } from './accountTags';
+import type { Account, AccountViewModel, Tag } from './interfaces';
 import { BaseService } from './service';
-import { transactionsService } from './transactions';
 
 export class AccountsService extends BaseService<Account> {
-  private _accounts: Account[] = [];
   private _accountStore;
 
   constructor() {
     super('AccountsService', 'accounts', 'account');
 
-    this._accountStore = derived(this.$items, (items) => this.mapItems(items));
-    this._accountStore.subscribe((items) => (this._accounts = items));
-  }
-
-  get accounts() {
-    return this._accounts;
+    this._accountStore = derived([this.$items, accountTagsStore], ([items, tags]) => this.mapItems(items, tags));
   }
 
   get $accounts() {
@@ -25,13 +21,23 @@ export class AccountsService extends BaseService<Account> {
 
   override delete(item: Account): void {
     super.delete(item);
-    transactionsService.deleteTransactionsByAccount(item.id);
+    this.deleteAccountOperations(item.id);
   }
 
-  private mapItems(items: Account[]) {
+  private mapItems(items: Account[], tags: Tag[]): AccountViewModel[] {
     items.sort((a, b) => a.order - b.order);
-    return items;
+
+    return items.map((item) => ({
+      ...item,
+      tags: filterNotEmpty(item.tagIds?.map((tagId) => tags.find(({ id }) => id === tagId))),
+    }));
   }
+
+  public deleteAccountOperations: (accountId: string) => void = () => {
+    throw new Error('accountsService.deleteAccountOperations is not set');
+  };
 }
 
 export const accountsService = new AccountsService();
+
+export const accountsStore = accountsService.$accounts;

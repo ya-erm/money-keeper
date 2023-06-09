@@ -36,6 +36,7 @@ export type JournalItem = {
 export type JournalOperation = {
   category?: Category;
   account?: Account;
+  accountTag?: Tag;
   transaction?: Transaction;
   currencyRate?: CurrencyRate;
   tag?: Tag;
@@ -63,7 +64,12 @@ export type Account = {
   order: number;
   currency: string;
   icon?: string | null;
+  tagIds?: string[];
   deleted?: boolean;
+};
+
+export type AccountViewModel = Account & {
+  tags: Tag[];
 };
 
 export type Tag = {
@@ -80,6 +86,7 @@ export type CurrencyRate = {
   deleted?: boolean;
 };
 
+// TODO: rename to Operation
 export type Transaction = {
   id: string;
   accountId: string;
@@ -142,6 +149,11 @@ export interface LocalDB extends DBSchema {
     };
   };
   tags: {
+    key: string;
+    value: WithOwner<Tag>;
+    indexes: { 'by-owner': string };
+  };
+  accountTags: {
     key: string;
     value: WithOwner<Tag>;
     indexes: { 'by-owner': string };

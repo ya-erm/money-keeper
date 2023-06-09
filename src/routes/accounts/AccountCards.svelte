@@ -1,30 +1,25 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { getSearchParam, groupBySelector } from '$lib/utils';
   import { onMount } from 'svelte';
 
-  import { accountsService, currencyRatesService, mainService, membersService } from '$lib/data';
+  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
+  import type { AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
+  import { getSearchParam, groupBySelector } from '$lib/utils';
 
-  import type { Account } from '$lib/data/interfaces';
   import AccountCard from './AccountCard.svelte';
   import { calculateBalance, findCurrencyRate } from './utils';
 
-  export let onEdit: (account: Account) => void;
-
-  const accountsStore = accountsService.$accounts;
-  const transactionsStore = mainService.$transactions;
-  const currencyRatesStore = currencyRatesService.$currencyRates;
-  const settingsStore = membersService.$selectedMemberSettings;
+  export let onEdit: (account: AccountViewModel) => void;
 
   $: accounts = $accountsStore;
-  $: transactions = $transactionsStore;
+  $: operations = $operationsStore;
   $: currencyRates = $currencyRatesStore;
-  $: settings = $settingsStore;
+  $: settings = $memberSettingsStore;
 
-  $: transactionsByAccount = groupBySelector(transactions, (t) => t.account.id);
+  $: operationsByAccount = groupBySelector(operations, (t) => t.account.id);
 
   $: cardId = getSearchParam($page, 'account-card');
 
@@ -66,7 +61,7 @@
       <div class="account-card" on:click={() => scrollToCard(account.id)} aria-hidden>
         <AccountCard
           {account}
-          balance={calculateBalance(transactionsByAccount[account.id] ?? [])}
+          balance={calculateBalance(operationsByAccount[account.id] ?? [])}
           currencyRate={findCurrencyRate(currencyRates, settings?.currency, account.currency)}
           {onEdit}
         />

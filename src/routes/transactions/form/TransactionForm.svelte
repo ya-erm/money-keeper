@@ -3,24 +3,25 @@
   import { v4 as uuid } from 'uuid';
 
   import { page } from '$app/stores';
+  import { operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type { Account, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Input from '$lib/ui/Input.svelte';
   import InputLabel from '$lib/ui/InputLabel.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
+  import { formatMoney, getSearchParam } from '$lib/utils';
   import {
     checkNumberFormParameter,
     checkStringFormParameter,
     checkStringOptionalFormParameter,
   } from '$lib/utils/checkFormParams';
-  import { formatMoney } from '$lib/utils/formatMoney';
-  import { getSearchParam } from '$lib/utils/getSearchParam';
+  import TagsList from '$lib/widgets/TagsList.svelte';
 
   import AccountSelect from './AccountSelect.svelte';
   import CategorySelect from './CategorySelect.svelte';
-  import TagsList from './TagsList.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
+
   export let accounts: Account[];
   export let categories: Category[];
   export let tags: Tag[];
@@ -193,7 +194,13 @@
     <Input label={$translate('transactions.comment')} name="comment" value={transaction?.comment} optional />
     <div class="flex-col gap-0.5">
       <InputLabel text={$translate('transactions.tags')} optional />
-      <TagsList bind:tags bind:selectedTags />
+      <TagsList
+        bind:tags
+        bind:selectedTags
+        onAdd={(t) => operationTagsService.save(t)}
+        onEdit={(t) => operationTagsService.save(t)}
+        onDelete={(t) => operationTagsService.delete(t)}
+      />
     </div>
     <slot />
     <slot name="button" />

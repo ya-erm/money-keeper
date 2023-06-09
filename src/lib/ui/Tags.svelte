@@ -1,14 +1,14 @@
 <script lang="ts">
   import { translate } from '$lib/translate';
+  import { longPress } from '$lib/utils';
   import Button from './Button.svelte';
   import Input from './Input.svelte';
   import Modal from './Modal.svelte';
-  import { longPress } from '$lib/utils';
 
   export let tags: { id: string; title: string }[];
   export let selected: string[];
   export let readOnly: boolean = false;
-  export let onChange: (id: string, selected: boolean) => void;
+  export let onChange: ((id: string, selected: boolean) => void) | null = null;
   export let onAdd: ((title: string) => Promise<void> | void) | null = null;
   export let onEdit: ((id: string, title: string) => Promise<void> | void) | null = null;
   export let onDelete: ((id: string) => Promise<void> | void) | null = null;
@@ -39,6 +39,14 @@
     await onDelete?.(id);
     opened = false;
   };
+
+  const handleChange = (id: string, checked: boolean) => {
+    if (onChange) {
+      onChange(id, checked);
+    } else {
+      selected = checked ? [...selected, id] : selected.filter((t) => t !== id);
+    }
+  };
 </script>
 
 <div class="flex flex-wrap container" data-testId="TagsContainer">
@@ -48,7 +56,7 @@
       class="tag"
       type="button"
       class:selected={isSelected}
-      on:click={() => onChange(tag.id, !isSelected)}
+      on:click={() => handleChange(tag.id, !isSelected)}
       use:longPress={() => handleOpenModal(tag)}
     >
       {tag.title}

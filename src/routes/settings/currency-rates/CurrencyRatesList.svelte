@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import { currencyRatesService } from '$lib/data';
+  import { currencyRatesStore } from '$lib/data';
   import type { CurrencyRate } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import { useRightButton, useTitle } from '$lib/ui/header';
@@ -13,8 +13,7 @@
   useTitle($translate('currency_rates.title'));
   useRightButton(AddCurrencyRateButton);
 
-  const currencyRates = currencyRatesService.$currencyRates;
-  $: items = $currencyRates;
+  $: currencyRates = $currencyRatesStore;
 
   let selectedItem: CurrencyRate | null = null;
   let opened = false;
@@ -35,7 +34,7 @@
 </script>
 
 <div class="container">
-  {#each items as item (item.id)}
+  {#each currencyRates as item (item.id)}
     <button class="card" on:click={() => changeCurrencyRate(item)} on:keypress={() => {}}>
       <b>{item.cur1} / {item.cur2}</b>
       <div>1 {item.cur1} = {item.rate} {item.cur2}</div>
