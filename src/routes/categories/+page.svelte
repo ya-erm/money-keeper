@@ -1,60 +1,58 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-  import { routes } from '$lib/routes';
+  import { categoriesService, categoriesStore } from '$lib/data';
+  import type { Category, CategoryType } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
+  import { useTitle } from '$lib/ui/header';
 
-  import type { PageData } from './$types';
+  import CategoryList from './CategoryList.svelte';
+  import CategoryModal from './CategoryModal.svelte';
 
-  export let data: PageData;
-  $: incomings = data.categories.filter((c) => c.type === 'IN');
-  $: outgoings = data.categories.filter((c) => c.type === 'OUT');
+  useTitle($translate('categories.title'));
+
+  $: categories = $categoriesStore;
+
+  $: incomings = categories.filter((x) => x.type === 'IN');
+  $: outgoings = categories.filter((x) => x.type === 'OUT');
+
+  let opened = false;
+  let category: Category | null = null;
+  let categoryType: CategoryType = 'IN';
+
+  const handleAdd = (type: CategoryType) => () => {
+    categoryType = type;
+    category = null;
+    opened = true;
+  };
+
+  const handleClick = (item: Category) => {
+    categoryType = item.type;
+    category = item;
+    opened = true;
+  };
+
+  const onSave = (item: Category) => {
+    categoriesService.save(item);
+  };
+
+  const onDelete = (item: Category) => {
+    categoriesService.delete(item);
+  };
 </script>
 
 <h2>{$translate('categories.incomings')}</h2>
-<div class="grid px-1 mb-1">
-  {#each incomings as category (category.id)}
-    <GridCircleItem
-      onClick={() => goto(`${routes.categories.path}/${category.id}`)}
-      icon={category.icon || 'mdi:folder-outline'}
-      text={category.name}
-    />
-  {/each}
-  <GridCircleItem
-    onClick={() => goto(`${routes['categories.create'].path}?type=IN`)}
-    text={$translate('common.add')}
-    icon="mdi:plus"
-    dashed
-  />
-</div>
+<CategoryList items={incomings} onClick={handleClick} onAdd={handleAdd('IN')} />
 
 <h2 class="mt-2">{$translate('categories.outgoings')}</h2>
-<div class="grid px-1">
-  {#each outgoings as category (category.id)}
-    <GridCircleItem
-      onClick={() => goto(`${routes.categories.path}/${category.id}`)}
-      icon={category.icon || 'mdi:folder-outline'}
-      text={category.name}
-    />
-  {/each}
-  <GridCircleItem
-    onClick={() => goto(`${routes['categories.create'].path}?type=OUT`)}
-    text={$translate('common.add')}
-    icon="mdi:plus"
-    dashed
-  />
-</div>
+<CategoryList items={outgoings} onClick={handleClick} onAdd={handleAdd('OUT')} />
+
+{#if opened}
+  <CategoryModal bind:opened {category} {categoryType} {onSave} {onDelete} />
+{/if}
 
 <style>
   h2 {
     text-align: center;
     font-weight: normal;
     font-size: 1.15rem;
-  }
-  .grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.25rem;
   }
 </style>

@@ -1,4 +1,5 @@
 export type Messages =
+  | 'app.title'
   // Common
   | 'common.back'
   | 'common.select'
@@ -6,6 +7,7 @@ export type Messages =
   | 'common.available_variants'
   | 'common.optional'
   | 'common.loading'
+  | 'common.synchronizing'
   | 'common.show_more'
   | 'common.sorting'
   | 'common.sort_by'
@@ -25,6 +27,7 @@ export type Messages =
   | 'common.cancel'
   | 'common.delete'
   | 'common.ok'
+  | 'common.continue'
   // Tags
   | 'tags.add_modal_header'
   | 'tags.edit_modal_header'
@@ -52,14 +55,17 @@ export type Messages =
   | 'auth.passwords_must_be_same'
   | 'auth.register'
   | 'auth.user_already_exists'
-  | 'auth.failed_to_register'
+  | 'auth.registration_success'
+  | 'auth.registration_failure'
   | 'auth.logout.title'
   | 'auth.sign_out'
   | 'auth.profile'
   | 'auth.logged_in_as'
   | 'auth.not_logged_in'
   // Accounts
+  | 'accounts.list'
   | 'accounts.title'
+  | 'accounts.new_account'
   | 'accounts.create_account'
   | 'accounts.create_account_failure'
   | 'accounts.create_account_success'
@@ -73,11 +79,15 @@ export type Messages =
   | 'accounts.currency'
   | 'accounts.icon'
   | 'accounts.color'
+  | 'accounts.tags'
   | 'accounts.order'
+  // Analytics
+  | 'analytics.title'
   // Categories
   | 'categories.title'
   | 'categories.incomings'
   | 'categories.outgoings'
+  | 'categories.new_category'
   | 'categories.create_category'
   | 'categories.create_category_success'
   | 'categories.create_category_failure'
@@ -184,6 +194,7 @@ export type Messages =
   | 'settings.theme.light'
   | 'settings.theme.dark'
   | 'settings.theme.system'
+  | 'settings.import_export'
   | 'settings.profile'
   | 'settings.profile.change_name'
   | 'settings.profile.change_name_failure'
@@ -200,6 +211,7 @@ export type Messages =
   | 'settings.collaboration.workspaces'
   | 'settings.collaboration.invites'
   | 'settings.collaboration.blocklist'
+  | 'settings.encryption'
   | 'settings.report_problem'
   | 'settings.version'
   | 'settings.uikit';

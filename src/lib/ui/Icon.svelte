@@ -6,7 +6,7 @@
   export let width: number | string = size;
   export let height: number | string = size;
   export let padding: number | string = 0;
-  export let color: string | null = null;
+  export let color: string | undefined = undefined;
 
   const _width = typeof width === 'number' ? `${width}rem` : width;
   const _height = typeof height === 'number' ? `${height}rem` : height;

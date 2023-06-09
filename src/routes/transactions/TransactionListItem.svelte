@@ -1,16 +1,13 @@
 <script lang="ts">
-  import type { CurrencyRate } from '@prisma/client';
-
-  import type { TransactionFullDto } from '$lib/interfaces';
-  import { routes } from '$lib/routes';
+  import type { CurrencyRate, TransactionViewModel } from '$lib/data/interfaces';
   import { translate, type Messages } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
   import { formatMoney } from '$lib/utils/formatMoney';
 
-  export let transaction: TransactionFullDto;
+  export let transaction: TransactionViewModel;
   export let currencyRate: CurrencyRate | null = null;
   export let hideAccount: boolean = false;
-  export let onClick: ((transaction: TransactionFullDto) => void) | null = null;
+  export let onClick: ((transaction: TransactionViewModel) => void) | null = null;
 
   const incoming = transaction.category.type === 'IN';
   const outgoing = transaction.category.type === 'OUT';
@@ -20,27 +17,25 @@
     ? $translate(transaction.category.name as Messages)
     : transaction.category.name;
 
-  const handleClick = (e: MouseEvent) => {
-    if (onClick) {
-      e.preventDefault();
-      onClick(transaction);
-    }
-  };
-
   $: rate = currencyRate?.cur1 === transaction.account.currency ? currencyRate.rate : 1 / (currencyRate?.rate ?? 1);
   $: otherCurrency = currencyRate?.cur1 === transaction.account.currency ? currencyRate.cur2 : currencyRate?.cur1;
+
+  const handleClick = () => {
+    onClick?.(transaction);
+  };
 </script>
 
-<a
-  href={transaction.id ? `${routes.transactions.path}/${transaction.id}` : '#'}
-  on:click={handleClick}
-  class="flex-grow"
->
-  <div class="flex gap-0.5 items-center justify-between">
+<li>
+  <button
+    data-testId="TransactionListItem"
+    data-id={transaction.id}
+    on:click={handleClick}
+    class="flex gap-0.5 items-center justify-between"
+  >
     <div class="icon flex-center">
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />
     </div>
-    <div class="text flex-col flex-grow">
+    <div class="text flex-col flex-grow items-start">
       <div class="flex items-center">
         {#if isTransfer}
           <span class="source">
@@ -66,9 +61,11 @@
           {/if}
         {/if}
       </div>
-      <div class="small-text">
-        {transaction.comment}
-      </div>
+      {#if transaction.comment}
+        <div class="small-text">
+          {transaction.comment}
+        </div>
+      {/if}
       {#if transaction.tags?.length}
         <div class="tags">
           {transaction.tags.map((t) => `#${t.name}`).join(' ')}
@@ -86,19 +83,28 @@
         </span>
       {/if}
     </div>
-  </div>
-</a>
+  </button>
+</li>
 
 <style>
-  a {
-    text-decoration: none;
-    color: inherit;
+  button {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 1rem;
+    background: transparent;
+    color: var(--primary-text-color);
+    cursor: pointer;
+    border: none;
+    width: 100%;
   }
   @media (hover: hover) {
-    a:hover .icon,
-    a:hover .text,
-    a:hover .tags,
-    a:hover .amount {
+    button:hover {
+      opacity: 0.9;
+    }
+    button:hover .icon,
+    button:hover .text,
+    button:hover .tags,
+    button:hover .amount {
       color: var(--active-color);
     }
   }

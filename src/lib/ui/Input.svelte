@@ -63,6 +63,7 @@
           {endText}
         </span>
       {/if}
+      <slot name="end" />
       {#if clearable && !!value}
         <div class="flex-center" title={$translate('common.clear')}>
           <Button

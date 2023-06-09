@@ -13,7 +13,8 @@
     "rootDir": "/",
     "paths": {
       "$lib": ["./src/lib"],
-      "$lib/*": ["./src/lib/*"]
+      "$lib/*": ["./src/lib/*"],
+      "@tests/*": ["./tests/*"]
     }
   }
   // Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias

@@ -1,5 +1,4 @@
 import test, { expect, type Page } from '@playwright/test';
-import { useAuthAsync } from '@tests/utils';
 
 const getLocators = (page: Page) => {
   const addTagForm = page.getByTestId('AddTagForm');
@@ -13,9 +12,8 @@ const getLocators = (page: Page) => {
 };
 
 test.describe('Tags', () => {
-  test('add tag modal has expected inputs', async ({ page, context }) => {
-    await useAuthAsync(page, context);
-    await page.goto('/transactions/create');
+  test('add tag modal has expected inputs', async ({ page }) => {
+    await page.goto('/transactions/create', { waitUntil: 'networkidle' });
 
     const { addTagButton, addTagForm, titleInput, submitButton } = getLocators(page);
 
@@ -29,8 +27,7 @@ test.describe('Tags', () => {
     expect(await submitButton.isVisible()).toBe(true);
   });
 
-  test('create new tag', async ({ page, context }) => {
-    await useAuthAsync(page, context);
+  test('create new tag', async ({ page }) => {
     await page.goto('/transactions/create');
 
     const { tagsContainer, addTagButton, addTagForm, titleInput, submitButton } = getLocators(page);

@@ -1,15 +1,13 @@
 <script lang="ts">
-  import { invalidate } from '$app/navigation';
-  import type { CurrencyRate } from '@prisma/client';
-  import type { ActionResult } from '@sveltejs/kit';
+  import { v4 as uuid } from 'uuid';
 
-  import { deps } from '$lib/deps';
+  import { currencyRatesService } from '$lib/data';
+  import type { CurrencyRate } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
-  import FormContainer from '$lib/ui/FormContainer.svelte';
+  import Icon from '$lib/ui/Icon.svelte';
   import Input from '$lib/ui/Input.svelte';
   import Modal from '$lib/ui/Modal.svelte';
-  import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
 
   export let opened: boolean;
   export let item: CurrencyRate | null = null;
@@ -18,24 +16,32 @@
   let cur2 = item?.cur2 ?? '';
   let rate = `${item?.rate ?? 1}`;
 
-  const onSave = async (result: ActionResult) => {
-    if (result.type === 'success') {
-      await invalidate(deps.currencyRates);
-      showSuccessToast($translate('common.save_changes_success'));
-      opened = false;
-    } else {
-      showErrorToast($translate('common.save_changes_failure'));
-    }
+  const swapCurrencies = () => {
+    const tmp = cur1;
+    cur1 = cur2;
+    cur2 = tmp;
   };
 
-  const onDelete = async (result: ActionResult) => {
-    if (result.type === 'success') {
-      await invalidate(deps.currencyRates);
-      showSuccessToast($translate('currency_rates.delete_currency_rate_success'));
-      opened = false;
-    } else {
-      showErrorToast($translate('currency_rates.delete_currency_rate_failure'));
+  const getGlobalRate = async () => {
+    const rates = await currencyRatesService.getGlobalCurrencyRates();
+    const usdToCur1 = rates[cur1];
+    const usdToCur2 = rates[cur2];
+    if (!usdToCur1 || !usdToCur2) return;
+    rate = (usdToCur2 / usdToCur1).toPrecision(4);
+  };
+
+  const onSave = async () => {
+    if (!item) {
+      item = { id: uuid(), cur1, cur2, rate: Number(rate) };
     }
+    currencyRatesService.save({ ...item, cur1, cur2, rate: Number(rate) });
+    opened = false;
+  };
+
+  const onDelete = async () => {
+    if (!item) return;
+    currencyRatesService.delete(item);
+    opened = false;
   };
 </script>
 
@@ -44,32 +50,35 @@
   bind:opened
   width={20}
 >
-  <FormContainer width="100%" action={!item ? '?/create' : '?/update'} onResult={onSave}>
+  <form class="flex-col gap-1 container" on:submit|preventDefault={onSave}>
     <input name="id" value={item?.id} readonly class="hidden" />
-    <Input name="cur1" label={$translate('currency_rates.currency1')} bind:value={cur1} />
-    <Input name="cur2" label={$translate('currency_rates.currency2')} bind:value={cur2} />
-    <Input name="rate" label={$translate('currency_rates.rate')} type="number" step="any" bind:value={rate} />
+    <Input name="cur1" label={$translate('currency_rates.currency1')} bind:value={cur1} required />
+    <Input name="cur2" label={$translate('currency_rates.currency2')} bind:value={cur2} required />
+    <Input name="rate" label={$translate('currency_rates.rate')} type="number" step="any" bind:value={rate} required>
+      <Button slot="end" on:click={getGlobalRate} appearance="transparent">
+        <Icon name="mdi:cached" />
+      </Button>
+    </Input>
 
     {#if cur1 && cur2}
-      <div>1 {cur1} = {rate} {cur2}</div>
-      <div>1 {cur2} = {(1 / Number(rate)).toFixed(4)} {cur1}</div>
-    {/if}
-
-    {#if !!item}
-      <FormContainer action="?/delete" onResult={onDelete}>
-        <input name="id" value={item?.id} readonly class="hidden" />
-        <Button
-          text={$translate('currency_rates.delete_currency_rate')}
-          appearance="transparent"
-          color="danger"
-          type="submit"
-        />
-      </FormContainer>
+      <div class="flex gap-1 items-center">
+        <div class="flex-grow flex-col gap-0.5">
+          <div>1 {cur1} = {rate} {cur2}</div>
+          <div>1 {cur2} = {(1 / Number(rate)).toFixed(4)} {cur1}</div>
+        </div>
+        <Button on:click={swapCurrencies} appearance="transparent" bordered>
+          <Icon name="mdi:swap-vertical" />
+        </Button>
+      </div>
     {/if}
 
     <div class="grid-col-2 gap-1">
-      <Button text={$translate('common.cancel')} color="secondary" on:click={() => (opened = false)} />
+      {#if !!item}
+        <Button on:click={onDelete} text={$translate('common.delete')} color="danger" />
+      {:else}
+        <Button text={$translate('common.cancel')} color="secondary" on:click={() => (opened = false)} />
+      {/if}
       <Button text={$translate('common.save')} color="primary" type="submit" />
     </div>
-  </FormContainer>
+  </form>
 </Modal>

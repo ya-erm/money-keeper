@@ -11,3 +11,5 @@ node_modules
 /backups
 screenshots/raw
 .ipynb_checkpoints
+.idea
+.vercel

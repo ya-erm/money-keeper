@@ -6,9 +6,13 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("POSTGRES_PRISMA_URL")
+  directUrl         = env("POSTGRES_URL_NON_POOLING")
+  shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING")
 }
+
+// Version 1 (depricated)
 
 model User {
   id    Int     @id @default(autoincrement())
@@ -208,4 +212,38 @@ model CurrencyRate {
   rate Float
 
   owner Group @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+}
+
+// Version 2
+
+model Member {
+  uuid  String  @id @default(uuid())
+  login String?
+
+  publicKey    String
+  encryptedKey String?
+
+  journal Journal[]
+  tokens  MemberToken[]
+}
+
+model MemberToken {
+  value String @id @default(uuid())
+
+  memberUuid  String
+  invalidated Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  member Member @relation(fields: [memberUuid], references: [uuid], onDelete: Cascade)
+}
+
+model Journal {
+  ownerUuid  String
+  order      Int
+  data       String
+  encryption String
+
+  owner Member @relation(fields: [ownerUuid], references: [uuid], onDelete: Cascade)
+
+  @@id([ownerUuid, order])
 }

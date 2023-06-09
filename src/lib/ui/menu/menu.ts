@@ -21,6 +21,11 @@ export const menu = readable<MenuItem[]>([
     path: routes.accounts.path,
   },
   {
+    icon: 'mdi:analytics',
+    title: 'analytics.title',
+    path: routes.analytics.path,
+  },
+  {
     icon: 'mdi:cog-outline',
     title: 'settings.title',
     path: routes.settings.path,

@@ -6,6 +6,7 @@
   export let onClick: () => void;
   export let selected: boolean = false;
   export let testId: string | undefined = undefined;
+  export let dataId: string | undefined = undefined;
   export let dashed: boolean = false;
 </script>
 
@@ -14,6 +15,7 @@
   class:selected
   class:dashed
   data-testId={testId}
+  data-id={dataId}
   class="grid-item flex-col flex-center gap-0.5 cursor-pointer"
   type="button"
 >

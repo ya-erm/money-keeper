@@ -2,6 +2,7 @@ import { addMessages } from 'svelte-i18n';
 import type { Dictionary } from './messages';
 
 export const ruDict: Dictionary = {
+  'app.title': 'Money Keeper',
   // Common
   'common.back': 'Назад',
   'common.select': 'Выбрать',
@@ -9,6 +10,7 @@ export const ruDict: Dictionary = {
   'common.available_variants': 'Доступные варианты',
   'common.optional': 'опционально',
   'common.loading': 'Загрузка...',
+  'common.synchronizing': 'Синхронизация',
   'common.show_more': 'Показать ещё',
   'common.sorting': 'Сортировка',
   'common.sort_by': 'Поле для сортировки',
@@ -28,6 +30,7 @@ export const ruDict: Dictionary = {
   'common.cancel': 'Отмена',
   'common.delete': 'Удалить',
   'common.ok': 'OK',
+  'common.continue': 'Продолжить',
   // Tags
   'tags.add_modal_header': 'Добавить тег',
   'tags.edit_modal_header': 'Редактировать тег',
@@ -55,14 +58,17 @@ export const ruDict: Dictionary = {
   'auth.passwords_must_be_same': 'Пароли должны совпадать',
   'auth.register': 'Зарегистрироваться',
   'auth.user_already_exists': 'Пользователь уже существует',
-  'auth.failed_to_register': 'Не удалось зарегистрироваться',
+  'auth.registration_success': 'Регистрация прошла успешно',
+  'auth.registration_failure': 'Не удалось зарегистрироваться',
   'auth.logout.title': 'Выход',
   'auth.sign_out': 'Выйти',
   'auth.profile': 'Профиль',
   'auth.logged_in_as': 'Вы зашли как {name}!',
   'auth.not_logged_in': 'Вы не авторизованы',
   // Accounts
+  'accounts.list': 'Список счетов',
   'accounts.title': 'Счета',
+  'accounts.new_account': 'Новый счёт',
   'accounts.create_account': 'Создать счёт',
   'accounts.create_account_failure': 'Не удалось создать счёт',
   'accounts.create_account_success': 'Счёт создан',
@@ -77,11 +83,15 @@ export const ruDict: Dictionary = {
   'accounts.currency': 'Валюта',
   'accounts.icon': 'Значок',
   'accounts.color': 'Цвет',
+  'accounts.tags': 'Теги',
   'accounts.order': 'Порядковый номер',
+  // Analytics
+  'analytics.title': 'Аналитика',
   // Categories
   'categories.title': 'Категории',
   'categories.incomings': 'Доходы',
   'categories.outgoings': 'Расходы',
+  'categories.new_category': 'Новая категория',
   'categories.create_category': 'Создать категорию',
   'categories.create_category_success': 'Категория создана',
   'categories.create_category_failure': 'Не удалось создать категорию',
@@ -192,6 +202,7 @@ export const ruDict: Dictionary = {
   'settings.theme.light': 'Светлое',
   'settings.theme.dark': 'Тёмное',
   'settings.theme.system': 'Как в системе',
+  'settings.import_export': 'Импорт / Экспорт',
   'settings.profile': 'Профиль',
   'settings.profile.change_name': 'Изменить имя',
   'settings.profile.change_name_failure': 'Не удалось изменить имя',
@@ -208,6 +219,7 @@ export const ruDict: Dictionary = {
   'settings.collaboration.workspaces': 'Рабочие пространства',
   'settings.collaboration.invites': 'Приглашения',
   'settings.collaboration.blocklist': 'Чёрный список',
+  'settings.encryption': 'Шифрование',
   'settings.report_problem': 'Сообщить о проблеме',
   'settings.version': 'Версия: {version}',
   'settings.uikit': 'UI Kit',

@@ -1,11 +1,10 @@
-import test, { expect, type Page } from '@playwright/test';
-import { hasLocatorClassAsync, useAuthAsync } from '@tests/utils';
+import test, { expect } from '@playwright/test';
 import { checkCommonInputs, getTransactionFormLocators } from '@tests/transactions/utils';
+import { hasLocatorClassAsync } from '@tests/utils';
 
 test.describe('Transactions. Create. Transfer', () => {
-  test('page has all required inputs', async ({ page, context }) => {
-    await useAuthAsync(page, context);
-    await page.goto('/transactions/create');
+  test('page has all required inputs', async ({ page }) => {
+    await page.goto('/transactions/create', { waitUntil: 'networkidle' });
 
     const {
       form,
@@ -20,7 +19,8 @@ test.describe('Transactions. Create. Transfer', () => {
     expect(await form.isVisible()).toBe(true);
     expect(await typeSwitch.isVisible()).toBe(true);
 
-    await typeSwitchTransferButton.click();
+    await typeSwitchTransferButton.click({ delay: 100 });
+    await page.waitForURL('/transactions/create?type=TRANSFER');
     expect(await hasLocatorClassAsync(typeSwitchTransferButton, 'active')).toBe(true);
 
     expect(await sourceAccountSelect.isVisible()).toBe(true);

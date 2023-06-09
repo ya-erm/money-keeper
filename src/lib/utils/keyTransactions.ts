@@ -3,13 +3,18 @@ export function keyTransactions<T extends { date: Date | string; amount: number 
   const keyedItemsMap = new Map<string, T>();
   const sameDateAmountTransactions = new Map<string, T[]>();
   const keyedItems = items.map((item) => {
-    const key = `${new Date(item.date).toISOString().substring(0, 10)}_${item.amount}`;
-    const items = sameDateAmountTransactions.get(key) ?? [];
-    items.push(item);
-    const uniqueKey = `${key}_#${items.length}`;
-    keyedItemsMap.set(uniqueKey, item);
-    sameDateAmountTransactions.set(key, items);
-    return { ...item, uniqueKey };
+    try {
+      const key = `${new Date(item.date).toISOString().substring(0, 10)}_${item.amount}`;
+      const items = sameDateAmountTransactions.get(key) ?? [];
+      items.push(item);
+      const uniqueKey = `${key}_#${items.length}`;
+      keyedItemsMap.set(uniqueKey, item);
+      sameDateAmountTransactions.set(key, items);
+      return { ...item, uniqueKey };
+    } catch (e) {
+      console.error('Failed to key item', item);
+      throw e;
+    }
   });
   return { keyedItemsMap, keyedItems };
 }

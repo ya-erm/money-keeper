@@ -2,6 +2,7 @@ import { addMessages } from 'svelte-i18n';
 import type { Dictionary } from './messages';
 
 export const enDict: Dictionary = {
+  'app.title': 'Money Keeper',
   // Common
   'common.back': 'Back',
   'common.select': 'Select',
@@ -9,6 +10,7 @@ export const enDict: Dictionary = {
   'common.available_variants': 'Available variants',
   'common.optional': 'optional',
   'common.loading': 'Loading...',
+  'common.synchronizing': 'Synchronizing',
   'common.show_more': 'Show more',
   'common.sorting': 'Sorting',
   'common.sort_by': 'Sort by',
@@ -28,6 +30,7 @@ export const enDict: Dictionary = {
   'common.cancel': 'Cancel',
   'common.delete': 'Delete',
   'common.ok': 'OK',
+  'common.continue': 'Continue',
   // Tags
   'tags.add_modal_header': 'Add tag',
   'tags.edit_modal_header': 'Edit tag',
@@ -55,14 +58,17 @@ export const enDict: Dictionary = {
   'auth.passwords_must_be_same': 'Passwords must be same',
   'auth.register': 'Sign up',
   'auth.user_already_exists': 'User already exists',
-  'auth.failed_to_register': 'Failed to register',
+  'auth.registration_success': 'Registration was successful',
+  'auth.registration_failure': 'Failed to register',
   'auth.logout.title': 'Logout',
   'auth.sign_out': 'Sign out',
   'auth.profile': 'Profile',
   'auth.logged_in_as': 'You are logged in as {name}!',
   'auth.not_logged_in': 'You are not logged in',
   // Accounts
+  'accounts.list': 'Account list',
   'accounts.title': 'Accounts',
+  'accounts.new_account': 'New account',
   'accounts.create_account': 'Create account',
   'accounts.create_account_failure': 'Failed to create account',
   'accounts.create_account_success': 'Account was created',
@@ -77,11 +83,15 @@ export const enDict: Dictionary = {
   'accounts.currency': 'Currency',
   'accounts.icon': 'Icon',
   'accounts.color': 'Color',
+  'accounts.tags': 'Tags',
   'accounts.order': 'Order number',
+  // Analytics
+  'analytics.title': 'Analytics',
   // Categories
   'categories.title': 'Categories',
   'categories.incomings': 'Incomings',
   'categories.outgoings': 'Outgoings',
+  'categories.new_category': 'New category',
   'categories.create_category': 'Create category',
   'categories.create_category_success': 'Category was created',
   'categories.create_category_failure': 'Failed to create category',
@@ -192,6 +202,7 @@ export const enDict: Dictionary = {
   'settings.theme.light': 'Light',
   'settings.theme.dark': 'Dark',
   'settings.theme.system': 'System',
+  'settings.import_export': 'Import / Export',
   'settings.profile': 'Profile',
   'settings.profile.change_name': 'Change name',
   'settings.profile.change_name_failure': 'Failed to change name',
@@ -208,6 +219,7 @@ export const enDict: Dictionary = {
   'settings.collaboration.workspaces': 'Workspaces',
   'settings.collaboration.invites': 'Invites',
   'settings.collaboration.blocklist': 'Blocklist',
+  'settings.encryption': 'Encryption',
   'settings.report_problem': 'Report a problem',
   'settings.version': 'Version: {version}',
   'settings.uikit': 'UI Kit',

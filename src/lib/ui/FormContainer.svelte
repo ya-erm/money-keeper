@@ -6,7 +6,7 @@
   export let action: string | undefined = undefined;
   export let testId: string = 'Form';
   export let onSubmit: (e: SubmitEvent) => void | Promise<void> = () => {};
-  export let onResult: ((result: ActionResult<any>, next: (result: ActionResult<any>) => void) => void) | null = null;
+  export let onResult: ((result: ActionResult, next: (result: ActionResult) => void) => void) | null = null;
 </script>
 
 <div class="content">

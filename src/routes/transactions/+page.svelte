@@ -1,26 +1,14 @@
 <script lang="ts">
-  import { routes } from '$lib/routes';
+  import { operationsStore } from '$lib/data';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
+  import { useRightButton, useTitle } from '$lib/ui/header/model';
+  import AddTransactionButton from './AddTransactionButton.svelte';
+  import TransactionList from './TransactionList.svelte';
 
-  import TransactionListItem from './TransactionListItem.svelte';
-  import type { PageData } from './$types';
+  $: transactions = $operationsStore;
 
-  export let data: PageData;
-  $: transactions = data.transactions;
+  useRightButton(AddTransactionButton);
+  useTitle($translate('transactions.title'));
 </script>
 
-<div class="p-1">
-  <a class="flex-col" href={routes['transactions.create'].path}>
-    <Button>
-      <Icon name="mdi:plus" />
-      {$translate('transactions.new_transaction')}
-    </Button>
-  </a>
-</div>
-<div class="p-1 flex-col gap-1">
-  {#each transactions as transaction}
-    <TransactionListItem {transaction} />
-  {/each}
-</div>
+<TransactionList {transactions} />

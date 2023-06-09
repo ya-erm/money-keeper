@@ -6,6 +6,8 @@
   import { getSearchParam } from '$lib/utils';
 
   $: cardId = getSearchParam($page, 'account-card');
+
+  // TODO: use <HeaderButton> instead
 </script>
 
 <a href={`${routes['transactions.create'].path}?accountId=${cardId}`}>

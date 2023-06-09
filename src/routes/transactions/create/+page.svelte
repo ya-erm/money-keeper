@@ -1,35 +1,28 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
-
-  import { routes } from '$lib/routes';
+  import { accountsStore, categoriesStore, operationsService, operationTagsStore } from '$lib/data';
+  import type { Transaction } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
+  import { useTitle } from '$lib/ui/header';
+
   import { showSuccessToast } from '$lib/ui/toasts';
-  import { getNumberSearchParam } from '$lib/utils/getSearchParam';
+  import TransactionForm from '../form/TransactionForm.svelte';
 
-  import TransactionForm from '../TransactionForm.svelte';
-  import type { PageData } from './$types';
+  $: accounts = $accountsStore;
+  $: categories = $categoriesStore;
+  $: tags = $operationTagsStore;
 
-  export let data: PageData;
-  $: accounts = data.accounts;
-  $: categories = data.categories;
-  $: tags = data.tags;
-  $: accountId = getNumberSearchParam($page, 'accountId');
+  useTitle($translate('transactions.new_transaction'));
 
-  const onSuccess = async () => {
+  const handleSubmit = async (transactions: Transaction[]) => {
+    transactions.forEach((transaction) => operationsService.save(transaction));
     showSuccessToast($translate('transactions.create_transaction_success'), {
       testId: 'CreateTransactionSuccessToast',
     });
-    await goto(`${routes.accounts.path}?account-card=${accountId}`);
+    history.back();
   };
 </script>
 
-<TransactionForm {accounts} {categories} {tags} action="?/create" {onSuccess}>
+<TransactionForm {accounts} {categories} {tags} onSubmit={handleSubmit}>
   <Button text={$translate('common.create')} type="submit" testId="CreateTransactionButton" />
-  <div slot="footer" class="flex-center mb-1">
-    <a href={routes['transactions.import'].path + (accountId ? `?accountId=${accountId}` : '')}>
-      {$translate('transactions.import')}
-    </a>
-  </div>
 </TransactionForm>

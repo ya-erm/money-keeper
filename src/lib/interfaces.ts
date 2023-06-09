@@ -6,6 +6,7 @@ export type GroupWithUsers = Pick<Group, 'id' | 'name'> & {
 
 export type TransactionDto = {
   id: number;
+  uuid: string;
   accountId: number;
   linkedTransactionId?: number | null;
   date: string;

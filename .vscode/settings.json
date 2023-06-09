@@ -1,4 +1,7 @@
 {
   "browser-preview.startUrl": "http://127.0.0.1:5173/",
-  "cSpell.words": ["datetime", "iconify"]
+  "browser-preview.chromeExecutable": "/Applications/Yandex.app/Contents/MacOS/Yandex",
+  "cSpell.words": ["datetime", "iconify", "Initialisable", "networkidle"],
+  "editor.tabSize": 2,
+  "cSpell.language": "en,ru,en-US,en-GB"
 }

@@ -15,6 +15,8 @@ type RouteKey =
   | 'groups.create'
   | 'accounts'
   | 'accounts.create'
+  | 'accounts.list'
+  | 'analytics'
   | 'categories'
   | 'categories.create'
   | 'transactions'
@@ -25,12 +27,14 @@ type RouteKey =
   | 'settings'
   | 'settings.language'
   | 'settings.currency_rates'
+  | 'settings.encryption'
+  | 'settings.import_export'
   | 'uikit';
 
 export const routes: { [key in RouteKey]: Route } = {
   root: {
     path: '/',
-    title: 'settings.title',
+    title: 'app.title',
   },
   login: {
     path: '/login',
@@ -42,7 +46,7 @@ export const routes: { [key in RouteKey]: Route } = {
   },
   register: {
     path: '/register',
-    title: 'auth.register',
+    title: 'auth.register.title',
   },
   profile: {
     path: '/profile',
@@ -63,6 +67,14 @@ export const routes: { [key in RouteKey]: Route } = {
   'accounts.create': {
     path: '/accounts/create',
     title: 'accounts.create_account',
+  },
+  'accounts.list': {
+    path: '/accounts/list',
+    title: 'accounts.title',
+  },
+  analytics: {
+    path: '/analytics',
+    title: 'analytics.title',
   },
   categories: {
     path: '/categories',
@@ -104,6 +116,14 @@ export const routes: { [key in RouteKey]: Route } = {
     path: '/settings/currency-rates',
     title: 'currency_rates.title',
   },
+  'settings.encryption': {
+    path: '/settings/encryption',
+    title: 'settings.encryption',
+  },
+  'settings.import_export': {
+    path: '/settings/import-export',
+    title: 'settings.import_export',
+  },
   uikit: {
     path: '/uikit',
     title: 'settings.uikit',
@@ -112,4 +132,8 @@ export const routes: { [key in RouteKey]: Route } = {
 
 export function findRoute(path: string) {
   return Object.values(routes).find((route) => route.path == path);
+}
+
+export function route(key: RouteKey) {
+  return routes[key].path;
 }
