@@ -3,6 +3,7 @@
   import type { Category, CategoryType } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
+  import InputLabel from '$lib/ui/InputLabel.svelte';
 
   import CategoryModal from '../../categories/CategoryModal.svelte';
 
@@ -30,7 +31,7 @@
 
 <div class="flex-col gap-0.5" data-testId={testId}>
   {#if !withoutHeader}
-    <span class="flex-center" data-testId={`${testId}.Label`}>{$translate('transactions.category')}</span>
+    <InputLabel testId={`${testId}.Label`} text={$translate('transactions.category')} />
   {/if}
   <input name="categoryId" value={categoryId} class="hidden" readonly required />
   <div class="grid" data-testId={`${testId}.Grid`}>
@@ -65,6 +66,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.25rem;
+    /* grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); */
+    gap: 0.5rem;
   }
 </style>

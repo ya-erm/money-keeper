@@ -12,10 +12,20 @@ test.describe('Transactions with tags', () => {
 
     await page.getByTestId('AddOperationButton').click();
 
-    const { categorySelect, sourceAccountSelect, amountInput, commentInput, createButton, tags } =
-      getTransactionFormLocators(page);
+    const {
+      categorySelect,
+      sourceAccountSelect,
+      sourceAccountSelectPortal,
+      amountInput,
+      commentInput,
+      createButton,
+      tags,
+    } = getTransactionFormLocators(page);
 
-    const accountButton = sourceAccountSelect.getByRole('button').filter({ hasText: 'T_TST' });
+    const selectorButton = sourceAccountSelect.getByRole('button');
+    await selectorButton.click();
+
+    const accountButton = sourceAccountSelectPortal.getByRole('button').filter({ hasText: 'T_TST' });
     await accountButton.click();
 
     const categoryButton = categorySelect.getByRole('button').filter({ hasText: 'T_Shop' });

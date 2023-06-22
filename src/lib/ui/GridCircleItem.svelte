@@ -19,7 +19,7 @@
   class="grid-item flex-col flex-center gap-0.5 cursor-pointer"
   type="button"
 >
-  <div class="circle mx-0.5">
+  <div class="circle">
     <Icon name={icon} size={2} />
   </div>
   <span class="text" title={text}>

@@ -25,6 +25,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.25rem;
+    /* grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); */
+    gap: 0.5rem;
   }
 </style>

@@ -126,6 +126,7 @@ export type Messages =
   | 'transactions.from'
   | 'transactions.to'
   | 'transactions.account'
+  | 'transactions.select_account'
   | 'transactions.account_is_required'
   | 'transactions.destination_account_is_required'
   | 'transactions.accounts_must_be_different'

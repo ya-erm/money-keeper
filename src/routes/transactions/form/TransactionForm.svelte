@@ -5,7 +5,7 @@
   import { page } from '$app/stores';
   import { operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
-  import type { Account, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
+  import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Input from '$lib/ui/Input.svelte';
   import InputLabel from '$lib/ui/InputLabel.svelte';
@@ -18,11 +18,11 @@
   } from '$lib/utils/checkFormParams';
   import TagsList from '$lib/widgets/TagsList.svelte';
 
-  import AccountSelect from './AccountSelect.svelte';
+  import AccountSelector from './AccountSelector.svelte';
   import CategorySelect from './CategorySelect.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
 
-  export let accounts: Account[];
+  export let accounts: AccountViewModel[];
   export let categories: Category[];
   export let tags: Tag[];
 
@@ -59,6 +59,9 @@
   let _value1 = (isTransfer ? sourceTransaction?.amount : transaction?.amount)?.toString() ?? '';
   let _value2 = destinationTransaction?.amount?.toString() ?? '';
   $: _rate = Number(_value1) / Number(_value2);
+
+  let selectingAccount = false;
+  let selectingDestinationAccount = false;
 
   let selectedTags = transaction?.tags.map((t) => `${t.id}`) ?? [];
 
@@ -120,22 +123,21 @@
   <div class="flex-col gap-1 p-1">
     <TypeSwitch bind:type disabled={isTransfer} />
     {#if type === 'OUT'}
-      <AccountSelect {accounts} bind:accountId testId="SourceAccountSelect" />
+      <AccountSelector bind:accountId bind:selecting={selectingAccount} testId="SourceAccountSelect" />
     {/if}
     {#if type === 'TRANSFER'}
-      <AccountSelect
-        name="accountId"
-        testId="SourceAccountSelect"
-        label={$translate('transactions.from')}
+      <AccountSelector
         bind:accountId
-        {accounts}
+        bind:selecting={selectingAccount}
+        label={$translate('transactions.from')}
+        testId="SourceAccountSelect"
       />
-      <AccountSelect
+      <AccountSelector
         name="destinationAccountId"
-        testId="DestinationAccountSelect"
-        label={$translate('transactions.to')}
         bind:accountId={destinationAccountId}
-        {accounts}
+        bind:selecting={selectingDestinationAccount}
+        label={$translate('transactions.to')}
+        testId="DestinationAccountSelect"
       />
     {/if}
     {#if type === 'IN' || type === 'OUT'}
@@ -150,7 +152,7 @@
       />
     {/if}
     {#if type === 'IN'}
-      <AccountSelect {accounts} bind:accountId testId="DestinationAccountSelect" />
+      <AccountSelector bind:accountId bind:selecting={selectingAccount} testId="DestinationAccountSelect" />
     {/if}
     <div class="flex-col gap-0.5">
       <InputLabel text={$translate('transactions.dateTime')} />

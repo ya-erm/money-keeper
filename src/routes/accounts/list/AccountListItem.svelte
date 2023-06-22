@@ -14,7 +14,14 @@
 </script>
 
 <li>
-  <button aria-label={account.name} on:click={() => onClick(account)} class="flex items-center justify-between">
+  <button
+    type="button"
+    data-id={account.id}
+    aria-label={account.name}
+    id={`account-list-item ${account.id}`}
+    class="flex items-center justify-between"
+    on:click={() => onClick(account)}
+  >
     <div class="flex items-center gap-0.5">
       <div class="account-icon">
         <Icon name={account.icon ?? 'mdi:credit-card-outline'} padding={0.5} />
@@ -24,20 +31,26 @@
         <div class="account-tags">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
       </div>
     </div>
-    <div class="flex-col items-end gap-0.25">
-      <div class="money-value flex gap-0.5">
-        {formatMoney(balance ?? 0, { currency: account.currency })}
-      </div>
-      {#if currencyRate && balance !== null}
-        <div class="other-money-value">
-          {formatMoney(balance * rate, { currency: otherCurrency })}
+    <div class="flex gap-0.25 items-center">
+      <div class="flex-col items-end gap-0.25">
+        <div class="money-value flex gap-0.5">
+          {formatMoney(balance ?? 0, { currency: account.currency })}
         </div>
-      {/if}
+        {#if currencyRate && balance !== null}
+          <div class="other-money-value">
+            {formatMoney(balance * rate, { currency: otherCurrency })}
+          </div>
+        {/if}
+      </div>
+      <slot name="end" />
     </div>
   </button>
 </li>
 
 <style>
+  li {
+    list-style: none;
+  }
   button {
     padding: 0.5rem;
     font-size: 1rem;
@@ -45,7 +58,7 @@
     background-color: var(--header-background-color);
     color: var(--primary-text-color);
     cursor: pointer;
-    border: none;
+    border: 1px solid var(--border-color);
     width: 100%;
     transition: box-shadow 0.2s ease-in-out;
   }
