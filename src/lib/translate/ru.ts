@@ -131,6 +131,7 @@ export const ruDict: Dictionary = {
   'transactions.from': 'Откуда',
   'transactions.to': 'Куда',
   'transactions.account': 'Счёт',
+  'transactions.select_account': 'Выбрать счёт',
   'transactions.account_is_required': 'Сначала выберите счёт',
   'transactions.destination_account_is_required': 'Сначала выберите счёт назначения',
   'transactions.accounts_must_be_different': 'Выберите разные счета',

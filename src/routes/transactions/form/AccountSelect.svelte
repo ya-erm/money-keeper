@@ -1,4 +1,6 @@
 <script lang="ts">
+  /** Deprecated: use AccountSelector */
+
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 

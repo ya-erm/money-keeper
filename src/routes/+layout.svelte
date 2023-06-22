@@ -5,8 +5,7 @@
   import '$lib/icons';
   import '$lib/translate';
 
-  import Header from '$lib/ui/header/Header.svelte';
-  import Menu from '$lib/ui/menu/Menu.svelte';
+  import Layout from '$lib/ui/Layout.svelte';
   import ThemeProvider from '$lib/ui/theme/ThemeProvider.svelte';
   import Toasts from '$lib/ui/toasts/Toasts.svelte';
 
@@ -15,14 +14,10 @@
 
 <Toasts />
 
-<main>
-  <Header />
-  <div class="page">
-    <slot />
-  </div>
-  <Menu />
-  <ThemeProvider />
-</main>
+<Layout>
+  <slot />
+</Layout>
+<ThemeProvider />
 
 <style>
   :global(body) {
@@ -30,20 +25,5 @@
     overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
       'Helvetica Neue', sans-serif;
-  }
-
-  main {
-    display: flex;
-    flex-direction: column;
-    color: var(--primary-text-color);
-    background-color: var(--background-color);
-    padding: 0;
-    height: 100vh;
-    max-height: -webkit-fill-available;
-  }
-
-  .page {
-    overflow-y: auto;
-    flex-grow: 1;
   }
 </style>

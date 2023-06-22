@@ -58,12 +58,20 @@ test.describe('Transactions > Create', () => {
 
       await page.goto('/transactions/create', { waitUntil: 'networkidle' });
 
-      const { typeSwitchInButton, destinationAccountSelect, amountInput, createButton } =
-        getTransactionFormLocators(page);
+      const {
+        typeSwitchInButton,
+        destinationAccountSelect,
+        destinationAccountSelectPortal,
+        amountInput,
+        createButton,
+      } = getTransactionFormLocators(page);
 
       await typeSwitchInButton.click();
 
-      const accountButton = destinationAccountSelect.getByRole('button').filter({ hasText: 'T_TST' });
+      const selectorButton = destinationAccountSelect.getByRole('button');
+      await selectorButton.click();
+
+      const accountButton = destinationAccountSelectPortal.getByRole('button').filter({ hasText: 'T_TST' });
       await accountButton.click();
 
       await amountInput.fill('10000');
@@ -83,16 +91,28 @@ test.describe('Transactions > Create', () => {
 
       await page.getByTestId('AddOperationButton').click();
 
-      const { typeSwitchInButton, categorySelect, destinationAccountSelect, amountInput, commentInput, createButton } =
-        getTransactionFormLocators(page);
+      const {
+        typeSwitchInButton,
+        categorySelect,
+        destinationAccountSelect,
+        destinationAccountSelectPortal,
+        amountInput,
+        commentInput,
+        createButton,
+      } = getTransactionFormLocators(page);
 
       await typeSwitchInButton.click();
 
       const categoryButton = categorySelect.getByRole('button').filter({ hasText: 'T_Work' });
       await categoryButton.click();
 
-      const accountButton = destinationAccountSelect.getByRole('button').filter({ hasText: 'T_TST' });
+      const selectorButton = destinationAccountSelect.getByRole('button');
+      await selectorButton.click();
+
+      const accountButton = destinationAccountSelectPortal.getByRole('button').filter({ hasText: 'T_TST' });
       const accountId = await accountButton.getAttribute('data-id');
+
+      expect(accountId).toBeDefined();
 
       await accountButton.click();
 

@@ -131,6 +131,7 @@ export const enDict: Dictionary = {
   'transactions.from': 'From',
   'transactions.to': 'To',
   'transactions.account': 'Account',
+  'transactions.select_account': 'Select account',
   'transactions.account_is_required': 'Select an account firstly',
   'transactions.destination_account_is_required': 'Select an destination account firstly',
   'transactions.accounts_must_be_different': 'Select different accounts',

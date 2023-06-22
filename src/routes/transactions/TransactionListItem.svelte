@@ -88,7 +88,7 @@
 
 <style>
   button {
-    padding: 0.5rem;
+    padding: 0;
     font-size: 1rem;
     border-radius: 1rem;
     background: transparent;

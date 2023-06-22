@@ -9,7 +9,10 @@
   import SyncState from './SyncState.svelte';
   import { backLink, leftButton, rightButton, title } from './model';
 
+  export let text: string | null = null;
+
   const titleText = derived([page, translate, title], ([page, translate, title]) => {
+    if (text) return text;
     if (title) return title;
     const route = findRoute(page.url.pathname);
     return route ? translate(route.title) : '';
