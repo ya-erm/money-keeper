@@ -84,7 +84,6 @@ export const enDict: Dictionary = {
   'accounts.icon': 'Icon',
   'accounts.color': 'Color',
   'accounts.tags': 'Tags',
-  'accounts.order': 'Order number',
   // Analytics
   'analytics.title': 'Analytics',
   // Categories
@@ -92,6 +91,8 @@ export const enDict: Dictionary = {
   'categories.incomings': 'Incomings',
   'categories.outgoings': 'Outgoings',
   'categories.new_category': 'New category',
+  'categories.incoming': 'Incoming',
+  'categories.outgoing': 'Outgoing',
   'categories.create_category': 'Create category',
   'categories.create_category_success': 'Category was created',
   'categories.create_category_failure': 'Failed to create category',

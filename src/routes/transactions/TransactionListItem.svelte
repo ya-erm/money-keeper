@@ -36,7 +36,7 @@
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />
     </div>
     <div class="text flex-col flex-grow items-start">
-      <div class="flex items-center">
+      <div class="flex items-center header">
         {#if isTransfer}
           <span class="source">
             {outgoing ? transaction.account.name : transaction.linkedTransaction?.account?.name}
@@ -107,6 +107,9 @@
     button:hover .amount {
       color: var(--active-color);
     }
+  }
+  .header {
+    font-weight: 500;
   }
   .icon {
     border-radius: 100%;

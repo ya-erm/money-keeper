@@ -1,31 +1,38 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import { categoriesService, categoriesStore } from '$lib/data';
   import type { Category, CategoryType } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import { useTitle } from '$lib/ui/header';
+  import { useRightButton, useTitle } from '$lib/ui/header';
+  import { deleteSearchParam, getSearchParam } from '$lib/utils';
 
+  import AddCategoryButton from './AddCategoryButton.svelte';
   import CategoryList from './CategoryList.svelte';
   import CategoryModal from './CategoryModal.svelte';
 
   useTitle($translate('categories.title'));
+  useRightButton(AddCategoryButton);
+
+  let opened = false;
+
+  $: action = getSearchParam($page, 'action');
+
+  $: if (action === 'create') {
+    category = null;
+    opened = true;
+  }
+  $: if (!!action && !opened) {
+    deleteSearchParam($page, 'action');
+  }
 
   $: categories = $categoriesStore;
 
   $: incomings = categories.filter((x) => x.type === 'IN');
   $: outgoings = categories.filter((x) => x.type === 'OUT');
 
-  let opened = false;
   let category: Category | null = null;
-  let categoryType: CategoryType = 'IN';
-
-  const handleAdd = (type: CategoryType) => () => {
-    categoryType = type;
-    category = null;
-    opened = true;
-  };
 
   const handleClick = (item: Category) => {
-    categoryType = item.type;
     category = item;
     opened = true;
   };
@@ -40,13 +47,13 @@
 </script>
 
 <h2>{$translate('categories.incomings')}</h2>
-<CategoryList items={incomings} onClick={handleClick} onAdd={handleAdd('IN')} />
+<CategoryList items={incomings} onClick={handleClick} />
 
 <h2 class="mt-2">{$translate('categories.outgoings')}</h2>
-<CategoryList items={outgoings} onClick={handleClick} onAdd={handleAdd('OUT')} />
+<CategoryList items={outgoings} onClick={handleClick} />
 
 {#if opened}
-  <CategoryModal bind:opened {category} {categoryType} {onSave} {onDelete} />
+  <CategoryModal bind:opened {category} {onSave} {onDelete} />
 {/if}
 
 <style>

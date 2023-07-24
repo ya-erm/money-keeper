@@ -63,6 +63,7 @@ class MainService implements Initialisable {
     );
     await Promise.all(services.map((service) => service.init()));
 
+    journalService.addSubscriber(membersService);
     services.forEach((service) => journalService.addSubscriber(service));
 
     logger.log('Initialise journal service');

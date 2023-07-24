@@ -7,6 +7,8 @@
 
   export let onClick: (category: Category) => void = () => {};
   export let onAdd: () => void = () => {};
+
+  export let showAddButton = false;
 </script>
 
 <div class="grid px-1 mb-1">
@@ -17,15 +19,17 @@
       text={category.name}
     />
   {/each}
-  <GridCircleItem onClick={onAdd} text={$translate('common.add')} icon="mdi:plus" dashed />
+  {#if showAddButton}
+    <GridCircleItem onClick={onAdd} text={$translate('common.add')} icon="mdi:plus" dashed />
+  {/if}
 </div>
 
 <style>
   .grid {
-    display: flex;
+    display: grid;
     flex-wrap: wrap;
     justify-content: center;
-    /* grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); */
+    grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
     gap: 0.5rem;
   }
 </style>

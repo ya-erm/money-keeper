@@ -5,11 +5,12 @@
   import Icon from '$lib/ui/Icon.svelte';
   import Input from '$lib/ui/Input.svelte';
   import Modal from '$lib/ui/Modal.svelte';
+  import MultiSwitch from '$lib/ui/MultiSwitch.svelte';
   import { v4 as uuid } from 'uuid';
 
   export let opened: boolean;
   export let category: Category | null = null;
-  export let categoryType: CategoryType;
+  export let categoryType: CategoryType = category?.type ?? 'OUT';
 
   export let onSave: (category: Category) => void | Promise<void>;
   export let onDelete: ((category: Category) => void | Promise<void>) | null = null;
@@ -33,10 +34,20 @@
     await onDelete?.(category);
     opened = false;
   };
+
+  const options = [
+    { id: 'IN', title: $translate('categories.incoming') },
+    { id: 'OUT', title: $translate('categories.outgoing') },
+  ];
+  const selectedOption = options.find(({ id }) => id == categoryType);
+  const handleChangeType = ({ id }: { id: string }) => {
+    categoryType = id as CategoryType;
+  };
 </script>
 
 <Modal width={20} header={category?.name ?? $translate('categories.new_category')} bind:opened>
   <form class="flex-col gap-1" on:submit|preventDefault={handleSave}>
+    <MultiSwitch {options} selected={selectedOption} on:change={(e) => handleChangeType(e.detail)} />
     <Input label={$translate('categories.name')} name="name" bind:value={name} required />
     <Input label={$translate('categories.icon')} name="icon" bind:value={icon} optional>
       <a slot="end" href="https://icon-sets.iconify.design/" target="_blank" rel="noopener noreferrer">

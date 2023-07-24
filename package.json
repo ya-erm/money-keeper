@@ -54,6 +54,7 @@
     "bcrypt": "^5.1.0",
     "dayjs": "^1.11.7",
     "idb": "^7.1.1",
+    "svelte-dnd-action": "^0.9.22",
     "uuid": "^9.0.0"
   },
   "prisma": {

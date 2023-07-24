@@ -84,7 +84,6 @@ export const ruDict: Dictionary = {
   'accounts.icon': 'Значок',
   'accounts.color': 'Цвет',
   'accounts.tags': 'Теги',
-  'accounts.order': 'Порядковый номер',
   // Analytics
   'analytics.title': 'Аналитика',
   // Categories
@@ -92,6 +91,8 @@ export const ruDict: Dictionary = {
   'categories.incomings': 'Доходы',
   'categories.outgoings': 'Расходы',
   'categories.new_category': 'Новая категория',
+  'categories.incoming': 'Доход',
+  'categories.outgoing': 'Расход',
   'categories.create_category': 'Создать категорию',
   'categories.create_category_success': 'Категория создана',
   'categories.create_category_failure': 'Не удалось создать категорию',

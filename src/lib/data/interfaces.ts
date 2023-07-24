@@ -26,6 +26,7 @@ export type MemberSettings = {
   syncNumber: number;
   currency?: string | null;
   encryption?: EncryptionVersion;
+  accountsOrder?: string[];
 };
 
 export type JournalItem = {
@@ -40,6 +41,7 @@ export type JournalOperation = {
   transaction?: Transaction;
   currencyRate?: CurrencyRate;
   tag?: Tag;
+  accountsOrder?: string[];
 };
 
 export type JournalSubscriber = {
@@ -61,7 +63,6 @@ export type Category = {
 export type Account = {
   id: string;
   name: string;
-  order: number;
   currency: string;
   icon?: string | null;
   tagIds?: string[];

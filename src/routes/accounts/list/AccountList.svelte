@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
+  import { dndzone, type DndEvent } from 'svelte-dnd-action';
+  import { flip } from 'svelte/animate';
+
+  import { currencyRatesStore, memberSettingsStore, membersService, operationsStore } from '$lib/data';
   import type { Account, AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
@@ -29,6 +32,17 @@
     .filter((account) => !selectedTags.length || selectedTags.some((tagId) => account.tagIds?.includes(tagId)))
     .filter((account) => !selectedCurrencies.length || selectedCurrencies.some((cur) => account.currency === cur))
     .filter((account) => !search || account.name.toLowerCase().includes(search.toLowerCase()));
+
+  const flipDurationMs = 200;
+
+  function handleDndConsider(e: CustomEvent<DndEvent<AccountViewModel>>) {
+    filteredAccounts = e.detail.items;
+  }
+
+  function handleDndFinalize(e: CustomEvent<DndEvent<AccountViewModel>>) {
+    filteredAccounts = e.detail.items;
+    membersService.saveAccountsOrder(filteredAccounts.map((account) => account.id));
+  }
 </script>
 
 <div class="p-1 flex-col gap-1">
@@ -46,14 +60,21 @@
   {#if showFilters}
     <Filters {accounts} bind:selectedTags bind:selectedCurrencies />
   {/if}
-  <ul class="flex-col gap-1">
+  <ul
+    class="flex-col gap-1"
+    use:dndzone={{ items: filteredAccounts, flipDurationMs, dropTargetStyle: {} }}
+    on:consider={handleDndConsider}
+    on:finalize={handleDndFinalize}
+  >
     {#each filteredAccounts as account (account.id)}
-      <AccountListItem
-        {account}
-        {onClick}
-        currencyRate={findCurrencyRate(currencyRates, settings?.currency, account.currency)}
-        balance={calculateBalance(operationsByAccount[account.id] ?? [])}
-      />
+      <li animate:flip={{ duration: flipDurationMs }}>
+        <AccountListItem
+          {account}
+          {onClick}
+          currencyRate={findCurrencyRate(currencyRates, settings?.currency, account.currency)}
+          balance={calculateBalance(operationsByAccount[account.id] ?? [])}
+        />
+      </li>
     {/each}
   </ul>
 </div>
@@ -71,5 +92,8 @@
     list-style: none;
     padding: 0;
     margin: 0;
+  }
+  li {
+    list-style: none;
   }
 </style>

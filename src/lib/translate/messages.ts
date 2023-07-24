@@ -80,7 +80,6 @@ export type Messages =
   | 'accounts.icon'
   | 'accounts.color'
   | 'accounts.tags'
-  | 'accounts.order'
   // Analytics
   | 'analytics.title'
   // Categories
@@ -88,6 +87,8 @@ export type Messages =
   | 'categories.incomings'
   | 'categories.outgoings'
   | 'categories.new_category'
+  | 'categories.incoming'
+  | 'categories.outgoing'
   | 'categories.create_category'
   | 'categories.create_category_success'
   | 'categories.create_category_failure'

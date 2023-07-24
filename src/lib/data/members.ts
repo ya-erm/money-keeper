@@ -1,12 +1,13 @@
 import { store } from '$lib/store';
 import { Logger } from '$lib/utils/logger';
-import type { Initialisable, Member, MemberSettings } from './interfaces';
+import type { Initialisable, JournalItem, JournalSubscriber, Member, MemberSettings } from './interfaces';
+import { journalService } from './journal';
 import { settingsService } from './settings';
 import { useDB } from './useDB';
 
 const logger = new Logger('MembersService', { disabled: false, color: '#00bbbb' });
 
-export class MembersService implements Initialisable {
+export class MembersService implements Initialisable, JournalSubscriber {
   // #region Private fields
   private _members = store<Member[]>([]);
   private _selectedMember = store<Member | null>(null);
@@ -14,6 +15,8 @@ export class MembersService implements Initialisable {
   // #endregion
 
   // #region Public properties
+
+  name = 'MembersService';
 
   /** List of all available members */
   get members() {
@@ -91,17 +94,15 @@ export class MembersService implements Initialisable {
     }
   }
 
-  /** Update member settings */
-  async updateSettings(settings: Partial<MemberSettings>) {
-    this._selectedMemberSettings.update((prev) => {
-      const newValue = { ...prev, ...settings } as MemberSettings;
-      logger.debug('Update member settings:', { prev, new: newValue });
-      return newValue;
-    });
-    const member = this.tryGetSelectedMember();
-    if (this.selectedMemberSettings) {
-      const db = await useDB();
-      await db.put('memberSettings', { ...this.selectedMemberSettings, owner: member.uuid });
+  /** Update member settings and optional save to DB */
+  async updateSettings(settings: Partial<MemberSettings>, saveToDB: boolean = true) {
+    this.updateSettingsInMemory(settings);
+    if (saveToDB) {
+      const member = this.tryGetSelectedMember();
+      if (this.selectedMemberSettings) {
+        const db = await useDB();
+        await db.put('memberSettings', { ...this.selectedMemberSettings, owner: member.uuid });
+      }
     }
   }
 
@@ -109,6 +110,21 @@ export class MembersService implements Initialisable {
   async deleteMember(member: Member) {
     const db = await useDB();
     await db.delete('members', member.uuid);
+  }
+
+  /** Save accounts order */
+  saveAccountsOrder(accountsOrder: string[]) {
+    journalService.addOperationToQueue({ accountsOrder });
+    this.updateSettingsInMemory({ accountsOrder });
+  }
+
+  /** Apply journal updates and optional save to DB */
+  async applyChanges(changes: JournalItem[], saveToDB: boolean) {
+    changes
+      .filter((item) => item.data.accountsOrder)
+      .forEach(async (item) => {
+        await this.updateSettings({ accountsOrder: item.data.accountsOrder }, saveToDB);
+      });
   }
 
   // #endregion
@@ -141,6 +157,15 @@ export class MembersService implements Initialisable {
     if (settings) {
       this._selectedMemberSettings.set(settings);
     }
+  }
+
+  /* Update settings in memory */
+  private async updateSettingsInMemory(settings: Partial<MemberSettings>) {
+    this._selectedMemberSettings.update((prev) => {
+      const newValue = { ...prev, ...settings } as MemberSettings;
+      logger.debug('Update member settings:', { prev, new: newValue });
+      return newValue;
+    });
   }
 }
 
