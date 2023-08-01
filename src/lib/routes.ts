@@ -29,6 +29,7 @@ type RouteKey =
   | 'settings.currency_rates'
   | 'settings.encryption'
   | 'settings.import_export'
+  | 'settings.logs'
   | 'uikit';
 
 export const routes: { [key in RouteKey]: Route } = {
@@ -123,6 +124,10 @@ export const routes: { [key in RouteKey]: Route } = {
   'settings.import_export': {
     path: '/settings/import-export',
     title: 'settings.import_export',
+  },
+  'settings.logs': {
+    path: '/settings/logs',
+    title: 'settings.logs',
   },
   uikit: {
     path: '/uikit',

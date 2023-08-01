@@ -7,6 +7,7 @@ body {
   --header-background-color: white;
 
   --red-color: #dc3545;
+  --orange-color: orange;
   --green-color: #28a745;
   --white-color: white;
   --active-color: #2f95dc;
@@ -25,6 +26,7 @@ body.dark-mode {
   --header-background-color: #121212;
 
   --red-color: #dc3545;
+  --orange-color: orange;
   --green-color: #28a745;
   --white-color: white;
   --active-color: #2f95dc;

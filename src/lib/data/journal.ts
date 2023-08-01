@@ -93,12 +93,14 @@ export class JournalService implements Initialisable {
     }
   }
 
+  /** Apply changes to subscribers */
   private async applyChangesToSubscribers(changes: JournalItem[], saveToDB: boolean) {
     if (changes.length === 0) return;
     const subscribers = Array.from(this._subscribers.values());
     await Promise.all(subscribers.map((subscriber) => subscriber.applyChanges(changes, saveToDB)));
   }
 
+  /** Fetch updates updates from server */
   private async fetchUpdates() {
     // await new Promise<void>((resolve) => setTimeout(() => resolve(), 5000));
     const fetcher = useFetch<GetJournalRequest, GetJournalResponse>('POST', '/api/v2/journal/get-updates');
@@ -138,6 +140,7 @@ export class JournalService implements Initialisable {
     this._updates.set(items);
   }
 
+  /** Try fetch updates from server, don't throw error */
   private async tryFetchUpdates() {
     try {
       this._state.set('downloading');
@@ -149,6 +152,7 @@ export class JournalService implements Initialisable {
     }
   }
 
+  /** Load queue from local database */
   private async loadQueueFromDB() {
     const db = await useDB();
     const member = membersService.tryGetSelectedMember();
@@ -160,6 +164,7 @@ export class JournalService implements Initialisable {
     this._queue.set(items);
   }
 
+  /** Add operation to queue (in memory) and try to upload it */
   async addOperationToQueue(operation: JournalOperation, options?: { upload: boolean }) {
     const item: JournalItem = {
       order: this.syncNumber + this._queue.value.length + 1,
@@ -178,12 +183,14 @@ export class JournalService implements Initialisable {
     }
   }
 
+  /** Clear queue */
   private async clearQueue() {
     this._queue.set([]);
     const db = await useDB();
     await db.clear('journal');
   }
 
+  /** Upload queue to the server */
   private async uploadQueue() {
     // TODO: optimize queue before upload
 
@@ -234,12 +241,14 @@ export class JournalService implements Initialisable {
     logger.log('Queue uploaded successfully.', 'New sync number:', json.syncNumber);
     if (json.syncNumber) this._syncNumber.set(json.syncNumber);
 
+    // TODO: move from this function for single responsibility
     logger.log('Applying changes from queue to subscribers');
     await this.applyChangesToSubscribers(this.queue, true);
 
     this.clearQueue();
   }
 
+  /** Try to upload queue to the server, don't throw error */
   async tryUploadQueue() {
     try {
       if (this.queue.length > 0) {

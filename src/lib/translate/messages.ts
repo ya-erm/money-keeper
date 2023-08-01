@@ -214,6 +214,10 @@ export type Messages =
   | 'settings.collaboration.invites'
   | 'settings.collaboration.blocklist'
   | 'settings.encryption'
+  | 'settings.logs'
+  | 'settings.logs.filters'
+  | 'settings.logs.show_filters'
+  | 'settings.logs.hide_filters'
   | 'settings.report_problem'
   | 'settings.version'
   | 'settings.uikit';
