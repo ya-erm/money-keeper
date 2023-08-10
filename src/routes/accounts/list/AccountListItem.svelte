@@ -6,11 +6,19 @@
   export let account: AccountViewModel;
   export let balance: number | null = null;
   export let currencyRate: CurrencyRate | null = null;
+  export let draggable = false;
 
   export let onClick: (account: Account) => void = () => {};
 
   const rate = currencyRate?.cur1 === account.currency ? currencyRate.rate : 1 / (currencyRate?.rate ?? 1);
   const otherCurrency = currencyRate?.cur1 === account.currency ? currencyRate.cur2 : currencyRate?.cur1;
+
+  const handleClick = () => {
+    if (draggable) {
+      return;
+    }
+    onClick(account);
+  };
 </script>
 
 <button
@@ -19,8 +27,12 @@
   aria-label={account.name}
   id={`account-list-item ${account.id}`}
   class="flex items-center justify-between"
-  on:click={() => onClick(account)}
+  class:draggable
+  on:click={handleClick}
 >
+  <div class="drag-zone" class:drag-zone-hidden={!draggable}>
+    <Icon name="mdi:drag" />
+  </div>
   <div class="flex items-center gap-0.5">
     <div class="account-icon">
       <Icon name={account.icon ?? 'mdi:credit-card-outline'} padding={0.5} />
@@ -57,12 +69,26 @@
     border: 1px solid var(--border-color);
     width: 100%;
     transition: box-shadow 0.2s ease-in-out;
+    overflow: hidden;
   }
   @media (hover: hover) {
     button:hover {
       box-shadow: 0.25rem 0.25rem 0.5rem 0 rgba(0, 0, 0, 0.1);
       opacity: 0.9;
     }
+  }
+  button.draggable {
+    cursor: grab;
+  }
+  .drag-zone {
+    pointer-events: auto;
+    justify-content: flex-start;
+    color: var(--secondary-text-color);
+    transition: width 0.5s;
+    width: 2rem;
+  }
+  .drag-zone-hidden {
+    width: 0;
   }
   .account-icon {
     border-radius: 100%;

@@ -180,9 +180,13 @@ a {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
+.pb-1,
+.py-1 {
+  padding-bottom: 1rem;
+}
+.pt-1,
 .py-1 {
   padding-top: 1rem;
-  padding-bottom: 1rem;
 }
 
 /* Margin */

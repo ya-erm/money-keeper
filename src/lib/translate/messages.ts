@@ -28,6 +28,7 @@ export type Messages =
   | 'common.delete'
   | 'common.ok'
   | 'common.continue'
+  | 'common.reset'
   // Tags
   | 'tags.add_modal_header'
   | 'tags.edit_modal_header'
@@ -80,6 +81,7 @@ export type Messages =
   | 'accounts.icon'
   | 'accounts.color'
   | 'accounts.tags'
+  | 'accounts.sort'
   // Analytics
   | 'analytics.title'
   // Categories

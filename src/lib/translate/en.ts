@@ -31,6 +31,7 @@ export const enDict: Dictionary = {
   'common.delete': 'Delete',
   'common.ok': 'OK',
   'common.continue': 'Continue',
+  'common.reset': 'Reset',
   // Tags
   'tags.add_modal_header': 'Add tag',
   'tags.edit_modal_header': 'Edit tag',
@@ -84,6 +85,7 @@ export const enDict: Dictionary = {
   'accounts.icon': 'Icon',
   'accounts.color': 'Color',
   'accounts.tags': 'Tags',
+  'accounts.sort': 'Sort accounts',
   // Analytics
   'analytics.title': 'Analytics',
   // Categories

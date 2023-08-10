@@ -31,6 +31,7 @@ export const ruDict: Dictionary = {
   'common.delete': 'Удалить',
   'common.ok': 'OK',
   'common.continue': 'Продолжить',
+  'common.reset': 'Сбросить',
   // Tags
   'tags.add_modal_header': 'Добавить тег',
   'tags.edit_modal_header': 'Редактировать тег',
@@ -84,6 +85,7 @@ export const ruDict: Dictionary = {
   'accounts.icon': 'Значок',
   'accounts.color': 'Цвет',
   'accounts.tags': 'Теги',
+  'accounts.sort': 'Сортировка счетов',
   // Analytics
   'analytics.title': 'Аналитика',
   // Categories

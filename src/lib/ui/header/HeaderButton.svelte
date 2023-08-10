@@ -5,18 +5,30 @@
   export let href: string;
   export let icon: string;
   export let label: string;
-
-  const handleClick = () => {
-    goto(href, { replaceState: true });
-  };
+  export let onClick: (() => void) | null = null;
 </script>
 
-<a title={label} aria-label={label} {href} on:click={handleClick}>
-  <Icon name={icon} padding={1} />
-</a>
+{#if onClick}
+  <button title={label} aria-label={label} on:click={onClick}>
+    <Icon name={icon} padding={1} />
+  </button>
+{:else}
+  <a title={label} aria-label={label} {href} on:click={() => goto(href, { replaceState: true })}>
+    <Icon name={icon} padding={1} />
+  </a>
+{/if}
 
 <style>
   a {
     display: inline-block;
+  }
+  button {
+    border: none;
+    outline: none;
+    display: inline-block;
+    background: transparent;
+    color: var(--active-color);
+    cursor: pointer;
+    padding: 0;
   }
 </style>
