@@ -62,19 +62,22 @@
 </script>
 
 <div class="accounts-list py-1 flex-col">
-  {#if sortable}
-    <div class="sorting px-1 pb-1 flex-center gap-1">
+  <div class="header mb-1">
+    <!-- {#if sortable} -->
+    <div class="sorting flex-center px-1 gap-1" class:left={!sortable}>
       <span>{$translate('common.sorting')}</span>
-      <Button color="white" on:click={restoreAccountsOrder}>
-        {$translate('common.cancel')}
-      </Button>
-      <Button color="primary" on:click={saveAccountsOrder}>
-        {$translate('common.save')}
-      </Button>
+      <div class="grid-col-2 gap-1">
+        <Button color="white" on:click={restoreAccountsOrder}>
+          {$translate('common.cancel')}
+        </Button>
+        <Button color="primary" on:click={saveAccountsOrder}>
+          {$translate('common.save')}
+        </Button>
+      </div>
     </div>
-  {:else}
-    <div class="search-and-filters">
-      <div class="px-1 pb-1 flex gap-1">
+    <!-- {:else} -->
+    <div class="search-and-filters" class:left={!sortable}>
+      <div class="flex px-1 gap-1">
         <div class="flex-grow">
           <Input bind:value={search} placeholder={$translate('common.search')} clearable />
         </div>
@@ -86,12 +89,15 @@
         </Button>
       </div>
       <Spoiler hidden={sortable || !showFilters}>
-        <div class="px-1 pb-1">
-          <Filters {accounts} bind:selectedTags bind:selectedCurrencies />
+        <div class="px-1 pt-1">
+          <div class="filters p-1">
+            <Filters {accounts} bind:selectedTags bind:selectedCurrencies />
+          </div>
         </div>
       </Spoiler>
     </div>
-  {/if}
+    <!-- {/if} -->
+  </div>
 
   <ul
     class="flex-col gap-1 px-1"
@@ -122,6 +128,23 @@
 <style>
   .accounts-list {
     overflow-x: hidden;
+  }
+  .header {
+    display: flex;
+    overflow: hidden;
+  }
+  .header > div {
+    overflow: hidden;
+    transition: all 0.5s;
+    min-width: 100%;
+  }
+  .header > div.left {
+    transform: translateX(-100%);
+  }
+  .filters {
+    border-radius: 1rem;
+    background: var(--header-background-color);
+    border: 1px solid var(--border-color);
   }
   .filter-badge {
     background: var(--active-color);
