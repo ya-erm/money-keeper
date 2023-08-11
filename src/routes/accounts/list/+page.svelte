@@ -20,10 +20,6 @@
 
   let opened = false;
 
-  page.subscribe((p) => {
-    console.log('searchParams', p.url.searchParams);
-  });
-
   $: action = getSearchParam($page, 'action');
 
   $: if (action === 'create') {
