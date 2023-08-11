@@ -38,8 +38,8 @@
       <Icon name={account.icon ?? 'mdi:credit-card-outline'} padding={0.5} />
     </div>
     <div class="flex-col items-start gap-0.25">
-      <div class="account-name">{account.name}</div>
-      <div class="account-tags">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
+      <div class="account-name text-ellipsis">{account.name}</div>
+      <div class="account-tags text-ellipsis">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
     </div>
   </div>
   <div class="flex-grow self-stretch" />
@@ -74,7 +74,6 @@
   @media (hover: hover) {
     button:hover {
       box-shadow: 0.25rem 0.25rem 0.5rem 0 rgba(0, 0, 0, 0.1);
-      opacity: 0.9;
     }
   }
   button.draggable {
@@ -85,7 +84,7 @@
     justify-content: flex-start;
     color: var(--secondary-text-color);
     transition: width 0.5s;
-    width: 2rem;
+    width: 2.5rem;
   }
   .drag-zone-hidden {
     width: 0;
@@ -93,6 +92,13 @@
   .account-icon {
     border-radius: 100%;
     background-color: var(--background-color);
+  }
+  .text-ellipsis {
+    display: -webkit-box;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
   }
   .account-name {
     font-size: 1rem;

@@ -1,4 +1,4 @@
-export function longPress(node: HTMLButtonElement, callback: () => void) {
+export function longPress(node: HTMLElement, callback: () => void) {
   let timer: NodeJS.Timeout;
 
   const handleMousedown = () => {

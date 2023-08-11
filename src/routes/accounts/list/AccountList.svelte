@@ -5,6 +5,7 @@
   import { currencyRatesStore, memberSettingsStore, membersService, operationsStore } from '$lib/data';
   import type { Account, AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
+  import { longPress } from '$lib/utils';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import Input from '$lib/ui/Input.svelte';
@@ -60,11 +61,10 @@
   }
 </script>
 
-<div class="py-1 flex-col h-full">
-  <div class="header" class:x-0={sortable} class:x-50={!sortable}>
-    <!-- {#if sortable} -->
-    <div class="sorting px-1 mb-1 flex-center gap-1">
-      <span>{$translate('accounts.sort')}</span>
+<div class="accounts-list py-1 flex-col">
+  {#if sortable}
+    <div class="sorting px-1 pb-1 flex-center gap-1">
+      <span>{$translate('common.sorting')}</span>
       <Button color="white" on:click={restoreAccountsOrder}>
         {$translate('common.cancel')}
       </Button>
@@ -72,9 +72,9 @@
         {$translate('common.save')}
       </Button>
     </div>
-    <!-- {:else} -->
+  {:else}
     <div class="search-and-filters">
-      <div class="px-1 mb-1 flex gap-1">
+      <div class="px-1 pb-1 flex gap-1">
         <div class="flex-grow">
           <Input bind:value={search} placeholder={$translate('common.search')} clearable />
         </div>
@@ -91,14 +91,19 @@
         </div>
       </Spoiler>
     </div>
-    <!-- {/if} -->
-  </div>
+  {/if}
 
   <ul
     class="flex-col gap-1 px-1"
-    use:dndzone={{ items: sortedAccounts, flipDurationMs, dragDisabled: !sortable, dropTargetStyle: {} }}
+    use:dndzone={{
+      items: sortedAccounts,
+      dragDisabled: !sortable,
+      dropTargetStyle: {},
+      flipDurationMs,
+    }}
     on:consider={handleDndConsider}
     on:finalize={handleDndFinalize}
+    on:contextmenu|preventDefault
   >
     {#each sortedAccounts as account (account.id)}
       <li animate:flip={{ duration: flipDurationMs }}>
@@ -115,17 +120,8 @@
 </div>
 
 <style>
-  .header {
-    display: grid;
-    width: 200vw;
-    grid-template-columns: 1fr 1fr;
-    transition: transform 0.5s;
-  }
-  .x-50 {
-    transform: translateX(-50%);
-  }
-  .x-0 {
-    transform: translateX(0%);
+  .accounts-list {
+    overflow-x: hidden;
   }
   .filter-badge {
     background: var(--active-color);
@@ -136,11 +132,7 @@
     transform: translate(10px, 10px);
   }
   ul {
-    overflow-y: auto;
     list-style: none;
     margin: 0;
-  }
-  li {
-    list-style: none;
   }
 </style>

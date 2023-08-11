@@ -18,21 +18,10 @@
 
 <div class="flex">
   <HeaderButton icon="mdi:sort" label={$translate('accounts.sort')} onClick={handleSortClick} href="?action=sort" />
-  <div class="button" class:button-hidden={action === 'sort'}>
-    <HeaderButton
-      icon="mdi:credit-card-plus-outline"
-      href="?action=create"
-      label={$translate('accounts.create_account')}
-    />
-  </div>
+  <HeaderButton
+    icon="mdi:credit-card-plus-outline"
+    href="?action=create"
+    label={$translate('accounts.create_account')}
+    disabled={action === 'sort'}
+  />
 </div>
-
-<style>
-  .button {
-    transition: width 0.5s;
-    width: 56px;
-  }
-  .button-hidden {
-    width: 0;
-  }
-</style>
