@@ -22,7 +22,6 @@
   let name = account?.name ?? '';
   let icon = account?.icon;
   let currency = account?.currency ?? '';
-  let order = `${account?.order ?? 0}`;
   let selectedTags = account?.tagIds;
 
   const handleSave = async () => {
@@ -33,7 +32,6 @@
       icon,
       currency,
       tagIds: selectedTags,
-      order: Number(order),
     });
     opened = false;
   };
@@ -61,7 +59,6 @@
         <Icon name="mdi:open-in-new" padding={0.5} />
       </a>
     </Input>
-    <Input label={$translate('accounts.order')} name="order" bind:value={order} type="number" optional />
     <div class="flex-col gap-0.5">
       <InputLabel text={$translate('accounts.tags')} optional />
       <TagsList

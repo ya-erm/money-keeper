@@ -36,7 +36,7 @@
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />
     </div>
     <div class="text flex-col flex-grow items-start">
-      <div class="flex items-center">
+      <div class="flex items-center header">
         {#if isTransfer}
           <span class="source">
             {outgoing ? transaction.account.name : transaction.linkedTransaction?.account?.name}
@@ -62,7 +62,7 @@
         {/if}
       </div>
       {#if transaction.comment}
-        <div class="small-text">
+        <div class="comment small-text">
           {transaction.comment}
         </div>
       {/if}
@@ -108,12 +108,16 @@
       color: var(--active-color);
     }
   }
+  .header {
+    font-weight: 500;
+  }
   .icon {
     border-radius: 100%;
     background-color: var(--header-background-color);
   }
   .text {
     overflow: hidden;
+    text-align: left;
   }
   .small-text {
     font-size: 0.9rem;
@@ -123,10 +127,12 @@
     color: var(--secondary-text-color);
   }
   .source,
+  .comment,
   .destination {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    max-width: 100%;
   }
   .amount {
     white-space: nowrap;

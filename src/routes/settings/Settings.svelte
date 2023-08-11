@@ -48,6 +48,12 @@
   <ListLinkItem title={$translate('settings.import_export')} href={route('settings.import_export')} />
 </ListGroup>
 
+<ListGroup title={'Инструменты отладки'}>
+  <ListLinkItem title={$translate('settings.logs')} href={route('settings.logs')} />
+  <ListLinkItem title={$translate('settings.report_problem')} href="https://github.com/ya-erm/money-keeper/issues" />
+  <ListLinkItem title={'UI Kit'} href={route('uikit')} />
+</ListGroup>
+
 <div class="mt-1 flex-col items-center gap-0.5">
   {#if selectedMember}
     <Button

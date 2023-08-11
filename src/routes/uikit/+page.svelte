@@ -7,6 +7,7 @@
   import Colors from './Colors.svelte';
   import Inputs from './Inputs.svelte';
   import Modals from './Modals.svelte';
+  import Spoilers from './Spoilers.svelte';
   import Switches from './Switches.svelte';
   import Tags from './Tags.svelte';
   import Toasts from './Toasts.svelte';
@@ -29,4 +30,5 @@
   <Modals />
   <Switches />
   <Tags />
+  <Spoilers />
 </div>

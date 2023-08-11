@@ -15,6 +15,7 @@
   </div>
   <div class="flex-col gap-1">
     <ColorItem color="--red-color" />
+    <ColorItem color="--orange-color" />
     <ColorItem color="--green-color" />
     <ColorItem color="--white-color" />
     <ColorItem color="--active-color" />

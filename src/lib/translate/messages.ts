@@ -28,6 +28,7 @@ export type Messages =
   | 'common.delete'
   | 'common.ok'
   | 'common.continue'
+  | 'common.reset'
   // Tags
   | 'tags.add_modal_header'
   | 'tags.edit_modal_header'
@@ -80,7 +81,7 @@ export type Messages =
   | 'accounts.icon'
   | 'accounts.color'
   | 'accounts.tags'
-  | 'accounts.order'
+  | 'accounts.sort'
   // Analytics
   | 'analytics.title'
   // Categories
@@ -88,6 +89,8 @@ export type Messages =
   | 'categories.incomings'
   | 'categories.outgoings'
   | 'categories.new_category'
+  | 'categories.incoming'
+  | 'categories.outgoing'
   | 'categories.create_category'
   | 'categories.create_category_success'
   | 'categories.create_category_failure'
@@ -213,6 +216,10 @@ export type Messages =
   | 'settings.collaboration.invites'
   | 'settings.collaboration.blocklist'
   | 'settings.encryption'
+  | 'settings.logs'
+  | 'settings.logs.filters'
+  | 'settings.logs.show_filters'
+  | 'settings.logs.hide_filters'
   | 'settings.report_problem'
   | 'settings.version'
   | 'settings.uikit';

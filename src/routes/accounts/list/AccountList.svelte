@@ -1,18 +1,24 @@
 <script lang="ts">
-  import { currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
+  import { dndzone, type DndEvent } from 'svelte-dnd-action';
+  import { flip } from 'svelte/animate';
+
+  import { currencyRatesStore, memberSettingsStore, membersService, operationsStore } from '$lib/data';
   import type { Account, AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
+  import { longPress } from '$lib/utils';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import Input from '$lib/ui/Input.svelte';
   import { groupBySelector } from '$lib/utils';
 
+  import Spoiler from '$lib/ui/Spoiler.svelte';
   import { calculateBalance, findCurrencyRate } from '../utils';
   import AccountListItem from './AccountListItem.svelte';
   import Filters from './Filters.svelte';
 
   export let accounts: AccountViewModel[];
   export let onClick: (account: Account) => void = () => {};
+  export let sortable = false;
 
   $: currencyRates = $currencyRatesStore;
   $: settings = $memberSettingsStore;
@@ -25,40 +31,112 @@
   let selectedTags: string[] = [];
   let selectedCurrencies: string[] = [];
 
-  $: filteredAccounts = accounts
-    .filter((account) => !selectedTags.length || selectedTags.some((tagId) => account.tagIds?.includes(tagId)))
-    .filter((account) => !selectedCurrencies.length || selectedCurrencies.some((cur) => account.currency === cur))
-    .filter((account) => !search || account.name.toLowerCase().includes(search.toLowerCase()));
+  $: filteredAccounts = sortable
+    ? accounts
+    : accounts
+        .filter((account) => !selectedTags.length || selectedTags.some((tagId) => account.tagIds?.includes(tagId)))
+        .filter((account) => !selectedCurrencies.length || selectedCurrencies.some((cur) => account.currency === cur))
+        .filter((account) => !search || account.name.toLowerCase().includes(search.toLowerCase()));
+
+  $: sortedAccounts = filteredAccounts;
+
+  const flipDurationMs = 200;
+
+  function handleDndConsider(e: CustomEvent<DndEvent<AccountViewModel>>) {
+    sortedAccounts = e.detail.items;
+  }
+
+  function handleDndFinalize(e: CustomEvent<DndEvent<AccountViewModel>>) {
+    sortedAccounts = e.detail.items;
+  }
+
+  function saveAccountsOrder() {
+    membersService.saveAccountsOrder(sortedAccounts.map((account) => account.id));
+    sortable = false;
+  }
+
+  function restoreAccountsOrder() {
+    sortedAccounts = accounts;
+    sortable = false;
+  }
 </script>
 
-<div class="p-1 flex-col gap-1">
-  <div class="flex gap-1">
-    <div class="flex-grow">
-      <Input bind:value={search} placeholder={$translate('common.search')} clearable />
+<div class="accounts-list py-1 flex-col">
+  <div class="header mb-1">
+    <!-- {#if sortable} -->
+    <div class="sorting flex-center px-1 gap-1" class:left={!sortable}>
+      <span>{$translate('common.sorting')}</span>
+      <div class="grid-col-2 gap-1">
+        <Button color="white" on:click={restoreAccountsOrder}>
+          {$translate('common.cancel')}
+        </Button>
+        <Button color="primary" on:click={saveAccountsOrder}>
+          {$translate('common.save')}
+        </Button>
+      </div>
     </div>
-    <Button color={showFilters ? 'primary' : 'white'} bordered on:click={() => (showFilters = !showFilters)}>
-      <Icon size={1.25} name="mdi:filter" />
-      {#if selectedTags.length || selectedCurrencies.length}
-        <span class="filter-badge" />
-      {/if}
-    </Button>
+    <!-- {:else} -->
+    <div class="search-and-filters" class:left={!sortable}>
+      <div class="flex px-1 gap-1">
+        <div class="flex-grow">
+          <Input bind:value={search} placeholder={$translate('common.search')} clearable />
+        </div>
+        <Button color={showFilters ? 'primary' : 'white'} bordered on:click={() => (showFilters = !showFilters)}>
+          <Icon size={1.25} name="mdi:filter" />
+          {#if selectedTags.length || selectedCurrencies.length}
+            <span class="filter-badge" />
+          {/if}
+        </Button>
+      </div>
+      <Spoiler hidden={sortable || !showFilters}>
+        <div class="px-1 pt-1">
+          <Filters {accounts} bind:selectedTags bind:selectedCurrencies />
+        </div>
+      </Spoiler>
+    </div>
+    <!-- {/if} -->
   </div>
-  {#if showFilters}
-    <Filters {accounts} bind:selectedTags bind:selectedCurrencies />
-  {/if}
-  <ul class="flex-col gap-1">
-    {#each filteredAccounts as account (account.id)}
-      <AccountListItem
-        {account}
-        {onClick}
-        currencyRate={findCurrencyRate(currencyRates, settings?.currency, account.currency)}
-        balance={calculateBalance(operationsByAccount[account.id] ?? [])}
-      />
+
+  <ul
+    class="flex-col gap-1 px-1"
+    use:dndzone={{
+      items: sortedAccounts,
+      dragDisabled: !sortable,
+      dropTargetStyle: {},
+      flipDurationMs,
+    }}
+    on:consider={handleDndConsider}
+    on:finalize={handleDndFinalize}
+    on:contextmenu|preventDefault
+  >
+    {#each sortedAccounts as account (account.id)}
+      <li animate:flip={{ duration: flipDurationMs }}>
+        <AccountListItem
+          {account}
+          {onClick}
+          currencyRate={findCurrencyRate(currencyRates, settings?.currency, account.currency)}
+          balance={calculateBalance(operationsByAccount[account.id] ?? [])}
+          draggable={sortable}
+        />
+      </li>
     {/each}
   </ul>
 </div>
 
 <style>
+  .accounts-list {
+    overflow-x: hidden;
+  }
+  .header {
+    display: flex;
+  }
+  .header > div {
+    transition: transform 0.5s;
+    min-width: 100%;
+  }
+  .header > div.left {
+    transform: translateX(-100%);
+  }
   .filter-badge {
     background: var(--active-color);
     border-radius: 100%;
@@ -69,7 +147,6 @@
   }
   ul {
     list-style: none;
-    padding: 0;
     margin: 0;
   }
 </style>

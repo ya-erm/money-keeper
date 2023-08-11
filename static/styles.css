@@ -7,6 +7,7 @@ body {
   --header-background-color: white;
 
   --red-color: #dc3545;
+  --orange-color: orange;
   --green-color: #28a745;
   --white-color: white;
   --active-color: #2f95dc;
@@ -25,6 +26,7 @@ body.dark-mode {
   --header-background-color: #121212;
 
   --red-color: #dc3545;
+  --orange-color: orange;
   --green-color: #28a745;
   --white-color: white;
   --active-color: #2f95dc;
@@ -113,6 +115,23 @@ a {
   justify-content: center;
 }
 
+/* Align self */
+.self-start {
+  align-self: flex-start;
+}
+.self-end {
+  align-self: flex-end;
+}
+.self-center {
+  align-self: center;
+}
+.self-stretch {
+  align-self: stretch;
+}
+.self-baseline {
+  align-self: baseline;
+}
+
 /* Grid */
 .grid-col-2 {
   display: grid;
@@ -161,9 +180,13 @@ a {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
+.pb-1,
+.py-1 {
+  padding-bottom: 1rem;
+}
+.pt-1,
 .py-1 {
   padding-top: 1rem;
-  padding-bottom: 1rem;
 }
 
 /* Margin */

@@ -10,23 +10,33 @@
 
   import AccountModal from '../AccountModal.svelte';
   import AccountList from './AccountList.svelte';
-  import AddAccountButton from './AddAccountButton.svelte';
+  import AccountListButtons from './AccountListButtons.svelte';
 
   $: accounts = $accountsStore;
 
   backLink.set(route('accounts'));
-  useRightButton(AddAccountButton);
+  useRightButton(AccountListButtons);
   useTitle($translate('accounts.title'));
 
   let opened = false;
+
+  page.subscribe((p) => {
+    console.log('searchParams', p.url.searchParams);
+  });
 
   $: action = getSearchParam($page, 'action');
 
   $: if (action === 'create') {
     opened = true;
   }
-  $: if (!!action && !opened) {
+  $: if (action === 'create' && !opened) {
     deleteSearchParam($page, 'action');
+  }
+
+  $: sortable = action === 'sort';
+
+  $: if (action === 'sort' && !sortable) {
+    goto('?', { replaceState: true });
   }
 
   const onClick = async (item: Account) => {
@@ -34,7 +44,7 @@
   };
 </script>
 
-<AccountList {accounts} {onClick} />
+<AccountList {accounts} {onClick} bind:sortable />
 
 {#if opened}
   <AccountModal account={null} bind:opened />

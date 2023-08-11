@@ -31,6 +31,7 @@ export const enDict: Dictionary = {
   'common.delete': 'Delete',
   'common.ok': 'OK',
   'common.continue': 'Continue',
+  'common.reset': 'Reset',
   // Tags
   'tags.add_modal_header': 'Add tag',
   'tags.edit_modal_header': 'Edit tag',
@@ -84,7 +85,7 @@ export const enDict: Dictionary = {
   'accounts.icon': 'Icon',
   'accounts.color': 'Color',
   'accounts.tags': 'Tags',
-  'accounts.order': 'Order number',
+  'accounts.sort': 'Sort accounts',
   // Analytics
   'analytics.title': 'Analytics',
   // Categories
@@ -92,6 +93,8 @@ export const enDict: Dictionary = {
   'categories.incomings': 'Incomings',
   'categories.outgoings': 'Outgoings',
   'categories.new_category': 'New category',
+  'categories.incoming': 'Incoming',
+  'categories.outgoing': 'Outgoing',
   'categories.create_category': 'Create category',
   'categories.create_category_success': 'Category was created',
   'categories.create_category_failure': 'Failed to create category',
@@ -220,6 +223,10 @@ export const enDict: Dictionary = {
   'settings.collaboration.workspaces': 'Workspaces',
   'settings.collaboration.invites': 'Invites',
   'settings.collaboration.blocklist': 'Blocklist',
+  'settings.logs': 'Logs',
+  'settings.logs.filters': 'Filters',
+  'settings.logs.show_filters': 'Show filters',
+  'settings.logs.hide_filters': 'Hide filters',
   'settings.encryption': 'Encryption',
   'settings.report_problem': 'Report a problem',
   'settings.version': 'Version: {version}',
