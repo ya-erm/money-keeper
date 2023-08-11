@@ -90,9 +90,7 @@
       </div>
       <Spoiler hidden={sortable || !showFilters}>
         <div class="px-1 pt-1">
-          <div class="filters p-1">
-            <Filters {accounts} bind:selectedTags bind:selectedCurrencies />
-          </div>
+          <Filters {accounts} bind:selectedTags bind:selectedCurrencies />
         </div>
       </Spoiler>
     </div>
@@ -131,20 +129,13 @@
   }
   .header {
     display: flex;
-    overflow: hidden;
   }
   .header > div {
-    overflow: hidden;
-    transition: all 0.5s;
+    transition: transform 0.5s;
     min-width: 100%;
   }
   .header > div.left {
     transform: translateX(-100%);
-  }
-  .filters {
-    border-radius: 1rem;
-    background: var(--header-background-color);
-    border: 1px solid var(--border-color);
   }
   .filter-badge {
     background: var(--active-color);

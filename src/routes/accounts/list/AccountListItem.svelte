@@ -39,7 +39,9 @@
     </div>
     <div class="flex-col items-start gap-0.25">
       <div class="account-name text-ellipsis">{account.name}</div>
-      <div class="account-tags text-ellipsis">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
+      {#if account.tags.length > 0}
+        <div class="account-tags text-ellipsis">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
+      {/if}
     </div>
   </div>
   <div class="flex-grow self-stretch" />
@@ -94,6 +96,7 @@
     background-color: var(--background-color);
   }
   .text-ellipsis {
+    text-align: left;
     display: -webkit-box;
     text-overflow: ellipsis;
     -webkit-box-orient: vertical;

@@ -14,15 +14,15 @@
   $: currencies = [...new Set(accounts.map((account) => account.currency))];
 </script>
 
-<div class="flex-col gap-1">
+<div class="filters-container p-1 flex-col gap-1">
   {#if accountTags.length > 0}
-    <div class="flex-col gap-0.5">
-      <div>{$translate('accounts.tags')}</div>
+    <div class="filter-group flex-col gap-0.5">
+      <div class="filter-title">{$translate('accounts.tags')}</div>
       <Tags tags={accountTags.map((tag) => ({ id: tag.id, title: tag.name }))} bind:selected={selectedTags} readOnly />
     </div>
   {/if}
-  <div class="flex-col gap-0.5">
-    <div>{$translate('accounts.currency')}</div>
+  <div class="filter-group flex-col gap-0.5">
+    <div class="filter-title">{$translate('accounts.currency')}</div>
     <Tags
       tags={currencies.map((currency) => ({ id: currency, title: currency }))}
       bind:selected={selectedCurrencies}
@@ -30,3 +30,14 @@
     />
   </div>
 </div>
+
+<style>
+  .filters-container {
+    border-radius: 1rem;
+    background: var(--header-background-color);
+    border: 1px solid var(--border-color);
+  }
+  .filter-title {
+    font-weight: 500;
+  }
+</style>

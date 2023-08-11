@@ -62,7 +62,7 @@
         {/if}
       </div>
       {#if transaction.comment}
-        <div class="small-text">
+        <div class="comment small-text">
           {transaction.comment}
         </div>
       {/if}
@@ -117,6 +117,7 @@
   }
   .text {
     overflow: hidden;
+    text-align: left;
   }
   .small-text {
     font-size: 0.9rem;
@@ -126,10 +127,12 @@
     color: var(--secondary-text-color);
   }
   .source,
+  .comment,
   .destination {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    max-width: 100%;
   }
   .amount {
     white-space: nowrap;
