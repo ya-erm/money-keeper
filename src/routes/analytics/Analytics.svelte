@@ -114,7 +114,7 @@
     <ul class="list">
       {#each groups as group (group.categoryId)}
         <li class="item" class:selected={selectedGroup === group} data-id={group.categoryId}>
-          <button on:click={() => (selectedGroup = group)}>
+          <button on:click={() => (selectedGroup = selectedGroup !== group ? group : null)}>
             <div class="category">
               <Icon name={group.category?.icon ?? 'mdi:help'} />
               <span>{group.category?.name ?? group.categoryId}</span>
