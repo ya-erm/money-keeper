@@ -113,7 +113,7 @@
   <div class="summary-by-categories">
     <ul class="list">
       {#each groups as group (group.categoryId)}
-        <li class="item" data-id={group.categoryId}>
+        <li class="item" class:selected={selectedGroup === group} data-id={group.categoryId}>
           <button on:click={() => (selectedGroup = group)}>
             <div class="category">
               <Icon name={group.category?.icon ?? 'mdi:help'} />
@@ -169,6 +169,7 @@
     padding: 0;
     border: none;
     font-size: 1rem;
+    color: var(--primary-text-color);
     background: transparent;
     cursor: pointer;
 
@@ -177,6 +178,9 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+  }
+  .item.selected button {
+    color: var(--active-color);
   }
   @media (hover: hover) {
     .item button:hover {
