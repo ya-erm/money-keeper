@@ -51,10 +51,12 @@
   .container {
     gap: 1rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   }
   .card {
-    padding: 1rem;
+    font-size: 0.7rem;
+    padding: 1rem 0.5rem;
+    color: var(--primary-text-color);
     background: var(--header-background-color);
     border: 1px solid var(--border-color);
     border-radius: 1rem;

@@ -39,7 +39,7 @@
     <h1 class="navigation-title my-0">
       <span class="relative">
         {$titleText}
-        {#if !$page.url.pathname.startsWith('/v1')}
+        {#if $page.url.pathname.startsWith('/beta')}
           <sup class="beta" title="Beta version">
             <Icon name="mdi:beta" size={1} padding={0} />
           </sup>

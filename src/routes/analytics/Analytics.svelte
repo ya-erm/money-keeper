@@ -14,6 +14,7 @@
   import { formatMoney } from '$lib/utils/formatMoney';
   import { groupBy } from '$lib/utils/groupBy';
   import { findCurrencyRate } from '../accounts/utils';
+  import TransactionList from '../transactions/TransactionList.svelte';
 
   const categories = $categoriesStore;
   const currencyRates = $currencyRatesStore;
@@ -28,11 +29,13 @@
   function prevMonth() {
     startDate = startDate.subtract(1, 'month').startOf('month');
     endDate = endDate.subtract(1, 'month').endOf('month');
+    selectedGroup = null;
   }
 
   function nextMonth() {
     startDate = startDate.add(1, 'month').startOf('month');
     endDate = endDate.add(1, 'month').endOf('month');
+    selectedGroup = null;
   }
 
   let globalRates: Record<string, number> | null = null;
@@ -92,10 +95,12 @@
       };
     })
     .sort((a, b) => a.sum - b.sum);
+
+  let selectedGroup: (typeof groups)[number] | null = null;
 </script>
 
 <div class="p-1">
-  <div class="flex gap-1 items-center justify-between">
+  <div class="month-selector flex gap-1 items-center justify-between">
     <Button color="white" bordered on:click={prevMonth}>
       <Icon name="mdi:chevron-left" />
     </Button>
@@ -104,39 +109,50 @@
       <Icon name="mdi:chevron-right" />
     </Button>
   </div>
-  <ul class="list">
-    {#each groups as group (group.categoryId)}
-      <li class="item" data-id={group.categoryId}>
-        <div class="category">
-          <Icon name={group.category?.icon ?? 'mdi:help'} />
-          <span>{group.category?.name ?? group.categoryId}</span>
+
+  <div class="summary-by-categories">
+    <ul class="list">
+      {#each groups as group (group.categoryId)}
+        <li class="item" class:selected={selectedGroup === group} data-id={group.categoryId}>
+          <button on:click={() => (selectedGroup = selectedGroup !== group ? group : null)}>
+            <div class="category">
+              <Icon name={group.category?.icon ?? 'mdi:help'} />
+              <span>{group.category?.name ?? group.categoryId}</span>
+            </div>
+            <span>
+              {formatMoney(group.sum, { currency: mainCurrency })}
+            </span>
+          </button>
+        </li>
+      {/each}
+    </ul>
+    <hr />
+    <div class="total-container">
+      <div class="total">
+        <div>{$translate('categories.incomings')}:</div>
+        <div>
+          {formatMoney(
+            groups.filter((g) => g.category?.type === 'IN').reduce((sum, g) => sum + g.sum, 0),
+            { currency: mainCurrency },
+          )}
         </div>
-        <span>
-          {formatMoney(group.sum, { currency: mainCurrency })}
-        </span>
-      </li>
-    {/each}
-  </ul>
-  <hr />
-  <div class="total-container">
-    <div class="total">
-      <div>{$translate('categories.incomings')}:</div>
-      <div>
-        {formatMoney(
-          groups.filter((g) => g.category?.type === 'IN').reduce((sum, g) => sum + g.sum, 0),
-          { currency: mainCurrency },
-        )}
-      </div>
-      <div>{$translate('categories.outgoings')}:</div>
-      <div>
-        {formatMoney(
-          groups.filter((g) => g.category?.type === 'OUT').reduce((sum, g) => sum + g.sum, 0),
-          { currency: mainCurrency },
-        )}
+        <div>{$translate('categories.outgoings')}:</div>
+        <div>
+          {formatMoney(
+            groups.filter((g) => g.category?.type === 'OUT').reduce((sum, g) => sum + g.sum, 0),
+            { currency: mainCurrency },
+          )}
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+{#if selectedGroup}
+  <div class="transactions-preview">
+    <TransactionList transactions={selectedGroup.transactions} />
+  </div>
+{/if}
 
 <style>
   .month {
@@ -149,11 +165,27 @@
     flex-direction: column;
     gap: 0.5rem;
   }
-  .item {
+  .item button {
+    padding: 0;
+    border: none;
+    font-size: 1rem;
+    color: var(--primary-text-color);
+    background: transparent;
+    cursor: pointer;
+
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+  }
+  .item.selected button {
+    color: var(--active-color);
+  }
+  @media (hover: hover) {
+    .item button:hover {
+      color: var(--active-color);
+    }
   }
   .category {
     display: flex;
