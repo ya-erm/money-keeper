@@ -59,10 +59,12 @@
     sortedAccounts = accounts;
     sortable = false;
   }
+
+  let scrollTop = 0;
 </script>
 
-<div class="accounts-list py-1 flex-col">
-  <div class="header mb-1">
+<div on:scroll={(e) => (scrollTop = e.currentTarget.scrollTop)} class="accounts-list pb-1 flex-col">
+  <div class="header py-1" class:sticky={sortable} class:bordered={scrollTop > 0}>
     <!-- {#if sortable} -->
     <div class="sorting flex-center px-1 gap-1" class:left={!sortable}>
       <span>{$translate('common.sorting')}</span>
@@ -126,9 +128,20 @@
 <style>
   .accounts-list {
     overflow-x: hidden;
+    height: 100%;
+  }
+  .sticky {
+    position: sticky;
+    top: 0;
   }
   .header {
     display: flex;
+    background: var(--background-color);
+    border-bottom: 1px solid transparent;
+    transition: border 0.3s;
+  }
+  .header.sticky.bordered {
+    border-bottom: 1px solid var(--border-color);
   }
   .header > div {
     transition: transform 0.5s;
