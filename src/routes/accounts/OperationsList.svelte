@@ -64,7 +64,7 @@
   </div>
   <ul class="operations-list mt-1 flex-col gap-1">
     {#each Object.entries(groups) as [date, transactions] (date)}
-      <div>{dayjs(date).format('DD MMMM YYYY')}</div>
+      <div>{dayjs(date).format('DD MMMM YYYY, dddd')}</div>
       {#each transactions as transaction (transaction.id)}
         <TransactionListItem
           hideAccount={!!account}
