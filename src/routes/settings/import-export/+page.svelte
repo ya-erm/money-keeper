@@ -14,7 +14,7 @@
   } from '$lib/data';
   import type { Account, Category, CurrencyRate, Tag, Transaction } from '$lib/data/interfaces';
   import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
-  import { deepEqual, groupBy, keyTransactions } from '$lib/utils';
+  import { deepEqual, groupByKey, keyTransactions } from '$lib/utils';
   import { Logger } from '$lib/utils/logger';
 
   const logger = new Logger('Import/Export');
@@ -118,7 +118,7 @@
   }
 
   const logOperationsKeys = () => {
-    const operationsByAccount = groupBy($operationsStore, 'accountId');
+    const operationsByAccount = groupByKey($operationsStore, 'accountId');
     logger.log('Logging operations keys for each account');
     Object.entries(operationsByAccount).forEach(([accountId, operations]) => {
       logger.debug({

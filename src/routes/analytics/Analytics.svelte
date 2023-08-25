@@ -11,8 +11,7 @@
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
-  import { formatMoney } from '$lib/utils/formatMoney';
-  import { groupBy } from '$lib/utils/groupBy';
+  import { formatMoney, groupByKey } from '$lib/utils';
   import { findCurrencyRate } from '../accounts/utils';
   import TransactionList from '../transactions/TransactionList.svelte';
 
@@ -79,7 +78,7 @@
     (t) => dayjs(t.date).isAfter(startDate) && dayjs(t.date).isBefore(endDate) && !t.category.system,
   );
 
-  $: transactionsByCategories = groupBy(filteredTransactions, 'categoryId');
+  $: transactionsByCategories = groupByKey(filteredTransactions, 'categoryId');
   $: groups = Object.entries(transactionsByCategories)
     .map(([categoryId, transactions]) => {
       const category = categories.find((c) => c.id === categoryId) ?? transactions?.[0]?.category;
