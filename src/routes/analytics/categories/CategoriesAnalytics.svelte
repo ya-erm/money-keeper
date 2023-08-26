@@ -1,19 +1,13 @@
 <script lang="ts">
   import dayjs from 'dayjs';
 
-  import {
-    categoriesStore,
-    currencyRatesService,
-    currencyRatesStore,
-    memberSettingsStore,
-    operationsStore,
-  } from '$lib/data';
+  import { categoriesStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import { formatMoney, groupByKey } from '$lib/utils';
-  import { findCurrencyRate } from '../accounts/utils';
-  import TransactionList from '../transactions/TransactionList.svelte';
+  import TransactionList from '../../transactions/TransactionList.svelte';
+  import { findRate } from '../utils/findRate';
+  import MonthSelect from './MonthSelect.svelte';
 
   const categories = $categoriesStore;
   const currencyRates = $currencyRatesStore;
@@ -25,54 +19,7 @@
   let startDate = dayjs().startOf('month');
   let endDate = dayjs().endOf('month');
 
-  function prevMonth() {
-    startDate = startDate.subtract(1, 'month').startOf('month');
-    endDate = endDate.subtract(1, 'month').endOf('month');
-    selectedGroup = null;
-  }
-
-  function nextMonth() {
-    startDate = startDate.add(1, 'month').startOf('month');
-    endDate = endDate.add(1, 'month').endOf('month');
-    selectedGroup = null;
-  }
-
-  let globalRates: Record<string, number> | null = null;
-  let globalRatesUsed = false;
-
-  async function loadGlobalRates() {
-    globalRatesUsed = true;
-    globalRates = await currencyRatesService.getGlobalCurrencyRates();
-  }
-
-  $: findRate = (currency: string) => {
-    if (currency === mainCurrency) {
-      return 1;
-    }
-    const rate = findCurrencyRate(currencyRates, mainCurrency, currency);
-    if (rate) {
-      return rate.cur1 === currency ? rate.rate : 1 / rate.rate;
-    }
-    if (!globalRatesUsed) {
-      console.debug(`No rate for ${currency} found, try to use global rates`);
-      loadGlobalRates();
-      return 0;
-    }
-    if (!globalRates) {
-      // console.debug('No global rates yet', { currency });
-      return 0;
-    }
-    if (!globalRates?.[currency] || !globalRates?.[mainCurrency]) {
-      console.warn(`No rate for ${currency} to ${mainCurrency}`);
-      // TODO: show warning four user, add transaction to the special list
-      return 0;
-    }
-    const usdToCur = globalRates[currency];
-    const usdToMain = globalRates[mainCurrency];
-    const curToMain = usdToMain / usdToCur;
-    // console.log(`Rate for ${currency} to ${mainCurrency} is ${curToMain}`);
-    return curToMain;
-  };
+  $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
   $: filteredTransactions = transactions.filter(
     (t) => dayjs(t.date).isAfter(startDate) && dayjs(t.date).isBefore(endDate) && !t.category.system,
@@ -88,7 +35,7 @@
         transactions: transactions ?? [],
         sum:
           transactions?.reduce(
-            (sum, t) => sum + (t.category.type == 'IN' ? 1 : -1) * t.amount * findRate(t.account.currency),
+            (sum, t) => sum + (t.category.type == 'IN' ? 1 : -1) * t.amount * findRateFn(t.account.currency),
             0,
           ) ?? 0,
       };
@@ -99,15 +46,7 @@
 </script>
 
 <div class="p-1">
-  <div class="month-selector flex gap-1 items-center justify-between">
-    <Button color="white" bordered on:click={prevMonth}>
-      <Icon name="mdi:chevron-left" />
-    </Button>
-    <h2 class="month">{startDate.format('MMMM YYYY')}</h2>
-    <Button color="white" bordered on:click={nextMonth}>
-      <Icon name="mdi:chevron-right" />
-    </Button>
-  </div>
+  <MonthSelect bind:startDate bind:endDate onChange={() => (selectedGroup = null)} />
 
   <div class="summary-by-categories">
     <ul class="list">
@@ -154,9 +93,6 @@
 {/if}
 
 <style>
-  .month {
-    margin: 0;
-  }
   .list {
     padding: 0;
     list-style: none;

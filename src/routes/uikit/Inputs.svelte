@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Checkbox from '$lib/ui/Checkbox.svelte';
   import Input from '$lib/ui/Input.svelte';
 
@@ -17,4 +17,5 @@
   <Input label="Text" value="Text input" optional {endText} {clearable} />
   <Input label="Password" value="Password" type="password" {endText} {clearable} />
   <Input label="Error" value="Value" error="Error text example" {endText} {clearable} />
+  <Input label="Color" type="color" {endText} {clearable} />
 </div>

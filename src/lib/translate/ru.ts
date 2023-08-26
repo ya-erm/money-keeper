@@ -84,10 +84,12 @@ export const ruDict: Dictionary = {
   'accounts.currency': 'Валюта',
   'accounts.icon': 'Значок',
   'accounts.color': 'Цвет',
+  'accounts.select_color': 'Выбрать цвет',
   'accounts.tags': 'Теги',
   'accounts.sort': 'Сортировка счетов',
   // Analytics
   'analytics.title': 'Аналитика',
+  'analytics.accounts.total': 'Всего',
   // Categories
   'categories.title': 'Категории',
   'categories.incomings': 'Доходы',

@@ -7,7 +7,7 @@
 
   export let name: string | null = null;
   export let label: string | null = null;
-  export let type: 'text' | 'password' | 'date' | 'time' | 'number' = 'text';
+  export let type: 'text' | 'password' | 'date' | 'time' | 'number' | 'color' = 'text';
   export let placeholder: string | null = null;
   export let step: string | number | null = 0.01;
   export let required: boolean = false;
@@ -46,6 +46,7 @@
       on:input={handleChange}
       autocomplete={autocomplete ? 'on' : undefined}
       step={type === 'number' ? step : undefined}
+      type={type === 'color' ? 'text' : type}
       data-testId={testId}
       class:error={!!error}
       class:clearable
@@ -54,10 +55,12 @@
       {maxlength}
       {required}
       {value}
-      {type}
       {name}
     />
     <div class="end-slot flex items-center">
+      {#if type === 'color'}
+        <input class="input-color" type="color" bind:value />
+      {/if}
       {#if endText}
         <span class="end-text" class:mr-1={!clearable || !value} data-testId={`${testId}.EndText`}>
           {endText}
@@ -95,6 +98,14 @@
   }
   .input-container {
     position: relative;
+  }
+  .input-color {
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    margin-right: 0.5rem;
   }
   input {
     font-size: 1rem;

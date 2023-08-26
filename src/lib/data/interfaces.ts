@@ -65,6 +65,7 @@ export type Account = {
   name: string;
   currency: string;
   icon?: string | null;
+  color?: string;
   tagIds?: string[];
   deleted?: boolean;
 };

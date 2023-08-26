@@ -34,7 +34,7 @@
     <Icon name="mdi:drag" />
   </div>
   <div class="flex items-center gap-0.5">
-    <div class="account-icon">
+    <div class="account-icon" style:background={account.color}>
       <Icon name={account.icon ?? 'mdi:credit-card-outline'} padding={0.5} />
     </div>
     <div class="flex-col items-start gap-0.25">

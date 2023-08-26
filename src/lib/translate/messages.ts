@@ -80,10 +80,12 @@ export type Messages =
   | 'accounts.currency'
   | 'accounts.icon'
   | 'accounts.color'
+  | 'accounts.select_color'
   | 'accounts.tags'
   | 'accounts.sort'
   // Analytics
   | 'analytics.title'
+  | 'analytics.accounts.total'
   // Categories
   | 'categories.title'
   | 'categories.incomings'

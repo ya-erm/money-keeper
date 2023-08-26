@@ -5,7 +5,6 @@
   import { currencyRatesStore, memberSettingsStore, membersService, operationsStore } from '$lib/data';
   import type { Account, AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import { longPress } from '$lib/utils';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import Input from '$lib/ui/Input.svelte';
