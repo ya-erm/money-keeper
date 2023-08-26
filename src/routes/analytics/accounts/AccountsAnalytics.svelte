@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
 
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
+  import { currencySymbols } from '$lib/data/currencySymbols';
   import type { AccountViewModel } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
@@ -12,14 +13,14 @@
 
   const currencyRates = $currencyRatesStore;
   const accounts = $accountsStore;
-  const transactions = $operationsStore;
+  const operations = $operationsStore;
   const settings = $memberSettingsStore;
 
   const mainCurrency = settings?.currency ?? 'USD';
 
   $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
-  $: operationsByAccount = groupBySelector($operationsStore, (t) => t.account.id);
+  $: operationsByAccount = groupBySelector(operations, (t) => t.account.id);
 
   type AccountSummary = {
     account: AccountViewModel;
@@ -64,24 +65,26 @@
   <tbody>
     {#each sortedItems as item, i (item.account.id)}
       <tr on:click={() => onClick(item.account)}>
-        <td class="number-cell">
-          <span class="color-badge" style:background={item.color} />
+        <td class="number-cell text-right">
           <span>{i + 1}.</span>
         </td>
         <td class="name-cell">
-          <div class="flex gap-0.25 items-baseline">
-            <span class="account-name">{item.account.name}</span>
+          <div class="flex gap-0.25 items-end">
+            <div class="flex gap-0.25 items-center">
+              <span class="color-badge" style:background={item.color} />
+              <span class="account-name">{item.account.name}</span>
+            </div>
             <span class="original-currency">{item.account.currency}</span>
           </div>
         </td>
         <td class="rated-balance">
           <div class="flex gap-0.25 items-baseline justify-end">
             <span>{formatMoney(item.ratedBalance, { maxPrecision: 0 })}</span>
-            <span class="main-currency">{mainCurrency}</span>
+            <span class="main-currency">{currencySymbols[mainCurrency] ?? mainCurrency}</span>
           </div>
         </td>
         <td class="percentages">
-          {formatMoney(item.percentages, { maxPrecision: 0 }) + '%'}
+          {formatMoney(item.percentages, { maxPrecision: item.percentages > 10 ? 0 : 1 }) + '%'}
         </td>
       </tr>
     {/each}
@@ -95,10 +98,9 @@
       <td>
         <div class="flex gap-0.25 items-baseline justify-end">
           <span>{formatMoney(totalBalance, { maxPrecision: 0 })}</span>
-          <span class="main-currency">{mainCurrency}</span>
         </div>
       </td>
-      <td />
+      <td>{mainCurrency} </td>
     </tr>
   </tfoot>
 </table>
@@ -111,7 +113,6 @@
   table {
     margin: 0;
     width: 100%;
-    padding-left: 1.5rem;
   }
   @media (hover: hover) {
     table tr {
@@ -125,9 +126,6 @@
     position: relative;
   }
   .color-badge {
-    position: absolute;
-    left: -12px;
-    top: 7.5px;
     width: 8px;
     height: 8px;
     border-radius: 100%;
@@ -143,10 +141,9 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
     overflow: hidden;
-    /* white-space: nowrap; */
-    /* display: inline-block; */
   }
   .rated-balance {
+    text-align: right;
     word-break: keep-all;
   }
   .original-currency {
@@ -154,10 +151,8 @@
     color: var(--secondary-text-color);
     word-break: keep-all;
   }
-  .main-currency {
-    font-size: 0.8rem;
-  }
   .percentages {
+    color: var(--secondary-text-color);
     flex-shrink: 0;
     display: inline-block;
     text-align: right;
