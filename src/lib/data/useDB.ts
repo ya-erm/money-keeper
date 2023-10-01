@@ -3,7 +3,7 @@
 import { openDB } from 'idb';
 import type { LocalDB } from './interfaces';
 
-const CURRENT_VERSION = 9;
+const CURRENT_VERSION = 10;
 
 export async function useDB() {
   return await openDB<LocalDB>('mk-2', CURRENT_VERSION, {
@@ -60,6 +60,11 @@ export async function useDB() {
 
       migration(9, 'Creating accounts tags store', () => {
         const objectStore = db.createObjectStore('accountTags', { keyPath: 'id' });
+        objectStore.createIndex('by-owner', 'owner');
+      });
+
+      migration(10, 'Creating groupings store', () => {
+        const objectStore = db.createObjectStore('groupings', { keyPath: 'id' });
         objectStore.createIndex('by-owner', 'owner');
       });
     },

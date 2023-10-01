@@ -2,6 +2,7 @@ export { accountTagsService, accountTagsStore } from './accountTags';
 export { accountsService, accountsStore } from './accounts';
 export { categoriesService, categoriesStore } from './categories';
 export { currencyRatesService, currencyRatesStore } from './currencyRates';
+export { groupingsService, groupingsStore } from './groupings';
 export { journalService } from './journal';
 export { mainService } from './main';
 export { memberSettingsStore, membersService, membersStore, selectedMemberStore } from './members';

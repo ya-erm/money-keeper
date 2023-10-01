@@ -18,6 +18,8 @@ type RouteKey =
   | 'accounts.list'
   | 'analytics'
   | 'analytics.accounts'
+  | 'analytics.accounts.groupings'
+  | 'analytics.accounts.groupings.edit'
   | 'analytics.categories'
   | 'categories'
   | 'categories.create'
@@ -82,6 +84,14 @@ export const routes: { [key in RouteKey]: Route } = {
   'analytics.accounts': {
     path: '/analytics/accounts',
     title: 'analytics.title',
+  },
+  'analytics.accounts.groupings': {
+    path: '/analytics/accounts/groupings',
+    title: 'analytics.groupings.title',
+  },
+  'analytics.accounts.groupings.edit': {
+    path: '/analytics/accounts/groupings/edit',
+    title: 'analytics.groupings.title',
   },
   'analytics.categories': {
     path: '/analytics/categories',

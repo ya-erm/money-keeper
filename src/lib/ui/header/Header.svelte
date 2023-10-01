@@ -6,13 +6,15 @@
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
 
+  import HeaderBackButton from './HeaderBackButton.svelte';
   import SyncState from './SyncState.svelte';
-  import { backLink, leftButton, rightButton, title } from './model';
+  import type { HeaderConfig } from './config';
+  import { backLink, backLinkTitle, leftButton, rightButton, title } from './model';
 
-  export let text: string | null = null;
+  export let config: HeaderConfig = {};
 
   const titleText = derived([page, translate, title], ([page, translate, title]) => {
-    if (text) return text;
+    if (config.title) return config.title;
     if (title) return title;
     const route = findRoute(page.url.pathname);
     return route ? translate(route.title) : '';
@@ -25,13 +27,18 @@
 
 <div class="navigation-bar">
   <div class="navigation-back-button">
-    {#if $backLink}
-      <a href={$backLink} on:click={() => backLink.set(null)}>
-        <Icon name="mdi:chevron-left" />
-        {$translate(findRoute($backLink)?.title ?? 'common.back')}
-      </a>
+    {#if config.backButton !== undefined}
+      <HeaderBackButton {...config.backButton} />
+    {:else if $backLink}
+      <HeaderBackButton
+        href={$backLink}
+        onClick={() => backLink.set(null)}
+        title={$backLinkTitle ?? $translate(findRoute($backLink)?.title ?? 'common.back')}
+      />
     {/if}
-    {#if $leftButton}
+    {#if config.leftButton !== undefined}
+      <svelte:component this={config.leftButton} />
+    {:else if $leftButton}
       <svelte:component this={$leftButton} />
     {/if}
   </div>
@@ -50,7 +57,9 @@
   </div>
 
   <div class="navigation-right-button">
-    {#if $rightButton}
+    {#if config.rightButton !== undefined}
+      <svelte:component this={config.rightButton} />
+    {:else if $rightButton}
       <svelte:component this={$rightButton} />
     {/if}
   </div>
@@ -67,13 +76,6 @@
   }
   .navigation-back-button:active {
     opacity: 0.8;
-  }
-  .navigation-back-button a {
-    display: flex;
-    align-items: center;
-    color: var(--active-color);
-    text-decoration: none;
-    padding: 0.5rem;
   }
   .navigation-bar {
     display: flex;
