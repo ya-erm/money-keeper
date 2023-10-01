@@ -36,8 +36,7 @@
             </div>
           </th>
           <th class="text-right">
-            {formatMoney(ratedBalance, { maxPrecision: 0 })}
-            {currencySymbols[mainCurrency] ?? mainCurrency}
+            {formatMoney(ratedBalance, { maxPrecision: 0, currency: currencySymbols[mainCurrency] ?? mainCurrency })}
           </th>
           <th class="percentages">
             {formatMoney(percentages, { maxPrecision: percentages > 10 ? 0 : 1 }) + '%'}
