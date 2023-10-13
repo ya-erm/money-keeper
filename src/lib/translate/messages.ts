@@ -30,6 +30,7 @@ export type Messages =
   | 'common.continue'
   | 'common.reset'
   | 'common.go_back_to_list'
+  | 'common.count'
   // Tags
   | 'tags.add_modal_header'
   | 'tags.edit_modal_header'
@@ -145,7 +146,6 @@ export type Messages =
   | 'transactions.title'
   | 'transactions.create_transaction'
   | 'transactions.new_transaction'
-  | 'transactions.title'
   | 'transactions.incoming'
   | 'transactions.outgoing'
   | 'transactions.transfer'

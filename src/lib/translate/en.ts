@@ -33,6 +33,7 @@ export const enDict: Dictionary = {
   'common.continue': 'Continue',
   'common.reset': 'Reset',
   'common.go_back_to_list': 'Go back to list',
+  'common.count': '{count} pcs.',
   // Tags
   'tags.add_modal_header': 'Add tag',
   'tags.edit_modal_header': 'Edit tag',

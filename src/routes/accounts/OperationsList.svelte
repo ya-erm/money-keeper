@@ -28,6 +28,7 @@
         t.comment?.toLowerCase().includes(search.toLowerCase()) ||
         t.category?.name.toLowerCase().includes(search.toLowerCase()) ||
         t.date.substring(0, 10).includes(search) ||
+        t.tags.some((tag) => tag.name.toLowerCase().includes(search.toLowerCase())) ||
         `${t.amount} ${account?.currency}`.toLowerCase().includes(search.toLowerCase()),
     ) ?? [];
 
@@ -47,7 +48,12 @@
 
 <div class="operations-container p-1">
   <div class="flex gap-1">
-    <h3 style:font-weight="normal" class="m-0 flex-grow">{$translate('transactions.title')}</h3>
+    <h3 style:font-weight="normal" class="m-0 flex-grow">
+      <span>{$translate('transactions.title')}</span>
+      <span class="operations-count">
+        {$translate('common.count', { values: { count: filteredTransactions.length } })}
+      </span>
+    </h3>
     <a href={`${route('transactions.create')}?accountId=${account?.id}`} data-testID="AddOperationButton">
       {$translate('common.add')}
     </a>
@@ -85,15 +91,9 @@
     position: relative;
   }
 
-  .operations-search-container::before {
-    content: '';
-    position: absolute;
-    pointer-events: none;
-    background: linear-gradient(to top, rgba(255, 255, 255, 0) 50%, var(--background-color));
-    left: 0;
-    right: 0;
-    height: 2rem;
-    bottom: -2rem;
+  .operations-count {
+    font-size: 0.85rem;
+    color: var(--secondary-text-color);
   }
 
   .operations-list {

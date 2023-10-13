@@ -33,6 +33,7 @@ export const ruDict: Dictionary = {
   'common.continue': 'Продолжить',
   'common.reset': 'Сбросить',
   'common.go_back_to_list': 'Вернуться назад к списку',
+  'common.count': '{count} шт.',
   // Tags
   'tags.add_modal_header': 'Добавить тег',
   'tags.edit_modal_header': 'Редактировать тег',
