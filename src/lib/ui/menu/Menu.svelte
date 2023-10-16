@@ -10,7 +10,7 @@
   import { menu } from './menu';
 
   const isActive = derived(page, (page) => {
-    return (path: string) => page.url.pathname === path;
+    return (path: string) => page.url.pathname.startsWith(path);
   });
 
   const hidden = derived(page, (page) => {

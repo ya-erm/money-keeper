@@ -2,11 +2,13 @@
   import Header from '$lib/ui/header/Header.svelte';
   import Menu from '$lib/ui/menu/Menu.svelte';
 
-  export let title: string | null = null;
+  import type { HeaderConfig } from './header/config';
+
+  export let header: HeaderConfig = {};
 </script>
 
 <main>
-  <Header text={title} />
+  <Header config={header} />
   <div class="page">
     <slot />
   </div>

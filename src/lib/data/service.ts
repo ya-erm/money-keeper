@@ -15,7 +15,7 @@ import { journalService } from './journal';
 import { membersService } from './members';
 import { useDB } from './useDB';
 
-type StorageName = 'categories' | 'accounts' | 'transactions' | 'tags' | 'accountTags' | 'currencyRates';
+type StorageName = 'categories' | 'accounts' | 'transactions' | 'tags' | 'accountTags' | 'currencyRates' | 'groupings';
 
 type EntityType = Category | Account | Transaction | Tag | CurrencyRate;
 

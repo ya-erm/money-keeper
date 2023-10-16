@@ -1,5 +1,7 @@
 <script lang="ts">
-  import Analytics from './Analytics.svelte';
-</script>
+  import { goto } from '$app/navigation';
+  import { route } from '$lib/routes';
+  import { onMount } from 'svelte';
 
-<Analytics />
+  onMount(() => goto(route('analytics.categories')));
+</script>

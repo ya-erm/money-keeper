@@ -21,6 +21,7 @@
 
   let name = account?.name ?? '';
   let icon = account?.icon;
+  let color = account?.color;
   let currency = account?.currency ?? '';
   let selectedTags = account?.tagIds;
 
@@ -30,6 +31,7 @@
       id: account?.id ?? uuid(),
       name,
       icon,
+      color,
       currency,
       tagIds: selectedTags,
     });
@@ -59,6 +61,7 @@
         <Icon name="mdi:open-in-new" padding={0.5} />
       </a>
     </Input>
+    <Input label={$translate('accounts.color')} type="color" name="color" bind:value={color} optional />
     <div class="flex-col gap-0.5">
       <InputLabel text={$translate('accounts.tags')} optional />
       <TagsList

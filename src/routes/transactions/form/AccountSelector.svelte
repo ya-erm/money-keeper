@@ -59,7 +59,14 @@
 </label>
 
 <Portal visible={selecting} testId={`${testId}.Portal`}>
-  <Layout title={$translate('transactions.select_account')}>
+  <Layout
+    header={{
+      backButton: {
+        onClick: () => (selecting = false),
+      },
+      title: $translate('transactions.select_account'),
+    }}
+  >
     <AccountList {accounts} onClick={selectAccount} />
   </Layout>
 </Portal>

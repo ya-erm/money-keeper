@@ -5,7 +5,7 @@
   import type { Account } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import { backLink, useRightButton, useTitle } from '$lib/ui/header/model';
+  import { useBackButton, useRightButton, useTitle } from '$lib/ui/header/model';
   import { deleteSearchParam, getSearchParam } from '$lib/utils';
 
   import AccountModal from '../AccountModal.svelte';
@@ -14,9 +14,9 @@
 
   $: accounts = $accountsStore;
 
-  backLink.set(route('accounts'));
-  useRightButton(AccountListButtons);
+  useBackButton(route('accounts'), $translate('common.back'));
   useTitle($translate('accounts.title'));
+  useRightButton(AccountListButtons);
 
   let opened = false;
 

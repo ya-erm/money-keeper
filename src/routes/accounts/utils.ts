@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 import type { CurrencyRate, TransactionViewModel } from '$lib/data/interfaces';
 
 export function calculateBalance(transactions: TransactionViewModel[]) {
@@ -17,3 +19,12 @@ export function findCurrencyRate(
     null
   );
 }
+
+export const operationBeforeDatePredicate = (date: Date) => (operation: TransactionViewModel) =>
+  dayjs(operation.date).isBefore(date);
+
+export const operationAfterDatePredicate = (date: Date) => (operation: TransactionViewModel) =>
+  dayjs(operation.date).isAfter(date);
+
+export const pastOperationsPredicate = operationBeforeDatePredicate(new Date());
+export const futureOperationsPredicate = operationAfterDatePredicate(new Date());

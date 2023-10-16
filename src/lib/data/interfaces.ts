@@ -27,6 +27,7 @@ export type MemberSettings = {
   currency?: string | null;
   encryption?: EncryptionVersion;
   accountsOrder?: string[];
+  groupingId?: string | null;
 };
 
 export type JournalItem = {
@@ -42,6 +43,7 @@ export type JournalOperation = {
   currencyRate?: CurrencyRate;
   tag?: Tag;
   accountsOrder?: string[];
+  grouping?: Grouping;
 };
 
 export type JournalSubscriber = {
@@ -65,6 +67,7 @@ export type Account = {
   name: string;
   currency: string;
   icon?: string | null;
+  color?: string;
   tagIds?: string[];
   deleted?: boolean;
 };
@@ -109,6 +112,20 @@ type TransactionWithAccountAndCategory = Transaction & {
 export type TransactionViewModel = TransactionWithAccountAndCategory & {
   linkedTransaction?: TransactionWithAccountAndCategory;
   tags: Tag[];
+};
+
+export type Grouping = {
+  id: string;
+  name: string;
+  groups?: Group[];
+  deleted?: boolean;
+};
+
+export type Group = {
+  id: string;
+  name: string;
+  color?: string;
+  accountIds?: string[];
 };
 
 export interface LocalDB extends DBSchema {
@@ -162,6 +179,11 @@ export interface LocalDB extends DBSchema {
   currencyRates: {
     key: string;
     value: WithOwner<CurrencyRate>;
+    indexes: { 'by-owner': string };
+  };
+  groupings: {
+    key: string;
+    value: WithOwner<Grouping>;
     indexes: { 'by-owner': string };
   };
 }

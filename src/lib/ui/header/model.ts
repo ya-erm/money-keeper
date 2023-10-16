@@ -4,6 +4,7 @@ import { writable } from 'svelte/store';
 export const title = writable<string | null>();
 
 export const backLink = writable<string | null>();
+export const backLinkTitle = writable<string | null>();
 
 export const leftButton = writable<typeof SvelteComponent | null>();
 export const rightButton = writable<typeof SvelteComponent | null>();
@@ -24,4 +25,14 @@ export function useRightButton(value: typeof SvelteComponent) {
 export function useLeftButton(value: typeof SvelteComponent) {
   leftButton.set(value);
   onDestroy(() => leftButton.set(null));
+}
+
+/** Set back button (with optional custom title) and clear it on destroy */
+export function useBackButton(route: string, title?: string) {
+  backLink.set(route);
+  backLinkTitle.set(title ?? null);
+  onDestroy(() => {
+    backLink.set(null);
+    backLinkTitle.set(null);
+  });
 }

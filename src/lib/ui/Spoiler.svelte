@@ -5,6 +5,9 @@
   let content: HTMLDivElement;
 </script>
 
+<div class="spoiler-header" style:--duration={duration}>
+  <slot name="spoiler-header" />
+</div>
 <div
   class="spoiler"
   class:spoiler-hidden={hidden}

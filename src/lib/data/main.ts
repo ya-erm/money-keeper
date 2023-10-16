@@ -14,6 +14,7 @@ import { membersService } from './members';
 import { operationTagsService } from './operationTags';
 import { operationsService } from './operations';
 import { settingsService } from './settings';
+import { groupingsService } from './groupings';
 
 const logger = new Logger('MainService', { disabled: false, color: '#00cc55' });
 
@@ -52,6 +53,7 @@ class MainService implements Initialisable {
       operationsService,
       currencyRatesService,
       operationTagsService,
+      groupingsService,
     ];
 
     $initialized.set(false);

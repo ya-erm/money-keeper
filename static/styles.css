@@ -114,6 +114,9 @@ a {
 .justify-center {
   justify-content: center;
 }
+.justify-end {
+  justify-content: end;
+}
 
 /* Align self */
 .self-start {
@@ -296,4 +299,12 @@ a {
 }
 .text-right {
   text-align: right;
+}
+
+/* Font-weight */
+.font-normal {
+  font-weight: normal;
+}
+.font-bold {
+  font-weight: bold;
 }

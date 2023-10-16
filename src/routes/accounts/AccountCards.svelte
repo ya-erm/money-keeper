@@ -10,7 +10,7 @@
   import { getSearchParam, groupBySelector } from '$lib/utils';
 
   import AccountCard from './AccountCard.svelte';
-  import { calculateBalance, findCurrencyRate } from './utils';
+  import { calculateBalance, findCurrencyRate, pastOperationsPredicate } from './utils';
 
   export let onEdit: (account: AccountViewModel) => void;
 
@@ -61,7 +61,7 @@
       <div class="account-card" on:click={() => scrollToCard(account.id)} aria-hidden>
         <AccountCard
           {account}
-          balance={calculateBalance(operationsByAccount[account.id] ?? [])}
+          balance={calculateBalance(operationsByAccount[account.id]?.filter(pastOperationsPredicate) ?? [])}
           currencyRate={findCurrencyRate(currencyRates, settings?.currency, account.currency)}
           {onEdit}
         />
