@@ -31,6 +31,8 @@ export type Messages =
   | 'common.reset'
   | 'common.go_back_to_list'
   | 'common.count'
+  | 'common.show'
+  | 'common.hide'
   // Tags
   | 'tags.add_modal_header'
   | 'tags.edit_modal_header'
@@ -170,6 +172,7 @@ export type Messages =
   | 'transactions.delete_transaction'
   | 'transactions.delete_transaction_success'
   | 'transactions.delete_transaction_failure'
+  | 'transactions.feature_operations'
   // Transactions import
   | 'transactions.import'
   | 'transactions.import.title'

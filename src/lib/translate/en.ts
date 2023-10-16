@@ -34,6 +34,8 @@ export const enDict: Dictionary = {
   'common.reset': 'Reset',
   'common.go_back_to_list': 'Go back to list',
   'common.count': '{count} pcs.',
+  'common.show': 'Show',
+  'common.hide': 'Hide',
   // Tags
   'tags.add_modal_header': 'Add tag',
   'tags.edit_modal_header': 'Edit tag',
@@ -176,6 +178,7 @@ export const enDict: Dictionary = {
   'transactions.delete_transaction': 'Delete operation',
   'transactions.delete_transaction_success': 'Operation was deleted',
   'transactions.delete_transaction_failure': 'Failed to delete operation',
+  'transactions.feature_operations': 'Feature operations',
   // Transactions import
   'transactions.import': 'Import',
   'transactions.import.title': 'Import operations',

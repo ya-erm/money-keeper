@@ -34,6 +34,8 @@ export const ruDict: Dictionary = {
   'common.reset': 'Сбросить',
   'common.go_back_to_list': 'Вернуться назад к списку',
   'common.count': '{count} шт.',
+  'common.show': 'Показать',
+  'common.hide': 'Скрыть',
   // Tags
   'tags.add_modal_header': 'Добавить тег',
   'tags.edit_modal_header': 'Редактировать тег',
@@ -207,6 +209,7 @@ export const ruDict: Dictionary = {
   'transactions.import.rules.delete': 'Удалить правило',
   'transactions.import.rules.delete_success': 'Правило удалено',
   'transactions.import.rules.delete_failure': 'Не удалось удалить правило',
+  'transactions.feature_operations': 'Будущие операции',
   // System
   'system.category.transfer_in': 'Перевод c другого счёта',
   'system.category.transfer_out': 'Перевод на другой счёт',

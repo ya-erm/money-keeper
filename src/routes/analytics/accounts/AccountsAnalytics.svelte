@@ -7,7 +7,7 @@
   import Portal from '$lib/ui/Portal.svelte';
   import { groupBySelector } from '$lib/utils';
 
-  import { calculateBalance } from '../../accounts/utils';
+  import { calculateBalance, pastOperationsPredicate } from '../../accounts/utils';
   import { findRate } from '../utils/findRate';
   import AccountsTableTable from './AccountsAnalyticsTable.svelte';
   import AddGroupingButton from './groupings/AddGroupingButton.svelte';
@@ -24,7 +24,7 @@
 
   $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
-  $: operationsByAccount = groupBySelector(operations, (t) => t.account.id);
+  $: operationsByAccount = groupBySelector(operations.filter(pastOperationsPredicate), (t) => t.account.id);
 
   const colors = ['#fd7f6f', '#7eb0d5', '#b2e061', '#bd7ebe', '#ffb55a', '#ffee65', '#beb9db', '#fdcce5', '#8bd3c7'];
 

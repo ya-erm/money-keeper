@@ -300,3 +300,11 @@ a {
 .text-right {
   text-align: right;
 }
+
+/* Font-weight */
+.font-normal {
+  font-weight: normal;
+}
+.font-bold {
+  font-weight: bold;
+}
