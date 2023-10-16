@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
+  import {
+    accountsStore,
+    currencyRatesStore,
+    groupingsStore,
+    memberSettingsStore,
+    membersService,
+    operationsStore,
+  } from '$lib/data';
   import type { AccountViewModel, Grouping } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
@@ -18,6 +25,7 @@
   const currencyRates = $currencyRatesStore;
   const accounts = $accountsStore;
   const operations = $operationsStore;
+  const groupings = $groupingsStore;
   const settings = $memberSettingsStore;
 
   const mainCurrency = settings?.currency ?? 'USD';
@@ -51,12 +59,15 @@
     }))
     .sort((a, b) => b.percentages - a.percentages);
 
-  let grouping: Grouping | null = null;
+  let groupingId = settings?.groupingId;
+  let grouping: Grouping | null = (groupingId ? groupings.find((g) => g.id === groupingId) : null) ?? null;
+
   let groupingSelecting = false;
 
   const handleGroupingSelect = (value: Grouping | null) => {
-    grouping = value;
+    membersService.updateSettings({ groupingId: value?.id });
     groupingSelecting = false;
+    grouping = value;
   };
 
   // Dictionary of grouped summaries keyed by groupId

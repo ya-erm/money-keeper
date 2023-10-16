@@ -120,11 +120,10 @@ export class MembersService implements Initialisable, JournalSubscriber {
 
   /** Apply journal updates and optional save to DB */
   async applyChanges(changes: JournalItem[], saveToDB: boolean) {
-    changes
-      .filter((item) => item.data.accountsOrder)
-      .forEach(async (item) => {
-        await this.updateSettings({ accountsOrder: item.data.accountsOrder }, saveToDB);
-      });
+    const accountsOrder = changes.findLast((item) => item.data.accountsOrder);
+    if (accountsOrder) {
+      await this.updateSettings({ accountsOrder: accountsOrder.data.accountsOrder }, saveToDB);
+    }
   }
 
   // #endregion

@@ -27,6 +27,7 @@ export type MemberSettings = {
   currency?: string | null;
   encryption?: EncryptionVersion;
   accountsOrder?: string[];
+  groupingId?: string | null;
 };
 
 export type JournalItem = {
