@@ -5,6 +5,7 @@ import type {
 } from '$lib/server/api/v2/journal';
 import type { GetJournalRequest } from '$lib/server/api/v2/journal/getJournal';
 import { store } from '$lib/store';
+import { showErrorToast } from '$lib/ui/toasts';
 import { unexpectedCase } from '$lib/utils';
 import { Logger } from '$lib/utils/logger';
 import { useFetch } from '$lib/utils/useFetch';
@@ -147,6 +148,11 @@ export class JournalService implements Initialisable {
       await this.fetchUpdates();
     } catch (e) {
       logger.error('Failed to fetch updates', e);
+      if (e instanceof Error) {
+        showErrorToast(`Failed to fetch updates: ${e.message}`);
+      } else {
+        showErrorToast('Failed to fetch updates');
+      }
     } finally {
       this._state.set('idle');
     }
