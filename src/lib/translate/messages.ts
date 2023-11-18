@@ -33,6 +33,8 @@ export type Messages =
   | 'common.count'
   | 'common.show'
   | 'common.hide'
+  | 'common.select_time_zone'
+  | 'common.current_time_zone'
   // Tags
   | 'tags.add_modal_header'
   | 'tags.edit_modal_header'
@@ -244,6 +246,7 @@ export type Messages =
   | 'settings.collaboration.invites'
   | 'settings.collaboration.blocklist'
   | 'settings.encryption'
+  | 'settings.debug_tools'
   | 'settings.logs'
   | 'settings.logs.filters'
   | 'settings.logs.show_filters'

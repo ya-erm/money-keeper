@@ -15,6 +15,7 @@ export { deepEqual } from './deepEqual';
 export { filterNotEmpty } from './filterNotEmpty';
 export { formatMoney } from './formatMoney';
 export { deleteSearchParam, getNumberSearchParam, getSearchParam, setSearchParam } from './getSearchParam';
+export { getTimeZoneOffset, toShortTimezoneOffset } from './getTimeZoneOffset';
 export { groupByKey, groupByKeyToMap, groupBySelector, groupBySelectorToMap } from './groupBy';
 export { handleError } from './handleError';
 export { join } from './join';

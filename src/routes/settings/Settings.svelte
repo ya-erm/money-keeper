@@ -48,7 +48,7 @@
   <ListLinkItem title={$translate('settings.import_export')} href={route('settings.import_export')} />
 </ListGroup>
 
-<ListGroup title={'Инструменты отладки'}>
+<ListGroup title={$translate('settings.debug_tools')}>
   <ListLinkItem title={$translate('settings.logs')} href={route('settings.logs')} />
   <ListLinkItem title={$translate('settings.report_problem')} href="https://github.com/ya-erm/money-keeper/issues" />
   <ListLinkItem title={'UI Kit'} href={route('uikit')} />

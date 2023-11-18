@@ -36,6 +36,8 @@ export const ruDict: Dictionary = {
   'common.count': '{count} шт.',
   'common.show': 'Показать',
   'common.hide': 'Скрыть',
+  'common.select_time_zone': 'Выберите часовой пояс',
+  'common.current_time_zone': 'Текущий часовой пояс',
   // Tags
   'tags.add_modal_header': 'Добавить тег',
   'tags.edit_modal_header': 'Редактировать тег',
@@ -254,6 +256,7 @@ export const ruDict: Dictionary = {
   'settings.collaboration.invites': 'Приглашения',
   'settings.collaboration.blocklist': 'Чёрный список',
   'settings.encryption': 'Шифрование',
+  'settings.debug_tools': 'Инструменты отладки',
   'settings.logs': 'Журнал логов',
   'settings.logs.filters': 'Фильтры',
   'settings.logs.show_filters': 'Показать фильтры',

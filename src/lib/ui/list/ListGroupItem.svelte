@@ -3,30 +3,33 @@
 </script>
 
 {#if href}
-  <a class="settings-group-item" {href}>
-    <slot />
-  </a>
+  <li class="list-group-item">
+    <a class="link" {href}>
+      <slot />
+    </a>
+  </li>
 {:else}
-  <div class="settings-group-item">
+  <li class="list-group-item">
     <slot />
-  </div>
+  </li>
 {/if}
 
 <style>
-  a.settings-group-item {
+  .list-group-item .link {
     text-decoration: inherit;
     color: inherit;
+    flex-grow: 1;
   }
-  .settings-group-item {
+  .list-group-item {
     min-height: 36px;
     display: flex;
     align-items: center;
     position: relative;
   }
-  .settings-group-item:not(:last-child) {
+  .list-group-item:not(:last-child) {
     margin-bottom: 1px;
   }
-  .settings-group-item:not(:last-child):after {
+  .list-group-item:not(:last-child):after {
     position: absolute;
     content: '';
     left: 0;

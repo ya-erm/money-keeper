@@ -10,9 +10,11 @@
   import Button from '$lib/ui/Button.svelte';
   import Input from '$lib/ui/Input.svelte';
   import InputLabel from '$lib/ui/InputLabel.svelte';
+  import Layout from '$lib/ui/Layout.svelte';
   import Modal from '$lib/ui/Modal.svelte';
+  import Portal from '$lib/ui/Portal.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
-  import { formatMoney, getSearchParam, handleError, spreadIf } from '$lib/utils';
+  import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
   import {
     checkNumberFormParameter,
@@ -20,6 +22,7 @@
     checkStringOptionalFormParameter,
   } from '$lib/utils/checkFormParams';
   import TagsList from '$lib/widgets/TagsList.svelte';
+  import TimeZoneList from '$lib/widgets/TimeZoneList.svelte';
 
   import AccountSelector from './AccountSelector.svelte';
   import CategorySelect from './CategorySelect.svelte';
@@ -43,9 +46,13 @@
 
   let categoryId = transaction?.categoryId ?? getSearchParam($page, 'categoryId');
 
-  let date = dayjs(transaction?.date).format('YYYY-MM-DD');
-  let time = dayjs(transaction?.date).format('HH:mm');
-  $: datetime = new Date([date, time].join('T')).toISOString();
+  let timeZone = transaction?.timeZone ?? dayjs.tz.guess();
+  let timeZoneShift = getTimeZoneOffset(timeZone);
+  let timeZoneListVisible = false;
+
+  let date = dayjs(transaction?.date).tz(timeZone).format('YYYY-MM-DD');
+  let time = dayjs(transaction?.date).tz(timeZone).format('HH:mm');
+  $: datetime = dayjs.tz(`${date} ${time}`, timeZone).format();
 
   let inputRef: HTMLInputElement | null = null;
 
@@ -105,6 +112,7 @@
         categoryId:
           type === 'TRANSFER' ? SYSTEM_CATEGORY_TRANSFER_OUT.id : checkStringFormParameter(formData, 'categoryId'),
         date: datetime,
+        timeZone,
         amount: checkNumberFormParameter(formData, 'amount'),
         comment: checkStringOptionalFormParameter(formData, 'comment'),
         tagIds: selectedTags,
@@ -122,6 +130,7 @@
           accountId: checkStringFormParameter(formData, 'destinationAccountId'),
           categoryId: SYSTEM_CATEGORY_TRANSFER_IN.id,
           date: datetime,
+          timeZone,
           amount: checkNumberFormParameter(formData, 'destinationAmount'),
           comment: checkStringOptionalFormParameter(formData, 'comment'),
           tagIds: selectedTags,
@@ -173,7 +182,17 @@
       <AccountSelector bind:accountId bind:selecting={selectingAccount} testId="DestinationAccountSelect" />
     {/if}
     <div class="flex-col gap-0.5">
-      <InputLabel text={$translate('transactions.dateTime')} />
+      <div class="flex gap-1 justify-between">
+        <span class="flex-shrink-0">
+          <InputLabel text={$translate('transactions.dateTime')} />
+        </span>
+        <Button appearance="link" underlined={false} on:click={() => (timeZoneListVisible = true)}>
+          <div class="flex gap-0.25">
+            <span class="time-zone">{timeZone}</span>
+            <span class="time-shift">(GMT{timeZoneShift})</span>
+          </div>
+        </Button>
+      </div>
       <div class="flex gap-1">
         <Input name="date" type="date" bind:value={date} required />
         <Input name="time" type="time" bind:value={time} required />
@@ -275,6 +294,23 @@
   </form>
 </Modal>
 
+<Portal visible={timeZoneListVisible}>
+  <Layout
+    header={{
+      title: $translate('common.select_time_zone'),
+      backButton: { title: $translate('common.back'), onClick: () => (timeZoneListVisible = false) },
+    }}
+  >
+    <TimeZoneList
+      onClick={(tz, shift) => {
+        timeZone = tz;
+        timeZoneShift = shift;
+        timeZoneListVisible = false;
+      }}
+    />
+  </Layout>
+</Portal>
+
 <style>
   .currency-rate-info {
     font-size: 0.9rem;
@@ -286,5 +322,18 @@
     margin-top: -0.5rem;
     margin-left: 0.5rem;
     color: var(--secondary-text-color);
+  }
+  .time-zone {
+    flex-shrink: 1;
+    text-align: left;
+    display: -webkit-box;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+  }
+  .time-shift {
+    flex-shrink: 0;
+    font-size: 0.9rem;
   }
 </style>

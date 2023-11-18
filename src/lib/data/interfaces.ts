@@ -96,6 +96,7 @@ export type Transaction = {
   accountId: string;
   categoryId: string;
   date: string;
+  timeZone?: string | null;
   amount: number;
   comment?: string | null;
   description?: string | null;
