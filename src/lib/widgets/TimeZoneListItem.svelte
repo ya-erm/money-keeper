@@ -36,6 +36,7 @@
     align-self: stretch;
     cursor: pointer;
     padding: 0.5rem 1rem;
+    color: var(--primary-text-color);
   }
   @media (hover: hover) {
     button:hover {
@@ -45,6 +46,7 @@
   .text-ellipsis {
     text-align: left;
     display: -webkit-box;
+    word-break: break-all;
     text-overflow: ellipsis;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
