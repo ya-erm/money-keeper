@@ -12,7 +12,7 @@
   import InputLabel from '$lib/ui/InputLabel.svelte';
   import Modal from '$lib/ui/Modal.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
-  import { formatMoney, getSearchParam, spreadIf } from '$lib/utils';
+  import { formatMoney, getSearchParam, handleError, spreadIf } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
   import {
     checkNumberFormParameter,
@@ -74,64 +74,70 @@
   let anotherCurrency: string | null = transaction?.anotherCurrency ?? null;
 
   const handleSubmit = async (e: Event) => {
-    const formData = new FormData(e.target as HTMLFormElement);
-    if (!formData.get('accountId')) {
-      showErrorToast($translate('transactions.account_is_required'), { testId: 'AccountIsRequiredErrorToast' });
-      return;
-    }
-    if ((type === 'IN' || type === 'OUT') && !formData.get('categoryId')) {
-      showErrorToast($translate('transactions.category_is_required'), { testId: 'CategoryIsRequiredErrorToast' });
-      return;
-    }
-    if (type === 'TRANSFER' && !formData.get('destinationAccountId')) {
-      showErrorToast($translate('transactions.destination_account_is_required'), {
-        testId: 'DestinationAccountIsRequiredErrorToast',
-      });
-      return;
-    }
-    if (type === 'TRANSFER' && formData.get('accountId') === formData.get('destinationAccountId')) {
-      showErrorToast($translate('transactions.accounts_must_be_different'), {
-        testId: 'AccountsMustBeDifferentErrorToast',
-      });
-      return;
-    }
+    try {
+      const formData = new FormData(e.target as HTMLFormElement);
+      if (!formData.get('accountId')) {
+        showErrorToast($translate('transactions.account_is_required'), { testId: 'AccountIsRequiredErrorToast' });
+        return;
+      }
+      if ((type === 'IN' || type === 'OUT') && !formData.get('categoryId')) {
+        showErrorToast($translate('transactions.category_is_required'), { testId: 'CategoryIsRequiredErrorToast' });
+        return;
+      }
+      if (type === 'TRANSFER' && !formData.get('destinationAccountId')) {
+        showErrorToast($translate('transactions.destination_account_is_required'), {
+          testId: 'DestinationAccountIsRequiredErrorToast',
+        });
+        return;
+      }
+      if (type === 'TRANSFER' && formData.get('accountId') === formData.get('destinationAccountId')) {
+        showErrorToast($translate('transactions.accounts_must_be_different'), {
+          testId: 'AccountsMustBeDifferentErrorToast',
+        });
+        return;
+      }
 
-    const transactions: Transaction[] = [];
+      const transactions: Transaction[] = [];
 
-    transactions.push({
-      id: transaction?.id ?? uuid(),
-      accountId: checkStringFormParameter(formData, 'accountId'),
-      categoryId:
-        type === 'TRANSFER' ? SYSTEM_CATEGORY_TRANSFER_OUT.id : checkStringFormParameter(formData, 'categoryId'),
-      date: datetime,
-      amount: checkNumberFormParameter(formData, 'amount'),
-      comment: checkStringOptionalFormParameter(formData, 'comment'),
-      tagIds: selectedTags,
-      ...spreadIf(!!anotherCurrency, {
-        anotherCurrency,
-        anotherCurrencyAmount: checkNumberFormParameter(formData, 'destinationAmount'),
-      }),
-    });
-
-    if (type === 'TRANSFER') {
       transactions.push({
-        id: transaction?.linkedTransactionId ?? uuid(),
-        accountId: checkStringFormParameter(formData, 'destinationAccountId'),
-        categoryId: SYSTEM_CATEGORY_TRANSFER_IN.id,
+        id: transaction?.id ?? uuid(),
+        accountId: checkStringFormParameter(formData, 'accountId'),
+        categoryId:
+          type === 'TRANSFER' ? SYSTEM_CATEGORY_TRANSFER_OUT.id : checkStringFormParameter(formData, 'categoryId'),
         date: datetime,
-        amount: checkNumberFormParameter(formData, 'destinationAmount'),
+        amount: checkNumberFormParameter(formData, 'amount'),
         comment: checkStringOptionalFormParameter(formData, 'comment'),
         tagIds: selectedTags,
-        linkedTransactionId: transactions[0].id,
+        ...(!!anotherCurrency
+          ? {
+              anotherCurrency,
+              anotherCurrencyAmount: checkNumberFormParameter(formData, 'destinationAmount'),
+            }
+          : {}),
       });
-      transactions[0].linkedTransactionId = transactions[1].id;
-    }
 
-    onSubmit(transactions);
+      if (type === 'TRANSFER') {
+        transactions.push({
+          id: transaction?.linkedTransactionId ?? uuid(),
+          accountId: checkStringFormParameter(formData, 'destinationAccountId'),
+          categoryId: SYSTEM_CATEGORY_TRANSFER_IN.id,
+          date: datetime,
+          amount: checkNumberFormParameter(formData, 'destinationAmount'),
+          comment: checkStringOptionalFormParameter(formData, 'comment'),
+          tagIds: selectedTags,
+          linkedTransactionId: transactions[0].id,
+        });
+        transactions[0].linkedTransactionId = transactions[1].id;
+      }
+
+      onSubmit(transactions);
+    } catch (e) {
+      handleError(e);
+    }
   };
 </script>
 
-<form on:submit|preventDefault={(e) => handleSubmit(e)} data-testId="TransactionForm">
+<form on:submit|preventDefault={handleSubmit} data-testId="TransactionForm">
   <div class="flex-col gap-1 p-1">
     <TypeSwitch bind:type disabled={isTransfer} />
     {#if type === 'OUT'}
