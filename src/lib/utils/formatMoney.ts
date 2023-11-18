@@ -25,6 +25,10 @@ export function formatMoney(value: number, options?: FormatMoneyOptions) {
   const minPrecision = options?.minPrecision ?? 0;
   const maxPrecision = options?.maxPrecision ?? 2;
 
+  if (Number(value.toFixed(maxPrecision)) === 0) {
+    value = 0;
+  }
+
   const sign = withSign && value > 0 ? '+' : '';
 
   const parts = value.toFixed(maxPrecision).split('.');
