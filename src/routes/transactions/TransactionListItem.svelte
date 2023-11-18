@@ -2,6 +2,7 @@
   import type { CurrencyRate, TransactionViewModel } from '$lib/data/interfaces';
   import { translate, type Messages } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
+  import { replaceCalcExpressions } from '$lib/utils/calc';
   import { formatMoney } from '$lib/utils/formatMoney';
 
   export let transaction: TransactionViewModel;
@@ -63,7 +64,7 @@
       </div>
       {#if transaction.comment}
         <div class="comment small-text">
-          {transaction.comment}
+          {replaceCalcExpressions(transaction.comment)}
         </div>
       {/if}
       {#if transaction.tags?.length}

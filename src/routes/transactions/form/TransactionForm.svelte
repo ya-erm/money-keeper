@@ -11,6 +11,7 @@
   import InputLabel from '$lib/ui/InputLabel.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
   import { formatMoney, getSearchParam } from '$lib/utils';
+  import { replaceCalcExpressions } from '$lib/utils/calc';
   import {
     checkNumberFormParameter,
     checkStringFormParameter,
@@ -64,6 +65,8 @@
   let selectingDestinationAccount = false;
 
   let selectedTags = transaction?.tags.map((t) => `${t.id}`) ?? [];
+
+  let comment = transaction?.comment ?? '';
 
   const handleSubmit = async (e: Event) => {
     const formData = new FormData(e.target as HTMLFormElement);
@@ -193,7 +196,18 @@
         </div>
       {/if}
     </div>
-    <Input label={$translate('transactions.comment')} name="comment" value={transaction?.comment} optional />
+    <Input
+      label={$translate('transactions.comment')}
+      name="comment"
+      value={transaction?.comment}
+      onChange={(value) => (comment = value)}
+      optional
+    />
+    {#if comment && replaceCalcExpressions(comment) !== comment}
+      <div class="comment-preview">
+        {replaceCalcExpressions(comment)}
+      </div>
+    {/if}
     <div class="flex-col gap-0.5">
       <InputLabel text={$translate('transactions.tags')} optional />
       <TagsList
@@ -214,6 +228,12 @@
   .currency-rate-info {
     font-size: 0.9rem;
     text-align: right;
+    color: var(--secondary-text-color);
+  }
+  .comment-preview {
+    font-size: 0.9em;
+    margin-top: -0.5rem;
+    margin-left: 0.5rem;
     color: var(--secondary-text-color);
   }
 </style>
