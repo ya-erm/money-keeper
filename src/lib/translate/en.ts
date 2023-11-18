@@ -179,6 +179,8 @@ export const enDict: Dictionary = {
   'transactions.delete_transaction_success': 'Operation was deleted',
   'transactions.delete_transaction_failure': 'Failed to delete operation',
   'transactions.feature_operations': 'Feature operations',
+  'transactions.another_currency': 'Another currency',
+  'transactions.same_currency': 'Same currency',
   // Transactions import
   'transactions.import': 'Import',
   'transactions.import.title': 'Import operations',

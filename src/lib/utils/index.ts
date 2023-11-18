@@ -21,6 +21,7 @@ export { join } from './join';
 export { keyTransactions } from './keyTransactions';
 export { longPress } from './longPress';
 export { serialize } from './serialize';
+export { spreadIf } from './spreadIf';
 export { unexpectedCase } from './unexpectedCase';
 export { useFetch } from './useFetch';
 export { useSmartLoading } from './useSmartLoading';

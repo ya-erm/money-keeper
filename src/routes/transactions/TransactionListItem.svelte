@@ -74,6 +74,11 @@
       {/if}
     </div>
     <div class="flex-col items-end">
+      {#if !!transaction.anotherCurrencyAmount}
+        <span class="other-money-value">
+          {formatMoney(transaction.anotherCurrencyAmount, { currency: transaction.anotherCurrency ?? undefined })}
+        </span>
+      {/if}
       <span class="amount" class:incoming class:outgoing>
         <span>{incoming ? '+' : outgoing ? '-' : ''}{formatMoney(transaction.amount)}</span>
         <span class="small-text">{transaction.account.currency}</span>
