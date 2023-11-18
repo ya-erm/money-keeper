@@ -151,6 +151,7 @@ export const calculate = (expression: string, previous: number | null) => {
       }
       switch (token.type) {
         case 'number': {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           accumulator = parseFloat(token.value!);
           return;
         }
@@ -177,6 +178,7 @@ export const calculate = (expression: string, previous: number | null) => {
       }
       switch (leftOperand.type) {
         case 'number': {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const value = parseFloat(leftOperand.value!);
           const result = performOperation(operation, value, accumulator ?? 0);
           accumulator = result;

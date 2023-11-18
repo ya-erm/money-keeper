@@ -14,6 +14,7 @@
   export let draggable = false;
   export let editable = true;
 
+  // TODO: on grouping click
   export let onClick: (grouping: Grouping) => void = () => console.log('onClick', grouping);
 
   const handleClick = () => {

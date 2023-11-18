@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { categoriesService, categoriesStore } from '$lib/data';
-  import type { Category, CategoryType } from '$lib/data/interfaces';
+  import type { Category } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import { useRightButton, useTitle } from '$lib/ui/header';
   import { deleteSearchParam, getSearchParam } from '$lib/utils';
