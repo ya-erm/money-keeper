@@ -1,12 +1,13 @@
 <script lang="ts">
   import dayjs from 'dayjs';
-  import { LogLevel, Logger, logs } from '$lib/utils/logger';
-  import Tags from '$lib/ui/Tags.svelte';
   import { onMount } from 'svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
+
+  import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
-  import { translate } from '$lib/translate';
+  import InputLabel from '$lib/ui/InputLabel.svelte';
+  import Tags from '$lib/ui/Tags.svelte';
+  import { LogLevel, logs } from '$lib/utils/logger';
 
   let filtersVisible = false;
 

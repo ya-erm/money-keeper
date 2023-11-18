@@ -178,6 +178,10 @@ export const ruDict: Dictionary = {
   'transactions.delete_transaction': 'Удалить операцию',
   'transactions.delete_transaction_success': 'Операция удалена',
   'transactions.delete_transaction_failure': 'Не удалось удалить операцию',
+  'transactions.feature_operations': 'Будущие операции',
+  'transactions.another_currency': 'Другая валюта',
+  'transactions.same_currency': 'Та же валюта',
+  // Transactions import
   'transactions.import': 'Импорт',
   'transactions.import.title': 'Импорт операций',
   'transactions.import.invalid_expression': 'Введите поисковый запрос, чтобы выбрать операции одной категории',
@@ -209,7 +213,6 @@ export const ruDict: Dictionary = {
   'transactions.import.rules.delete': 'Удалить правило',
   'transactions.import.rules.delete_success': 'Правило удалено',
   'transactions.import.rules.delete_failure': 'Не удалось удалить правило',
-  'transactions.feature_operations': 'Будущие операции',
   // System
   'system.category.transfer_in': 'Перевод c другого счёта',
   'system.category.transfer_out': 'Перевод на другой счёт',

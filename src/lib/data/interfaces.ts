@@ -100,6 +100,8 @@ export type Transaction = {
   comment?: string | null;
   description?: string | null;
   linkedTransactionId?: string | null;
+  anotherCurrency?: string | null;
+  anotherCurrencyAmount?: number | null;
   tagIds?: string[];
   deleted?: boolean;
 };

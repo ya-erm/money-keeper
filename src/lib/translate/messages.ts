@@ -173,6 +173,8 @@ export type Messages =
   | 'transactions.delete_transaction_success'
   | 'transactions.delete_transaction_failure'
   | 'transactions.feature_operations'
+  | 'transactions.another_currency'
+  | 'transactions.same_currency'
   // Transactions import
   | 'transactions.import'
   | 'transactions.import.title'

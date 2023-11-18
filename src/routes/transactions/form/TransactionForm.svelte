@@ -7,10 +7,13 @@
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
+  import Button from '$lib/ui/Button.svelte';
   import Input from '$lib/ui/Input.svelte';
   import InputLabel from '$lib/ui/InputLabel.svelte';
+  import Modal from '$lib/ui/Modal.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
-  import { formatMoney, getSearchParam } from '$lib/utils';
+  import { formatMoney, getSearchParam, spreadIf } from '$lib/utils';
+  import { replaceCalcExpressions } from '$lib/utils/calc';
   import {
     checkNumberFormParameter,
     checkStringFormParameter,
@@ -57,13 +60,18 @@
   $: destinationAccountCurrency = accounts.find(({ id }) => id === destinationAccountId)?.currency;
 
   let _value1 = (isTransfer ? sourceTransaction?.amount : transaction?.amount)?.toString() ?? '';
-  let _value2 = destinationTransaction?.amount?.toString() ?? '';
+  let _value2 = destinationTransaction?.amount?.toString() ?? transaction?.anotherCurrencyAmount?.toString() ?? '';
   $: _rate = Number(_value1) / Number(_value2);
 
   let selectingAccount = false;
   let selectingDestinationAccount = false;
 
   let selectedTags = transaction?.tags.map((t) => `${t.id}`) ?? [];
+
+  let comment = transaction?.comment ?? '';
+
+  let anotherCurrencyModalOpened = false;
+  let anotherCurrency: string | null = transaction?.anotherCurrency ?? null;
 
   const handleSubmit = async (e: Event) => {
     const formData = new FormData(e.target as HTMLFormElement);
@@ -99,6 +107,10 @@
       amount: checkNumberFormParameter(formData, 'amount'),
       comment: checkStringOptionalFormParameter(formData, 'comment'),
       tagIds: selectedTags,
+      ...spreadIf(!!anotherCurrency, {
+        anotherCurrency,
+        anotherCurrencyAmount: checkNumberFormParameter(formData, 'destinationAmount'),
+      }),
     });
 
     if (type === 'TRANSFER') {
@@ -163,7 +175,20 @@
       <input name="datetime" value={datetime} class="hidden" readonly />
     </div>
     <div class="flex-col gap-0.5">
-      <InputLabel text={$translate('transactions.amount')} />
+      <div class="flex justify-between">
+        <InputLabel text={$translate('transactions.amount')} />
+        {#if type !== 'TRANSFER'}
+          {#if !anotherCurrency}
+            <Button appearance="link" underlined={false} on:click={() => (anotherCurrencyModalOpened = true)}>
+              {$translate('transactions.another_currency')}
+            </Button>
+          {:else}
+            <Button appearance="link" underlined={false} on:click={() => (anotherCurrency = null)}>
+              {$translate('transactions.same_currency')}
+            </Button>
+          {/if}
+        {/if}
+      </div>
       <div class="flex gap-1">
         <Input
           type="number"
@@ -173,27 +198,41 @@
           endText={accountCurrency}
           required
         />
-        {#if type === 'TRANSFER'}
+        {#if type === 'TRANSFER' || !!anotherCurrency}
           <Input
             type="number"
             name="destinationAmount"
             bind:value={_value2}
-            endText={destinationAccountCurrency}
+            endText={destinationAccountCurrency || anotherCurrency}
             required
           />
         {/if}
       </div>
-      {#if type === 'TRANSFER' && Number(_value1) && Number(_value2)}
+      {#if (type === 'TRANSFER' || !!anotherCurrency) && Number(_value1) && Number(_value2)}
         <div class="currency-rate-info">
           {`1 ${accountCurrency} = ${formatMoney(1 / _rate, {
             maxPrecision: 4,
-            currency: destinationAccountCurrency,
+            currency: destinationAccountCurrency || (anotherCurrency ?? undefined),
           })}`}
-          {`(1 ${destinationAccountCurrency} = ${formatMoney(_rate, { maxPrecision: 4, currency: accountCurrency })})`}
+          {`(1 ${destinationAccountCurrency || anotherCurrency} = ${formatMoney(_rate, {
+            maxPrecision: 4,
+            currency: accountCurrency,
+          })})`}
         </div>
       {/if}
     </div>
-    <Input label={$translate('transactions.comment')} name="comment" value={transaction?.comment} optional />
+    <Input
+      label={$translate('transactions.comment')}
+      name="comment"
+      value={transaction?.comment}
+      onChange={(value) => (comment = value)}
+      optional
+    />
+    {#if comment && replaceCalcExpressions(comment) !== comment}
+      <div class="comment-preview">
+        {replaceCalcExpressions(comment)}
+      </div>
+    {/if}
     <div class="flex-col gap-0.5">
       <InputLabel text={$translate('transactions.tags')} optional />
       <TagsList
@@ -210,10 +249,36 @@
   </div>
 </form>
 
+<Modal opened={anotherCurrencyModalOpened}>
+  <form
+    class="flex-col gap-1"
+    on:submit|preventDefault={(e) => {
+      anotherCurrency = new FormData(e.currentTarget).get('another-currency')?.toString() ?? null;
+      anotherCurrencyModalOpened = false;
+    }}
+  >
+    <Input label={$translate('transactions.another_currency')} value={anotherCurrency} name="another-currency" />
+    <div class="grid-col-2 gap-1">
+      <Button
+        color="secondary"
+        text={$translate('common.cancel')}
+        on:click={() => (anotherCurrencyModalOpened = false)}
+      />
+      <Button text={$translate('common.save')} color="primary" type="submit" />
+    </div>
+  </form>
+</Modal>
+
 <style>
   .currency-rate-info {
     font-size: 0.9rem;
     text-align: right;
+    color: var(--secondary-text-color);
+  }
+  .comment-preview {
+    font-size: 0.9em;
+    margin-top: -0.5rem;
+    margin-left: 0.5rem;
     color: var(--secondary-text-color);
   }
 </style>
