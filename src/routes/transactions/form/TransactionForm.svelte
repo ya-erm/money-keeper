@@ -3,7 +3,7 @@
   import { v4 as uuid } from 'uuid';
 
   import { page } from '$app/stores';
-  import { operationTagsService } from '$lib/data';
+  import { memberSettingsStore, membersService, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
@@ -27,6 +27,8 @@
   import AccountSelector from './AccountSelector.svelte';
   import CategorySelect from './CategorySelect.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
+
+  $: settings = $memberSettingsStore;
 
   export let accounts: AccountViewModel[];
   export let categories: Category[];
@@ -208,7 +210,14 @@
         <InputLabel text={$translate('transactions.amount')} />
         {#if type !== 'TRANSFER'}
           {#if !anotherCurrency}
-            <Button appearance="link" underlined={false} on:click={() => (anotherCurrencyModalOpened = true)}>
+            <Button
+              appearance="link"
+              underlined={false}
+              on:click={() => {
+                anotherCurrencyModalOpened = true;
+                anotherCurrency = settings?.lastAnotherCurrency ?? null;
+              }}
+            >
               {$translate('transactions.another_currency')}
             </Button>
           {:else}
@@ -283,6 +292,9 @@
     class="flex-col gap-1"
     on:submit|preventDefault={(e) => {
       anotherCurrency = new FormData(e.currentTarget).get('another-currency')?.toString() ?? null;
+      if (anotherCurrency !== settings?.lastAnotherCurrency) {
+        membersService.updateSettings({ lastAnotherCurrency: anotherCurrency });
+      }
       anotherCurrencyModalOpened = false;
     }}
   >
