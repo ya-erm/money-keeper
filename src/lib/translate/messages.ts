@@ -33,8 +33,13 @@ export type Messages =
   | 'common.count'
   | 'common.show'
   | 'common.hide'
-  | 'common.select_time_zone'
-  | 'common.current_time_zone'
+  // Timezones
+  | 'timezones.select_time_zone'
+  | 'timezones.current_time_zone'
+  | 'timezones.favorite_time_zones'
+  | 'timezones.all_time_zones'
+  | 'timezones.timezone_added_to_favorites'
+  | 'timezones.timezone_removed_from_favorites'
   // Tags
   | 'tags.add_modal_header'
   | 'tags.edit_modal_header'

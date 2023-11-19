@@ -36,8 +36,13 @@ export const ruDict: Dictionary = {
   'common.count': '{count} шт.',
   'common.show': 'Показать',
   'common.hide': 'Скрыть',
-  'common.select_time_zone': 'Выберите часовой пояс',
-  'common.current_time_zone': 'Текущий часовой пояс',
+  // Timezones
+  'timezones.select_time_zone': 'Выберите часовой пояс',
+  'timezones.current_time_zone': 'Текущий часовой пояс',
+  'timezones.favorite_time_zones': 'Избранные часовые пояса',
+  'timezones.all_time_zones': 'Все часовые пояса',
+  'timezones.timezone_added_to_favorites': 'Часовой пояс добавлен в избранные',
+  'timezones.timezone_removed_from_favorites': 'Часовой пояс удалён из избранных',
   // Tags
   'tags.add_modal_header': 'Добавить тег',
   'tags.edit_modal_header': 'Редактировать тег',

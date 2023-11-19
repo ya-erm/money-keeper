@@ -1,6 +1,6 @@
 <script lang="ts">
   import ListGroupItem from '$lib/ui/list/ListGroupItem.svelte';
-  import { toShortTimezoneOffset } from '$lib/utils';
+  import { longPress, toShortTimezoneOffset } from '$lib/utils';
 
   export let timezone: {
     tzCode: string;
@@ -9,12 +9,14 @@
   };
 
   export let onClick: (timezone: string, shift: string) => void;
+  export let onLongClick: ((timezone: string) => void) | null = null;
 </script>
 
 <ListGroupItem>
   <button
     class="item flex gap-1 items-center"
     on:click={() => onClick(timezone.tzCode, toShortTimezoneOffset(timezone.utc))}
+    use:longPress={() => onLongClick?.(timezone.tzCode)}
   >
     <div class="flex-col gap-0.25 items-start flex-grow">
       <span class="name text-ellipsis">{timezone.tzCode}</span>

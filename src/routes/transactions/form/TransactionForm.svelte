@@ -14,7 +14,7 @@
   import Modal from '$lib/ui/Modal.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
-  import { formatMoney, getSearchParam, getTimeZoneOffset, handleError, spreadIf } from '$lib/utils';
+  import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
   import {
     checkNumberFormParameter,
@@ -46,15 +46,13 @@
 
   let categoryId = transaction?.categoryId ?? getSearchParam($page, 'categoryId');
 
-  let timeZone = !!transaction ? transaction?.timeZone ?? undefined : dayjs.tz.guess();
+  let timeZone = transaction ? transaction?.timeZone ?? undefined : dayjs.tz.guess();
   let timeZoneShift = timeZone ? getTimeZoneOffset(timeZone) : undefined;
   let timeZoneListVisible = false;
 
   let date = dayjs(transaction?.date).tz(timeZone).format('YYYY-MM-DD');
   let time = dayjs(transaction?.date).tz(timeZone).format('HH:mm');
-  $: datetime = !!timeZone
-    ? dayjs.tz(`${date} ${time}`, timeZone).format()
-    : dayjs(`${date} ${time}`).tz('UTC').format();
+  $: datetime = timeZone ? dayjs.tz(`${date} ${time}`, timeZone).format() : dayjs(`${date} ${time}`).tz('UTC').format();
 
   let inputRef: HTMLInputElement | null = null;
 
@@ -114,11 +112,11 @@
         categoryId:
           type === 'TRANSFER' ? SYSTEM_CATEGORY_TRANSFER_OUT.id : checkStringFormParameter(formData, 'categoryId'),
         date: datetime,
-        ...(!!timeZone ? { timeZone } : {}),
+        ...(timeZone ? { timeZone } : {}),
         amount: checkNumberFormParameter(formData, 'amount'),
         comment: checkStringOptionalFormParameter(formData, 'comment'),
         tagIds: selectedTags,
-        ...(!!anotherCurrency
+        ...(anotherCurrency
           ? {
               anotherCurrency,
               anotherCurrencyAmount: checkNumberFormParameter(formData, 'destinationAmount'),
@@ -195,7 +193,7 @@
               <span class="time-shift">(GMT{timeZoneShift})</span>
             </div>
           {:else}
-            {$translate('common.select_time_zone')}
+            {$translate('timezones.select_time_zone')}
           {/if}
         </Button>
       </div>
@@ -303,7 +301,7 @@
 <Portal visible={timeZoneListVisible}>
   <Layout
     header={{
-      title: $translate('common.select_time_zone'),
+      title: $translate('timezones.select_time_zone'),
       backButton: { title: $translate('common.back'), onClick: () => (timeZoneListVisible = false) },
     }}
   >
