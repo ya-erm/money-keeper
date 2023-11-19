@@ -30,8 +30,8 @@
 
   let featureOperationsHidden = true;
 
-  $: pastOperations = filteredOperations.filter(pastOperationsPredicate);
-  $: futureOperations = filteredOperations.filter(futureOperationsPredicate);
+  $: pastOperations = filteredOperations.filter(pastOperationsPredicate());
+  $: futureOperations = filteredOperations.filter(futureOperationsPredicate());
 </script>
 
 <div class="operations-container p-1">

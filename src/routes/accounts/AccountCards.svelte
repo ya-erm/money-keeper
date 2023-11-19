@@ -61,7 +61,7 @@
       <div class="account-card" on:click={() => scrollToCard(account.id)} aria-hidden>
         <AccountCard
           {account}
-          balance={calculateBalance(operationsByAccount[account.id]?.filter(pastOperationsPredicate) ?? [])}
+          balance={calculateBalance(operationsByAccount[account.id]?.filter(pastOperationsPredicate()) ?? [])}
           currencyRate={findCurrencyRate(currencyRates, settings?.currency, account.currency)}
           {onEdit}
         />

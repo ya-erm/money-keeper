@@ -11,7 +11,7 @@
   import { groupBySelector } from '$lib/utils';
 
   import Spoiler from '$lib/ui/Spoiler.svelte';
-  import { calculateBalance, findCurrencyRate } from '../utils';
+  import { calculateBalance, findCurrencyRate, pastOperationsPredicate } from '../utils';
   import AccountListItem from './AccountListItem.svelte';
   import Filters from './Filters.svelte';
 
@@ -116,7 +116,7 @@
           {account}
           {onClick}
           currencyRate={findCurrencyRate(currencyRates, settings?.currency, account.currency)}
-          balance={calculateBalance(operationsByAccount[account.id] ?? [])}
+          balance={calculateBalance(operationsByAccount[account.id]?.filter(pastOperationsPredicate()) ?? [])}
           draggable={sortable}
         />
       </li>

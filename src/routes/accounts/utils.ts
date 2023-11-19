@@ -26,5 +26,5 @@ export const operationBeforeDatePredicate = (date: Date) => (operation: Transact
 export const operationAfterDatePredicate = (date: Date) => (operation: TransactionViewModel) =>
   dayjs(operation.date).isAfter(date);
 
-export const pastOperationsPredicate = operationBeforeDatePredicate(new Date());
-export const futureOperationsPredicate = operationAfterDatePredicate(new Date());
+export const pastOperationsPredicate = () => operationBeforeDatePredicate(new Date());
+export const futureOperationsPredicate = () => operationAfterDatePredicate(new Date());
