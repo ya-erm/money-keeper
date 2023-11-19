@@ -14,7 +14,7 @@
   import Modal from '$lib/ui/Modal.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
-  import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
+  import { formatMoney, getSearchParam, getTimeZoneOffset, handleError, spreadIf } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
   import {
     checkNumberFormParameter,
@@ -46,13 +46,15 @@
 
   let categoryId = transaction?.categoryId ?? getSearchParam($page, 'categoryId');
 
-  let timeZone = transaction?.timeZone ?? dayjs.tz.guess();
-  let timeZoneShift = getTimeZoneOffset(timeZone);
+  let timeZone = !!transaction ? transaction?.timeZone ?? undefined : dayjs.tz.guess();
+  let timeZoneShift = timeZone ? getTimeZoneOffset(timeZone) : undefined;
   let timeZoneListVisible = false;
 
   let date = dayjs(transaction?.date).tz(timeZone).format('YYYY-MM-DD');
   let time = dayjs(transaction?.date).tz(timeZone).format('HH:mm');
-  $: datetime = dayjs.tz(`${date} ${time}`, timeZone).format();
+  $: datetime = !!timeZone
+    ? dayjs.tz(`${date} ${time}`, timeZone).format()
+    : dayjs(`${date} ${time}`).tz('UTC').format();
 
   let inputRef: HTMLInputElement | null = null;
 
@@ -112,7 +114,7 @@
         categoryId:
           type === 'TRANSFER' ? SYSTEM_CATEGORY_TRANSFER_OUT.id : checkStringFormParameter(formData, 'categoryId'),
         date: datetime,
-        timeZone,
+        ...(!!timeZone ? { timeZone } : {}),
         amount: checkNumberFormParameter(formData, 'amount'),
         comment: checkStringOptionalFormParameter(formData, 'comment'),
         tagIds: selectedTags,
@@ -187,10 +189,14 @@
           <InputLabel text={$translate('transactions.dateTime')} />
         </span>
         <Button appearance="link" underlined={false} on:click={() => (timeZoneListVisible = true)}>
-          <div class="flex gap-0.25">
-            <span class="time-zone">{timeZone}</span>
-            <span class="time-shift">(GMT{timeZoneShift})</span>
-          </div>
+          {#if timeZone}
+            <div class="flex gap-0.25">
+              <span class="time-zone">{timeZone}</span>
+              <span class="time-shift">(GMT{timeZoneShift})</span>
+            </div>
+          {:else}
+            {$translate('common.select_time_zone')}
+          {/if}
         </Button>
       </div>
       <div class="flex gap-1">
@@ -305,6 +311,8 @@
       onClick={(tz, shift) => {
         timeZone = tz;
         timeZoneShift = shift;
+        date = dayjs.utc(datetime).tz(timeZone).format('YYYY-MM-DD');
+        time = dayjs.utc(datetime).tz(timeZone).format('HH:mm');
         timeZoneListVisible = false;
       }}
     />
