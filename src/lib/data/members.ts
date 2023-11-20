@@ -7,6 +7,8 @@ import { useDB } from './useDB';
 
 const logger = new Logger('MembersService', { disabled: false, color: '#00bbbb' });
 
+export const GUEST_UUID = 'guest';
+
 export class MembersService implements Initialisable, JournalSubscriber {
   // #region Private fields
   private _members = store<Member[]>([]);
@@ -76,7 +78,7 @@ export class MembersService implements Initialisable, JournalSubscriber {
   }
 
   /** @throws error if member is not selected */
-  tryGetSelectedMember() {
+  getSelectedMember() {
     if (!this.selectedMember) {
       throw new Error('No member selected');
     }
@@ -87,7 +89,7 @@ export class MembersService implements Initialisable, JournalSubscriber {
   async updateSyncNumber(value: number) {
     logger.debug('SyncNumber:', value);
     this._selectedMemberSettings.update((prev) => ({ ...prev, syncNumber: value }));
-    const member = this.tryGetSelectedMember();
+    const member = this.getSelectedMember();
     if (this.selectedMemberSettings) {
       const db = await useDB();
       await db.put('memberSettings', { ...this.selectedMemberSettings, owner: member.uuid });
@@ -98,7 +100,7 @@ export class MembersService implements Initialisable, JournalSubscriber {
   async updateSettings(settings: Partial<MemberSettings>, saveToDB: boolean = true) {
     this.updateSettingsInMemory(settings);
     if (saveToDB) {
-      const member = this.tryGetSelectedMember();
+      const member = this.getSelectedMember();
       if (this.selectedMemberSettings) {
         const db = await useDB();
         await db.put('memberSettings', { ...this.selectedMemberSettings, owner: member.uuid });
@@ -132,7 +134,13 @@ export class MembersService implements Initialisable, JournalSubscriber {
   private async loadFromDB() {
     const db = await useDB();
     const items = await db.getAll('members');
-    this._members.set(items);
+    const guest: Member = {
+      login: 'guest',
+      uuid: GUEST_UUID,
+      publicKey: '',
+      privateKey: '',
+    };
+    this._members.set([guest, ...items]);
   }
 
   /* Set selected member or choose first one */

@@ -1,8 +1,9 @@
 <script lang="ts">
   import { version } from '$app/environment';
   import { goto } from '$app/navigation';
-  import { membersService, selectedMemberStore } from '$lib/data';
 
+  import { membersService, selectedMemberStore } from '$lib/data';
+  import { GUEST_UUID } from '$lib/data/members';
   import { route, routes } from '$lib/routes';
   import { activeLocaleName, translate } from '$lib/translate';
   import LanguageModal from '$lib/translate/LanguageModal.svelte';
@@ -43,7 +44,11 @@
   {#if !selectedMember}
     <ListLinkItem title={$translate('auth.sign_in')} href={route('login')} />
   {:else}
-    <ListSelectItem title={$translate('auth.login')} value={login ?? ''} on:click={openChangeLoginModal} />
+    <ListSelectItem
+      title={$translate('auth.login')}
+      value={selectedMember?.uuid === GUEST_UUID ? $translate('auth.guest') : login ?? ''}
+      on:click={openChangeLoginModal}
+    />
   {/if}
   <ListLinkItem title={$translate('settings.import_export')} href={route('settings.import_export')} />
 </ListGroup>

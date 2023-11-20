@@ -98,6 +98,9 @@
     <!-- {/if} -->
   </div>
 
+  {#if accounts.length === 0}
+    <span class="no-data">{$translate('accounts.no_data')}</span>
+  {/if}
   <ul
     class="flex-col gap-1 px-1"
     use:dndzone={{
@@ -125,6 +128,10 @@
 </div>
 
 <style>
+  .no-data {
+    text-align: center;
+    color: var(--secondary-text-color);
+  }
   .accounts-list {
     overflow-x: hidden;
     height: 100%;

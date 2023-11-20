@@ -8,12 +8,15 @@
     currencyRatesService,
     journalService,
     mainService,
+    membersService,
     operationTagsService,
     operationsService,
     operationsStore,
   } from '$lib/data';
   import type { Account, Category, CurrencyRate, Tag, Transaction } from '$lib/data/interfaces';
-  import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
+  import { GUEST_UUID } from '$lib/data/members';
+  import { translate } from '$lib/translate';
+  import { showErrorToast, showInfoToast, showSuccessToast } from '$lib/ui/toasts';
   import { deepEqual, groupByKey, keyTransactions } from '$lib/utils';
   import { Logger } from '$lib/utils/logger';
 
@@ -107,11 +110,21 @@
         count += 1;
       });
 
-      await journalService.tryUploadQueue();
+      await journalService.applyChangesToSubscribers(journalService.queue, true);
 
-      showSuccessToast(`${count} items were added`, { testId: 'ImportSuccessToast' });
+      if (membersService.selectedMember?.uuid !== GUEST_UUID) {
+        await journalService.uploadQueue();
+      }
+
+      if (count === 0) {
+        showInfoToast($translate('import_export.nothing_to_import'));
+      } else {
+        showSuccessToast($translate('import_export.import_failure', { values: { count } }), {
+          testId: 'ImportSuccessToast',
+        });
+      }
     } catch (e) {
-      showErrorToast(`Failed to import items ${e}`);
+      showErrorToast(`${$translate('import_export.import_failure')}\n${e}`);
     } finally {
       uploading = false;
     }
@@ -126,53 +139,55 @@
         operationsKeys: [...keyTransactions(operations).keyedItemsMap.keys()],
       });
     });
-    showSuccessToast('Operations keys were logged. See logs or console');
+    showSuccessToast($translate('import_export.operations_keys_logged'));
   };
 </script>
 
 <div class="container p-1">
-  <h2>Import</h2>
+  <h2>{$translate('import_export.import')}</h2>
   <label class="flex-col gap-0.5">
-    <span>RAW Data (json):</span>
+    <span>{$translate('import_export.raw_data_json')}:</span>
     <textarea class="text-area-json" data-testId="ImportTextArea" bind:value={rawImport} />
   </label>
 
-  <button data-testId="ParseJsonButton" class="mt-1 w-full" on:click={parseInput}>Parse json</button>
+  <button data-testId="ParseJsonButton" class="mt-1 w-full" on:click={parseInput}>
+    {$translate('import_export.parse_data')}
+  </button>
 
   {#if parsed}
     <p>
-      <span>Categories: <b>{v2.categories?.length ?? 0}</b>,</span>
-      <span>Account Tags: <b>{v2.accountTags?.length ?? 0}</b>,</span>
-      <span>Accounts: <b>{v2.accounts?.length ?? 0}</b>,</span>
-      <span>Operation Tags: <b>{v2.operationTags?.length ?? 0}</b>,</span>
-      <span>Operations: <b>{v2.operations?.length ?? 0}</b>,</span>
-      <span>CurrencyRates: <b>{v2.currencyRates?.length ?? 0}</b></span>
+      <span>{$translate('import_export.categories')}: <b>{v2.categories?.length ?? 0}</b>,</span>
+      <span>{$translate('import_export.account_tags')}: <b>{v2.accountTags?.length ?? 0}</b>,</span>
+      <span>{$translate('import_export.accounts')}: <b>{v2.accounts?.length ?? 0}</b>,</span>
+      <span>{$translate('import_export.operation_tags')}: <b>{v2.operationTags?.length ?? 0}</b>,</span>
+      <span>{$translate('import_export.operations')}: <b>{v2.operations?.length ?? 0}</b>,</span>
+      <span>{$translate('import_export.currency_rates')}: <b>{v2.currencyRates?.length ?? 0}</b></span>
     </p>
 
     <button data-testId="AddToJournalButton" disabled={uploading} class="w-full" on:click={addToJournal}>
-      {uploading ? 'Uploading...' : 'Add to journal'}
+      {$translate(uploading ? 'import_export.uploading' : 'import_export.start_import')}
     </button>
   {/if}
 
-  <h2>Export</h2>
+  <h2>{$translate('import_export.export')}</h2>
   <label class="flex-col gap-0.5">
-    <span>RAW Data (json):</span>
+    <span>{$translate('import_export.raw_data_json')}:</span>
     <textarea class="text-area-json" value={currentJson} />
   </label>
   <p>
-    <span>Categories: <b>{current.categories?.length ?? 0}</b>,</span>
-    <span>Account Tags: <b>{current.accountTags?.length ?? 0}</b>,</span>
-    <span>Accounts: <b>{current.accounts?.length ?? 0}</b>,</span>
-    <span>Operation Tags: <b>{current.operationTags?.length ?? 0}</b>,</span>
-    <span>Operations: <b>{current.operations?.length ?? 0}</b>,</span>
-    <span>CurrencyRates: <b>{current.currencyRates?.length ?? 0}</b></span>
+    <span>{$translate('import_export.categories')}: <b>{current.categories?.length ?? 0}</b>,</span>
+    <span>{$translate('import_export.account_tags')}: <b>{current.accountTags?.length ?? 0}</b>,</span>
+    <span>{$translate('import_export.accounts')}: <b>{current.accounts?.length ?? 0}</b>,</span>
+    <span>{$translate('import_export.operation_tags')}: <b>{current.operationTags?.length ?? 0}</b>,</span>
+    <span>{$translate('import_export.operations')}: <b>{current.operations?.length ?? 0}</b>,</span>
+    <span>{$translate('import_export.currency_rates')}: <b>{current.currencyRates?.length ?? 0}</b></span>
   </p>
   <a href={URL.createObjectURL(currentJsonFile)} download={`export-${dayjs().format('YYYY-MM-DD')}.json`}>
-    <button class="w-full">Save as json</button>
+    <button class="w-full">{$translate('import_export.save')}</button>
   </a>
 
-  <h3>Other features</h3>
-  <button on:click={logOperationsKeys}>Log operations Keys</button>
+  <h3>{$translate('import_export.other_features')}</h3>
+  <button on:click={logOperationsKeys}>{$translate('import_export.log_operations_keys')}</button>
 </div>
 
 <style>

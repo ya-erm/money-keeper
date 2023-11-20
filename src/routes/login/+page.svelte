@@ -90,7 +90,7 @@
       const decryptedToken = await decryptRsa(privateKey, encryptedToken.base64Data);
       await loginConfirmFetcher.fetch({ token: decryptedToken, uuid: member.uuid });
       // Initialize main service asynchronously
-      mainService.initServices();
+      await mainService.initServices();
       // Fetch updates from server
       journalService.syncWithServer();
       // Go to default route

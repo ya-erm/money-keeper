@@ -10,7 +10,7 @@ import { categoriesService } from './categories';
 import { currencyRatesService } from './currencyRates';
 import { $initialized } from './initialized';
 import { journalService } from './journal';
-import { membersService } from './members';
+import { GUEST_UUID, membersService } from './members';
 import { operationTagsService } from './operationTags';
 import { operationsService } from './operations';
 import { settingsService } from './settings';
@@ -36,10 +36,8 @@ class MainService implements Initialisable {
     await settingsService.init();
     await membersService.init();
 
-    if (!membersService.selectedMember) {
-      // TODO: check is it possible to use app without authorization
-      logger.log('No selected member found. Skip initialisation of other services');
-      return;
+    if (membersService.selectedMember?.uuid === GUEST_UUID) {
+      logger.log('No selected member found. Continue as guest');
     }
 
     await this.initServices();

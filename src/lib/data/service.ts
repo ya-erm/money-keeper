@@ -55,7 +55,7 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
   /** Load items from local DB to memory */
   private async loadFromDB() {
     const db = await useDB();
-    const member = membersService.tryGetSelectedMember();
+    const member = membersService.getSelectedMember();
     const allItems = (await db.getAllFromIndex(this._storageName, 'by-owner', member.uuid)) as unknown as T[];
     this._items.set(allItems.filter((x) => !x.deleted));
   }
@@ -63,12 +63,12 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
   /** Save one item to local DB */
   private async saveToDB(item: T) {
     const db = await useDB();
-    const member = membersService.tryGetSelectedMember();
+    const member = membersService.getSelectedMember();
     await db.put(this._storageName, { ...item, owner: member.uuid });
   }
 
   /** Apply journal updates and optional save to DB */
-  async applyChanges(changes: JournalItem[], saveToDB = false) {
+  async applyChanges(changes: Pick<JournalItem, 'data'>[], saveToDB = false) {
     const updates = new Map<string, T>();
     changes.forEach((item) => {
       const update = item.data[this._journalKey] as unknown as T;
@@ -97,21 +97,17 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
 
   /** Save item */
   save(item: T) {
+    // Apply changes in memory and save to DB
+    this.applyChanges([{ data: { [this._journalKey]: item } }], true);
     // Add operation to queue
     journalService.addOperationToQueue({ [this._journalKey]: item });
-    // Apply changes in memory
-    this._items.update((prev) => {
-      return prev.findIndex((x) => x.id === item.id) >= 0
-        ? prev.map((x) => (x.id === item.id ? item : x))
-        : prev.concat(item);
-    });
   }
 
   /** Delete item */
   delete(item: T) {
+    // Apply changes in memory and save to DB
+    this.applyChanges([{ data: { [this._journalKey]: item } }], true);
     // Add operation to queue
     journalService.addOperationToQueue({ [this._journalKey]: { ...item, deleted: true } });
-    // Apply changes in memory
-    this._items.update((prev) => prev.filter((x) => x.id !== item.id));
   }
 }
