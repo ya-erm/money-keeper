@@ -3,16 +3,18 @@
   import { v4 as uuid } from 'uuid';
 
   import { page } from '$app/stores';
-  import { operationTagsService } from '$lib/data';
+  import { memberSettingsStore, membersService, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Input from '$lib/ui/Input.svelte';
   import InputLabel from '$lib/ui/InputLabel.svelte';
+  import Layout from '$lib/ui/Layout.svelte';
   import Modal from '$lib/ui/Modal.svelte';
+  import Portal from '$lib/ui/Portal.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
-  import { formatMoney, getSearchParam, handleError, spreadIf } from '$lib/utils';
+  import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
   import {
     checkNumberFormParameter,
@@ -20,10 +22,13 @@
     checkStringOptionalFormParameter,
   } from '$lib/utils/checkFormParams';
   import TagsList from '$lib/widgets/TagsList.svelte';
+  import TimeZoneList from '$lib/widgets/TimeZoneList.svelte';
 
   import AccountSelector from './AccountSelector.svelte';
   import CategorySelect from './CategorySelect.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
+
+  $: settings = $memberSettingsStore;
 
   export let accounts: AccountViewModel[];
   export let categories: Category[];
@@ -43,9 +48,13 @@
 
   let categoryId = transaction?.categoryId ?? getSearchParam($page, 'categoryId');
 
-  let date = dayjs(transaction?.date).format('YYYY-MM-DD');
-  let time = dayjs(transaction?.date).format('HH:mm');
-  $: datetime = new Date([date, time].join('T')).toISOString();
+  let timeZone = transaction ? transaction?.timeZone ?? undefined : dayjs.tz.guess();
+  let timeZoneShift = timeZone ? getTimeZoneOffset(timeZone) : undefined;
+  let timeZoneListVisible = false;
+
+  let date = dayjs(transaction?.date).tz(timeZone).format('YYYY-MM-DD');
+  let time = dayjs(transaction?.date).tz(timeZone).format('HH:mm');
+  $: datetime = timeZone ? dayjs.tz(`${date} ${time}`, timeZone).format() : dayjs(`${date} ${time}`).tz('UTC').format();
 
   let inputRef: HTMLInputElement | null = null;
 
@@ -105,10 +114,11 @@
         categoryId:
           type === 'TRANSFER' ? SYSTEM_CATEGORY_TRANSFER_OUT.id : checkStringFormParameter(formData, 'categoryId'),
         date: datetime,
+        ...(timeZone ? { timeZone } : {}),
         amount: checkNumberFormParameter(formData, 'amount'),
         comment: checkStringOptionalFormParameter(formData, 'comment'),
         tagIds: selectedTags,
-        ...(!!anotherCurrency
+        ...(anotherCurrency
           ? {
               anotherCurrency,
               anotherCurrencyAmount: checkNumberFormParameter(formData, 'destinationAmount'),
@@ -122,6 +132,7 @@
           accountId: checkStringFormParameter(formData, 'destinationAccountId'),
           categoryId: SYSTEM_CATEGORY_TRANSFER_IN.id,
           date: datetime,
+          timeZone,
           amount: checkNumberFormParameter(formData, 'destinationAmount'),
           comment: checkStringOptionalFormParameter(formData, 'comment'),
           tagIds: selectedTags,
@@ -173,7 +184,21 @@
       <AccountSelector bind:accountId bind:selecting={selectingAccount} testId="DestinationAccountSelect" />
     {/if}
     <div class="flex-col gap-0.5">
-      <InputLabel text={$translate('transactions.dateTime')} />
+      <div class="flex gap-1 justify-between">
+        <span class="flex-shrink-0">
+          <InputLabel text={$translate('transactions.dateTime')} />
+        </span>
+        <Button appearance="link" underlined={false} on:click={() => (timeZoneListVisible = true)}>
+          {#if timeZone}
+            <div class="flex gap-0.25">
+              <span class="time-zone">{timeZone}</span>
+              <span class="time-shift">(GMT{timeZoneShift})</span>
+            </div>
+          {:else}
+            {$translate('timezones.select_time_zone')}
+          {/if}
+        </Button>
+      </div>
       <div class="flex gap-1">
         <Input name="date" type="date" bind:value={date} required />
         <Input name="time" type="time" bind:value={time} required />
@@ -185,7 +210,14 @@
         <InputLabel text={$translate('transactions.amount')} />
         {#if type !== 'TRANSFER'}
           {#if !anotherCurrency}
-            <Button appearance="link" underlined={false} on:click={() => (anotherCurrencyModalOpened = true)}>
+            <Button
+              appearance="link"
+              underlined={false}
+              on:click={() => {
+                anotherCurrencyModalOpened = true;
+                anotherCurrency = settings?.lastAnotherCurrency ?? null;
+              }}
+            >
               {$translate('transactions.another_currency')}
             </Button>
           {:else}
@@ -260,10 +292,18 @@
     class="flex-col gap-1"
     on:submit|preventDefault={(e) => {
       anotherCurrency = new FormData(e.currentTarget).get('another-currency')?.toString() ?? null;
+      if (anotherCurrency !== settings?.lastAnotherCurrency) {
+        membersService.updateSettings({ lastAnotherCurrency: anotherCurrency });
+      }
       anotherCurrencyModalOpened = false;
     }}
   >
-    <Input label={$translate('transactions.another_currency')} value={anotherCurrency} name="another-currency" />
+    <Input
+      label={$translate('transactions.another_currency')}
+      value={anotherCurrency}
+      name="another-currency"
+      clearable
+    />
     <div class="grid-col-2 gap-1">
       <Button
         color="secondary"
@@ -274,6 +314,25 @@
     </div>
   </form>
 </Modal>
+
+<Portal visible={timeZoneListVisible}>
+  <Layout
+    header={{
+      title: $translate('timezones.select_time_zone'),
+      backButton: { title: $translate('common.back'), onClick: () => (timeZoneListVisible = false) },
+    }}
+  >
+    <TimeZoneList
+      onClick={(tz, shift) => {
+        timeZone = tz;
+        timeZoneShift = shift;
+        date = dayjs.utc(datetime).tz(timeZone).format('YYYY-MM-DD');
+        time = dayjs.utc(datetime).tz(timeZone).format('HH:mm');
+        timeZoneListVisible = false;
+      }}
+    />
+  </Layout>
+</Portal>
 
 <style>
   .currency-rate-info {
@@ -286,5 +345,18 @@
     margin-top: -0.5rem;
     margin-left: 0.5rem;
     color: var(--secondary-text-color);
+  }
+  .time-zone {
+    flex-shrink: 1;
+    text-align: left;
+    display: -webkit-box;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+  }
+  .time-shift {
+    flex-shrink: 0;
+    font-size: 0.9rem;
   }
 </style>

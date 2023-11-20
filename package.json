@@ -1,6 +1,6 @@
 {
   "name": "client",
-  "version": "2.6.2",
+  "version": "2.7.0",
   "private": true,
   "scripts": {
     "dev": "vite dev",
@@ -55,6 +55,7 @@
     "dayjs": "^1.11.7",
     "idb": "^7.1.1",
     "svelte-dnd-action": "^0.9.24",
+    "timezones-list": "^3.0.2",
     "uuid": "^9.0.0"
   },
   "prisma": {

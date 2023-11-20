@@ -27,6 +27,8 @@ export type MemberSettings = {
   currency?: string | null;
   encryption?: EncryptionVersion;
   accountsOrder?: string[];
+  lastAnotherCurrency?: string | null;
+  favoriteTimeZones?: string[];
   groupingId?: string | null;
 };
 
@@ -96,6 +98,7 @@ export type Transaction = {
   accountId: string;
   categoryId: string;
   date: string;
+  timeZone?: string | null;
   amount: number;
   comment?: string | null;
   description?: string | null;

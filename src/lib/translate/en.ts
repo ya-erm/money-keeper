@@ -36,6 +36,13 @@ export const enDict: Dictionary = {
   'common.count': '{count} pcs.',
   'common.show': 'Show',
   'common.hide': 'Hide',
+  // Timezones
+  'timezones.select_time_zone': 'Select time zone',
+  'timezones.current_time_zone': 'Current time zone',
+  'timezones.favorite_time_zones': 'Favorite time zones',
+  'timezones.all_time_zones': 'All time zones',
+  'timezones.timezone_added_to_favorites': 'Time zone was added to favorites',
+  'timezones.timezone_removed_from_favorites': 'Time zone was removed from favorites',
   // Tags
   'tags.add_modal_header': 'Add tag',
   'tags.edit_modal_header': 'Edit tag',
@@ -252,6 +259,7 @@ export const enDict: Dictionary = {
   'settings.collaboration.workspaces': 'Workspaces',
   'settings.collaboration.invites': 'Invites',
   'settings.collaboration.blocklist': 'Blocklist',
+  'settings.debug_tools': 'Debug tools',
   'settings.logs': 'Logs',
   'settings.logs.filters': 'Filters',
   'settings.logs.show_filters': 'Show filters',

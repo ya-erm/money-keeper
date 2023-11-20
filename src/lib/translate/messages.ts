@@ -33,6 +33,13 @@ export type Messages =
   | 'common.count'
   | 'common.show'
   | 'common.hide'
+  // Timezones
+  | 'timezones.select_time_zone'
+  | 'timezones.current_time_zone'
+  | 'timezones.favorite_time_zones'
+  | 'timezones.all_time_zones'
+  | 'timezones.timezone_added_to_favorites'
+  | 'timezones.timezone_removed_from_favorites'
   // Tags
   | 'tags.add_modal_header'
   | 'tags.edit_modal_header'
@@ -244,6 +251,7 @@ export type Messages =
   | 'settings.collaboration.invites'
   | 'settings.collaboration.blocklist'
   | 'settings.encryption'
+  | 'settings.debug_tools'
   | 'settings.logs'
   | 'settings.logs.filters'
   | 'settings.logs.show_filters'

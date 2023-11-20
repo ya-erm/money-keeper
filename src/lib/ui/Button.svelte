@@ -36,6 +36,7 @@
 
 <style>
   button {
+    min-width: 0;
     font-size: 1rem;
     font-weight: normal;
     padding: 0.75rem;
