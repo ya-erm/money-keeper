@@ -298,7 +298,12 @@
       anotherCurrencyModalOpened = false;
     }}
   >
-    <Input label={$translate('transactions.another_currency')} value={anotherCurrency} name="another-currency" />
+    <Input
+      label={$translate('transactions.another_currency')}
+      value={anotherCurrency}
+      name="another-currency"
+      clearable
+    />
     <div class="grid-col-2 gap-1">
       <Button
         color="secondary"
