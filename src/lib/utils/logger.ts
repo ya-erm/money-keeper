@@ -43,7 +43,7 @@ export class Logger {
   }
 
   private getDefaultArgs() {
-    return [`%c${this.name}:`, `color: ${this._options.color ?? 'green'}`];
+    return [`%c[${this.name}]`, `color: ${this._options.color ?? 'green'}`];
   }
 
   private onMessage(message: LogMessage) {

@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { derived, type Readable } from 'svelte/store';
 
 import { showErrorToast } from '$lib/ui/toasts';
+import { Logger } from '$lib/utils/logger';
 
 import { accountsService, accountsStore } from './accounts';
 import { categoriesStore, SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from './categories';
@@ -9,6 +10,8 @@ import { $initialized } from './initialized';
 import type { Transaction, TransactionViewModel } from './interfaces';
 import { operationTagsStore } from './operationTags';
 import { BaseService } from './service';
+
+const logger = new Logger('OperationsService', { disabled: false });
 
 export class OperationsService extends BaseService<Transaction> {
   private _operations: Readable<TransactionViewModel[]>;
@@ -47,7 +50,7 @@ export class OperationsService extends BaseService<Transaction> {
           return tag;
         }
 
-        transactions.sort((a, b) => dayjs(b.date).diff(dayjs(a.date)));
+        transactions.filter((x) => !x.deleted).sort((a, b) => dayjs(b.date).diff(dayjs(a.date)));
 
         const problems: Array<{ transaction: Transaction; e: unknown }> = [];
 
@@ -71,7 +74,6 @@ export class OperationsService extends BaseService<Transaction> {
               };
               return viewModel;
             } catch (e) {
-              console.error('problems', e);
               problems.push({ transaction, e });
               return null as unknown as TransactionViewModel;
             }
@@ -79,7 +81,7 @@ export class OperationsService extends BaseService<Transaction> {
           .filter((x) => x !== null);
 
         if (problems.length) {
-          console.error(problems);
+          logger.error('Data load problems:', problems);
           showErrorToast(`Data loaded with ${problems.length} problem(s)`);
         }
 

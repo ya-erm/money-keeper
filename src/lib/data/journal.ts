@@ -61,9 +61,17 @@ export class JournalService implements Initialisable {
     this._subscribers.delete(id);
   }
 
+  private _syncNumberUnsubscribe: (() => void) | undefined;
+
   /** Initialisation */
   async init() {
-    this._syncNumber.subscribe((value) => value >= 0 && membersService.updateSyncNumber(value));
+    if (this._syncNumberUnsubscribe !== undefined) {
+      this._syncNumberUnsubscribe?.();
+    }
+    this._syncNumberUnsubscribe = this._syncNumber.subscribe((value) => {
+      logger.debug('[subscription] _syncNumber:', value);
+      if (value >= 0) void membersService.updateSyncNumber(value);
+    });
 
     logger.log('Load outgoing queue from local DB');
     await this.loadQueueFromDB();
@@ -72,6 +80,16 @@ export class JournalService implements Initialisable {
       logger.log('Apply queue to subscribers');
       await this.applyChangesToSubscribers(this.queue, false);
     }
+  }
+
+  reset() {
+    logger.debug('Reset journal service');
+    this._syncNumberUnsubscribe?.();
+    this._syncNumberUnsubscribe = undefined;
+    this._updates.reset();
+    this._queue.reset();
+    this._syncNumber.reset();
+    this._state.reset();
   }
 
   /** Synchronize updates with server */
@@ -177,6 +195,7 @@ export class JournalService implements Initialisable {
       order: this.syncNumber + this._queue.value.length + 1,
       data: operation,
     };
+    logger.debug('Add operation to queue', { item, options });
     this._queue.update((prev) => prev.concat(item));
 
     // Save to DB
@@ -186,8 +205,10 @@ export class JournalService implements Initialisable {
 
     if (options?.upload ?? true) {
       // Try run upload asynchronously
-      this.tryUploadQueue();
+      void this.tryUploadQueue();
     }
+
+    return item;
   }
 
   /** Clear queue */
@@ -199,9 +220,14 @@ export class JournalService implements Initialisable {
 
   /** Upload queue to the server */
   private async _uploadQueue() {
+    if (membersService.isGuest) {
+      logger.debug('Uploading queue: skipped (guest mode)');
+      return;
+    }
+
     // TODO: optimize queue before upload
 
-    logger.log('Uploading queue: ', this.queue.length);
+    logger.log('Uploading queue: ', this.queue.length, 'items');
     logger.debug('Queue: ', this.queue);
 
     // TODO: pull and merge conflicts firstly
@@ -248,7 +274,7 @@ export class JournalService implements Initialisable {
     logger.log('Queue uploaded successfully.', 'New sync number:', json.syncNumber);
     if (json.syncNumber) this._syncNumber.set(json.syncNumber);
 
-    this.clearQueue();
+    await this.clearQueue();
   }
 
   /** Upload queue to the server, @throw if error */

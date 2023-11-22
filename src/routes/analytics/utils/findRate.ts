@@ -23,7 +23,7 @@ export function findRate(currencyRates: CurrencyRate[], mainCurrency: string = '
   }
   if (!globalRatesUsed) {
     logger.debug(`No rate for ${currency} found, try to use global rates`);
-    loadGlobalRates();
+    void loadGlobalRates();
     return 0;
   }
   if (!globalRates) {

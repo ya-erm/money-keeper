@@ -26,7 +26,7 @@ class UseCreateActionResult<T> {
 
     this._opened.subscribe((value) => {
       if (!value && _page) {
-        deleteSearchParam(_page, 'action');
+        void deleteSearchParam(_page, 'action');
       }
     });
   }

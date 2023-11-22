@@ -73,10 +73,12 @@ export const ruDict: Dictionary = {
   'auth.registration_success': 'Регистрация прошла успешно',
   'auth.registration_failure': 'Не удалось зарегистрироваться',
   'auth.logout.title': 'Выход',
+  'auth.logging_out': 'Выходим из системы...',
   'auth.sign_out': 'Выйти',
   'auth.profile': 'Профиль',
   'auth.logged_in_as': 'Вы зашли как {name}!',
   'auth.not_logged_in': 'Вы не авторизованы',
+  'auth.continue_as_guest': 'Войти как гость',
   'auth.logged_in_as_guest_info': 'Вы авторизованы как гость. Синхронизация отключена.',
   'auth.guest': 'Гость',
   // Accounts

@@ -14,11 +14,9 @@
     operationsStore,
   } from '$lib/data';
   import type { Account, Category, CurrencyRate, Tag, Transaction } from '$lib/data/interfaces';
-  import { GUEST_UUID } from '$lib/data/members';
   import { translate } from '$lib/translate';
   import { showErrorToast, showInfoToast, showSuccessToast } from '$lib/ui/toasts';
-  import { deepEqual, groupByKey, keyTransactions } from '$lib/utils';
-  import { Logger } from '$lib/utils/logger';
+  import { Logger, deepEqual, groupByKey, keyTransactions } from '$lib/utils';
 
   const logger = new Logger('Import/Export');
 
@@ -112,7 +110,7 @@
 
       await journalService.applyChangesToSubscribers(journalService.queue, true);
 
-      if (membersService.selectedMember?.uuid !== GUEST_UUID) {
+      if (!membersService.isGuest) {
         await journalService.uploadQueue();
       }
 

@@ -3,7 +3,7 @@
   import { derived } from 'svelte/store';
 
   import { ApiError, isApiError } from '$lib/api/ApiError';
-  import { journalService, mainService, membersService } from '$lib/data';
+  import { journalService, mainService, membersService, settingsService } from '$lib/data';
   import { createKeyFromPassword, decryptAes, decryptRsa } from '$lib/data/crypto';
   import type {
     LoginConfirmRequestData,
@@ -85,6 +85,8 @@
         publicKey: member.publicKey,
         privateKey: decryptedKey,
       });
+      // Save as default member
+      settingsService.updateSettings({ selectedMember: member.uuid });
       // eslint-disable-next-line no-undef
       const privateKey: JsonWebKey = JSON.parse(decryptedKey);
       const decryptedToken = await decryptRsa(privateKey, encryptedToken.base64Data);
@@ -118,6 +120,7 @@
     />
     <Button text={$translate('auth.sign_in')} type="submit" testId="SignInButton" />
     <a class="flex-center" href="/register">{$translate('auth.register')}</a>
+    <a class="flex-center" href="/">{$translate('auth.continue_as_guest')}</a>
     <Loader visible={$smartLoading} />
   </form>
 </div>

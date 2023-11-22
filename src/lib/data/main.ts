@@ -8,13 +8,13 @@ import { accountTagsService } from './accountTags';
 import { accountsService } from './accounts';
 import { categoriesService } from './categories';
 import { currencyRatesService } from './currencyRates';
+import { groupingsService } from './groupings';
 import { $initialized } from './initialized';
 import { journalService } from './journal';
-import { GUEST_UUID, membersService } from './members';
+import { membersService } from './members';
 import { operationTagsService } from './operationTags';
 import { operationsService } from './operations';
 import { settingsService } from './settings';
-import { groupingsService } from './groupings';
 
 const logger = new Logger('MainService', { disabled: false, color: '#00cc55' });
 
@@ -31,19 +31,18 @@ class MainService implements Initialisable {
     console.debug('%cMain service ID:', 'color: red', this._id, { called: this._called });
 
     if (this._called) return;
+
     this._called = true;
-
-    await settingsService.init();
-    await membersService.init();
-
-    if (membersService.selectedMember?.uuid === GUEST_UUID) {
-      logger.log('No selected member found. Continue as guest');
-    }
 
     await this.initServices();
   }
 
   async initServices() {
+    $initialized.set(false);
+
+    await settingsService.init();
+    await membersService.init();
+
     const services: Service[] = [
       categoriesService,
       accountsService,
@@ -54,23 +53,19 @@ class MainService implements Initialisable {
       groupingsService,
     ];
 
-    $initialized.set(false);
-
     logger.log(`Initialise ${services.length} services to load data from local DB`);
-    logger.debug(
-      'Services:',
-      services.map((service) => service.name),
-    );
+    logger.debug('Services:', [...services.map((service) => service.name)]);
     await Promise.all(services.map((service) => service.init()));
 
-    journalService.addSubscriber(membersService);
-    services.forEach((service) => journalService.addSubscriber(service));
+    services.concat(membersService).forEach((service) => journalService.addSubscriber(service));
 
     logger.log('Initialise journal service');
     await journalService.init();
 
     $initialized.set(true);
   }
+
+  reset() {}
 }
 
 export const mainService = new MainService();

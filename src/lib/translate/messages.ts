@@ -70,10 +70,12 @@ export type Messages =
   | 'auth.registration_success'
   | 'auth.registration_failure'
   | 'auth.logout.title'
+  | 'auth.logging_out'
   | 'auth.sign_out'
   | 'auth.profile'
   | 'auth.logged_in_as'
   | 'auth.not_logged_in'
+  | 'auth.continue_as_guest'
   | 'auth.logged_in_as_guest_info'
   | 'auth.guest'
   // Accounts

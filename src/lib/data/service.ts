@@ -97,17 +97,19 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
 
   /** Save item */
   save(item: T) {
+    const operation = { [this._journalKey]: item };
     // Apply changes in memory and save to DB
-    this.applyChanges([{ data: { [this._journalKey]: item } }], true);
+    void this.applyChanges([{ data: operation }], true);
     // Add operation to queue
-    journalService.addOperationToQueue({ [this._journalKey]: item });
+    void journalService.addOperationToQueue(operation);
   }
 
   /** Delete item */
   delete(item: T) {
+    const operation = { [this._journalKey]: { ...item, deleted: true } };
     // Apply changes in memory and save to DB
-    this.applyChanges([{ data: { [this._journalKey]: item } }], true);
+    void this.applyChanges([{ data: operation }], true);
     // Add operation to queue
-    journalService.addOperationToQueue({ [this._journalKey]: { ...item, deleted: true } });
+    void journalService.addOperationToQueue(operation);
   }
 }

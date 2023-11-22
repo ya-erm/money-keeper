@@ -2,13 +2,14 @@
   import { version } from '$app/environment';
   import { goto } from '$app/navigation';
 
-  import { membersService, selectedMemberStore } from '$lib/data';
-  import { GUEST_UUID } from '$lib/data/members';
+  import { membersService, selectedMemberStore, settingsService } from '$lib/data';
   import { route, routes } from '$lib/routes';
   import { activeLocaleName, translate } from '$lib/translate';
   import LanguageModal from '$lib/translate/LanguageModal.svelte';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
+  import Loader from '$lib/ui/Loader.svelte';
+  import Portal from '$lib/ui/Portal.svelte';
   import ListGroup from '$lib/ui/list/ListGroup.svelte';
   import ListLinkItem from '$lib/ui/list/ListLinkItem.svelte';
   import ListSelectItem from '$lib/ui/list/ListSelectItem.svelte';
@@ -18,7 +19,7 @@
 
   // TODO: selectedMember is not a user, it can be a group
   $: selectedMember = $selectedMemberStore;
-  $: login = selectedMember?.login;
+  $: userIsLoggedIn = selectedMember && !membersService.isGuest;
 
   const [languageModalOpened, openLanguageModal] = createBooleanStore();
   const [changeNameModalOpened, openChangeNameModal] = createBooleanStore();
@@ -26,11 +27,15 @@
   const [changePasswordModalOpened, openChangePasswordModal] = createBooleanStore();
   const [selectGroupModalOpened, openSelectGroupModal] = createBooleanStore();
 
+  let showLogoutPortal = false;
+
   async function logout() {
+    await settingsService.updateSettings({ selectedMember: null });
     if (selectedMember) {
       await membersService.deleteMember(selectedMember);
     }
-    await goto(routes.login.path);
+    showLogoutPortal = true;
+    window.location.assign(routes.login.path);
   }
 </script>
 
@@ -41,12 +46,12 @@
 </ListGroup>
 
 <ListGroup title={$translate('settings.profile')}>
-  {#if !selectedMember}
+  {#if !userIsLoggedIn}
     <ListLinkItem title={$translate('auth.sign_in')} href={route('login')} />
   {:else}
     <ListSelectItem
       title={$translate('auth.login')}
-      value={selectedMember?.uuid === GUEST_UUID ? $translate('auth.guest') : login ?? ''}
+      value={selectedMember?.login ?? undefined}
       on:click={openChangeLoginModal}
     />
   {/if}
@@ -60,7 +65,7 @@
 </ListGroup>
 
 <div class="mt-1 flex-col items-center gap-0.5">
-  {#if selectedMember}
+  {#if userIsLoggedIn}
     <Button
       color="danger"
       appearance="link"
@@ -86,8 +91,21 @@
 
 <LanguageModal bind:opened={$languageModalOpened} />
 
+<Portal visible={showLogoutPortal}>
+  <div class="logout-portal flex-col items-center justify-center h-full">
+    <h3>{$translate('auth.logging_out')}</h3>
+    <Loader visible={true} />
+  </div>
+</Portal>
+
 <style>
   .build-info {
     font-size: 0.9em;
+  }
+  .logout-portal {
+    background: var(--background-color);
+  }
+  .logout-portal > h3 {
+    font-weight: normal;
   }
 </style>

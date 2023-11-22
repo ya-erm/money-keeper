@@ -73,10 +73,12 @@ export const enDict: Dictionary = {
   'auth.registration_success': 'Registration was successful',
   'auth.registration_failure': 'Failed to register',
   'auth.logout.title': 'Logout',
+  'auth.logging_out': 'Logging out...',
   'auth.sign_out': 'Sign out',
   'auth.profile': 'Profile',
   'auth.logged_in_as': 'You are logged in as {name}!',
   'auth.not_logged_in': 'You are not logged in',
+  'auth.continue_as_guest': 'Continue as a guest',
   'auth.logged_in_as_guest_info': "You're are using app as a guest. Data won't be sync with server.",
   'auth.guest': 'Guest',
   // Accounts
