@@ -50,7 +50,7 @@ export class OperationsService extends BaseService<Transaction> {
           return tag;
         }
 
-        transactions.filter((x) => !x.deleted).sort((a, b) => dayjs(b.date).diff(dayjs(a.date)));
+        transactions.sort((a, b) => dayjs(b.date).diff(dayjs(a.date)));
 
         const problems: Array<{ transaction: Transaction; e: unknown }> = [];
 
