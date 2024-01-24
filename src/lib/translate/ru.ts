@@ -105,6 +105,10 @@ export const ruDict: Dictionary = {
   'accounts.sort': 'Сортировка счетов',
   // Analytics
   'analytics.title': 'Аналитика',
+  'analytics.categories.start_date': 'Начало интервала',
+  'analytics.categories.end_date': 'Конец интервала',
+  'analytics.categories.monthly_interval': 'По месяцам',
+  'analytics.categories.custom_interval': 'Произвольный',
   'analytics.accounts.total': 'Всего',
   'analytics.accounts.grouping': 'Группировка',
   'analytics.accounts.grouping.not_selected': 'Без группировки',

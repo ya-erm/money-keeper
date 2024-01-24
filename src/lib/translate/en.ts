@@ -105,6 +105,10 @@ export const enDict: Dictionary = {
   'accounts.sort': 'Sort accounts',
   // Analytics
   'analytics.title': 'Analytics',
+  'analytics.categories.start_date': 'Start date',
+  'analytics.categories.end_date': 'End date',
+  'analytics.categories.monthly_interval': 'Monthly',
+  'analytics.categories.custom_interval': 'Custom',
   'analytics.accounts.total': 'Total',
   'analytics.accounts.grouping': 'Grouping',
   'analytics.accounts.grouping.not_selected': 'No grouping',

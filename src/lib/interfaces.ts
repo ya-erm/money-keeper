@@ -49,3 +49,5 @@ export type ImportedTransaction = {
   categoryId: number;
   tags?: number[];
 };
+
+export type DateIntervalType = 'month' | 'custom';

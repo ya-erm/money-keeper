@@ -7,6 +7,7 @@
   export let underlined: boolean = appearance == 'link';
   export let type: 'button' | 'submit' = 'button';
   export let bordered: boolean = false;
+  export let disabled: boolean = false;
   export let testId: string | null = 'Button';
 
   const dispatch = createEventDispatcher();
@@ -26,6 +27,7 @@
   class:link={appearance === 'link'}
   class:underlined
   data-testId={testId}
+  {disabled}
   {type}
 >
   <slot />

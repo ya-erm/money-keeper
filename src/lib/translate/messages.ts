@@ -101,6 +101,10 @@ export type Messages =
   | 'accounts.sort'
   // Analytics
   | 'analytics.title'
+  | 'analytics.categories.start_date'
+  | 'analytics.categories.end_date'
+  | 'analytics.categories.monthly_interval'
+  | 'analytics.categories.custom_interval'
   | 'analytics.accounts.total'
   | 'analytics.accounts.grouping'
   | 'analytics.accounts.grouping.not_selected'
