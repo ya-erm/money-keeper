@@ -1,6 +1,9 @@
 import { store } from '$lib/store';
+import { Logger } from '$lib/utils/logger';
 import type { GlobalSettings, Initialisable } from './interfaces';
 import { useDB } from './useDB';
+
+const logger = new Logger('GlobalSettings', { disabled: false });
 
 const defaultSettings: GlobalSettings = {
   id: 'global',
@@ -30,6 +33,15 @@ export class GlobalSettingsService implements Initialisable {
   async saveToDB() {
     const db = await useDB();
     await db.put('globalSettings', this.settings);
+  }
+
+  async updateSettings(value: Partial<GlobalSettings>) {
+    this._settings.update((prev) => {
+      const newValue = { ...this.settings, ...value };
+      logger.debug('Update global settings', { prev, newValue });
+      return newValue;
+    });
+    await this.saveToDB();
   }
 }
 

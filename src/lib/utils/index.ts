@@ -20,6 +20,7 @@ export { groupByKey, groupByKeyToMap, groupBySelector, groupBySelectorToMap } fr
 export { handleError } from './handleError';
 export { join } from './join';
 export { keyTransactions } from './keyTransactions';
+export { Logger } from './logger';
 export { longPress } from './longPress';
 export { serialize } from './serialize';
 export { spreadIf } from './spreadIf';

@@ -12,6 +12,7 @@
   export let step: string | number | null = 0.01;
   export let required: boolean = false;
   export let optional: boolean = false;
+  export let disabled: boolean = false;
   export let autocomplete: boolean = false;
   export let minlength: number | null = null;
   export let maxlength: number | null = null;
@@ -38,7 +39,7 @@
 
 <label class="input-label" data-testId={`${testId}.Container`}>
   {#if label}
-    <InputLabel text={label} {optional} {error} testId={`${testId}.Label`} />
+    <InputLabel text={label} {optional} {disabled} {error} testId={`${testId}.Label`} />
   {/if}
   <div class="input-container flex-col">
     <input
@@ -54,12 +55,13 @@
       {minlength}
       {maxlength}
       {required}
+      {disabled}
       {value}
       {name}
     />
     <div class="end-slot flex items-center">
       {#if type === 'color'}
-        <input class="input-color" type="color" bind:value />
+        <input class="input-color" type="color" bind:value {disabled} />
       {/if}
       {#if endText}
         <span class="end-text" class:mr-1={!clearable || !value} data-testId={`${testId}.EndText`}>
@@ -74,6 +76,7 @@
             appearance="link"
             color={error ? 'danger' : 'secondary'}
             testId={`${testId}.ClearButton`}
+            {disabled}
           >
             <Icon name="mdi:close" size={1.25} padding={0.5} />
           </Button>
@@ -134,6 +137,9 @@
   }
   input.clearable {
     padding-right: 1.75rem;
+  }
+  input:disabled {
+    color: var(--secondary-text-color);
   }
   :global(body.dark-mode input) {
     color-scheme: dark;

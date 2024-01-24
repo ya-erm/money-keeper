@@ -61,9 +61,17 @@ export class JournalService implements Initialisable {
     this._subscribers.delete(id);
   }
 
+  private _syncNumberUnsubscribe: (() => void) | undefined;
+
   /** Initialisation */
   async init() {
-    this._syncNumber.subscribe((value) => value >= 0 && membersService.updateSyncNumber(value));
+    if (this._syncNumberUnsubscribe !== undefined) {
+      this._syncNumberUnsubscribe?.();
+    }
+    this._syncNumberUnsubscribe = this._syncNumber.subscribe((value) => {
+      logger.debug('[subscription] _syncNumber:', value);
+      if (value >= 0) void membersService.updateSyncNumber(value);
+    });
 
     logger.log('Load outgoing queue from local DB');
     await this.loadQueueFromDB();
@@ -72,6 +80,16 @@ export class JournalService implements Initialisable {
       logger.log('Apply queue to subscribers');
       await this.applyChangesToSubscribers(this.queue, false);
     }
+  }
+
+  reset() {
+    logger.debug('Reset journal service');
+    this._syncNumberUnsubscribe?.();
+    this._syncNumberUnsubscribe = undefined;
+    this._updates.reset();
+    this._queue.reset();
+    this._syncNumber.reset();
+    this._state.reset();
   }
 
   /** Synchronize updates with server */
@@ -95,9 +113,10 @@ export class JournalService implements Initialisable {
   }
 
   /** Apply changes to subscribers */
-  private async applyChangesToSubscribers(changes: JournalItem[], saveToDB: boolean) {
+  async applyChangesToSubscribers(changes: JournalItem[], saveToDB: boolean) {
     if (changes.length === 0) return;
     const subscribers = Array.from(this._subscribers.values());
+    logger.debug('Apply changes to subscribers', { changes, subscribers });
     await Promise.all(subscribers.map((subscriber) => subscriber.applyChanges(changes, saveToDB)));
   }
 
@@ -106,8 +125,6 @@ export class JournalService implements Initialisable {
     // await new Promise<void>((resolve) => setTimeout(() => resolve(), 5000));
     const fetcher = useFetch<GetJournalRequest, GetJournalResponse>('POST', '/api/v2/journal/get-updates');
     const { journal } = await fetcher.fetch({ start: this.syncNumber });
-    const member = membersService.tryGetSelectedMember();
-    const privateKey = JSON.parse(member.privateKey) as JsonWebKey;
     const items = await Promise.all(
       journal.map(async (item) => {
         const encryption = item.encryption as EncryptionVersion;
@@ -120,6 +137,8 @@ export class JournalService implements Initialisable {
             return result;
           }
           case 'aes+rsa-v1': {
+            const member = membersService.getSelectedMember();
+            const privateKey = JSON.parse(member.privateKey) as JsonWebKey;
             const { encryptedMessage, encryptedAesKey } = JSON.parse(item.data);
             const json = await decryptAsync(privateKey, encryptedMessage, encryptedAesKey);
             const result: JournalItem = {
@@ -161,7 +180,7 @@ export class JournalService implements Initialisable {
   /** Load queue from local database */
   private async loadQueueFromDB() {
     const db = await useDB();
-    const member = membersService.tryGetSelectedMember();
+    const member = membersService.getSelectedMember();
     const settings = membersService.selectedMemberSettings;
     if (settings?.syncNumber) {
       this._syncNumber.set(settings?.syncNumber);
@@ -176,17 +195,20 @@ export class JournalService implements Initialisable {
       order: this.syncNumber + this._queue.value.length + 1,
       data: operation,
     };
+    logger.debug('Add operation to queue', { item, options });
     this._queue.update((prev) => prev.concat(item));
 
     // Save to DB
     const db = await useDB();
-    const member = membersService.tryGetSelectedMember();
+    const member = membersService.getSelectedMember();
     await db.put('journal', { ...item, owner: member.uuid });
 
     if (options?.upload ?? true) {
       // Try run upload asynchronously
-      this.tryUploadQueue();
+      void this.tryUploadQueue();
     }
+
+    return item;
   }
 
   /** Clear queue */
@@ -197,10 +219,15 @@ export class JournalService implements Initialisable {
   }
 
   /** Upload queue to the server */
-  private async uploadQueue() {
+  private async _uploadQueue() {
+    if (membersService.isGuest) {
+      logger.debug('Uploading queue: skipped (guest mode)');
+      return;
+    }
+
     // TODO: optimize queue before upload
 
-    logger.log('Uploading queue: ', this.queue.length);
+    logger.log('Uploading queue: ', this.queue.length, 'items');
     logger.debug('Queue: ', this.queue);
 
     // TODO: pull and merge conflicts firstly
@@ -211,9 +238,7 @@ export class JournalService implements Initialisable {
       this._queue.set(reorderedItems);
     }
 
-    const member = membersService.tryGetSelectedMember();
     const encryption = membersService.selectedMemberSettings?.encryption ?? 'none';
-    const publicKey = JSON.parse(member.publicKey) as JsonWebKey;
 
     const items = await Promise.all(
       this.queue.map(async (item) => {
@@ -226,6 +251,8 @@ export class JournalService implements Initialisable {
               data: json,
             };
           case 'aes+rsa-v1': {
+            const member = membersService.getSelectedMember();
+            const publicKey = JSON.parse(member.publicKey) as JsonWebKey;
             const { encryptedMessage, encryptedAesKey } = await encryptAsync(publicKey, json);
             return {
               order: item.order,
@@ -247,25 +274,27 @@ export class JournalService implements Initialisable {
     logger.log('Queue uploaded successfully.', 'New sync number:', json.syncNumber);
     if (json.syncNumber) this._syncNumber.set(json.syncNumber);
 
-    // TODO: move from this function for single responsibility
-    logger.log('Applying changes from queue to subscribers');
-    await this.applyChangesToSubscribers(this.queue, true);
+    await this.clearQueue();
+  }
 
-    this.clearQueue();
+  /** Upload queue to the server, @throw if error */
+  async uploadQueue() {
+    try {
+      if (this.queue.length > 0) {
+        this._state.set('uploading');
+        await this._uploadQueue();
+      }
+    } catch (e) {
+      logger.error('Failed to upload queue', e);
+      throw new Error('Failed to upload queue', { cause: e });
+    } finally {
+      this._state.set('idle');
+    }
   }
 
   /** Try to upload queue to the server, don't throw error */
   async tryUploadQueue() {
-    try {
-      if (this.queue.length > 0) {
-        this._state.set('uploading');
-        await this.uploadQueue();
-      }
-    } catch (e) {
-      logger.error('Error while uploading queue', e);
-    } finally {
-      this._state.set('idle');
-    }
+    return await this.uploadQueue().catch();
   }
 }
 

@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 
 import { browser } from '$app/environment';
 
@@ -17,8 +17,8 @@ export const load = async () => {
 
   await mainService.init().catch(handleError);
 
-  if (membersService.selectedMember) {
-    // TODO: don't sync for non-authorized users only
+  // sync for authorized users only
+  if (!membersService.isGuest) {
     void journalService.syncWithServer().catch(handleError);
   }
 };

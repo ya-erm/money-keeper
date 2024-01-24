@@ -6,13 +6,12 @@
   export let disabled: boolean = false;
   export let testId: string | undefined = 'MultiSwitch';
 
-  const dispatch = createEventDispatcher<{ change: { id: string; title: string } }>();
-  export let change = (value: { id: string; title: string }) => dispatch('change', value);
+  export let onChange: (value: { id: string; title: string }) => void;
 
   const handleClick = (value: { id: string; title: string }) => async () => {
     if (disabled) return;
     selected = value;
-    change(value);
+    onChange(value);
   };
 </script>
 

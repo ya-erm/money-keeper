@@ -15,7 +15,7 @@ export type { Locales, Messages } from './messages';
 
 const initialLocale = getLocaleFromNavigator();
 
-init({
+void init({
   fallbackLocale: 'en-US',
   initialLocale,
 });
@@ -37,7 +37,7 @@ export const languages: { [key in Locales]: { name: string; icon: string; dayjs:
 
 export const activeLocale = storable<Locales>((initialLocale as Locales) ?? 'ru-RU', 'locale');
 activeLocale.subscribe((value) => {
-  locale.set(value);
+  void locale.set(value);
   dayjs.locale(languages[value]?.dayjs);
 });
 

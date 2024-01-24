@@ -12,6 +12,9 @@
 </script>
 
 <div class="grid px-1 mb-1">
+  {#if items.length === 0}
+    <span class="no-data">{$translate('categories.no_data')}</span>
+  {/if}
   {#each items as category (category.id)}
     <GridCircleItem
       onClick={() => onClick(category)}
@@ -31,5 +34,9 @@
     justify-content: center;
     grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
     gap: 0.5rem;
+  }
+  .no-data {
+    text-align: center;
+    color: var(--secondary-text-color);
   }
 </style>

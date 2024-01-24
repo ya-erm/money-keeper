@@ -47,7 +47,7 @@
 
 <Modal width={20} header={category?.name ?? $translate('categories.new_category')} bind:opened>
   <form class="flex-col gap-1" on:submit|preventDefault={handleSave}>
-    <MultiSwitch {options} selected={selectedOption} on:change={(e) => handleChangeType(e.detail)} />
+    <MultiSwitch {options} selected={selectedOption} onChange={handleChangeType} />
     <Input label={$translate('categories.name')} name="name" bind:value={name} required />
     <Input label={$translate('categories.icon')} name="icon" bind:value={icon} optional>
       <a slot="end" href="https://icon-sets.iconify.design/" target="_blank" rel="noopener noreferrer">

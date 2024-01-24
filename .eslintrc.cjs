@@ -3,7 +3,7 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
   plugins: ['svelte3', '@typescript-eslint'],
-  ignorePatterns: ['*.cjs'],
+  ignorePatterns: ['*.cjs', '*.js', 'playwright.config.ts', 'service-worker.ts'],
   overrides: [
     { files: ['*.svelte'], processor: 'svelte3/svelte3' },
     {
@@ -12,6 +12,8 @@ module.exports = {
         '@typescript-eslint/ban-ts-comment': 'off',
         '@typescript-eslint/no-empty-function': 'off',
         '@typescript-eslint/no-inferrable-types': 'off',
+        '@typescript-eslint/no-misused-promises': 'warn',
+        '@typescript-eslint/no-floating-promises': 'warn',
         'no-console': ['warn', { allow: ['warn', 'error'] }],
       },
     },
@@ -20,6 +22,7 @@ module.exports = {
     'svelte3/typescript': () => require('typescript'),
   },
   parserOptions: {
+    project: ['tsconfig.json'],
     sourceType: 'module',
     ecmaVersion: 2020,
   },

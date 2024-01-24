@@ -7,6 +7,15 @@ import { useDB } from './useDB';
 
 const logger = new Logger('MembersService', { disabled: false, color: '#00bbbb' });
 
+const GUEST_UUID = 'guest';
+
+const guest: Member = {
+  login: 'guest',
+  uuid: GUEST_UUID,
+  publicKey: '',
+  privateKey: '',
+};
+
 export class MembersService implements Initialisable, JournalSubscriber {
   // #region Private fields
   private _members = store<Member[]>([]);
@@ -48,6 +57,11 @@ export class MembersService implements Initialisable, JournalSubscriber {
     return this._selectedMemberSettings;
   }
 
+  /** Selected member is guest */
+  get isGuest() {
+    return this.selectedMember?.uuid === GUEST_UUID;
+  }
+
   // #endregion
 
   // #region Public methods
@@ -56,27 +70,22 @@ export class MembersService implements Initialisable, JournalSubscriber {
     // Load from DB
     await this.loadFromDB();
 
-    // Set selected member
-    this.setSelectedMember();
+    // Choose selected member
+    this.chooseSelectedMember();
 
     // Load selected member settings
     await this.loadSelectedMemberSettings();
   }
 
-  /** Save one member to local DB amd memory */
+  /** Save one member to local DB and memory */
   async save(item: Member) {
     const db = await useDB();
-    db.put('members', item);
+    await db.put('members', item);
     this._members.update((prev) => prev.concat(item));
-
-    // Set selected member
-    if (!this.selectedMember) {
-      this.setSelectedMember();
-    }
   }
 
   /** @throws error if member is not selected */
-  tryGetSelectedMember() {
+  getSelectedMember() {
     if (!this.selectedMember) {
       throw new Error('No member selected');
     }
@@ -85,20 +94,15 @@ export class MembersService implements Initialisable, JournalSubscriber {
 
   /** Update sync number */
   async updateSyncNumber(value: number) {
-    logger.debug('SyncNumber:', value);
-    this._selectedMemberSettings.update((prev) => ({ ...prev, syncNumber: value }));
-    const member = this.tryGetSelectedMember();
-    if (this.selectedMemberSettings) {
-      const db = await useDB();
-      await db.put('memberSettings', { ...this.selectedMemberSettings, owner: member.uuid });
-    }
+    logger.debug('updateSyncNumber', { value });
+    await this.updateSettings({ syncNumber: value });
   }
 
   /** Update member settings and optional save to DB */
   async updateSettings(settings: Partial<MemberSettings>, saveToDB: boolean = true) {
-    this.updateSettingsInMemory(settings);
+    await this.updateSettingsInMemory(settings);
     if (saveToDB) {
-      const member = this.tryGetSelectedMember();
+      const member = this.getSelectedMember();
       if (this.selectedMemberSettings) {
         const db = await useDB();
         await db.put('memberSettings', { ...this.selectedMemberSettings, owner: member.uuid });
@@ -114,8 +118,8 @@ export class MembersService implements Initialisable, JournalSubscriber {
 
   /** Save accounts order */
   saveAccountsOrder(accountsOrder: string[]) {
-    journalService.addOperationToQueue({ accountsOrder });
-    this.updateSettingsInMemory({ accountsOrder });
+    void journalService.addOperationToQueue({ accountsOrder });
+    void this.updateSettingsInMemory({ accountsOrder });
   }
 
   /** Apply journal updates and optional save to DB */
@@ -126,27 +130,25 @@ export class MembersService implements Initialisable, JournalSubscriber {
     }
   }
 
+  /* Get selected member from settings or select a guest */
+  chooseSelectedMember() {
+    const uuid = settingsService.settings.selectedMember;
+    const member = this.members.find((x) => x.uuid === uuid);
+    this._selectedMember.set(member ?? guest);
+    logger.debug('Selected member:', this.selectedMember?.login);
+  }
+
   // #endregion
 
   /** Load all members from local DB to memory*/
   private async loadFromDB() {
     const db = await useDB();
     const items = await db.getAll('members');
-    this._members.set(items);
+
+    this._members.set([guest, ...items]);
   }
 
-  /* Set selected member or choose first one */
-  private setSelectedMember() {
-    const uuid = settingsService.settings.selectedMember;
-    const member = this.members.find((x) => x.uuid === uuid);
-    if (member) {
-      this._selectedMember.set(member);
-    } else if (this.members.length > 0) {
-      this._selectedMember.set(this.members[0]);
-    }
-  }
-
-  /* Load selected member settings from local DB to memory */
+  /* Load selected member's settings from local DB to memory */
   private async loadSelectedMemberSettings() {
     if (!this.selectedMember) {
       return;

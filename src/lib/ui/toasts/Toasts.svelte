@@ -15,7 +15,10 @@
           dismissible={toast.dismissible}
           on:dismiss={() => hideToast(toast.id)}
         >
-          {toast.message}
+          {#each toast.message.split('\n') as line}
+            {line}
+            <br />
+          {/each}
         </Toast>
       </div>
     {/each}

@@ -1,13 +1,16 @@
 <script lang="ts">
-  import dayjs from 'dayjs';
+  import dayjs, { Dayjs } from 'dayjs';
 
   import { categoriesStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
   import { formatMoney, groupByKey } from '$lib/utils';
+
   import TransactionList from '../../transactions/TransactionList.svelte';
   import { findRate } from '../utils/findRate';
+
   import MonthSelect from './MonthSelect.svelte';
+  import { intervalEndStore, intervalStartStore, intervalTypeStore } from './store';
 
   const categories = $categoriesStore;
   const currencyRates = $currencyRatesStore;
@@ -18,6 +21,20 @@
 
   let startDate = dayjs().startOf('month');
   let endDate = dayjs().endOf('month');
+
+  $: if ($intervalTypeStore === 'custom') {
+    startDate = dayjs($intervalStartStore);
+    endDate = dayjs($intervalEndStore);
+  } else {
+    startDate = dayjs().startOf('month');
+    endDate = dayjs().endOf('month');
+  }
+
+  const handleDateChange = (value: { startDate: Dayjs; endDate: Dayjs }) => {
+    startDate = value.startDate;
+    endDate = value.endDate;
+    selectedGroup = null;
+  };
 
   $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
@@ -46,7 +63,7 @@
 </script>
 
 <div class="p-1">
-  <MonthSelect bind:startDate bind:endDate onChange={() => (selectedGroup = null)} />
+  <MonthSelect {startDate} {endDate} onChange={handleDateChange} />
 
   <div class="summary-by-categories">
     <ul class="list">

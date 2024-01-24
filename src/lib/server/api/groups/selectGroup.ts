@@ -12,7 +12,7 @@ export async function selectGroup(data: SelectGroupRequestData, locals: App.Loca
   const groupId = checkNumberParameter(data.groupId, 'groupId');
   const userId = checkUserId(locals);
 
-  const userInGroup = db.userToGroup.findUnique({
+  const userInGroup = await db.userToGroup.findUnique({
     where: {
       userId_groupId: {
         userId,

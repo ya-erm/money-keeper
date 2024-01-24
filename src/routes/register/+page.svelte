@@ -25,6 +25,7 @@
     <Button text={$translate('common.continue')} type="submit" />
   </form>
   <a class="flex-center" href="/login">{$translate('auth.sign_in')}</a>
+  <a class="flex-center" href="/">{$translate('auth.continue_as_guest')}</a>
 </div>
 
 <EncryptionModal {login} bind:opened />
