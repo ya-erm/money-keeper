@@ -13,9 +13,9 @@
 <h2>MultiSwitch</h2>
 <div class="flex-col gap-1 items-start">
   <div>
-    <MultiSwitch options={options.slice(0, 2)} {selected} />
+    <MultiSwitch options={options.slice(0, 2)} {selected} onChange={(item) => (selected = item)} />
   </div>
   <div>
-    <MultiSwitch {options} {selected} />
+    <MultiSwitch {options} {selected} onChange={(item) => (selected = item)} />
   </div>
 </div>

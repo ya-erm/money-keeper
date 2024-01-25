@@ -26,7 +26,7 @@
 
 <MultiSwitch
   selected={options.find((option) => option.id === type)}
-  on:change={(e) => handleChange(e.detail)}
+  onChange={handleChange}
   testId="TypeSwitch"
   {options}
   {disabled}
