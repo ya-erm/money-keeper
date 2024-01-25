@@ -42,7 +42,10 @@
         {$translate('common.count', { values: { count: filteredOperations.length } })}
       </span>
     </h3>
-    <a href={`${route('transactions.create')}?accountId=${account?.id}`} data-testID="AddOperationButton">
+    <a
+      href={route('transactions.create') + (account?.id ? `?accountId=${account?.id}` : '')}
+      data-testID="AddOperationButton"
+    >
       {$translate('common.add')}
     </a>
   </div>

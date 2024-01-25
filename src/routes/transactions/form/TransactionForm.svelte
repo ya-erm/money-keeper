@@ -85,7 +85,7 @@
   const handleSubmit = async (e: Event) => {
     try {
       const formData = new FormData(e.target as HTMLFormElement);
-      if (!formData.get('accountId')) {
+      if (!formData.get('accountId') || formData.get('accountId') === 'undefined') {
         showErrorToast($translate('transactions.account_is_required'), { testId: 'AccountIsRequiredErrorToast' });
         return;
       }
