@@ -16,8 +16,7 @@
     "format": "prettier --plugin-search-dir . --write .",
     "generate:icons": "node ./pack-icons.js && prettier --write ./src/lib/icons.ts",
     "generate:prisma": "npx prisma generate",
-    "generate": "npm run generate:icons && npm run generate:prisma",
-    "seed": "ts-node prisma/seed.ts"
+    "generate": "npm run generate:icons && npm run generate:prisma"
   },
   "devDependencies": {
     "@iconify/json": "^2.2.70",
@@ -57,9 +56,6 @@
     "svelte-dnd-action": "^0.9.24",
     "timezones-list": "^3.0.2",
     "uuid": "^9.0.0"
-  },
-  "prisma": {
-    "seed": "node prisma/seed.js"
   },
   "type": "module"
 }
