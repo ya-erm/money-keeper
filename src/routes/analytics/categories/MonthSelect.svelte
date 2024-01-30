@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Dayjs } from 'dayjs';
 
-  import type { DateIntervalType } from '$lib/interfaces';
+  import type { DateIntervalType } from '$lib/data/interfaces';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import DateIntervalModal from './DateIntervalModal.svelte';

@@ -1,4 +1,4 @@
-import type { DateIntervalType } from '$lib/interfaces';
+import type { DateIntervalType } from '$lib/data/interfaces';
 import { storable } from '$lib/storable';
 
 export const intervalTypeStore = storable<DateIntervalType>('month', 'intervalType');
