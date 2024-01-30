@@ -6,12 +6,12 @@
   export let title: string;
 </script>
 
-<ListGroupItem>
-  <label class="theme-switch">
+<ListGroupItem onClick={() => (checked = !checked)}>
+  <div class="theme-switch">
     <input type="checkbox" bind:checked />
     <span>{title}</span>
     <Switch bind:checked />
-  </label>
+  </div>
 </ListGroupItem>
 
 <style>

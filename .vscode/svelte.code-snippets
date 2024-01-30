@@ -2,7 +2,7 @@
   "Svelte component": {
     "scope": "svelte",
     "prefix": "sc",
-    "body": ["<script lang=\"ts\">", "", "</script>", "", "<div>${0:$TM_FILENAME_BASE}</div>", ""]
+    "body": ["<script lang=\"ts\">", "", "</script>", "", "<div>${0:$TM_FILENAME_BASE}</div>", ""],
   },
   "Api function with params": {
     "scope": "typescript",
@@ -19,8 +19,8 @@
       "};",
       "",
       "export type ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}Response = Awaitable<ReturnType<typeof ${TM_FILENAME_BASE}>>",
-      ""
-    ]
+      "",
+    ],
   },
 
   "Api function with request data": {
@@ -39,8 +39,8 @@
       "};",
       "",
       "export type ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}Response = Awaitable<ReturnType<typeof ${TM_FILENAME_BASE}>>",
-      ""
-    ]
+      "",
+    ],
   },
   "Api function with params and request data": {
     "scope": "typescript",
@@ -61,27 +61,27 @@
       "};",
       "",
       "export type ${TM_FILENAME_BASE/(.*)$/${1:/capitalize}/}Response = Awaitable<ReturnType<typeof ${TM_FILENAME_BASE}>>",
-      ""
-    ]
+      "",
+    ],
   },
   "export": {
     "scope": "typescript",
     "prefix": "ex",
-    "body": ["export { $2 } from './$1';"]
+    "body": ["export { $2 } from './$1';"],
   },
   "useState": {
     "scope": "typescript,typescriptreact",
     "prefix": "us",
-    "body": ["const [$1, set${1/(.*)/${1:/capitalize}/}] = useState($2);", "$3"]
+    "body": ["const [$1, set${1/(.*)/${1:/capitalize}/}] = useState($2);", "$3"],
   },
   "useCallback": {
     "scope": "typescript,typescriptreact",
     "prefix": "uc",
-    "body": ["const $1 = useCallback(() => { $2 },[]);", "$3"]
+    "body": ["const $1 = useCallback(() => { $2 },[]);", "$3"],
   },
   "fm": {
     "scope": "typescript,typescriptreact",
     "prefix": "fm",
-    "body": ["const { formatMessage } = useIntl();", ""]
-  }
+    "body": ["const { formatMessage } = useIntl();", ""],
+  },
 }

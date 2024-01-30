@@ -5,11 +5,14 @@
  * @returns Object
  */
 export function groupByKey<T extends Record<K, PropertyKey>, K extends keyof T>(array: T[], key: K): Record<T[K], T[]> {
-  return array.reduce((res, item) => {
-    const group = item[key];
-    (res[group] = res[group] || []).push(item);
-    return res;
-  }, {} as Record<T[K], T[]>);
+  return array.reduce(
+    (res, item) => {
+      const group = item[key];
+      (res[group] = res[group] || []).push(item);
+      return res;
+    },
+    {} as Record<T[K], T[]>,
+  );
 }
 
 /**
@@ -36,11 +39,14 @@ export function groupBySelector<T, K extends string | number | symbol>(
   array: T[],
   selector: (item: T) => K,
 ): Record<K, T[] | undefined> {
-  return array.reduce((res, item) => {
-    const group = selector(item);
-    (res[group] = res[group] || []).push(item);
-    return res;
-  }, {} as Record<K, T[]>);
+  return array.reduce(
+    (res, item) => {
+      const group = selector(item);
+      (res[group] = res[group] || []).push(item);
+      return res;
+    },
+    {} as Record<K, T[]>,
+  );
 }
 
 /**

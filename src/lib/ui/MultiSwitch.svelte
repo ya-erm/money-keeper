@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
   export let options: { id: string; title: string }[];
   export let selected: { id: string; title: string } | undefined;
   export let disabled: boolean = false;

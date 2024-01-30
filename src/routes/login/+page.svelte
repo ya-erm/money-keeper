@@ -44,10 +44,14 @@
     }
   }
 
-  async function decryptKey(encryptedKey: Record<string, any>) {
+  async function decryptKey(encryptedKey: Record<string, unknown>) {
     switch (encryptedKey.version) {
       case '1.0.0': {
-        const { salt, base64Data, initialVector } = encryptedKey;
+        const { salt, base64Data, initialVector } = encryptedKey as {
+          salt: string;
+          base64Data: string;
+          initialVector: string;
+        };
         const { jwk } = await createKeyFromPassword(password, salt);
         return await tryDecryptAes(jwk, base64Data, initialVector);
       }
