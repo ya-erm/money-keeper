@@ -117,7 +117,7 @@
       if (count === 0) {
         showInfoToast($translate('import_export.nothing_to_import'));
       } else {
-        showSuccessToast($translate('import_export.import_failure', { values: { count } }), {
+        showSuccessToast($translate('import_export.import_success', { values: { count } }), {
           testId: 'ImportSuccessToast',
         });
       }

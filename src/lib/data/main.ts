@@ -45,11 +45,11 @@ class MainService implements Initialisable {
 
     const services: Service[] = [
       categoriesService,
-      accountsService,
       accountTagsService,
+      accountsService,
+      operationTagsService,
       operationsService,
       currencyRatesService,
-      operationTagsService,
       groupingsService,
     ];
 
