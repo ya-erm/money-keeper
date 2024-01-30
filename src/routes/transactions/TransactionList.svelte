@@ -23,8 +23,8 @@
     return res;
   }, {});
 
-  const onClick = ({ id }: { id: string }) => {
-    goto(route('transactions') + `/edit?id=${id}`);
+  const onClick = async ({ id }: { id: string }) => {
+    await goto(route('transactions') + `/edit?id=${id}`);
   };
 </script>
 

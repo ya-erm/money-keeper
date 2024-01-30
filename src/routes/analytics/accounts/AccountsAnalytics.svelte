@@ -64,8 +64,8 @@
 
   let groupingSelecting = false;
 
-  const handleGroupingSelect = (value: Grouping | null) => {
-    membersService.updateSettings({ groupingId: value?.id });
+  const handleGroupingSelect = async (value: Grouping | null) => {
+    await membersService.updateSettings({ groupingId: value?.id });
     groupingSelecting = false;
     grouping = value;
   };

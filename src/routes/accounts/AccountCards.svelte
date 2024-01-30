@@ -32,25 +32,25 @@
     card?.scrollIntoView({ behavior: 'auto', inline: 'center' });
   };
 
-  const handleScroll = () => {
+  const handleScroll = async () => {
     const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
     const index = accountListElement.scrollLeft / Math.min(26 * rem, accountsContainerElement.clientWidth - 1 * rem);
     if (Number.isInteger(index)) {
       if (index < accounts.length) {
         const id = accounts[index].id;
         if (`${id}` !== cardId) {
-          goto(`?account-card=${id}`, { noScroll: true });
+          await goto(`?account-card=${id}`, { noScroll: true });
         }
       }
     }
   };
 
-  onMount(() => {
+  onMount(async () => {
     if (cardId) {
       scrollToCard(cardId);
     } else if (accounts.length) {
       // Select first account card by default
-      goto(`?account-card=${accounts[0].id}`, { noScroll: true });
+      await goto(`?account-card=${accounts[0].id}`, { noScroll: true });
     }
   });
 </script>

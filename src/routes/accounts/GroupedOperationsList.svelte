@@ -25,8 +25,8 @@
     return res;
   }, {});
 
-  const handleTransactionClick = (id: string) => {
-    goto(route('transactions') + `/edit?id=${id}`);
+  const handleTransactionClick = async (id: string) => {
+    await goto(route('transactions') + `/edit?id=${id}`);
   };
 </script>
 

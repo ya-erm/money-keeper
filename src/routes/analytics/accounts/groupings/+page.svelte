@@ -10,9 +10,9 @@
   useBackButton(route('analytics.accounts'));
   useRightButton(AddGroupingButton);
 
-  const onClick = (group: Group | null) => {
+  const onClick = async (group: Group | null) => {
     if (group) {
-      goto(route('analytics.accounts.groupings.edit') + '?id=' + group.id);
+      await goto(route('analytics.accounts.groupings.edit') + '?id=' + group.id);
     }
   };
 </script>

@@ -90,7 +90,7 @@
         privateKey: decryptedKey,
       });
       // Save as default member
-      settingsService.updateSettings({ selectedMember: member.uuid });
+      void settingsService.updateSettings({ selectedMember: member.uuid });
       // eslint-disable-next-line no-undef
       const privateKey: JsonWebKey = JSON.parse(decryptedKey);
       const decryptedToken = await decryptRsa(privateKey, encryptedToken.base64Data);
@@ -98,9 +98,9 @@
       // Initialize main service asynchronously
       await mainService.initServices();
       // Fetch updates from server
-      journalService.syncWithServer();
+      void journalService.syncWithServer();
       // Go to default route
-      goto('/');
+      await goto('/');
     } catch (e) {
       if (!tryHandleError(e)) {
         console.error(e);

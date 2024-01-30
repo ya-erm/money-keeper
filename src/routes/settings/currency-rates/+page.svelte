@@ -10,8 +10,8 @@
   const settings = membersService.$selectedMemberSettings;
   let currency = $settings?.currency ?? '';
 
-  const handleSaveCurrency = () => {
-    membersService.updateSettings({ currency });
+  const handleSaveCurrency = async () => {
+    await membersService.updateSettings({ currency });
     showSuccessToast($translate('common.save_changes_success'));
   };
 </script>

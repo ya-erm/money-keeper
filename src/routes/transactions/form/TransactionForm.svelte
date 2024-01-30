@@ -290,10 +290,10 @@
 <Modal opened={anotherCurrencyModalOpened}>
   <form
     class="flex-col gap-1"
-    on:submit|preventDefault={(e) => {
+    on:submit|preventDefault={async (e) => {
       anotherCurrency = new FormData(e.currentTarget).get('another-currency')?.toString() ?? null;
       if (anotherCurrency !== settings?.lastAnotherCurrency) {
-        membersService.updateSettings({ lastAnotherCurrency: anotherCurrency });
+        await membersService.updateSettings({ lastAnotherCurrency: anotherCurrency });
       }
       anotherCurrencyModalOpened = false;
     }}

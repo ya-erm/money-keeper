@@ -26,13 +26,13 @@
     opened = true;
   }
   $: if (action === 'create' && !opened) {
-    deleteSearchParam($page, 'action');
+    void deleteSearchParam($page, 'action');
   }
 
   $: sortable = action === 'sort';
 
   $: if (action === 'sort' && !sortable) {
-    goto('?', { replaceState: true });
+    void goto('?', { replaceState: true });
   }
 
   const onClick = async (item: Account) => {

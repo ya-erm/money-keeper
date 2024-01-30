@@ -9,9 +9,9 @@
   $: action = getSearchParam($page, 'action');
   const handleSortClick = async () => {
     if (action === 'sort') {
-      goto('?', { replaceState: true });
+      await goto('?', { replaceState: true });
     } else {
-      goto('?action=sort', { replaceState: true });
+      await goto('?action=sort', { replaceState: true });
     }
   };
 </script>
