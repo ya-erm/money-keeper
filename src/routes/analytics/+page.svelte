@@ -3,5 +3,5 @@
   import { route } from '$lib/routes';
   import { onMount } from 'svelte';
 
-  onMount(() => goto(route('analytics.categories')));
+  onMount(() => goto(route('analytics.categories'), { replaceState: true }));
 </script>
