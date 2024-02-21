@@ -94,7 +94,7 @@
 {#if grouping?.groups}
   <div class="flex chart">
     {#each sortedGroupSummaries as { group, groupId, percentages } (groupId)}
-      <div class="flex-center" style:width={`${percentages}%`} style:background={group?.color}>
+      <div class="flex-center" style:width={`${percentages.toFixed(10)}%`} style:background={group?.color}>
         {group?.name ?? $translate('analytics.groupings.groups.other')}
       </div>
     {/each}
@@ -104,7 +104,7 @@
 <div class="flex chart">
   {#each sortedGroupSummaries as { groupId, accountSummaries }, i (groupId)}
     {#each accountSummaries as item, j (item.account.id)}
-      <div class="flex-center" style:width={`${item.percentages}%`} style:background={item.color}>
+      <div class="flex-center" style:width={`${item.percentages.toFixed(10)}%`} style:background={item.color}>
         {countPreviousItems(sortedGroupSummaries, i) + j + 1}
       </div>
     {/each}
