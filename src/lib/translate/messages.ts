@@ -110,6 +110,7 @@ export type Messages =
   | 'analytics.accounts.grouping.not_selected'
   | 'analytics.accounts.grouping.not_selected.description'
   | 'analytics.accounts.grouping.select_grouping'
+  | 'analytics.accounts.hide_zero_balance_accounts'
   | 'analytics.groupings.title'
   | 'analytics.groupings.create_grouping'
   | 'analytics.groupings.new_grouping'

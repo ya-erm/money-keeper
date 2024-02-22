@@ -114,6 +114,7 @@ export const ruDict: Dictionary = {
   'analytics.accounts.grouping.not_selected': 'Без группировки',
   'analytics.accounts.grouping.not_selected.description': 'Отображать все счета',
   'analytics.accounts.grouping.select_grouping': 'Выбрать группировку',
+  'analytics.accounts.hide_zero_balance_accounts': 'Скрыть счета с нулевым балансом',
   'analytics.groupings.title': 'Группировки',
   'analytics.groupings.create_grouping': 'Добавить группировку',
   'analytics.groupings.new_grouping': 'Новая группировка',
