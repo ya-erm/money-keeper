@@ -231,6 +231,7 @@
         <Input
           type="number"
           name="amount"
+          inputmode="decimal"
           bind:ref={inputRef}
           bind:value={_value1}
           endText={accountCurrency}
