@@ -10,6 +10,7 @@
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
   import { showInfoToast } from '$lib/ui/toasts';
+  import { getSearchParam } from '$lib/utils';
 
   import Layout from '$lib/ui/Layout.svelte';
   import ThemeProvider from '$lib/ui/theme/ThemeProvider.svelte';
@@ -17,8 +18,12 @@
 
   inject({ mode: dev ? 'development' : 'production', debug: false });
 
-  if (!$page.url.pathname.startsWith(routes.login.path) && membersService.isGuest) {
-    showInfoToast($translate('auth.logged_in_as_guest_info'));
+  if (
+    membersService.isGuest &&
+    !getSearchParam($page, 'hideGuestToast') &&
+    !$page.url.pathname.startsWith(routes.login.path)
+  ) {
+    showInfoToast($translate('auth.logged_in_as_guest_info'), { testId: 'guestToast' });
   }
 </script>
 

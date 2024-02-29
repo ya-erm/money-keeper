@@ -1,6 +1,6 @@
 import { expect, type BrowserContext, type Locator, type Page } from '@playwright/test';
 
-import { mockData } from './mock';
+import { mockData as testMockData } from './mock';
 
 export async function useAuthAsync(page: Page, context: BrowserContext) {
   const { TEST_LOGIN = '', TEST_PASSWORD = '' } = process.env;
@@ -20,14 +20,30 @@ export async function useAuthAsync(page: Page, context: BrowserContext) {
   expect(sessionCookie?.value).toBeDefined();
 }
 
-export async function importMockDataAsync(page: Page) {
-  // await page.goto('/settings/import-export', { waitUntil: 'networkidle' });
+type ImportMockDataOptions = {
+  direct?: boolean;
+  mockData?: string;
+};
 
-  await page.locator('a[href="/settings"]').click();
-  await page.waitForURL('/settings', { waitUntil: 'networkidle' });
+const defaultOptions: ImportMockDataOptions = {
+  direct: false,
+  mockData: testMockData,
+};
 
-  await page.locator('a[href="/settings/import-export"]').click();
-  await page.waitForURL('/settings/import-export', { waitUntil: 'networkidle' });
+export async function importMockDataAsync(page: Page, options: ImportMockDataOptions = {}) {
+  const { direct, mockData } = { ...defaultOptions, ...options };
+
+  if (direct) {
+    // Go to import page directly
+    await page.goto('/settings/import-export', { waitUntil: 'networkidle' });
+  } else {
+    // Go to import page via settings
+    await page.locator('a[href="/settings"]').click();
+    await page.waitForURL('/settings', { waitUntil: 'networkidle' });
+
+    await page.locator('a[href="/settings/import-export"]').click();
+    await page.waitForURL('/settings/import-export', { waitUntil: 'networkidle' });
+  }
 
   await page.getByTestId('ImportTextArea').fill(mockData);
 
