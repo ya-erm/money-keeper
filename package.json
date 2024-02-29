@@ -26,7 +26,7 @@
     "@playwright/test": "^1.34.3",
     "@sveltejs/adapter-auto": "^2.1.0",
     "@sveltejs/adapter-node": "^1.2.4",
-    "@sveltejs/kit": "^1.19.0",
+    "@sveltejs/kit": "^1.30.4",
     "@types/bcrypt": "^5.0.0",
     "@types/uuid": "^9.0.1",
     "@typescript-eslint/eslint-plugin": "^5.58.7",
