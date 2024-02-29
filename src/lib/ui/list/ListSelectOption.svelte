@@ -1,16 +1,13 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
   import ListGroupItem from './ListGroupItem.svelte';
-
-  const dispatch = createEventDispatcher();
 
   export let value: string;
   export let checked: boolean = false;
-  export let click = () => dispatch('click');
+  export let onClick: (() => void) | undefined = undefined;
 </script>
 
-<ListGroupItem>
-  <label class="container" on:click={click} on:keypress={() => {}}>
+<ListGroupItem {onClick}>
+  <label class="container">
     <span>{value}</span>
     <input type="radio" {checked} />
     {#if checked}

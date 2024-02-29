@@ -21,7 +21,7 @@ export async function register(data: RegisterRequestData) {
   const encryptedKey = data.encryptedKey;
 
   const user = await db.member.findFirst({
-    where: { OR: { uuid, login: login ?? undefined } },
+    where: { OR: [{ uuid }, { login: login ?? undefined }] },
   });
 
   if (user) {

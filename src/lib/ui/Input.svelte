@@ -8,6 +8,7 @@
   export let name: string | null = null;
   export let label: string | null = null;
   export let type: 'text' | 'password' | 'date' | 'time' | 'number' | 'color' = 'text';
+  export let inputmode: 'text' | 'search' | 'none' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | null = null;
   export let placeholder: string | null = null;
   export let step: string | number | null = 0.01;
   export let required: boolean = false;
@@ -54,6 +55,7 @@
       {placeholder}
       {minlength}
       {maxlength}
+      {inputmode}
       {required}
       {disabled}
       {value}

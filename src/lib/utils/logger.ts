@@ -28,7 +28,10 @@ type LoggerOptions = {
 };
 
 export class Logger {
-  constructor(private _name: string, private _options: LoggerOptions = {}) {}
+  constructor(
+    private _name: string,
+    private _options: LoggerOptions = {},
+  ) {}
 
   get name() {
     return this._name;

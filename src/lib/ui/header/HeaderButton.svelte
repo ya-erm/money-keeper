@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
+  import { replaceState } from '$app/navigation';
+  import { page } from '$app/stores';
   import Icon from '$lib/ui/Icon.svelte';
 
   export let href: string;
@@ -15,7 +16,7 @@
   </button>
 {:else}
   <button {disabled}>
-    <a title={label} aria-label={label} {href} on:click={() => goto(href, { replaceState: true })}>
+    <a title={label} aria-label={label} {href} on:click={() => replaceState(href, $page.state)}>
       <Icon name={icon} padding={1} />
     </a>
   </button>

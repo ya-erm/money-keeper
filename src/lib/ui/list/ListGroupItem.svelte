@@ -1,27 +1,22 @@
 <script lang="ts">
   export let href: string | undefined = undefined;
+  export let onClick: (() => void) | undefined = undefined;
 </script>
 
-{#if href}
-  <li class="list-group-item">
-    <a class="link" {href}>
+<li class="list-group-item">
+  {#if href}
+    <a class="item" {href}>
       <slot />
     </a>
-  </li>
-{:else}
-  <li class="list-group-item">
-    <slot />
-  </li>
-{/if}
+  {:else}
+    <button class="item" on:click={onClick}>
+      <slot />
+    </button>
+  {/if}
+</li>
 
 <style>
-  .list-group-item .link {
-    text-decoration: inherit;
-    color: inherit;
-    flex-grow: 1;
-  }
   .list-group-item {
-    min-height: 36px;
     display: flex;
     align-items: center;
     position: relative;
@@ -37,5 +32,18 @@
     bottom: -1px;
     height: 1px;
     background-color: var(--border-color);
+  }
+  .list-group-item > .item {
+    min-height: 36px;
+    text-decoration: inherit;
+    color: inherit;
+    flex-grow: 1;
+    display: flex;
+  }
+  .list-group-item > button.item {
+    border: none;
+    background: none;
+    font-size: inherit;
+    padding: 0;
   }
 </style>

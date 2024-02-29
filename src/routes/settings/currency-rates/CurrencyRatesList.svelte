@@ -24,7 +24,7 @@
     opened = true;
   }
   $: if (!!action && !opened) {
-    deleteSearchParam($page, 'action');
+    void deleteSearchParam($page, 'action');
   }
 
   const changeCurrencyRate = (item: CurrencyRate) => {

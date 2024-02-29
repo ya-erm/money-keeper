@@ -231,6 +231,7 @@
         <Input
           type="number"
           name="amount"
+          inputmode="decimal"
           bind:ref={inputRef}
           bind:value={_value1}
           endText={accountCurrency}
@@ -240,6 +241,7 @@
           <Input
             type="number"
             name="destinationAmount"
+            inputmode="decimal"
             bind:value={_value2}
             endText={destinationAccountCurrency || anotherCurrency}
             required
@@ -290,10 +292,10 @@
 <Modal opened={anotherCurrencyModalOpened}>
   <form
     class="flex-col gap-1"
-    on:submit|preventDefault={(e) => {
+    on:submit|preventDefault={async (e) => {
       anotherCurrency = new FormData(e.currentTarget).get('another-currency')?.toString() ?? null;
       if (anotherCurrency !== settings?.lastAnotherCurrency) {
-        membersService.updateSettings({ lastAnotherCurrency: anotherCurrency });
+        await membersService.updateSettings({ lastAnotherCurrency: anotherCurrency });
       }
       anotherCurrencyModalOpened = false;
     }}

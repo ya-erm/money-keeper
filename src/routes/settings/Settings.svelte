@@ -40,7 +40,7 @@
 </script>
 
 <ListGroup title={$translate('settings.common')}>
-  <ListSelectItem title={$translate('settings.language')} value={$activeLocaleName} on:click={openLanguageModal} />
+  <ListSelectItem title={$translate('settings.language')} value={$activeLocaleName} onClick={openLanguageModal} />
   <ListSwitchItem title={$translate('settings.darkMode')} bind:checked={$darkMode} />
   <ListLinkItem title={$translate('currency_rates.title')} href={route('settings.currency_rates')} />
 </ListGroup>
@@ -52,7 +52,7 @@
     <ListSelectItem
       title={$translate('auth.login')}
       value={selectedMember?.login ?? undefined}
-      on:click={openChangeLoginModal}
+      onClick={openChangeLoginModal}
     />
   {/if}
   <ListLinkItem title={$translate('settings.import_export')} href={route('settings.import_export')} />

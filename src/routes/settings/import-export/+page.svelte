@@ -12,8 +12,9 @@
     operationTagsService,
     operationsService,
     operationsStore,
+    groupingsService,
   } from '$lib/data';
-  import type { Account, Category, CurrencyRate, Tag, Transaction } from '$lib/data/interfaces';
+  import type { Account, Category, CurrencyRate, Grouping, Tag, Transaction } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import { showErrorToast, showInfoToast, showSuccessToast } from '$lib/ui/toasts';
   import { Logger, deepEqual, groupByKey, keyTransactions } from '$lib/utils';
@@ -29,6 +30,7 @@
     operationTags: Tag[];
     operations: Transaction[];
     currencyRates: CurrencyRate[];
+    groupings: Grouping[];
   } = {
     categories: [],
     accountTags: [],
@@ -36,6 +38,7 @@
     operationTags: [],
     operations: [],
     currencyRates: [],
+    groupings: [],
   };
 
   let parsed = false;
@@ -45,20 +48,14 @@
     parsed = true;
   }
 
-  let current: {
-    categories: Category[];
-    accountTags: Tag[];
-    accounts: Account[];
-    operationTags: Tag[];
-    operations: Transaction[];
-    currencyRates: CurrencyRate[];
-  } = {
+  let current = {
     categories: categoriesService.items,
     accountTags: accountTagsService.items,
     accounts: accountsService.items,
     operationTags: operationTagsService.items,
     operations: operationsService.items,
     currencyRates: currencyRatesService.items,
+    groupings: groupingsService.items,
   };
 
   $: currentJson = JSON.stringify(current, null, 2);
@@ -108,6 +105,11 @@
         count += 1;
       });
 
+      v2.groupings?.filter(notExists(groupingsService.items)).forEach((grouping) => {
+        journalService.addOperationToQueue({ grouping }, { upload: false });
+        count += 1;
+      });
+
       await journalService.applyChangesToSubscribers(journalService.queue, true);
 
       if (!membersService.isGuest) {
@@ -117,7 +119,7 @@
       if (count === 0) {
         showInfoToast($translate('import_export.nothing_to_import'));
       } else {
-        showSuccessToast($translate('import_export.import_failure', { values: { count } }), {
+        showSuccessToast($translate('import_export.import_success', { values: { count } }), {
           testId: 'ImportSuccessToast',
         });
       }
@@ -160,6 +162,7 @@
       <span>{$translate('import_export.operation_tags')}: <b>{v2.operationTags?.length ?? 0}</b>,</span>
       <span>{$translate('import_export.operations')}: <b>{v2.operations?.length ?? 0}</b>,</span>
       <span>{$translate('import_export.currency_rates')}: <b>{v2.currencyRates?.length ?? 0}</b></span>
+      <span>{$translate('import_export.groupings')}: <b>{v2.groupings?.length ?? 0}</b></span>
     </p>
 
     <button data-testId="AddToJournalButton" disabled={uploading} class="w-full" on:click={addToJournal}>
@@ -179,6 +182,7 @@
     <span>{$translate('import_export.operation_tags')}: <b>{current.operationTags?.length ?? 0}</b>,</span>
     <span>{$translate('import_export.operations')}: <b>{current.operations?.length ?? 0}</b>,</span>
     <span>{$translate('import_export.currency_rates')}: <b>{current.currencyRates?.length ?? 0}</b></span>
+    <span>{$translate('import_export.groupings')}: <b>{current.groupings?.length ?? 0}</b></span>
   </p>
   <a href={URL.createObjectURL(currentJsonFile)} download={`export-${dayjs().format('YYYY-MM-DD')}.json`}>
     <button class="w-full">{$translate('import_export.save')}</button>

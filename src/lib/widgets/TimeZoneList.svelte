@@ -29,15 +29,15 @@
 
   $: favoriteTimeZones = timezones.filter((timezone) => settings?.favoriteTimeZones?.includes(timezone.tzCode));
 
-  const addToFavorite = (timezone: string) => {
-    membersService.updateSettings({
+  const addToFavorite = async (timezone: string) => {
+    await membersService.updateSettings({
       favoriteTimeZones: [...(settings?.favoriteTimeZones ?? []), timezone],
     });
     showSuccessToast($translate('timezones.timezone_added_to_favorites'));
   };
 
-  const removeFromFavorite = (timezone: string) => {
-    membersService.updateSettings({
+  const removeFromFavorite = async (timezone: string) => {
+    await membersService.updateSettings({
       favoriteTimeZones: settings?.favoriteTimeZones?.filter((x) => x !== timezone) ?? [],
     });
     showSuccessToast($translate('timezones.timezone_removed_from_favorites'));

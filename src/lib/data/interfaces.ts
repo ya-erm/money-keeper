@@ -192,3 +192,5 @@ export interface LocalDB extends DBSchema {
     indexes: { 'by-owner': string };
   };
 }
+
+export type DateIntervalType = 'month' | 'custom';

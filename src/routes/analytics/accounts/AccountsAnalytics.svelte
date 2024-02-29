@@ -10,6 +10,7 @@
   import type { AccountViewModel, Grouping } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
+  import Checkbox from '$lib/ui/Checkbox.svelte';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import { groupBySelector } from '$lib/utils';
@@ -20,6 +21,7 @@
   import AddGroupingButton from './groupings/AddGroupingButton.svelte';
   import GroupingList from './groupings/GroupingList.svelte';
   import type { AccountSummary, GroupSummary } from './interfaces';
+  import { hideZeroBalanceAccounts } from './store';
   import { countPreviousItems } from './utils';
 
   const currencyRates = $currencyRatesStore;
@@ -39,6 +41,10 @@
   // Dictionary of account summaries keyed by account.id
   $: accountSummaries = accounts.reduce((acc: Record<string, AccountSummary>, account: AccountViewModel, i) => {
     const balance = calculateBalance(operationsByAccount[account.id] ?? []);
+    // skip zero-balance accounts
+    if ($hideZeroBalanceAccounts && Number(balance.toFixed(8)) == 0) {
+      return acc;
+    }
     acc[account.id] = {
       account,
       balance,
@@ -64,8 +70,8 @@
 
   let groupingSelecting = false;
 
-  const handleGroupingSelect = (value: Grouping | null) => {
-    membersService.updateSettings({ groupingId: value?.id });
+  const handleGroupingSelect = async (value: Grouping | null) => {
+    await membersService.updateSettings({ groupingId: value?.id });
     groupingSelecting = false;
     grouping = value;
   };
@@ -94,7 +100,7 @@
 {#if grouping?.groups}
   <div class="flex chart">
     {#each sortedGroupSummaries as { group, groupId, percentages } (groupId)}
-      <div class="flex-center" style:width={`${percentages}%`} style:background={group?.color}>
+      <div class="flex-center" style:width={`${percentages.toFixed(8)}%`} style:background={group?.color}>
         {group?.name ?? $translate('analytics.groupings.groups.other')}
       </div>
     {/each}
@@ -104,7 +110,7 @@
 <div class="flex chart">
   {#each sortedGroupSummaries as { groupId, accountSummaries }, i (groupId)}
     {#each accountSummaries as item, j (item.account.id)}
-      <div class="flex-center" style:width={`${item.percentages}%`} style:background={item.color}>
+      <div class="flex-center" style:width={`${item.percentages.toFixed(8)}%`} style:background={item.color}>
         {countPreviousItems(sortedGroupSummaries, i) + j + 1}
       </div>
     {/each}
@@ -113,11 +119,18 @@
 
 <AccountsTableTable groups={sortedGroupSummaries} {totalBalance} />
 
-<div class="p-1">
-  <span>{$translate('analytics.accounts.grouping')}:</span>
-  <Button appearance="link" on:click={() => (groupingSelecting = true)}>
-    {grouping?.name ?? $translate('analytics.accounts.grouping.not_selected')}
-  </Button>
+<div class="p-1 flex-col gap-1">
+  <div>
+    <span>{$translate('analytics.accounts.grouping')}:</span>
+    <Button appearance="link" on:click={() => (groupingSelecting = true)}>
+      {grouping?.name ?? $translate('analytics.accounts.grouping.not_selected')}
+    </Button>
+  </div>
+  <Checkbox
+    checked={$hideZeroBalanceAccounts}
+    onChange={(value) => hideZeroBalanceAccounts.set(value)}
+    label={$translate('analytics.accounts.hide_zero_balance_accounts')}
+  />
 </div>
 
 <Portal visible={groupingSelecting}>

@@ -114,6 +114,7 @@ export const enDict: Dictionary = {
   'analytics.accounts.grouping.not_selected': 'No grouping',
   'analytics.accounts.grouping.not_selected.description': 'Show all accounts',
   'analytics.accounts.grouping.select_grouping': 'Select grouping',
+  'analytics.accounts.hide_zero_balance_accounts': 'Hide zero balance accounts',
   'analytics.groupings.title': 'Groupings',
   'analytics.groupings.create_grouping': 'Add grouping',
   'analytics.groupings.new_grouping': 'New grouping',

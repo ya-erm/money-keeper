@@ -1,6 +1,6 @@
 import { isApiErrorData, ApiError, type ApiErrorData, type ApiErrorCode } from '$lib/api';
 import { isApiError } from '$lib/api/ApiError';
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, type NumericRange } from '@sveltejs/kit';
 
 type ApiErrorArgs = [status: number, code: ApiErrorCode, message?: string | undefined] | [error: ApiError];
 
@@ -27,7 +27,7 @@ export const serverErrorResponse = (...args: ApiErrorArgs) => {
 
 export const serverApiError = (...args: ApiErrorArgs) => {
   const apiError = mapApiErrorArgs(args);
-  return error(apiError.status, apiError);
+  return error(apiError.status as NumericRange<400, 599>, apiError);
 };
 
 export const serverError = (...args: ApiErrorArgs) => {

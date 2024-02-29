@@ -1,5 +1,5 @@
 <script lang="ts">
-  import dayjs, { Dayjs } from 'dayjs';
+  import dayjs, { type Dayjs } from 'dayjs';
 
   import { categoriesStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import { translate } from '$lib/translate';

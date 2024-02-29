@@ -1,22 +1,18 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
 
   import ListGroupItem from './ListGroupItem.svelte';
 
-  const dispatch = createEventDispatcher();
-
   export let title: string;
   export let href: string | undefined = undefined;
   export let value: string | undefined = undefined;
   export let disabled = false;
-  export let click = () => dispatch('click');
+  export let onClick: (() => void) | undefined = undefined;
 </script>
 
-<ListGroupItem {href}>
-  <div class="container" class:disabled on:click={click} on:keypress={() => {}}>
+<ListGroupItem {href} {onClick}>
+  <div class="container" class:disabled>
     <span class="title">{title}</span>
     <div class="value-container">
       <span class="value-text">{value == undefined ? $translate('common.select') : value}</span>
