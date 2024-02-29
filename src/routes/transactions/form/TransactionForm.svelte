@@ -241,6 +241,7 @@
           <Input
             type="number"
             name="destinationAmount"
+            inputmode="decimal"
             bind:value={_value2}
             endText={destinationAccountCurrency || anotherCurrency}
             required

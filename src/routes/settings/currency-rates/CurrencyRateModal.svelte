@@ -54,7 +54,15 @@
     <input name="id" value={item?.id} readonly class="hidden" />
     <Input name="cur1" label={$translate('currency_rates.currency1')} bind:value={cur1} required />
     <Input name="cur2" label={$translate('currency_rates.currency2')} bind:value={cur2} required />
-    <Input name="rate" label={$translate('currency_rates.rate')} type="number" step="any" bind:value={rate} required>
+    <Input
+      name="rate"
+      type="number"
+      inputmode="decimal"
+      label={$translate('currency_rates.rate')}
+      bind:value={rate}
+      step="any"
+      required
+    >
       <Button slot="end" on:click={getGlobalRate} appearance="transparent">
         <Icon name="mdi:cached" />
       </Button>
