@@ -40,6 +40,7 @@
     "prettier-plugin-svelte": "^3.1.2",
     "prisma": "^5.8.1",
     "svelte": "^4.2.9",
+    "svelte-chartjs": "^3.1.5",
     "svelte-check": "^3.6.3",
     "svelte-i18n": "^4.0.0",
     "svelte-preprocess": "^5.1.3",
