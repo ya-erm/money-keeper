@@ -322,6 +322,8 @@
     header={{
       title: $translate('timezones.select_time_zone'),
       backButton: { title: $translate('common.back'), onClick: () => (timeZoneListVisible = false) },
+      leftButton: null,
+      rightButton: null,
     }}
   >
     <TimeZoneList
