@@ -10,55 +10,61 @@
   export let hideAccount: boolean = false;
   export let onClick: ((transaction: TransactionViewModel) => void) | null = null;
 
-  const incoming = transaction.category.type === 'IN';
-  const outgoing = transaction.category.type === 'OUT';
-  const isTransfer = !!transaction.linkedTransaction;
+  $: incoming = transaction.category.type === 'IN';
+  $: outgoing = transaction.category.type === 'OUT';
+  $: isTransfer = !!transaction.linkedTransaction;
 
-  const categoryName = transaction.category.name.startsWith('system.category')
+  $: categoryName = transaction.category.name.startsWith('system.category')
     ? $translate(transaction.category.name as Messages)
     : transaction.category.name;
 
   $: rate = currencyRate?.cur1 === transaction.account.currency ? currencyRate.rate : 1 / (currencyRate?.rate ?? 1);
   $: otherCurrency = currencyRate?.cur1 === transaction.account.currency ? currencyRate.cur2 : currencyRate?.cur1;
 
-  const handleClick = () => {
-    onClick?.(transaction);
+  $: transactionAccount = {
+    name: transaction.account.name,
+    deleted: transaction.account.deleted,
   };
+
+  $: linkedTransactionAccountOrCategory = isTransfer
+    ? {
+        name: transaction.linkedTransaction?.account?.name,
+        deleted: transaction.linkedTransaction?.account?.deleted,
+      }
+    : {
+        name: categoryName,
+        deleted: transaction.category.deleted,
+      };
+
+  $: source = outgoing ? transactionAccount : linkedTransactionAccountOrCategory;
+  $: destination = incoming ? transactionAccount : linkedTransactionAccountOrCategory;
 </script>
 
 <li>
   <button
     data-testId="TransactionListItem"
     data-id={transaction.id}
-    on:click={handleClick}
+    on:click={() => onClick?.(transaction)}
     class="flex gap-0.5 items-center justify-between"
   >
-    <div class="icon flex-center">
+    <div class="icon flex-center" class:deleted={transaction.category.deleted}>
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />
     </div>
     <div class="text flex-col flex-grow items-start">
       <div class="flex items-center header">
         {#if isTransfer}
-          <span class="source">
-            {outgoing ? transaction.account.name : transaction.linkedTransaction?.account?.name}
-          </span>
+          <span class="source" class:deleted={source.deleted}>{source.name}</span>
           <Icon name="mdi:chevron-right" size={1.25} />
-          <span class="destination">
-            {incoming ? transaction.account.name : transaction.linkedTransaction?.account?.name}
-          </span>
+          <span class="destination" class:deleted={destination.deleted}>{destination.name} </span>
         {:else}
           {#if (outgoing && !hideAccount) || incoming}
-            <span class="source">
-              {outgoing ? transaction.account.name : categoryName}
-            </span>
+            <span class="source" class:deleted={source.deleted}>{source.name}</span>
           {/if}
           {#if !hideAccount}
             <Icon name="mdi:chevron-right" size={1.25} />
           {/if}
           {#if (incoming && !hideAccount) || outgoing}
-            <span class="destination">
-              {incoming ? transaction.account.name : categoryName}
-            </span>
+            <span class="destination" class:deleted={destination.deleted}>{destination.name}</span>
           {/if}
         {/if}
       </div>
@@ -69,7 +75,9 @@
       {/if}
       {#if transaction.tags?.length}
         <div class="tags">
-          {transaction.tags.map((t) => `#${t.name}`).join(' ')}
+          {#each transaction.tags as tag (tag.id)}
+            <span class="tag" class:deleted={tag.deleted}>#{tag.name}</span>
+          {/each}
         </div>
       {/if}
     </div>
@@ -117,6 +125,10 @@
   .header {
     font-weight: 500;
   }
+  .deleted {
+    opacity: 0.5;
+    text-decoration: line-through;
+  }
   .icon {
     border-radius: 100%;
     background-color: var(--header-background-color);
@@ -131,6 +143,9 @@
   .tags {
     font-size: 0.85rem;
     color: var(--secondary-text-color);
+  }
+  .tag:not(:last-child)::after {
+    content: ' ';
   }
   .source,
   .comment,

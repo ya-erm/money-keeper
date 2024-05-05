@@ -106,6 +106,8 @@
         return;
       }
 
+      const tagIds = selectedTags.filter((tagId) => tags.find((t) => t.id === tagId));
+
       const transactions: Transaction[] = [];
 
       transactions.push({
@@ -117,7 +119,7 @@
         ...(timeZone ? { timeZone } : {}),
         amount: checkNumberFormParameter(formData, 'amount'),
         comment: checkStringOptionalFormParameter(formData, 'comment'),
-        tagIds: selectedTags,
+        tagIds,
         ...(anotherCurrency
           ? {
               anotherCurrency,
@@ -135,7 +137,7 @@
           timeZone,
           amount: checkNumberFormParameter(formData, 'destinationAmount'),
           comment: checkStringOptionalFormParameter(formData, 'comment'),
-          tagIds: selectedTags,
+          tagIds,
           linkedTransactionId: transactions[0].id,
         });
         transactions[0].linkedTransactionId = transactions[1].id;

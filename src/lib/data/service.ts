@@ -1,4 +1,5 @@
 import { store } from '$lib/store';
+import { derived, type Readable } from 'svelte/store';
 
 import type {
   Account,
@@ -23,23 +24,37 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
   private _name: string;
   private _journalKey: keyof JournalOperation;
   private _storageName: StorageName;
-  private _items = store<T[]>([]);
+  private _items = store<{
+    active: T[];
+    deleted: T[];
+  }>({
+    active: [],
+    deleted: [],
+  });
+  private _activeItems: Readable<T[]>;
 
   /** Constructor */
   constructor(serviceName: string, storageName: StorageName, journalOperationKey: keyof JournalOperation) {
     this._name = serviceName;
     this._storageName = storageName;
     this._journalKey = journalOperationKey;
+
+    this._activeItems = derived(this._items, ({ active }) => active);
   }
 
   /** List of all items */
   public get items() {
-    return this._items.value;
+    return this._items.value.active;
   }
 
   /** Readable store of all items */
   protected get $items() {
-    return this._items.readable;
+    return this._activeItems;
+  }
+
+  /** List of deleted items */
+  public get deletedItems() {
+    return this._items.value.deleted;
   }
 
   /** Service name */
@@ -57,7 +72,10 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
     const db = await useDB();
     const member = membersService.getSelectedMember();
     const allItems = (await db.getAllFromIndex(this._storageName, 'by-owner', member.uuid)) as unknown as T[];
-    this._items.set(allItems.filter((x) => !x.deleted));
+    this._items.set({
+      active: allItems.filter((x) => !x.deleted),
+      deleted: allItems.filter((x) => x.deleted),
+    });
   }
 
   /** Save one item to local DB */
@@ -80,9 +98,14 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
 
     this._items.update((prev) => {
       const dict = new Map<string, T>();
-      prev.forEach((item) => dict.set(item.id, item));
+      prev.active.forEach((item) => dict.set(item.id, item));
+      prev.deleted.forEach((item) => dict.set(item.id, item));
       items.forEach((item) => dict.set(item.id, item));
-      return Array.from(dict.values()).filter((x) => !x.deleted);
+      const allItems = Array.from(dict.values());
+      return {
+        active: allItems.filter((x) => !x.deleted),
+        deleted: allItems.filter((x) => x.deleted),
+      };
     });
 
     if (saveToDB) {

@@ -33,6 +33,7 @@ export type Messages =
   | 'common.count'
   | 'common.show'
   | 'common.hide'
+  | 'common.data_problems'
   // Timezones
   | 'timezones.select_time_zone'
   | 'timezones.current_time_zone'
