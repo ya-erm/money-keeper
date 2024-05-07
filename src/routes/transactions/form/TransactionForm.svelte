@@ -68,6 +68,8 @@
   $: accountCurrency = accounts.find(({ id }) => id === accountId)?.currency;
   $: destinationAccountCurrency = accounts.find(({ id }) => id === destinationAccountId)?.currency;
 
+  let destinationAmountTouched = false;
+
   let _value1 = (isTransfer ? sourceTransaction?.amount : transaction?.amount)?.toString() ?? '';
   let _value2 = destinationTransaction?.amount?.toString() ?? transaction?.anotherCurrencyAmount?.toString() ?? '';
   $: _rate = Number(_value1) / Number(_value2);
@@ -238,6 +240,11 @@
           inputmode="decimal"
           bind:ref={inputRef}
           bind:value={_value1}
+          onChange={(value) => {
+            if (type === 'TRANSFER' && accountCurrency === destinationAccountCurrency && !destinationAmountTouched) {
+              _value2 = value;
+            }
+          }}
           endText={accountCurrency}
           required
         />
@@ -248,6 +255,9 @@
             inputmode="decimal"
             bind:value={_value2}
             endText={destinationAccountCurrency || anotherCurrency}
+            onChange={(value) => {
+              destinationAmountTouched = !!value;
+            }}
             required
           />
         {/if}
