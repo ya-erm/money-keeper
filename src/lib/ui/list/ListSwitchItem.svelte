@@ -10,7 +10,9 @@
   <div class="theme-switch">
     <input type="checkbox" bind:checked />
     <span>{title}</span>
-    <Switch bind:checked />
+    <div class="switch">
+      <Switch bind:checked />
+    </div>
   </div>
 </ListGroupItem>
 
@@ -32,5 +34,8 @@
   }
   .theme-switch input {
     display: none;
+  }
+  .switch {
+    pointer-events: none;
   }
 </style>
