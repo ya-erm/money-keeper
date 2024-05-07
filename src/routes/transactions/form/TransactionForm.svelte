@@ -177,8 +177,10 @@
         bind:categoryId
         categories={categories.filter((c) => c.type === type)}
         onChange={() => {
-          inputRef?.focus({ preventScroll: true });
-          inputRef?.scrollIntoView({ behavior: 'smooth' });
+          if (!inputRef?.value) {
+            inputRef?.focus({ preventScroll: true });
+            inputRef?.scrollIntoView({ behavior: 'smooth' });
+          }
         }}
       />
     {/if}
