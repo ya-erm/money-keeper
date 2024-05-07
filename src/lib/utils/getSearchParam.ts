@@ -1,4 +1,4 @@
-import { replaceState } from '$app/navigation';
+import { goto } from '$app/navigation';
 import type { Page } from '@sveltejs/kit';
 
 export function getNumberSearchParam(page: Page, name: string) {
@@ -9,12 +9,19 @@ export function getSearchParam(page: Page, name: string) {
   return page.url.searchParams.get(name);
 }
 
-export async function setSearchParam(page: Page, name: string, value: string) {
-  page.url.searchParams.set(name, value);
-  replaceState(page.url, page.state);
+export async function setSearchParam(
+  page: Page,
+  name: string,
+  value: string,
+  { replace }: { replace: boolean } = { replace: true },
+) {
+  const searchParams = new URLSearchParams(page.url.searchParams);
+  searchParams.set(name, value);
+  await goto(`?${searchParams.toString()}`, { replaceState: replace });
 }
 
 export async function deleteSearchParam(page: Page, name: string) {
-  page.url.searchParams.delete(name);
-  replaceState(page.url, page.state);
+  const searchParams = new URLSearchParams(page.url.searchParams);
+  searchParams.delete(name);
+  await goto(`?${searchParams.toString()}`, { replaceState: true });
 }

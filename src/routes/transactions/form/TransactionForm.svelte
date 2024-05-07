@@ -68,6 +68,8 @@
   $: accountCurrency = accounts.find(({ id }) => id === accountId)?.currency;
   $: destinationAccountCurrency = accounts.find(({ id }) => id === destinationAccountId)?.currency;
 
+  let destinationAmountTouched = false;
+
   let _value1 = (isTransfer ? sourceTransaction?.amount : transaction?.amount)?.toString() ?? '';
   let _value2 = destinationTransaction?.amount?.toString() ?? transaction?.anotherCurrencyAmount?.toString() ?? '';
   $: _rate = Number(_value1) / Number(_value2);
@@ -106,6 +108,8 @@
         return;
       }
 
+      const tagIds = selectedTags.filter((tagId) => tags.find((t) => t.id === tagId));
+
       const transactions: Transaction[] = [];
 
       transactions.push({
@@ -117,7 +121,7 @@
         ...(timeZone ? { timeZone } : {}),
         amount: checkNumberFormParameter(formData, 'amount'),
         comment: checkStringOptionalFormParameter(formData, 'comment'),
-        tagIds: selectedTags,
+        tagIds,
         ...(anotherCurrency
           ? {
               anotherCurrency,
@@ -135,7 +139,7 @@
           timeZone,
           amount: checkNumberFormParameter(formData, 'destinationAmount'),
           comment: checkStringOptionalFormParameter(formData, 'comment'),
-          tagIds: selectedTags,
+          tagIds,
           linkedTransactionId: transactions[0].id,
         });
         transactions[0].linkedTransactionId = transactions[1].id;
@@ -175,8 +179,10 @@
         bind:categoryId
         categories={categories.filter((c) => c.type === type)}
         onChange={() => {
-          inputRef?.focus({ preventScroll: true });
-          inputRef?.scrollIntoView({ behavior: 'smooth' });
+          if (!inputRef?.value) {
+            inputRef?.focus({ preventScroll: true });
+            inputRef?.scrollIntoView({ behavior: 'smooth' });
+          }
         }}
       />
     {/if}
@@ -234,6 +240,11 @@
           inputmode="decimal"
           bind:ref={inputRef}
           bind:value={_value1}
+          onChange={(value) => {
+            if (type === 'TRANSFER' && accountCurrency === destinationAccountCurrency && !destinationAmountTouched) {
+              _value2 = value;
+            }
+          }}
           endText={accountCurrency}
           required
         />
@@ -244,6 +255,9 @@
             inputmode="decimal"
             bind:value={_value2}
             endText={destinationAccountCurrency || anotherCurrency}
+            onChange={(value) => {
+              destinationAmountTouched = !!value;
+            }}
             required
           />
         {/if}
@@ -322,6 +336,8 @@
     header={{
       title: $translate('timezones.select_time_zone'),
       backButton: { title: $translate('common.back'), onClick: () => (timeZoneListVisible = false) },
+      leftButton: null,
+      rightButton: null,
     }}
   >
     <TimeZoneList

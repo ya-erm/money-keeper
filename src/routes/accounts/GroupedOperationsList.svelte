@@ -1,12 +1,17 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import dayjs from 'dayjs';
+
+  import { page } from '$app/stores';
 
   import { currencyRatesStore, memberSettingsStore } from '$lib/data';
   import type { Account, TransactionViewModel } from '$lib/data/interfaces';
-  import { route } from '$lib/routes';
+  import { translate } from '$lib/translate';
+  import Layout from '$lib/ui/Layout.svelte';
+  import Portal from '$lib/ui/Portal.svelte';
+  import { getSearchParam, setSearchParam } from '$lib/utils';
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
+  import EditTransaction from '../transactions/edit/EditTransaction.svelte';
 
   import { findCurrencyRate } from './utils';
 
@@ -25,9 +30,9 @@
     return res;
   }, {});
 
-  const handleTransactionClick = async (id: string) => {
-    await goto(route('transactions') + `/edit?id=${id}`);
-  };
+  $: operationId = getSearchParam($page, 'operation-id');
+  const openOperationForm = (id: string) => setSearchParam($page, 'operation-id', id, { replace: false });
+  const closeOperationForm = () => history.back();
 </script>
 
 <ul class="operations-list flex-col gap-1">
@@ -37,12 +42,27 @@
       <TransactionListItem
         hideAccount={!!account}
         currencyRate={currencyRate ?? findCurrencyRate(currencyRates, settings?.currency, transaction.account.currency)}
-        onClick={() => handleTransactionClick(transaction.id)}
+        onClick={() => openOperationForm(transaction.id)}
         {transaction}
       />
     {/each}
   {/each}
 </ul>
+
+<Portal visible={operationId !== null}>
+  <Layout
+    header={{
+      backButton: {
+        onClick: closeOperationForm,
+      },
+      leftButton: null,
+      rightButton: null,
+      title: $translate('transactions.edit_transaction'),
+    }}
+  >
+    <EditTransaction id={operationId} onBack={closeOperationForm} />
+  </Layout>
+</Portal>
 
 <style>
   .operations-list {
