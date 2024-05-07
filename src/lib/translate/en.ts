@@ -215,6 +215,7 @@ export const enDict: Dictionary = {
   'transactions.import.select_category_for_all_operations': 'Select categories for all operations',
   'transactions.import.finish': 'Finish import',
   'transactions.import.finished': '{count, plural, one {# operation was imported} other {# operations were imported}}',
+  'transactions.show_more': 'Show more',
   // Import rules
   'transactions.import.rules.title': 'Rules of import',
   'transactions.import.rules.create': 'Create rule',

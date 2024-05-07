@@ -201,6 +201,7 @@ export const ruDict: Dictionary = {
   'transactions.feature_operations': 'Будущие операции',
   'transactions.another_currency': 'Другая валюта',
   'transactions.same_currency': 'Та же валюта',
+  'transactions.show_more': 'Показать ещё',
   // Transactions import
   'transactions.import': 'Импорт',
   'transactions.import.title': 'Импорт операций',

@@ -194,6 +194,7 @@ export type Messages =
   | 'transactions.feature_operations'
   | 'transactions.another_currency'
   | 'transactions.same_currency'
+  | 'transactions.show_more'
   // Transactions import
   | 'transactions.import'
   | 'transactions.import.title'
