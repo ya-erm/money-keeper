@@ -24,6 +24,7 @@
   let color = account?.color;
   let currency = account?.currency ?? '';
   let selectedTags = account?.tagIds;
+  let archived = account?.archived;
 
   const handleSave = async () => {
     accountsService.save({
@@ -34,6 +35,7 @@
       color,
       currency,
       tagIds: selectedTags,
+      archived,
     });
     opened = false;
   };
@@ -50,9 +52,23 @@
       showErrorToast($translate('accounts.delete_account_failure'));
     }
   };
+
+  const handleArchive = async () => {
+    archived = true;
+    await handleSave();
+  };
+
+  const handleRestore = async () => {
+    archived = false;
+    await handleSave();
+  };
 </script>
 
-<Modal width={20} header={account?.name ?? $translate('accounts.new_account')} bind:opened>
+<Modal width={20} bind:opened>
+  <div slot="header" class="text-center mb-1">
+    <div class="font-bold">{account?.name ?? $translate('accounts.new_account')}</div>
+    <div class="subtitle" class:visibility-hidden={!archived}>{$translate('accounts.archived')}</div>
+  </div>
   <form class="flex-col gap-1" data-testId="AccountForm" on:submit|preventDefault={handleSave}>
     <Input label={$translate('accounts.name')} name="name" bind:value={name} required />
     <Input label={$translate('accounts.currency')} name="currency" bind:value={currency} required />
@@ -74,13 +90,52 @@
     </div>
     <div class="grid-col-2 gap-1">
       {#if !!account}
-        <Button color="danger" text={$translate('common.delete')} on:click={() => (deleteModalOpened = true)} />
+        {#if archived}
+          <Button
+            bordered
+            color="danger"
+            appearance="transparent"
+            text={$translate('common.delete')}
+            on:click={() => (deleteModalOpened = true)}
+          />
+        {:else}
+          <Button
+            bordered
+            color="secondary"
+            appearance="transparent"
+            text={$translate('accounts.archive')}
+            on:click={handleArchive}
+          />
+        {/if}
       {:else}
-        <Button color="secondary" text={$translate('common.cancel')} on:click={() => (opened = false)} />
+        <Button
+          bordered
+          color="secondary"
+          appearance="transparent"
+          text={$translate('common.cancel')}
+          on:click={() => (opened = false)}
+        />
       {/if}
-      <Button text={$translate('common.save')} type="submit" />
+      {#if archived}
+        <Button bordered text={$translate('accounts.restore')} on:click={handleRestore} />
+      {:else}
+        <Button bordered text={$translate('common.save')} type="submit" />
+      {/if}
     </div>
   </form>
 </Modal>
 
 <DeleteAccountModal bind:opened={deleteModalOpened} onDelete={handleDelete} />
+
+<style>
+  .subtitle {
+    font-size: 0.9rem;
+    opacity: 0.5;
+    height: 1rem;
+    transition: height 0.5s;
+    overflow: hidden;
+  }
+  .visibility-hidden {
+    height: 0;
+  }
+</style>

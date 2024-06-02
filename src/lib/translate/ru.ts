@@ -105,6 +105,10 @@ export const ruDict: Dictionary = {
   'accounts.select_color': 'Выбрать цвет',
   'accounts.tags': 'Теги',
   'accounts.sort': 'Сортировка счетов',
+  'accounts.archived_accounts': 'Архивные счета',
+  'accounts.archive': 'В архив',
+  'accounts.archived': 'В архиве',
+  'accounts.restore': 'Восстановить',
   // Analytics
   'analytics.title': 'Аналитика',
   'analytics.categories.start_date': 'Начало интервала',
@@ -201,6 +205,7 @@ export const ruDict: Dictionary = {
   'transactions.feature_operations': 'Будущие операции',
   'transactions.another_currency': 'Другая валюта',
   'transactions.same_currency': 'Та же валюта',
+  'transactions.show_more': 'Показать ещё',
   // Transactions import
   'transactions.import': 'Импорт',
   'transactions.import.title': 'Импорт операций',

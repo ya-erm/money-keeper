@@ -2,7 +2,10 @@
   import { accountTagsStore } from '$lib/data';
   import type { AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
+  import Checkbox from '$lib/ui/Checkbox.svelte';
   import Tags from '$lib/ui/Tags.svelte';
+
+  import { hideZeroBalanceAccounts } from './store';
 
   export let accounts: AccountViewModel[];
 
@@ -29,6 +32,11 @@
       readOnly
     />
   </div>
+  <Checkbox
+    checked={$hideZeroBalanceAccounts}
+    onChange={(value) => hideZeroBalanceAccounts.set(value)}
+    label={$translate('analytics.accounts.hide_zero_balance_accounts')}
+  />
 </div>
 
 <style>

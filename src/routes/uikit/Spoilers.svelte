@@ -1,12 +1,12 @@
 <script>
-  import Button from '$lib/ui/Button.svelte';
   import Spoiler from '$lib/ui/Spoiler.svelte';
+  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
   let hidden = true;
 </script>
 
 <h2>Spoilers</h2>
 
-<Button on:click={() => (hidden = !hidden)}>Toggle</Button>
+<SpoilerToggle bind:hidden>Spoiler Toggle</SpoilerToggle>
 <Spoiler {hidden}>
   <h3>Content example</h3>
   <p>

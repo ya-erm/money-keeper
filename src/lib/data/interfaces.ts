@@ -72,6 +72,7 @@ export type Account = {
   color?: string;
   tagIds?: string[];
   deleted?: boolean;
+  archived?: boolean;
 };
 
 export type AccountViewModel = Account & {

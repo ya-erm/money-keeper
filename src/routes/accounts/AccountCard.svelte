@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { AccountViewModel, CurrencyRate } from '$lib/data/interfaces';
+  import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import { formatMoney } from '$lib/utils/formatMoney';
@@ -24,7 +25,14 @@
       <Icon name={account.icon || 'mdi:briefcase-outline'} padding={0.5} />
     </div>
     <div class="flex-grow">
-      <div data-testId="AccountName">{account.name}</div>
+      <div data-testId="AccountName">
+        {#if account.archived}
+          <span class="archived" title={$translate('accounts.archived')}>
+            <Icon name="ri:archive-line" size={1} />
+          </span>
+        {/if}
+        <span>{account.name}</span>
+      </div>
       <div class="account-tags">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
     </div>
     <Button appearance="link" color="white" on:click={handleEdit}>
@@ -45,6 +53,10 @@
 </div>
 
 <style>
+  .archived {
+    font-size: 0.9rem;
+    opacity: 0.5;
+  }
   .account-icon {
     border-radius: 100%;
     background-color: var(--background-color);

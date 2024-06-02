@@ -8,6 +8,7 @@
 
   export let tags: Tag[];
   export let selectedTags: string[] = [];
+  export let readOnly: boolean = false;
 
   export let onAdd: (tag: Tag) => void;
   export let onEdit: (tag: Tag) => void;
@@ -58,5 +59,6 @@
   onAdd={addTag}
   onEdit={editTag}
   onDelete={deleteTag}
+  {readOnly}
 />
 <input name="tags" class="hidden" multiple value={selectedTags} />

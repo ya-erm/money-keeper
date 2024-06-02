@@ -3,26 +3,26 @@
   import Icon from '$lib/ui/Icon.svelte';
 
   export let hidden: boolean;
-  export let futureOperationsCount: number;
 </script>
 
-<button class="future-operations-button flex gap-1 items-center justify-between" on:click={() => (hidden = !hidden)}>
+<button
+  class="spoiler-toggle flex gap-1 items-center justify-between"
+  on:click={() => (hidden = !hidden)}
+  type="button"
+>
   <h3 class="m-0 font-normal">
-    <span>{$translate('transactions.feature_operations')}</span>
-    <span class="operations-count">
-      {$translate('common.count', { values: { count: futureOperationsCount } })}
-    </span>
+    <slot />
   </h3>
   <div class="flex items-center">
     <span>{$translate(hidden ? 'common.show' : 'common.hide')}</span>
-    <div class="future-operations-button-icon" class:shown={!hidden}>
+    <div class="spoiler-toggle-icon" class:shown={!hidden}>
       <Icon padding={0} name={'mdi:chevron-down'} />
     </div>
   </div>
 </button>
 
 <style>
-  .future-operations-button {
+  .spoiler-toggle {
     border: none;
     background: none;
     color: var(--primary-text-color);
@@ -31,17 +31,13 @@
     width: 100%;
     padding: 0;
   }
-  .future-operations-button:hover {
+  .spoiler-toggle:hover {
     color: var(--active-color);
   }
-  .future-operations-button-icon {
+  .spoiler-toggle-icon {
     transition: transform var(--duration, 0.5s);
   }
-  .future-operations-button-icon.shown {
+  .spoiler-toggle-icon.shown {
     transform: scaleY(-1);
-  }
-  .operations-count {
-    font-size: 0.85rem;
-    color: var(--secondary-text-color);
   }
 </style>

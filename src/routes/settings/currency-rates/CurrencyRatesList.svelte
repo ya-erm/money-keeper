@@ -1,11 +1,14 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import { currencyRatesStore } from '$lib/data';
+  import { currencyRatesStore, memberSettingsStore } from '$lib/data';
   import type { CurrencyRate } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import { useRightButton, useTitle } from '$lib/ui/header';
-  import { deleteSearchParam, getSearchParam } from '$lib/utils';
+  import Input from '$lib/ui/Input.svelte';
+  import { deleteSearchParam, getSearchParam, groupByKeyToMap } from '$lib/utils';
+
+  import { findRate } from '../../analytics/utils/findRate';
 
   import AddCurrencyRateButton from './AddCurrencyRateButton.svelte';
   import CurrencyRateModal from './CurrencyRateModal.svelte';
@@ -14,6 +17,7 @@
   useRightButton(AddCurrencyRateButton);
 
   $: currencyRates = $currencyRatesStore;
+  $: settings = $memberSettingsStore;
 
   let selectedItem: CurrencyRate | null = null;
   let opened = false;
@@ -31,15 +35,46 @@
     selectedItem = item;
     opened = true;
   };
+
+  let search: string = '';
+  $: filteredCurrencyRates = currencyRates.filter(
+    (rate) =>
+      !search ||
+      rate.cur1.toLowerCase().includes(search.toLowerCase()) ||
+      rate.cur2.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  $: currencyRateByCurrency = groupByKeyToMap(filteredCurrencyRates, 'cur1');
+  $: currencyKeys = Array.from(currencyRateByCurrency.keys());
+  $: currencyKeys.forEach((currency) => {
+    currencyRateByCurrency.get(currency)?.sort((a, b) => {
+      const aRate = findRate(currencyRates, settings?.currency ?? undefined, a.cur2);
+      const bRate = findRate(currencyRates, settings?.currency ?? undefined, b.cur2);
+      return bRate - aRate;
+    });
+  });
+  $: currenciesGroups = currencyKeys.sort((a, b) => {
+    const aRate = findRate(currencyRates, settings?.currency ?? undefined, a);
+    const bRate = findRate(currencyRates, settings?.currency ?? undefined, b);
+    return bRate - aRate;
+  });
 </script>
 
-<div class="container">
-  {#each currencyRates as item (item.id)}
-    <button class="card" on:click={() => changeCurrencyRate(item)} on:keypress={() => {}}>
-      <b>{item.cur1} / {item.cur2}</b>
-      <div>1 {item.cur1} = {item.rate} {item.cur2}</div>
-      <div>1 {item.cur2} = {(1 / item.rate).toFixed(4)} {item.cur1}</div>
-    </button>
+<div class="flex-col gap-1">
+  <div class="flex-grow">
+    <Input bind:value={search} placeholder={$translate('common.search')} clearable />
+  </div>
+  {#each currenciesGroups as currency}
+    <h4 class="m-0">{currency}</h4>
+    <div class="container">
+      {#each currencyRateByCurrency.get(currency) ?? [] as item (item.id)}
+        <button class="card" on:click={() => changeCurrencyRate(item)} on:keypress={() => {}}>
+          <b>{item.cur1} / {item.cur2}</b>
+          <div>1 {item.cur1} = {item.rate} {item.cur2}</div>
+          <div>1 {item.cur2} = {(1 / item.rate).toFixed(4)} {item.cur1}</div>
+        </button>
+      {/each}
+    </div>
   {/each}
 </div>
 
