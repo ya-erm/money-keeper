@@ -100,6 +100,10 @@ export type Messages =
   | 'accounts.select_color'
   | 'accounts.tags'
   | 'accounts.sort'
+  | 'accounts.archived_accounts'
+  | 'accounts.archive'
+  | 'accounts.archived'
+  | 'accounts.restore'
   // Analytics
   | 'analytics.title'
   | 'analytics.categories.start_date'

@@ -8,10 +8,14 @@
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import Input from '$lib/ui/Input.svelte';
+  import Spoiler from '$lib/ui/Spoiler.svelte';
+  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
   import { groupBySelector } from '$lib/utils';
 
-  import Spoiler from '$lib/ui/Spoiler.svelte';
   import { calculateBalance, findCurrencyRate, pastOperationsPredicate } from '../utils';
+
+  import { hideZeroBalanceAccounts } from './store';
+
   import AccountListItem from './AccountListItem.svelte';
   import Filters from './Filters.svelte';
 
@@ -33,11 +37,17 @@
   $: filteredAccounts = sortable
     ? accounts
     : accounts
+        .filter((account) => {
+          const balance = calculateBalance(operationsByAccount[account.id]?.filter(pastOperationsPredicate()) ?? []);
+          return $hideZeroBalanceAccounts ? Number(balance.toFixed(8)) !== 0 : true;
+        })
         .filter((account) => !selectedTags.length || selectedTags.some((tagId) => account.tagIds?.includes(tagId)))
         .filter((account) => !selectedCurrencies.length || selectedCurrencies.some((cur) => account.currency === cur))
         .filter((account) => !search || account.name.toLowerCase().includes(search.toLowerCase()));
 
-  $: sortedAccounts = filteredAccounts;
+  $: archivedAccounts = filteredAccounts.filter((account) => account.archived);
+
+  $: sortedAccounts = filteredAccounts.filter((account) => !account.archived);
 
   const flipDurationMs = 200;
 
@@ -60,6 +70,8 @@
   }
 
   let scrollTop = 0;
+
+  let archivedHidden = true;
 </script>
 
 <div on:scroll={(e) => (scrollTop = e.currentTarget.scrollTop)} class="accounts-list pb-1 flex-col">
@@ -84,7 +96,7 @@
         </div>
         <Button color={showFilters ? 'primary' : 'white'} bordered on:click={() => (showFilters = !showFilters)}>
           <Icon size={1.25} name="mdi:filter" />
-          {#if selectedTags.length || selectedCurrencies.length}
+          {#if selectedTags.length || selectedCurrencies.length || $hideZeroBalanceAccounts}
             <span class="filter-badge" />
           {/if}
         </Button>
@@ -101,6 +113,7 @@
   {#if accounts.length === 0}
     <span class="no-data">{$translate('accounts.no_data')}</span>
   {/if}
+
   <ul
     class="flex-col gap-1 px-1"
     use:dndzone={{
@@ -125,6 +138,31 @@
       </li>
     {/each}
   </ul>
+
+  {#if archivedAccounts.length > 0}
+    <Spoiler hidden={archivedHidden}>
+      <div class="mt-1 px-1" slot="spoiler-header">
+        <SpoilerToggle bind:hidden={archivedHidden}>
+          <div class="ml-0.5 flex items-center gap-0.5">
+            <Icon name="ri:archive-line" size={1.5} />
+            <span>{$translate('accounts.archived_accounts')}</span>
+          </div>
+        </SpoilerToggle>
+      </div>
+      <ul class="flex-col gap-1 pt-1 px-1">
+        {#each archivedAccounts as account (account.id)}
+          <li animate:flip={{ duration: flipDurationMs }}>
+            <AccountListItem
+              {account}
+              {onClick}
+              currencyRate={findCurrencyRate(currencyRates, settings?.currency, account.currency)}
+              balance={calculateBalance(operationsByAccount[account.id]?.filter(pastOperationsPredicate()) ?? [])}
+            />
+          </li>
+        {/each}
+      </ul>
+    </Spoiler>
+  {/if}
 </div>
 
 <style>

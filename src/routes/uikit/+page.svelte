@@ -28,7 +28,7 @@
   <Inputs />
   <Toasts />
   <Modals />
+  <Spoilers />
   <Switches />
   <Tags />
-  <Spoilers />
 </div>

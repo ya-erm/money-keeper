@@ -98,28 +98,28 @@
   button.transparent.primary {
     color: var(--active-color);
   }
-  button.transparent.primary.border {
+  button.primary.border {
     box-shadow: 0 0 0 1px var(--active-color);
   }
 
   button.transparent.secondary {
     color: var(--secondary-text-color);
   }
-  button.transparent.secondary.border {
+  button.secondary.border {
     box-shadow: 0 0 0 1px var(--secondary-text-color);
   }
 
   button.transparent.success {
     color: var(--green-color);
   }
-  button.transparent.success.border {
+  button.success.border {
     box-shadow: 0 0 0 1px var(--green-color);
   }
 
   button.transparent.danger {
     color: var(--red-color);
   }
-  button.transparent.danger.border {
+  button.danger.border {
     box-shadow: 0 0 0 1px var(--red-color);
   }
 

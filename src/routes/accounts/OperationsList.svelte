@@ -6,8 +6,8 @@
   import Input from '$lib/ui/Input.svelte';
   import ShowMoreContainer from '$lib/ui/ShowMoreContainer.svelte';
   import Spoiler from '$lib/ui/Spoiler.svelte';
+  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
 
-  import FeatureOperationsSpoilerHeader from './FeatureOperationsSpoilerHeader.svelte';
   import GroupedOperationsList from './GroupedOperationsList.svelte';
   import { futureOperationsPredicate, pastOperationsPredicate } from './utils';
 
@@ -65,11 +65,12 @@
     </div>
     {#if futureOperations.length > 0}
       <Spoiler hidden={featureOperationsHidden}>
-        <FeatureOperationsSpoilerHeader
-          slot="spoiler-header"
-          bind:hidden={featureOperationsHidden}
-          futureOperationsCount={futureOperations.length}
-        />
+        <SpoilerToggle slot="spoiler-header" bind:hidden={featureOperationsHidden}>
+          <span>{$translate('transactions.feature_operations')}</span>
+          <span class="operations-count">
+            {$translate('common.count', { values: { count: futureOperations.length } })}
+          </span>
+        </SpoilerToggle>
         <GroupedOperationsList {account} operations={futureOperations} />
       </Spoiler>
       <hr class="line" />

@@ -104,6 +104,10 @@ export const enDict: Dictionary = {
   'accounts.select_color': 'Select color',
   'accounts.tags': 'Tags',
   'accounts.sort': 'Sort accounts',
+  'accounts.archived_accounts': 'Archived accounts',
+  'accounts.archive': 'Archive',
+  'accounts.archived': 'Archived',
+  'accounts.restore': 'Restore',
   // Analytics
   'analytics.title': 'Analytics',
   'analytics.categories.start_date': 'Start date',

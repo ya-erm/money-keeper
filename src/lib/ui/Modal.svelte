@@ -68,7 +68,7 @@
   .modal {
     max-width: calc(100vw - 4rem);
     max-height: calc(100vh - 4rem);
-    border-radius: 0.75em;
+    border-radius: 1.5em;
     background: var(--header-background-color);
     border: 1px solid var(--border-color);
     padding: 1em;
