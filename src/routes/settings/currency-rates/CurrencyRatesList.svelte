@@ -6,9 +6,7 @@
   import { translate } from '$lib/translate';
   import { useRightButton, useTitle } from '$lib/ui/header';
   import Input from '$lib/ui/Input.svelte';
-  import { deleteSearchParam, getSearchParam, groupByKeyToMap } from '$lib/utils';
-
-  import { findRate } from '../../analytics/utils/findRate';
+  import { deleteSearchParam, findRate, getSearchParam, groupByKeyToMap } from '$lib/utils';
 
   import AddCurrencyRateButton from './AddCurrencyRateButton.svelte';
   import CurrencyRateModal from './CurrencyRateModal.svelte';

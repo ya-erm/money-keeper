@@ -4,10 +4,9 @@
   import { categoriesStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
-  import { formatMoney, groupByKey } from '$lib/utils';
+  import { findRate, formatMoney, groupByKey } from '$lib/utils';
 
   import TransactionList from '../../transactions/TransactionList.svelte';
-  import { findRate } from '../utils/findRate';
 
   import MonthSelect from './MonthSelect.svelte';
   import { intervalEndStore, intervalStartStore, intervalTypeStore } from './store';

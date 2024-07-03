@@ -1,4 +1,4 @@
-import type { SvelteComponent } from 'svelte';
+import type { Component } from './model';
 
 export type HeaderConfig = {
   backButton?: {
@@ -6,7 +6,7 @@ export type HeaderConfig = {
     onClick?: () => void;
     title?: string;
   };
-  leftButton?: typeof SvelteComponent | null;
+  leftButton?: Component | null;
   title?: string;
-  rightButton?: typeof SvelteComponent | null;
+  rightButton?: Component | null;
 };
