@@ -33,6 +33,7 @@ export type Messages =
   | 'common.count'
   | 'common.show'
   | 'common.hide'
+  | 'common.data_problems'
   // Timezones
   | 'timezones.select_time_zone'
   | 'timezones.current_time_zone'
@@ -99,6 +100,10 @@ export type Messages =
   | 'accounts.select_color'
   | 'accounts.tags'
   | 'accounts.sort'
+  | 'accounts.archived_accounts'
+  | 'accounts.archive'
+  | 'accounts.archived'
+  | 'accounts.restore'
   // Analytics
   | 'analytics.title'
   | 'analytics.categories.start_date'
@@ -193,6 +198,7 @@ export type Messages =
   | 'transactions.feature_operations'
   | 'transactions.another_currency'
   | 'transactions.same_currency'
+  | 'transactions.show_more'
   // Transactions import
   | 'transactions.import'
   | 'transactions.import.title'

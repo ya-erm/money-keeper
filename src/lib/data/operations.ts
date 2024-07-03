@@ -1,20 +1,28 @@
 import dayjs from 'dayjs';
-import { derived, type Readable } from 'svelte/store';
+import { derived, get } from 'svelte/store';
 
+import { translate } from '$lib/translate';
 import { showErrorToast } from '$lib/ui/toasts';
 import { Logger } from '$lib/utils/logger';
 
+import { store } from '$lib/store';
 import { accountsService, accountsStore } from './accounts';
-import { categoriesStore, SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from './categories';
+import {
+  SYSTEM_CATEGORY_TRANSFER_IN,
+  SYSTEM_CATEGORY_TRANSFER_OUT,
+  categoriesService,
+  categoriesStore,
+} from './categories';
 import { $initialized } from './initialized';
 import type { Transaction, TransactionViewModel } from './interfaces';
-import { operationTagsStore } from './operationTags';
+import { operationTagsService, operationTagsStore } from './operationTags';
 import { BaseService } from './service';
 
 const logger = new Logger('OperationsService', { disabled: false });
 
 export class OperationsService extends BaseService<Transaction> {
-  private _operations: Readable<TransactionViewModel[]>;
+  private _operations = store<TransactionViewModel[]>([]);
+  private _errorToastShown = false;
 
   get $operations() {
     return this._operations;
@@ -25,28 +33,51 @@ export class OperationsService extends BaseService<Transaction> {
 
     accountsService.deleteAccountOperations = this.deleteTransactionsByAccount;
 
-    this._operations = derived(
+    derived(
       [this.$items, $initialized, accountsStore, categoriesStore, operationTagsStore],
       ([transactions, initialized, accounts, _categories, tags]) => {
-        if (!initialized) return [];
+        if (!initialized) return null;
 
         const categories = _categories.concat(SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT);
 
+        const warnings: Array<unknown> = [];
+
         function findAccount(id: string) {
           const account = accounts.find((account) => account.id === id);
-          if (!account) throw new Error(`Account ${id} not found`);
+          if (!account) {
+            const deletedAccount = accountsService.deletedItems.find((account) => account.id === id);
+            if (!deletedAccount) {
+              throw new Error(`Account ${id} not found`);
+            }
+            warnings.push(`Account "${deletedAccount.name}" ${id} is deleted`);
+            return deletedAccount;
+          }
           return account;
         }
 
         function findCategory(id: string) {
           const category = categories.find((category) => category.id === id);
-          if (!category) throw new Error(`Category ${id} not found`);
+          if (!category) {
+            const deletedCategory = categoriesService.deletedItems.find((category) => category.id === id);
+            if (!deletedCategory) {
+              throw new Error(`Category ${id} not found`);
+            }
+            warnings.push(`Category "${deletedCategory.name}" ${id} is deleted`);
+            return deletedCategory;
+          }
           return category;
         }
 
         function findTag(id: string) {
           const tag = tags.find((tag) => tag.id === id);
-          if (!tag) throw new Error(`Tag ${id} not found`);
+          if (!tag) {
+            const deletedTag = operationTagsService.deletedItems.find((tag) => tag.id === id);
+            if (!deletedTag) {
+              throw new Error(`Tag ${id} not found`);
+            }
+            warnings.push(`Tag "${deletedTag.name}" ${id} is deleted`);
+            return deletedTag;
+          }
           return tag;
         }
 
@@ -56,7 +87,9 @@ export class OperationsService extends BaseService<Transaction> {
 
         const items = transactions
           .map((transaction) => {
-            const linkedTransaction = transactions.find((t) => t.id === transaction.linkedTransactionId);
+            const linkedTransaction = transaction.linkedTransactionId
+              ? transactions.find((t) => t.id === transaction.linkedTransactionId)
+              : undefined;
 
             try {
               const viewModel: TransactionViewModel = {
@@ -80,14 +113,21 @@ export class OperationsService extends BaseService<Transaction> {
           })
           .filter((x) => x !== null);
 
-        if (problems.length) {
-          logger.error('Data load problems:', problems);
-          showErrorToast(`Data loaded with ${problems.length} problem(s)`);
+        const problemsCount = problems.length + warnings.length;
+        if (problemsCount) {
+          logger.error('Data load problems:', problems, warnings);
+          if (!this._errorToastShown) {
+            const $translate = get(translate);
+            showErrorToast($translate('common.data_problems', { values: { count: problemsCount } }));
+            this._errorToastShown = true;
+          }
         }
 
         return items;
       },
-    );
+    ).subscribe((items) => {
+      if (items) this._operations.set(items);
+    });
   }
 
   deleteTransactionsByAccount(accountId: string): void {

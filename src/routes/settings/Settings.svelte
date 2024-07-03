@@ -2,7 +2,7 @@
   import { version } from '$app/environment';
   import { goto } from '$app/navigation';
 
-  import { membersService, selectedMemberStore, settingsService } from '$lib/data';
+  import { membersService, selectedMemberStore, settingsService, memberSettingsStore } from '$lib/data';
   import { route, routes } from '$lib/routes';
   import { activeLocaleName, translate } from '$lib/translate';
   import LanguageModal from '$lib/translate/LanguageModal.svelte';
@@ -16,12 +16,16 @@
   import ListSwitchItem from '$lib/ui/list/ListSwitchItem.svelte';
   import { darkMode } from '$lib/ui/theme';
   import createBooleanStore from '$lib/utils/createBooleanStore';
+  import MainCurrencyModal from './currency-rates/MainCurrencyModal.svelte';
 
   // TODO: selectedMember is not a user, it can be a group
   $: selectedMember = $selectedMemberStore;
   $: userIsLoggedIn = selectedMember && !membersService.isGuest;
 
+  $: memberSettings = $memberSettingsStore;
+
   const [languageModalOpened, openLanguageModal] = createBooleanStore();
+  const [currencyModalOpened, openCurrencyModal] = createBooleanStore();
   const [changeNameModalOpened, openChangeNameModal] = createBooleanStore();
   const [changeLoginModalOpened, openChangeLoginModal] = createBooleanStore();
   const [changePasswordModalOpened, openChangePasswordModal] = createBooleanStore();
@@ -43,6 +47,11 @@
   <ListSelectItem title={$translate('settings.language')} value={$activeLocaleName} onClick={openLanguageModal} />
   <ListSwitchItem title={$translate('settings.darkMode')} bind:checked={$darkMode} />
   <ListLinkItem title={$translate('currency_rates.title')} href={route('settings.currency_rates')} />
+  <ListSelectItem
+    title={$translate('currency_rates.default_currency')}
+    value={memberSettings?.currency ?? ''}
+    onClick={openCurrencyModal}
+  />
 </ListGroup>
 
 <ListGroup title={$translate('settings.profile')}>
@@ -90,6 +99,7 @@
 </div>
 
 <LanguageModal bind:opened={$languageModalOpened} />
+<MainCurrencyModal bind:opened={$currencyModalOpened} />
 
 <Portal visible={showLogoutPortal}>
   <div class="logout-portal flex-col items-center justify-center h-full">

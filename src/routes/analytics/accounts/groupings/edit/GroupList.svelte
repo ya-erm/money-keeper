@@ -75,6 +75,8 @@
       backButton: {
         onClick: () => (groupIdForAddAccount = null),
       },
+      leftButton: null,
+      rightButton: null,
       title: $translate('transactions.select_account'),
     }}
   >

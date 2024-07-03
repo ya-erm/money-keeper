@@ -64,6 +64,8 @@
       backButton: {
         onClick: () => (selecting = false),
       },
+      leftButton: null,
+      rightButton: null,
       title: $translate('transactions.select_account'),
     }}
   >

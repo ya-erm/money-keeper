@@ -36,6 +36,8 @@ export const ruDict: Dictionary = {
   'common.count': '{count} шт.',
   'common.show': 'Показать',
   'common.hide': 'Скрыть',
+  'common.data_problems':
+    '{count, plural, one {Обнаружена # ошибка} few {Обнаружено # ошибки} other {Обнаружено # ошибок}} при инициализации данных',
   // Timezones
   'timezones.select_time_zone': 'Выберите часовой пояс',
   'timezones.current_time_zone': 'Текущий часовой пояс',
@@ -103,6 +105,10 @@ export const ruDict: Dictionary = {
   'accounts.select_color': 'Выбрать цвет',
   'accounts.tags': 'Теги',
   'accounts.sort': 'Сортировка счетов',
+  'accounts.archived_accounts': 'Архивные счета',
+  'accounts.archive': 'В архив',
+  'accounts.archived': 'В архиве',
+  'accounts.restore': 'Восстановить',
   // Analytics
   'analytics.title': 'Аналитика',
   'analytics.categories.start_date': 'Начало интервала',
@@ -199,6 +205,7 @@ export const ruDict: Dictionary = {
   'transactions.feature_operations': 'Будущие операции',
   'transactions.another_currency': 'Другая валюта',
   'transactions.same_currency': 'Та же валюта',
+  'transactions.show_more': 'Показать ещё',
   // Transactions import
   'transactions.import': 'Импорт',
   'transactions.import.title': 'Импорт операций',

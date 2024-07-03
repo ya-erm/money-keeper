@@ -5,7 +5,7 @@
   import Input from '$lib/ui/Input.svelte';
   import { useRightButton, useTitle } from '$lib/ui/header';
 
-  import EncryptionModal from './EncryptionModal.svelte';
+  import PasswordModal from './PasswordModal.svelte';
 
   useTitle($translate('auth.register.title'));
   useRightButton(LanguageButton);
@@ -28,7 +28,7 @@
   <a class="flex-center" href="/">{$translate('auth.continue_as_guest')}</a>
 </div>
 
-<EncryptionModal {login} bind:opened />
+<PasswordModal {login} bind:opened />
 
 <style>
   .content {

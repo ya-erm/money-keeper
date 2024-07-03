@@ -36,6 +36,7 @@ export const enDict: Dictionary = {
   'common.count': '{count} pcs.',
   'common.show': 'Show',
   'common.hide': 'Hide',
+  'common.data_problems': 'Data storage initialization finished with {count, plural, =1 {# error} other {# errors}}',
   // Timezones
   'timezones.select_time_zone': 'Select time zone',
   'timezones.current_time_zone': 'Current time zone',
@@ -103,6 +104,10 @@ export const enDict: Dictionary = {
   'accounts.select_color': 'Select color',
   'accounts.tags': 'Tags',
   'accounts.sort': 'Sort accounts',
+  'accounts.archived_accounts': 'Archived accounts',
+  'accounts.archive': 'Archive',
+  'accounts.archived': 'Archived',
+  'accounts.restore': 'Restore',
   // Analytics
   'analytics.title': 'Analytics',
   'analytics.categories.start_date': 'Start date',
@@ -214,6 +219,7 @@ export const enDict: Dictionary = {
   'transactions.import.select_category_for_all_operations': 'Select categories for all operations',
   'transactions.import.finish': 'Finish import',
   'transactions.import.finished': '{count, plural, one {# operation was imported} other {# operations were imported}}',
+  'transactions.show_more': 'Show more',
   // Import rules
   'transactions.import.rules.title': 'Rules of import',
   'transactions.import.rules.create': 'Create rule',
