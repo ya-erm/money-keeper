@@ -10,9 +10,7 @@
   import Input from '$lib/ui/Input.svelte';
   import Spoiler from '$lib/ui/Spoiler.svelte';
   import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
-  import { groupBySelector } from '$lib/utils';
-
-  import { calculateBalance, findCurrencyRate, pastOperationsPredicate } from '../utils';
+  import { calculateBalance, findCurrencyRate, groupBySelector, pastOperationsPredicate } from '$lib/utils';
 
   import { hideZeroBalanceAccounts } from './store';
 

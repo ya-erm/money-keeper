@@ -5,11 +5,10 @@
   import InputLabel from '$lib/ui/InputLabel.svelte';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
-  import { groupBySelector } from '$lib/utils';
+  import { calculateBalance, findCurrencyRate, groupBySelector } from '$lib/utils';
 
   import AccountList from '../../accounts/list/AccountList.svelte';
   import AccountListItem from '../../accounts/list/AccountListItem.svelte';
-  import { calculateBalance, findCurrencyRate } from '../../accounts/utils';
 
   export let name = 'accountId';
   export let testId: string = 'AccountSelect';

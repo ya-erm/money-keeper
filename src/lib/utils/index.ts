@@ -1,3 +1,4 @@
+export { calculateBalance } from './calculateBalance';
 export {
   checkArrayOptionalParameter,
   checkArrayParameter,
@@ -13,7 +14,15 @@ export {
 export { checkUserAndGroup, checkUserId } from './checkUser';
 export { deepEqual } from './deepEqual';
 export { filterNotEmpty } from './filterNotEmpty';
+export { findCurrencyRate } from './findCurrencyRate';
+export { findRate } from './findRate';
 export { formatMoney } from './formatMoney';
+export {
+  futureOperationsPredicate,
+  operationAfterDatePredicate,
+  operationBeforeDatePredicate,
+  pastOperationsPredicate,
+} from './futureOperations';
 export { deleteSearchParam, getNumberSearchParam, getSearchParam, setSearchParam } from './getSearchParam';
 export { getTimeZoneOffset, toShortTimezoneOffset } from './getTimeZoneOffset';
 export { groupByKey, groupByKeyToMap, groupBySelector, groupBySelectorToMap } from './groupBy';
