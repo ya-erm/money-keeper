@@ -12,13 +12,17 @@
     Title,
     Tooltip,
   } from 'chart.js';
-
-  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
-  import { groupBySelector } from '$lib/utils';
   import dayjs from 'dayjs';
 
+  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
+  import { useRightButton } from '$lib/ui/header';
+  import { groupBySelector } from '$lib/utils';
+
   import { calculateBalance, operationBeforeDatePredicate, pastOperationsPredicate } from '../../accounts/utils';
+  import AnalyticsButtons from '../AnalyticsButtons.svelte';
   import { findRate } from '../utils/findRate';
+
+  useRightButton(AnalyticsButtons);
 
   Chart.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler);
 
@@ -103,27 +107,39 @@
   }
 </script>
 
-<Line
-  options={{
-    scales: {
-      y: { stacked: true },
-    },
-    elements: {
-      line: { tension: 0.1 },
-    },
-    interaction: {
-      intersect: false,
-    },
-  }}
-  data={{
-    labels: items.map((x) => dayjs(x.date).format('DD.MM')),
-    datasets: accounts.reverse().map((account) => ({
-      label: account.name,
-      data: items.map((item) => item.accountBalance[account.id].ratedBalance),
-      backgroundColor: account.color,
-      fill: true,
-      pointRadius: 0,
-      // hidden: true,
-    })),
-  }}
-/>
+<div class="chart-container">
+  <Line
+    options={{
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { stacked: true },
+      },
+      elements: {
+        line: { tension: 0.1 },
+      },
+      interaction: {
+        intersect: false,
+      },
+    }}
+    data={{
+      labels: items.map((x) => dayjs(x.date).format('DD.MM')),
+      datasets: accounts.reverse().map((account) => ({
+        label: account.name,
+        data: items.map((item) => item.accountBalance[account.id].ratedBalance),
+        backgroundColor: account.color,
+        fill: true,
+        pointRadius: 0,
+        // hidden: true,
+      })),
+    }}
+  />
+</div>
+
+<style>
+  .chart-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
+</style>
