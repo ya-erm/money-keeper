@@ -18,7 +18,7 @@
   data-testId={testId}
   data-id={dataId}
   disabled={!onClick}
-  class="grid-item flex-col flex-center gap-0.5"
+  class="grid-item w-full flex-col flex-center gap-0.5"
   type="button"
 >
   <div class="circle">
@@ -56,10 +56,10 @@
   }
   .grid-item .text {
     font-size: 0.8rem;
-    max-width: 5rem;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    max-width: calc(100% + 0.5rem);
   }
   .grid-item.dashed .text {
     color: var(--active-color);

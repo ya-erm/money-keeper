@@ -154,6 +154,7 @@ export const enDict: Dictionary = {
   'categories.delete_category_success': 'Category was deleted',
   'categories.name': 'Name',
   'categories.icon': 'Icon',
+  'categories.more': 'More',
   // Categories list
   'categories.list.Alcohol': 'Alcohol',
   'categories.list.Bank': 'Bank',
