@@ -22,7 +22,9 @@
   type="button"
 >
   <div class="circle">
-    <Icon name={icon} size={2} />
+    <div class="circle-icon">
+      <Icon name={icon} size={2} />
+    </div>
   </div>
   {#if text}
     <span class="text" title={text}>
@@ -73,6 +75,9 @@
     width: 4rem;
     height: 4rem;
     background: var(--header-background-color);
+  }
+  .circle-icon {
+    pointer-events: none;
   }
   .grid-item.dashed .circle {
     border-style: dashed;

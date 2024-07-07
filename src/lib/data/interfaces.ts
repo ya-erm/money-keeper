@@ -27,6 +27,8 @@ export type MemberSettings = {
   currency?: string | null;
   encryption?: EncryptionVersion;
   accountsOrder?: string[];
+  categoriesInOrder?: string[];
+  categoriesOutOrder?: string[];
   lastAnotherCurrency?: string | null;
   favoriteTimeZones?: string[];
   groupingId?: string | null;
@@ -45,6 +47,8 @@ export type JournalOperation = {
   currencyRate?: CurrencyRate;
   tag?: Tag;
   accountsOrder?: string[];
+  categoriesInOrder?: string[];
+  categoriesOutOrder?: string[];
   grouping?: Grouping;
 };
 
