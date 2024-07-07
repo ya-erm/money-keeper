@@ -19,7 +19,7 @@
       on:click={handleClick(option)}
       class:active={selected?.id === option.id}
       data-testId={`${testId}.Button.${option.id}`}
-      class="switch-item"
+      class="switch-item text-ellipsis"
       type="button"
       {disabled}
     >
@@ -33,6 +33,7 @@
     display: flex;
     margin: 0 auto;
     border-radius: 1rem;
+    max-width: 100%;
   }
   .switch-item {
     border: 0;

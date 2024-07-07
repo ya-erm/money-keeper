@@ -201,6 +201,7 @@ export const ruDict: Dictionary = {
   'categories.list.Transport': 'Транспорт',
   // Icons
   'icons.title': 'Значки',
+  'icons.select_icon': 'Выберите значок',
   'icons.recommended': 'Рекомендуемые',
   'icons.custom': 'Пользовательский',
   // Groups

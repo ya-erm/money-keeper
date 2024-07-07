@@ -3,7 +3,7 @@
   import { v4 as uuid } from 'uuid';
 
   import { page } from '$app/stores';
-  import { memberSettingsStore, membersService, operationTagsService } from '$lib/data';
+  import { memberSettingsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
@@ -11,7 +11,6 @@
   import Input from '$lib/ui/Input.svelte';
   import InputLabel from '$lib/ui/InputLabel.svelte';
   import Layout from '$lib/ui/Layout.svelte';
-  import Modal from '$lib/ui/Modal.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
   import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
@@ -25,6 +24,7 @@
   import TimeZoneList from '$lib/widgets/TimeZoneList.svelte';
 
   import AccountSelector from './AccountSelector.svelte';
+  import AnotherCurrencyModal from './AnotherCurrencyModal.svelte';
   import CategorySelect from './CategorySelect.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
 
@@ -197,7 +197,7 @@
         <Button appearance="link" underlined={false} on:click={() => (timeZoneListVisible = true)}>
           {#if timeZone}
             <div class="flex gap-0.25">
-              <span class="time-zone">{timeZone}</span>
+              <span class="time-zone text-ellipsis">{timeZone}</span>
               <span class="time-shift">(GMT{timeZoneShift})</span>
             </div>
           {:else}
@@ -303,33 +303,7 @@
   </div>
 </form>
 
-<Modal opened={anotherCurrencyModalOpened}>
-  <form
-    class="flex-col gap-1"
-    on:submit|preventDefault={async (e) => {
-      anotherCurrency = new FormData(e.currentTarget).get('another-currency')?.toString() ?? null;
-      if (anotherCurrency !== settings?.lastAnotherCurrency) {
-        await membersService.updateSettings({ lastAnotherCurrency: anotherCurrency });
-      }
-      anotherCurrencyModalOpened = false;
-    }}
-  >
-    <Input
-      label={$translate('transactions.another_currency')}
-      value={anotherCurrency}
-      name="another-currency"
-      clearable
-    />
-    <div class="grid-col-2 gap-1">
-      <Button
-        color="secondary"
-        text={$translate('common.cancel')}
-        on:click={() => (anotherCurrencyModalOpened = false)}
-      />
-      <Button text={$translate('common.save')} color="primary" type="submit" />
-    </div>
-  </form>
-</Modal>
+<AnotherCurrencyModal bind:opened={anotherCurrencyModalOpened} bind:anotherCurrency />
 
 <Portal visible={timeZoneListVisible}>
   <Layout
@@ -366,12 +340,6 @@
   }
   .time-zone {
     flex-shrink: 1;
-    text-align: left;
-    display: -webkit-box;
-    text-overflow: ellipsis;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-    overflow: hidden;
   }
   .time-shift {
     flex-shrink: 0;

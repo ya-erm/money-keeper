@@ -196,6 +196,7 @@ export type Messages =
   | 'categories.list.Transport'
   // Icons
   | 'icons.title'
+  | 'icons.select_icon'
   | 'icons.recommended'
   | 'icons.custom'
   // Groups

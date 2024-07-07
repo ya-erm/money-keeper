@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import { v4 as uuid } from 'uuid';
 
   import type { Category, CategoryType } from '$lib/data/interfaces';
@@ -10,6 +11,7 @@
   import Modal from '$lib/ui/Modal.svelte';
   import MultiSwitch from '$lib/ui/MultiSwitch.svelte';
   import Portal from '$lib/ui/Portal.svelte';
+  import { deleteSearchParam, getSearchParam, setSearchParam } from '$lib/utils';
 
   import CategoryIcons from './CategoryIcons.svelte';
   import { categoryDataList, type CategorySuggestionMessage } from './datalist';
@@ -60,15 +62,24 @@
     categoryType = id as CategoryType;
   };
 
-  let iconSelecting = false;
+  $: iconSelectingParam = getSearchParam($page, 'iconSelecting');
+  $: iconSelecting = iconSelectingParam === 'true';
+  $: if (iconSelectingParam === 'true') {
+    iconSelecting = true;
+  }
+  $: if (!!iconSelectingParam && !iconSelecting) {
+    void deleteSearchParam($page, 'iconSelecting');
+  }
+  const openIconSelecting = async () => {
+    await setSearchParam($page, 'iconSelecting', 'true', { replace: false });
+  };
+  const closeIconSelecting = async () => {
+    history.back();
+    await deleteSearchParam($page, 'iconSelecting');
+  };
 </script>
 
-<Modal
-  width={20}
-  header={category?.name ?? $translate('categories.new_category')}
-  opened={opened && !iconSelecting}
-  on:close={() => (opened = false)}
->
+<Modal width={20} header={category?.name ?? $translate('categories.new_category')} bind:opened>
   <form class="flex-col gap-1 items-center" on:submit|preventDefault={handleSave}>
     <MultiSwitch {options} selected={selectedOption} onChange={handleChangeType} />
     <div class="w-full flex gap-1 items-center">
@@ -80,8 +91,13 @@
         required
         v2
       />
+      <datalist id="categories">
+        {#each suggestions as option}
+          <option value={$translate(option)} />
+        {/each}
+      </datalist>
       <div class="flex-col gap-0.5">
-        <GridCircleItem icon={icon || suggestedIcon || 'mdi:folder-outline'} onClick={() => (iconSelecting = true)} />
+        <GridCircleItem icon={icon || suggestedIcon || 'mdi:folder-outline'} onClick={openIconSelecting} />
       </div>
     </div>
     <div class="w-full grid-col-2 gap-1">
@@ -93,31 +109,25 @@
       <Button text={$translate('common.save')} type="submit" />
     </div>
   </form>
-</Modal>
 
-<Portal visible={iconSelecting}>
-  <Layout
-    header={{
-      backButton: {
-        onClick: () => (iconSelecting = false),
-      },
-      leftButton: null,
-      rightButton: null,
-      title: $translate('categories.icon'),
-    }}
-  >
-    <CategoryIcons
-      icon={icon ?? null}
-      onSelect={(value) => {
-        iconSelecting = false;
-        icon = value;
+  <Portal visible={iconSelecting}>
+    <Layout
+      header={{
+        backButton: {
+          onClick: closeIconSelecting,
+        },
+        leftButton: null,
+        rightButton: null,
+        title: $translate('icons.select_icon'),
       }}
-    />
-  </Layout>
-</Portal>
-
-<datalist id="categories">
-  {#each suggestions as option}
-    <option value={$translate(option)} />
-  {/each}
-</datalist>
+    >
+      <CategoryIcons
+        icon={icon ?? null}
+        onSelect={(value) => {
+          void closeIconSelecting();
+          icon = value;
+        }}
+      />
+    </Layout>
+  </Portal>
+</Modal>

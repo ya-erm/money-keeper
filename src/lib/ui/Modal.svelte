@@ -66,8 +66,8 @@
     background: rgba(0, 0, 0, 0.7);
   }
   .modal {
-    max-width: calc(100vw - 4rem);
-    max-height: calc(100vh - 4rem);
+    max-width: calc(100vw - 2rem);
+    max-height: calc(100vh - 2rem);
     border-radius: 1.5em;
     background: var(--header-background-color);
     border: 1px solid var(--border-color);

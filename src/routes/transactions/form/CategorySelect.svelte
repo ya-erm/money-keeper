@@ -4,6 +4,7 @@
   import { translate } from '$lib/translate';
   import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
   import InputLabel from '$lib/ui/InputLabel.svelte';
+  import ModalContainer from '$lib/ui/ModalContainer.svelte';
 
   import CategoryModal from '../../categories/CategoryModal.svelte';
 
@@ -57,8 +58,10 @@
   </div>
 </div>
 
-{#if !!type}
-  <CategoryModal bind:opened={createCategoryModalOpened} categoryType={type} onSave={handleSave} />
+{#if !!type && createCategoryModalOpened}
+  <ModalContainer>
+    <CategoryModal bind:opened={createCategoryModalOpened} categoryType={type} onSave={handleSave} />
+  </ModalContainer>
 {/if}
 
 <style>

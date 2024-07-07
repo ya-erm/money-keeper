@@ -200,6 +200,7 @@ export const enDict: Dictionary = {
   'categories.list.Transport': 'Transport',
   // Icons
   'icons.title': 'Icons',
+  'icons.select_icon': 'Select icon',
   'icons.recommended': 'Recommended',
   'icons.custom': 'Custom',
   // Groups

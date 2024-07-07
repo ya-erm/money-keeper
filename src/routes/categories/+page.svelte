@@ -4,6 +4,7 @@
   import type { Category } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import { useRightButton, useTitle } from '$lib/ui/header';
+  import ModalContainer from '$lib/ui/ModalContainer.svelte';
   import { deleteSearchParam, getSearchParam } from '$lib/utils';
 
   import AddCategoryButton from './AddCategoryButton.svelte';
@@ -53,7 +54,9 @@
 <CategoryList items={outgoings} onClick={handleClick} />
 
 {#if opened}
-  <CategoryModal bind:opened {category} {onSave} {onDelete} />
+  <ModalContainer>
+    <CategoryModal bind:opened {category} {onSave} {onDelete} />
+  </ModalContainer>
 {/if}
 
 <style>

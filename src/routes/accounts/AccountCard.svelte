@@ -25,7 +25,7 @@
       <Icon name={account.icon || 'mdi:briefcase-outline'} padding={0.5} />
     </div>
     <div class="flex-grow">
-      <div data-testId="AccountName">
+      <div class="text-ellipsis-all" data-testId="AccountName">
         {#if account.archived}
           <span class="archived" title={$translate('accounts.archived')}>
             <Icon name="ri:archive-line" size={1} />
