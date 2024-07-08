@@ -48,6 +48,19 @@ a {
   display: none;
 }
 
+.text-ellipsis,
+.text-ellipsis-all {
+  text-align: left;
+  display: -webkit-box;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+.text-ellipsis-all {
+  word-break: break-all;
+}
+
 /* Position */
 
 .relative {

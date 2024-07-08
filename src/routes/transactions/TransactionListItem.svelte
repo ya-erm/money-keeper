@@ -51,7 +51,7 @@
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />
     </div>
     <div class="text flex-col flex-grow items-start">
-      <div class="flex items-center header">
+      <div class="header flex items-center">
         {#if isTransfer}
           <span class="source" class:deleted={source.deleted}>{source.name}</span>
           <Icon name="mdi:chevron-right" size={1.25} />

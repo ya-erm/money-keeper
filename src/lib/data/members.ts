@@ -122,11 +122,20 @@ export class MembersService implements Initialisable, JournalSubscriber {
     void this.updateSettingsInMemory({ accountsOrder });
   }
 
+  /** Save categories order */
+  savCategoriesOrder(categoriesInOrder: string[], categoriesOutOrder: string[]) {
+    void journalService.addOperationToQueue({ categoriesInOrder, categoriesOutOrder });
+    void this.updateSettingsInMemory({ categoriesInOrder, categoriesOutOrder });
+  }
+
   /** Apply journal updates and optional save to DB */
   async applyChanges(changes: JournalItem[], saveToDB: boolean) {
     const accountsOrder = changes.findLast((item) => item.data.accountsOrder);
-    if (accountsOrder) {
-      await this.updateSettings({ accountsOrder: accountsOrder.data.accountsOrder }, saveToDB);
+    const categoriesInOrder = changes.findLast((item) => item.data.categoriesInOrder);
+    const categoriesOutOrder = changes.findLast((item) => item.data.categoriesOutOrder);
+    const mergedSettings = { ...accountsOrder?.data, ...categoriesInOrder?.data, ...categoriesOutOrder?.data };
+    if (Object.keys(mergedSettings).length > 0) {
+      await this.updateSettings({ ...mergedSettings }, saveToDB);
     }
   }
 

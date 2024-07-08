@@ -8,12 +8,10 @@
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
-  import { getSearchParam, setSearchParam } from '$lib/utils';
+  import { findCurrencyRate, getSearchParam, setSearchParam } from '$lib/utils';
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
   import EditTransaction from '../transactions/edit/EditTransaction.svelte';
-
-  import { findCurrencyRate } from './utils';
 
   $: currencyRates = $currencyRatesStore;
   $: settings = $memberSettingsStore;

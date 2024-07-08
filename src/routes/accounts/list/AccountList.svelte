@@ -10,9 +10,7 @@
   import Input from '$lib/ui/Input.svelte';
   import Spoiler from '$lib/ui/Spoiler.svelte';
   import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
-  import { groupBySelector } from '$lib/utils';
-
-  import { calculateBalance, findCurrencyRate, pastOperationsPredicate } from '../utils';
+  import { calculateBalance, findCurrencyRate, groupBySelector, pastOperationsPredicate } from '$lib/utils';
 
   import { hideZeroBalanceAccounts } from './store';
 
@@ -141,11 +139,11 @@
 
   {#if archivedAccounts.length > 0}
     <Spoiler hidden={archivedHidden}>
-      <div class="mt-1 px-1" slot="spoiler-header">
+      <div slot="spoiler-header" class="mt-1 px-1">
         <SpoilerToggle bind:hidden={archivedHidden}>
           <div class="ml-0.5 flex items-center gap-0.5">
             <Icon name="ri:archive-line" size={1.5} />
-            <span>{$translate('accounts.archived_accounts')}</span>
+            <span class="text-ellipsis-all">{$translate('accounts.archived_accounts')}</span>
           </div>
         </SpoilerToggle>
       </div>

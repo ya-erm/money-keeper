@@ -38,9 +38,9 @@
       <Icon name={account.icon ?? 'mdi:credit-card-outline'} padding={0.5} />
     </div>
     <div class="flex-col items-start gap-0.25">
-      <div class="account-name text-ellipsis">{account.name}</div>
+      <div class="account-name text-ellipsis-all">{account.name}</div>
       {#if account.tags.length > 0}
-        <div class="account-tags text-ellipsis">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
+        <div class="account-tags text-ellipsis-all">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
       {/if}
     </div>
   </div>
@@ -94,14 +94,6 @@
   .account-icon {
     border-radius: 100%;
     background-color: var(--background-color);
-  }
-  .text-ellipsis {
-    text-align: left;
-    display: -webkit-box;
-    text-overflow: ellipsis;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-    overflow: hidden;
   }
   .account-name {
     font-size: 1rem;

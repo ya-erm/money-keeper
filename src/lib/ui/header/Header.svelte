@@ -90,6 +90,8 @@
     font-weight: normal;
     text-align: center;
     font-size: 1.25rem;
+    background: var(--header-background-color);
+    z-index: 1;
   }
   .beta {
     color: var(--red-color);

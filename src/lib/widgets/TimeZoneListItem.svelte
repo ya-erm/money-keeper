@@ -19,8 +19,8 @@
     use:longPress={() => onLongClick?.(timezone.tzCode)}
   >
     <div class="flex-col gap-0.25 items-start flex-grow">
-      <span class="name text-ellipsis">{timezone.tzCode}</span>
-      <span class="description text-ellipsis">{timezone.name}</span>
+      <span class="name text-ellipsis-all">{timezone.tzCode}</span>
+      <span class="description text-ellipsis-all">{timezone.name}</span>
     </div>
     <span class="utc">
       GMT{timezone.utc}
@@ -44,15 +44,6 @@
     button:hover {
       background: var(--hover-background-color);
     }
-  }
-  .text-ellipsis {
-    text-align: left;
-    display: -webkit-box;
-    word-break: break-all;
-    text-overflow: ellipsis;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-    overflow: hidden;
   }
   .name {
     font-weight: 500;

@@ -7,9 +7,9 @@
   import ShowMoreContainer from '$lib/ui/ShowMoreContainer.svelte';
   import Spoiler from '$lib/ui/Spoiler.svelte';
   import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
+  import { futureOperationsPredicate, pastOperationsPredicate } from '$lib/utils';
 
   import GroupedOperationsList from './GroupedOperationsList.svelte';
-  import { futureOperationsPredicate, pastOperationsPredicate } from './utils';
 
   export let account: Account | null = null;
 

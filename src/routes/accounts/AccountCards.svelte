@@ -7,10 +7,15 @@
   import type { AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
-  import { getSearchParam, groupBySelector } from '$lib/utils';
+  import {
+    calculateBalance,
+    findCurrencyRate,
+    getSearchParam,
+    groupBySelector,
+    pastOperationsPredicate,
+  } from '$lib/utils';
 
   import AccountCard from './AccountCard.svelte';
-  import { calculateBalance, findCurrencyRate, pastOperationsPredicate } from './utils';
 
   export let onEdit: (account: AccountViewModel) => void;
 

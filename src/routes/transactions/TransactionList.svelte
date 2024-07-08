@@ -9,9 +9,8 @@
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import ShowMoreContainer from '$lib/ui/ShowMoreContainer.svelte';
-  import { getSearchParam, setSearchParam } from '$lib/utils';
+  import { findCurrencyRate, getSearchParam, setSearchParam } from '$lib/utils';
 
-  import { findCurrencyRate } from '../accounts/utils';
   import TransactionListItem from './TransactionListItem.svelte';
   import EditTransaction from './edit/EditTransaction.svelte';
 

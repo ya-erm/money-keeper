@@ -1,7 +1,7 @@
 import { currencyRatesService } from '$lib/data';
 import type { CurrencyRate } from '$lib/data/interfaces';
+import { findCurrencyRate } from '$lib/utils';
 import { Logger } from '$lib/utils/logger';
-import { findCurrencyRate } from '../../accounts/utils';
 
 const logger = new Logger('findRate');
 
