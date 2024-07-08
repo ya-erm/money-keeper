@@ -155,6 +155,7 @@ export const ruDict: Dictionary = {
   'categories.delete_category_success': 'Категория удалена',
   'categories.name': 'Название',
   'categories.icon': 'Значок',
+  'categories.more': 'Ещё',
   // Categories list
   'categories.list.Alcohol': 'Алкоголь',
   'categories.list.Bank': 'Банк',

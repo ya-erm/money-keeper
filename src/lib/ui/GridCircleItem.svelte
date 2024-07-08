@@ -18,11 +18,13 @@
   data-testId={testId}
   data-id={dataId}
   disabled={!onClick}
-  class="grid-item flex-col flex-center gap-0.5"
+  class="grid-item w-full flex-col flex-center gap-0.5"
   type="button"
 >
   <div class="circle">
-    <Icon name={icon} size={2} />
+    <div class="circle-icon">
+      <Icon name={icon} size={2} />
+    </div>
   </div>
   {#if text}
     <span class="text" title={text}>
@@ -54,10 +56,10 @@
   }
   .grid-item .text {
     font-size: 0.8rem;
-    max-width: 5rem;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    max-width: calc(100% + 0.5rem);
   }
   .grid-item.dashed .text {
     color: var(--active-color);
@@ -73,6 +75,9 @@
     width: 4rem;
     height: 4rem;
     background: var(--header-background-color);
+  }
+  .circle-icon {
+    pointer-events: none;
   }
   .grid-item.dashed .circle {
     border-style: dashed;

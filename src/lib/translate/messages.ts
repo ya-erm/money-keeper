@@ -150,6 +150,7 @@ export type Messages =
   | 'categories.delete_category_success'
   | 'categories.name'
   | 'categories.icon'
+  | 'categories.more'
   // Categories list
   | 'categories.list.Alcohol'
   | 'categories.list.Bank'
