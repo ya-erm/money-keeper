@@ -27,6 +27,10 @@
   import AnotherCurrencyModal from './AnotherCurrencyModal.svelte';
   import CategorySelect from './CategorySelect.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
+  import HeaderButton from '$lib/ui/header/HeaderButton.svelte';
+  import BlocksOrderModal from './BlocksOrderModal.svelte';
+  import { amountInputAutofocus, blocksOrder } from './blocksOrderStore';
+  import { onMount } from 'svelte';
 
   $: settings = $memberSettingsStore;
 
@@ -150,156 +154,193 @@
       handleError(e);
     }
   };
+
+  let blocksOrderModalOpened = false;
+
+  onMount(() => {
+    if (!inputRef?.value && $amountInputAutofocus) {
+      inputRef?.focus({ preventScroll: true });
+    }
+  });
 </script>
 
 <form on:submit|preventDefault={handleSubmit} data-testId="TransactionForm">
-  <div class="flex-col gap-1 p-1">
-    <TypeSwitch bind:type disabled={isTransfer} />
-    {#if type === 'OUT'}
-      <AccountSelector bind:accountId bind:selecting={selectingAccount} testId="SourceAccountSelect" />
-    {/if}
-    {#if type === 'TRANSFER'}
-      <AccountSelector
-        bind:accountId
-        bind:selecting={selectingAccount}
-        label={$translate('transactions.from')}
-        testId="SourceAccountSelect"
-      />
-      <AccountSelector
-        name="destinationAccountId"
-        bind:accountId={destinationAccountId}
-        bind:selecting={selectingDestinationAccount}
-        label={$translate('transactions.to')}
-        testId="DestinationAccountSelect"
-      />
-    {/if}
-    {#if type === 'IN' || type === 'OUT'}
-      <CategorySelect
-        {type}
-        bind:categoryId
-        categories={categories.filter((c) => c.type === type)}
-        onChange={() => {
-          if (!inputRef?.value) {
-            inputRef?.focus({ preventScroll: true });
-            inputRef?.scrollIntoView({ behavior: 'smooth' });
-          }
-        }}
-      />
-    {/if}
-    {#if type === 'IN'}
-      <AccountSelector bind:accountId bind:selecting={selectingAccount} testId="DestinationAccountSelect" />
-    {/if}
-    <div class="flex-col gap-0.5">
-      <div class="flex gap-1 justify-between">
-        <span class="flex-shrink-0">
-          <InputLabel text={$translate('transactions.dateTime')} />
-        </span>
-        <Button appearance="link" underlined={false} on:click={() => (timeZoneListVisible = true)}>
-          {#if timeZone}
-            <div class="flex gap-0.25">
-              <span class="time-zone text-ellipsis">{timeZone}</span>
-              <span class="time-shift">(GMT{timeZoneShift})</span>
-            </div>
-          {:else}
-            {$translate('timezones.select_time_zone')}
-          {/if}
-        </Button>
-      </div>
-      <div class="flex gap-1">
-        <Input name="date" type="date" bind:value={date} required />
-        <Input name="time" type="time" bind:value={time} required />
-      </div>
-      <input name="datetime" value={datetime} class="hidden" readonly />
+  <div class="grid gap-1 p-1">
+    <div class="flex-col" style={`grid-area: ${$blocksOrder.switch}`}>
+      <TypeSwitch bind:type disabled={isTransfer} />
     </div>
-    <div class="flex-col gap-0.5">
-      <div class="flex justify-between">
-        <InputLabel text={$translate('transactions.amount')} />
-        {#if type !== 'TRANSFER'}
-          {#if !anotherCurrency}
-            <Button
-              appearance="link"
-              underlined={false}
-              on:click={() => {
-                anotherCurrencyModalOpened = true;
-                anotherCurrency = settings?.lastAnotherCurrency ?? null;
-              }}
-            >
-              {$translate('transactions.another_currency')}
-            </Button>
-          {:else}
-            <Button appearance="link" underlined={false} on:click={() => (anotherCurrency = null)}>
-              {$translate('transactions.same_currency')}
-            </Button>
-          {/if}
-        {/if}
+
+    {#if type === 'OUT'}
+      <div style={`grid-area: ${$blocksOrder.sourceAccount}`}>
+        <AccountSelector bind:accountId bind:selecting={selectingAccount} testId="SourceAccountSelect" />
       </div>
-      <div class="flex gap-1">
-        <Input
-          type="number"
-          name="amount"
-          inputmode="decimal"
-          bind:ref={inputRef}
-          bind:value={_value1}
-          onChange={(value) => {
-            if (type === 'TRANSFER' && accountCurrency === destinationAccountCurrency && !destinationAmountTouched) {
-              _value2 = value;
+    {/if}
+
+    {#if type === 'TRANSFER'}
+      <div style={`grid-area: ${$blocksOrder.transferAccounts}`}>
+        <AccountSelector
+          bind:accountId
+          bind:selecting={selectingAccount}
+          label={$translate('transactions.from')}
+          testId="SourceAccountSelect"
+        />
+        <AccountSelector
+          name="destinationAccountId"
+          bind:accountId={destinationAccountId}
+          bind:selecting={selectingDestinationAccount}
+          label={$translate('transactions.to')}
+          testId="DestinationAccountSelect"
+        />
+      </div>
+    {/if}
+
+    {#if type === 'IN' || type === 'OUT'}
+      <div style={`grid-area: ${$blocksOrder.category}`}>
+        <CategorySelect
+          {type}
+          bind:categoryId
+          categories={categories.filter((c) => c.type === type)}
+          onChange={() => {
+            if (!inputRef?.value) {
+              inputRef?.focus({ preventScroll: true });
+              inputRef?.scrollIntoView({ behavior: 'smooth' });
             }
           }}
-          endText={accountCurrency}
-          required
         />
-        {#if type === 'TRANSFER' || !!anotherCurrency}
+      </div>
+    {/if}
+
+    {#if type === 'IN'}
+      <div style={`grid-area: ${$blocksOrder.destinationAccount}`}>
+        <AccountSelector bind:accountId bind:selecting={selectingAccount} testId="DestinationAccountSelect" />
+      </div>
+    {/if}
+
+    <div style={`grid-area: ${$blocksOrder.dateTime}`}>
+      <div class="flex-col gap-0.5">
+        <div class="flex gap-1 justify-between">
+          <span class="flex-shrink-0">
+            <InputLabel text={$translate('transactions.dateTime')} />
+          </span>
+          <Button appearance="link" underlined={false} on:click={() => (timeZoneListVisible = true)}>
+            {#if timeZone}
+              <div class="flex gap-0.25">
+                <span class="time-zone text-ellipsis">{timeZone}</span>
+                <span class="time-shift">(GMT{timeZoneShift})</span>
+              </div>
+            {:else}
+              {$translate('timezones.select_time_zone')}
+            {/if}
+          </Button>
+        </div>
+        <div class="flex gap-1">
+          <Input name="date" type="date" bind:value={date} required />
+          <Input name="time" type="time" bind:value={time} required />
+        </div>
+        <input name="datetime" value={datetime} class="hidden" readonly />
+      </div>
+    </div>
+
+    <div style={`grid-area: ${$blocksOrder.amount}`}>
+      <div class="flex-col gap-0.5">
+        <div class="flex justify-between">
+          <InputLabel text={$translate('transactions.amount')} />
+          {#if type !== 'TRANSFER'}
+            {#if !anotherCurrency}
+              <Button
+                appearance="link"
+                underlined={false}
+                on:click={() => {
+                  anotherCurrencyModalOpened = true;
+                  anotherCurrency = settings?.lastAnotherCurrency ?? null;
+                }}
+              >
+                {$translate('transactions.another_currency')}
+              </Button>
+            {:else}
+              <Button appearance="link" underlined={false} on:click={() => (anotherCurrency = null)}>
+                {$translate('transactions.same_currency')}
+              </Button>
+            {/if}
+          {/if}
+        </div>
+        <div class="flex gap-1">
           <Input
             type="number"
-            name="destinationAmount"
+            name="amount"
             inputmode="decimal"
-            bind:value={_value2}
-            endText={destinationAccountCurrency || anotherCurrency}
+            bind:ref={inputRef}
+            bind:value={_value1}
             onChange={(value) => {
-              destinationAmountTouched = !!value;
+              if (type === 'TRANSFER' && accountCurrency === destinationAccountCurrency && !destinationAmountTouched) {
+                _value2 = value;
+              }
             }}
+            endText={accountCurrency}
             required
           />
+          {#if type === 'TRANSFER' || !!anotherCurrency}
+            <Input
+              type="number"
+              name="destinationAmount"
+              inputmode="decimal"
+              bind:value={_value2}
+              endText={destinationAccountCurrency || anotherCurrency}
+              onChange={(value) => {
+                destinationAmountTouched = !!value;
+              }}
+              required
+            />
+          {/if}
+        </div>
+        {#if (type === 'TRANSFER' || !!anotherCurrency) && Number(_value1) && Number(_value2)}
+          <div class="currency-rate-info">
+            {`1 ${accountCurrency} = ${formatMoney(1 / _rate, {
+              maxPrecision: 4,
+              currency: destinationAccountCurrency || (anotherCurrency ?? undefined),
+            })}`}
+            {`(1 ${destinationAccountCurrency || anotherCurrency} = ${formatMoney(_rate, {
+              maxPrecision: 4,
+              currency: accountCurrency,
+            })})`}
+          </div>
         {/if}
       </div>
-      {#if (type === 'TRANSFER' || !!anotherCurrency) && Number(_value1) && Number(_value2)}
-        <div class="currency-rate-info">
-          {`1 ${accountCurrency} = ${formatMoney(1 / _rate, {
-            maxPrecision: 4,
-            currency: destinationAccountCurrency || (anotherCurrency ?? undefined),
-          })}`}
-          {`(1 ${destinationAccountCurrency || anotherCurrency} = ${formatMoney(_rate, {
-            maxPrecision: 4,
-            currency: accountCurrency,
-          })})`}
+    </div>
+
+    <div style={`grid-area: ${$blocksOrder.comment}`}>
+      <Input
+        label={$translate('transactions.comment')}
+        name="comment"
+        value={transaction?.comment}
+        onChange={(value) => (comment = value)}
+        optional
+      />
+      {#if comment && replaceCalcExpressions(comment) !== comment}
+        <div class="comment-preview">
+          {replaceCalcExpressions(comment)}
         </div>
       {/if}
     </div>
-    <Input
-      label={$translate('transactions.comment')}
-      name="comment"
-      value={transaction?.comment}
-      onChange={(value) => (comment = value)}
-      optional
-    />
-    {#if comment && replaceCalcExpressions(comment) !== comment}
-      <div class="comment-preview">
-        {replaceCalcExpressions(comment)}
+
+    <div style={`grid-area: ${$blocksOrder.tags}`}>
+      <div class="flex-col gap-0.5">
+        <InputLabel text={$translate('transactions.tags')} optional />
+        <TagsList
+          bind:tags
+          bind:selectedTags
+          onAdd={(t) => operationTagsService.save(t)}
+          onEdit={(t) => operationTagsService.save(t)}
+          onDelete={(t) => operationTagsService.delete(t)}
+        />
       </div>
-    {/if}
-    <div class="flex-col gap-0.5">
-      <InputLabel text={$translate('transactions.tags')} optional />
-      <TagsList
-        bind:tags
-        bind:selectedTags
-        onAdd={(t) => operationTagsService.save(t)}
-        onEdit={(t) => operationTagsService.save(t)}
-        onDelete={(t) => operationTagsService.delete(t)}
-      />
     </div>
-    <slot />
-    <slot name="button" />
-    <slot name="footer" />
+
+    <div class="flex-col" style={`grid-area: ${$blocksOrder.save}`}>
+      <slot />
+      <slot name="button" />
+      <slot name="footer" />
+    </div>
   </div>
 </form>
 
@@ -326,6 +367,12 @@
   </Layout>
 </Portal>
 
+<div class="menu-button">
+  <HeaderButton icon="mdi:dots-horizontal" onClick={() => (blocksOrderModalOpened = true)} href="" label="options" />
+</div>
+
+<BlocksOrderModal bind:opened={blocksOrderModalOpened} />
+
 <style>
   .currency-rate-info {
     font-size: 0.9rem;
@@ -344,5 +391,15 @@
   .time-shift {
     flex-shrink: 0;
     font-size: 0.9rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 100%;
+  }
+  .menu-button {
+    position: fixed;
+    top: 0;
+    right: 0;
   }
 </style>
