@@ -65,9 +65,21 @@
 
   let legendVisible = false;
 
+  $: selectedAccounts = accounts.map((account) => account.id);
+
+  const handleAccountCheckedChange = (id: 'all' | string, checked: boolean) => {
+    if (id === 'all') {
+      selectedAccounts = checked ? accounts.map((account) => account.id) : [];
+      return;
+    }
+    selectedAccounts = checked ? selectedAccounts.concat(id) : selectedAccounts.filter((x) => x !== id);
+  };
+
+  $: filteredAccounts = sortedAccounts.filter((account) => selectedAccounts.includes(account.id));
+
   $: items = getAccountBalanceChartData({
     operations,
-    accounts: sortedAccounts,
+    accounts: filteredAccounts,
     startDate,
     step,
     endDate,
@@ -76,10 +88,13 @@
 </script>
 
 <div class="chart-container">
-  <div class="legend-button flex-col items-start gap-0.5">
+  <div class="legend-button flex items-start gap-0.5">
     <Button color="white" bordered on:click={changeInterval}>
       <Icon name="mdi:arrow-expand-horizontal" />
       {interval}M
+    </Button>
+    <Button color="white" bordered on:click={() => (legendVisible = true)}>
+      <Icon name="mdi:format-list-bulleted" />
     </Button>
   </div>
   <Line
@@ -120,7 +135,7 @@
     }}
     data={{
       labels: items.map((x) => dayjs(x.date).format('DD.MM')),
-      datasets: sortedAccounts.map((account) => ({
+      datasets: filteredAccounts.map((account) => ({
         label: account.name,
         data: items.map((item) => item.accountBalance[account.id].ratedBalance),
         backgroundColor: account.color ?? 'gray',
@@ -143,7 +158,11 @@
     }}
   >
     <div class="p-1">
-      <BalanceChartLegend accounts={sortedAccounts.slice().reverse()} />
+      <BalanceChartLegend
+        accounts={sortedAccounts.slice().reverse()}
+        onChange={handleAccountCheckedChange}
+        {selectedAccounts}
+      />
     </div>
   </Layout>
 </Portal>

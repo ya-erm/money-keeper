@@ -37,6 +37,7 @@ export const enDict: Dictionary = {
   'common.show': 'Show',
   'common.hide': 'Hide',
   'common.data_problems': 'Data storage initialization finished with {count, plural, =1 {# error} other {# errors}}',
+  'common.select_all': 'Select all',
   // Timezones
   'timezones.select_time_zone': 'Select time zone',
   'timezones.current_time_zone': 'Current time zone',
