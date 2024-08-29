@@ -26,7 +26,7 @@
   const handleDelete = () => {
     if (!transaction) return;
     const t = operationsService.getById(transaction.id);
-    t && operationsService.delete(t);
+    if (t) operationsService.delete(t);
     showSuccessToast($translate('transactions.delete_transaction_success'), {
       testId: 'DeleteTransactionSuccessToast',
     });

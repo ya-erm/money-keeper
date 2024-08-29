@@ -152,7 +152,7 @@ export const calculate = (expression: string, previous: number | null) => {
       switch (token.type) {
         case 'number': {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          accumulator = parseFloat(token.value!);
+          accumulator = Number.parseFloat(token.value!);
           return;
         }
         default: {
@@ -165,7 +165,6 @@ export const calculate = (expression: string, previous: number | null) => {
 
   scroll();
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     let leftToken = leftStack[0];
     const rightToken = rightStack[0];
@@ -179,7 +178,7 @@ export const calculate = (expression: string, previous: number | null) => {
       switch (leftOperand.type) {
         case 'number': {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const value = parseFloat(leftOperand.value!);
+          const value = Number.parseFloat(leftOperand.value!);
           const result = performOperation(operation, value, accumulator ?? 0);
           accumulator = result;
           leftToken = leftStack[0];
@@ -216,7 +215,7 @@ export function roundTo(n: number, digits?: number) {
     n = -1 * n;
   }
   const m = Math.pow(10, digits);
-  let r = parseFloat((n * m).toFixed(11));
+  let r = Number.parseFloat((n * m).toFixed(11));
   r = Number((Math.round(r) / m).toFixed(digits));
   if (negative) {
     r = -1 * r;

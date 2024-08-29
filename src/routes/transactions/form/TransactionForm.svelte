@@ -44,11 +44,15 @@
   const destinationTransaction =
     isTransfer && transaction?.category.type === 'IN' ? transaction : transaction?.linkedTransaction;
 
-  let type = isTransfer ? 'TRANSFER' : transaction ? transaction.category.type : getSearchParam($page, 'type') ?? 'OUT';
+  let type = isTransfer
+    ? 'TRANSFER'
+    : transaction
+      ? transaction.category.type
+      : (getSearchParam($page, 'type') ?? 'OUT');
 
   let categoryId = transaction?.categoryId ?? getSearchParam($page, 'categoryId');
 
-  let timeZone = transaction ? transaction?.timeZone ?? undefined : dayjs.tz.guess();
+  let timeZone = transaction ? (transaction?.timeZone ?? undefined) : dayjs.tz.guess();
   let timeZoneShift = timeZone ? getTimeZoneOffset(timeZone) : undefined;
   let timeZoneListVisible = false;
 
@@ -60,7 +64,7 @@
 
   let accountId = isTransfer
     ? sourceTransaction?.accountId
-    : transaction?.accountId ?? getSearchParam($page, 'accountId');
+    : (transaction?.accountId ?? getSearchParam($page, 'accountId'));
   let destinationAccountId = isTransfer
     ? destinationTransaction?.accountId
     : getSearchParam($page, 'destinationAccountId');

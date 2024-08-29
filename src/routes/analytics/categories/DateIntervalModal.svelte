@@ -21,7 +21,7 @@
   ];
 
   let selectedIntervalType = intervalType;
-  $: selected = options.find((item) => item.id == selectedIntervalType);
+  $: selected = options.find((item) => item.id === selectedIntervalType);
 
   const handleTypeChange = ({ id }: { id: string }) => {
     selectedIntervalType = id as DateIntervalType;

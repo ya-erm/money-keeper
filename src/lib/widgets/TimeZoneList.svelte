@@ -25,7 +25,7 @@
   );
 
   const currentTimeZoneCode = dayjs.tz.guess();
-  const currentTimeZone = timezones.find((timezone) => timezone.tzCode == currentTimeZoneCode);
+  const currentTimeZone = timezones.find((timezone) => timezone.tzCode === currentTimeZoneCode);
 
   $: favoriteTimeZones = timezones.filter((timezone) => settings?.favoriteTimeZones?.includes(timezone.tzCode));
 

@@ -161,7 +161,7 @@ export const routes: { [key in RouteKey]: Route } = {
 };
 
 export function findRoute(path: string) {
-  return Object.values(routes).find((route) => route.path == path);
+  return Object.values(routes).find((route) => route.path === path);
 }
 
 export function route(key: RouteKey) {

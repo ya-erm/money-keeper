@@ -40,6 +40,7 @@
     try {
       return await decryptAes(...params);
     } catch (e) {
+      console.error(e);
       throw new ApiError(403, 'INCORRECT_LOGIN_OR_PASSWORD');
     }
   }
@@ -91,7 +92,7 @@
       });
       // Save as default member
       void settingsService.updateSettings({ selectedMember: member.uuid });
-      // eslint-disable-next-line no-undef
+
       const privateKey: JsonWebKey = JSON.parse(decryptedKey);
       const decryptedToken = await decryptRsa(privateKey, encryptedToken.base64Data);
       await loginConfirmFetcher.fetch({ token: decryptedToken, uuid: member.uuid });

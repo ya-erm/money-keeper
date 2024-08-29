@@ -51,7 +51,7 @@
         transactions: transactions ?? [],
         sum:
           transactions?.reduce(
-            (sum, t) => sum + (t.category.type == 'IN' ? 1 : -1) * t.amount * findRateFn(t.account.currency),
+            (sum, t) => sum + (t.category.type === 'IN' ? 1 : -1) * t.amount * findRateFn(t.account.currency),
             0,
           ) ?? 0,
       };

@@ -38,7 +38,7 @@
   };
 
   const handleScroll = async () => {
-    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
     const index = accountListElement.scrollLeft / Math.min(26 * rem, accountsContainerElement.clientWidth - 1 * rem);
     if (Number.isInteger(index)) {
       if (index < accounts.length) {
