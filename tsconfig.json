@@ -10,12 +10,12 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "rootDir": "/",
-    "paths": {
-      "$lib": ["./src/lib"],
-      "$lib/*": ["./src/lib/*"],
-      "@tests/*": ["./tests/*"],
-    },
+    "rootDir": "/"
+    // "paths": {
+    //   "$lib": ["./src/lib"],
+    //   "$lib/*": ["./src/lib/*"],
+    //   "@tests/*": ["./tests/*"],
+    // },
   },
   // Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
   //
@@ -33,6 +33,6 @@
     "./src/**/*.svelte",
     "./tests/**/*.js",
     "./tests/**/*.ts",
-    "./tests/**/*.svelte",
-  ],
+    "./tests/**/*.svelte"
+  ]
 }
