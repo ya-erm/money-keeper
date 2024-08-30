@@ -32,16 +32,16 @@ export function getAccountBalanceChartData({
   endDate,
   findRateFn,
 }: Options): BalanceChartItem[] {
-  const bucketsCount = Math.ceil(endDate.diff(startDate, step, true)) + 1;
+  const bucketsCount = Math.ceil(endDate.diff(startDate, step, true));
   const buckets = Array.from({ length: bucketsCount }, (_, i) => ({
     date: startDate.add(i, step),
     operationsByAccount: {} as Record<string, TransactionViewModel[]>,
   }));
 
   for (const operation of operations) {
-    let bucketIndex = Math.ceil(dayjs(operation.date).diff(startDate, step, true));
+    let bucketIndex = Math.floor(dayjs(operation.date).diff(startDate, step, true));
     if (bucketIndex < 0) bucketIndex = 0;
-    if (bucketIndex <= bucketsCount) {
+    if (bucketIndex < bucketsCount) {
       const operationsByAccount = buckets[bucketIndex].operationsByAccount[operation.account.id];
       if (!operationsByAccount) {
         buckets[bucketIndex].operationsByAccount[operation.account.id] = [operation];
