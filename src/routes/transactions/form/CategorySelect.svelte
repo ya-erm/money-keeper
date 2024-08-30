@@ -44,6 +44,9 @@
     }
   };
 
+  // recalculate rows count on categories change
+  $: if (categories) getRowsNumber();
+
   $: showMoreButton = rowsCount > 2 && !showAll;
   $: filteredItems = showMoreButton ? categories.slice(0, itemsInRow * 2 - 1) : categories;
 </script>
