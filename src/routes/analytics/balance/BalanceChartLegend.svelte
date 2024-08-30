@@ -1,39 +1,55 @@
 <script lang="ts">
   import type { Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
+  import Button from '$lib/ui/Button.svelte';
   import Checkbox from '$lib/ui/Checkbox.svelte';
 
   export let accounts: Account[];
   export let selectedAccounts: string[] = [];
-  export let onChange: (id: 'all' | string, checked: boolean) => void;
+  export let onApply: (selected: string[]) => void;
+
+  const handleChange = (id: string, checked: boolean) => {
+    selectedAccounts = checked ? selectedAccounts.concat(id) : selectedAccounts.filter((x) => x !== id);
+  };
 
   $: allChecked = accounts.every((account) => selectedAccounts.includes(account.id));
   $: someChecked = accounts.some((account) => selectedAccounts.includes(account.id));
 </script>
 
-<div class="legend">
+<div class="p-1 flex-col h-full">
   <Checkbox
     checked={allChecked}
     indeterminate={!allChecked && someChecked}
-    onChange={(value) => onChange('all', value)}
+    onChange={(value) => (selectedAccounts = value ? accounts.map((account) => account.id) : [])}
   >
-    {$translate('common.select_all')}</Checkbox
-  >
-  {#each accounts as account (account.id)}
-    <Checkbox checked={selectedAccounts.includes(account.id)} onChange={(value) => onChange(account.id, value)}>
-      <div class="color" style="background-color: {account.color}" />
-      <span>{account.name}</span>
-    </Checkbox>
-  {/each}
+    <div class="py-0.5">
+      {$translate('common.select_all')}
+    </div>
+  </Checkbox>
+  <ul class="flex-col list">
+    {#each accounts as account (account.id)}
+      <li>
+        <Checkbox checked={selectedAccounts.includes(account.id)} onChange={(value) => handleChange(account.id, value)}>
+          <div class="py-0.5 flex gap-0.5">
+            <div class="color" style="background-color: {account.color}" />
+            <span>{account.name}</span>
+          </div>
+        </Checkbox>
+      </li>
+    {/each}
+  </ul>
+  <Button on:click={() => onApply(selectedAccounts)}>
+    {$translate('common.apply')}
+  </Button>
 </div>
 
 <style>
-  .legend {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  .list {
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
   }
-
   .color {
     width: 1rem;
     height: 1rem;

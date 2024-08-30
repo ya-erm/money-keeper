@@ -7,6 +7,7 @@ export const ruDict: Dictionary = {
   'common.back': 'Назад',
   'common.select': 'Выбрать',
   'common.accept': 'Принять',
+  'common.apply': 'Применить',
   'common.available_variants': 'Доступные варианты',
   'common.optional': 'опционально',
   'common.loading': 'Загрузка...',

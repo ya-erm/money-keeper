@@ -67,12 +67,9 @@
 
   $: selectedAccounts = accounts.map((account) => account.id);
 
-  const handleAccountCheckedChange = (id: 'all' | string, checked: boolean) => {
-    if (id === 'all') {
-      selectedAccounts = checked ? accounts.map((account) => account.id) : [];
-      return;
-    }
-    selectedAccounts = checked ? selectedAccounts.concat(id) : selectedAccounts.filter((x) => x !== id);
+  const handleAccountCheckedApply = (value: string[]) => {
+    selectedAccounts = value;
+    legendVisible = false;
   };
 
   $: filteredAccounts = sortedAccounts.filter((account) => selectedAccounts.includes(account.id));
@@ -157,13 +154,11 @@
       title: $translate('analytics.balance.legend'),
     }}
   >
-    <div class="p-1">
-      <BalanceChartLegend
-        accounts={sortedAccounts.slice().reverse()}
-        onChange={handleAccountCheckedChange}
-        {selectedAccounts}
-      />
-    </div>
+    <BalanceChartLegend
+      accounts={sortedAccounts.slice().reverse()}
+      onApply={handleAccountCheckedApply}
+      {selectedAccounts}
+    />
   </Layout>
 </Portal>
 

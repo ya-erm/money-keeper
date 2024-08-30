@@ -4,6 +4,7 @@ export type Messages =
   | 'common.back'
   | 'common.select'
   | 'common.accept'
+  | 'common.apply'
   | 'common.available_variants'
   | 'common.optional'
   | 'common.loading'

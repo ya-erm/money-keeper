@@ -7,6 +7,7 @@ export const enDict: Dictionary = {
   'common.back': 'Back',
   'common.select': 'Select',
   'common.accept': 'Accept',
+  'common.apply': 'Apply',
   'common.available_variants': 'Available variants',
   'common.optional': 'optional',
   'common.loading': 'Loading...',
