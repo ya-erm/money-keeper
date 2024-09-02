@@ -7,6 +7,10 @@
   export let href: string | null = null;
   export let onClick: (() => void) | null = null;
   export let title: string | null = null;
+
+  const goBack = () => {
+    history.back();
+  };
 </script>
 
 {#if href}
@@ -15,7 +19,7 @@
     {title ?? $translate(findRoute(href)?.title ?? 'common.back')}
   </a>
 {:else}
-  <Button appearance="link" underlined={false} on:click={onClick}>
+  <Button appearance="link" underlined={false} on:click={onClick ?? goBack}>
     <div class="flex items-center">
       <Icon name="mdi:chevron-left" />
       <span>

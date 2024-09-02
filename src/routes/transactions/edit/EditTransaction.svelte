@@ -19,7 +19,6 @@
 
   const handleSubmit = async (transactions: Transaction[]) => {
     transactions.forEach((transaction) => operationsService.save(transaction));
-    showSuccessToast($translate('common.save_changes_success'));
     onBack();
   };
 

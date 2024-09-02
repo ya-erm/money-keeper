@@ -31,6 +31,7 @@ export const ruDict: Dictionary = {
   'common.cancel': 'Отмена',
   'common.delete': 'Удалить',
   'common.ok': 'OK',
+  'common.done': 'Готово',
   'common.continue': 'Продолжить',
   'common.reset': 'Сбросить',
   'common.go_back_to_list': 'Вернуться назад к списку',

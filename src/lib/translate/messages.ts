@@ -28,6 +28,7 @@ export type Messages =
   | 'common.cancel'
   | 'common.delete'
   | 'common.ok'
+  | 'common.done'
   | 'common.continue'
   | 'common.reset'
   | 'common.go_back_to_list'

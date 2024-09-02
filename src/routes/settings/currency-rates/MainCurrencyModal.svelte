@@ -4,7 +4,6 @@
   import Button from '$lib/ui/Button.svelte';
   import Input from '$lib/ui/Input.svelte';
   import Modal from '$lib/ui/Modal.svelte';
-  import { showSuccessToast } from '$lib/ui/toasts';
 
   export let opened: boolean;
 
@@ -17,7 +16,6 @@
 
   const handleSaveCurrency = async () => {
     await membersService.updateSettings({ currency });
-    showSuccessToast($translate('common.save_changes_success'));
     opened = false;
   };
 </script>

@@ -12,6 +12,7 @@
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
   import EditTransaction from '../transactions/edit/EditTransaction.svelte';
+  import SaveTransactionButton from '../transactions/edit/SaveTransactionButton.svelte';
 
   $: currencyRates = $currencyRatesStore;
   $: settings = $memberSettingsStore;
@@ -54,7 +55,7 @@
         onClick: closeOperationForm,
       },
       leftButton: null,
-      rightButton: null,
+      rightButton: SaveTransactionButton,
       title: $translate('transactions.edit_transaction'),
     }}
   >

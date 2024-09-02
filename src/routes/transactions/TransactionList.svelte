@@ -13,6 +13,7 @@
 
   import TransactionListItem from './TransactionListItem.svelte';
   import EditTransaction from './edit/EditTransaction.svelte';
+  import SaveTransactionButton from './edit/SaveTransactionButton.svelte';
 
   export let transactions: TransactionViewModel[];
   export let hideAccount: boolean = false;
@@ -60,7 +61,7 @@
         onClick: closeOperationForm,
       },
       leftButton: null,
-      rightButton: null,
+      rightButton: SaveTransactionButton,
       title: $translate('transactions.edit_transaction'),
     }}
   >

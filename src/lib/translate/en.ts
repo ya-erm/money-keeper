@@ -31,6 +31,7 @@ export const enDict: Dictionary = {
   'common.cancel': 'Cancel',
   'common.delete': 'Delete',
   'common.ok': 'OK',
+  'common.done': 'Done',
   'common.continue': 'Continue',
   'common.reset': 'Reset',
   'common.go_back_to_list': 'Go back to list',
