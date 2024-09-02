@@ -259,6 +259,8 @@ export const ruDict: Dictionary = {
   'transactions.another_currency': 'Другая валюта',
   'transactions.same_currency': 'Та же валюта',
   'transactions.show_more': 'Показать ещё',
+  'transactions.additional_parameters': 'Дополнительные параметры',
+  'transactions.exclude_from_analytics': 'Исключить из аналитики',
   // Transactions import
   'transactions.import': 'Импорт',
   'transactions.import.title': 'Импорт операций',

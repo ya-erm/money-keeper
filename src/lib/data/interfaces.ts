@@ -110,6 +110,7 @@ export type Transaction = {
   linkedTransactionId?: string | null;
   anotherCurrency?: string | null;
   anotherCurrencyAmount?: number | null;
+  excludeFromAnalysis?: boolean;
   tagIds?: string[];
   deleted?: boolean;
 };

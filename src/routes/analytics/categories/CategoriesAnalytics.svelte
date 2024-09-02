@@ -38,7 +38,11 @@
   $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
   $: filteredTransactions = transactions.filter(
-    (t) => dayjs(t.date).isAfter(startDate) && dayjs(t.date).isBefore(endDate) && !t.category.system,
+    (t) =>
+      dayjs(t.date).isAfter(startDate) &&
+      dayjs(t.date).isBefore(endDate) &&
+      !t.excludeFromAnalysis &&
+      !t.category.system,
   );
 
   $: transactionsByCategories = groupByKey(filteredTransactions, 'categoryId');

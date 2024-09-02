@@ -23,6 +23,9 @@
   import TagsList from '$lib/widgets/TagsList.svelte';
   import TimeZoneList from '$lib/widgets/TimeZoneList.svelte';
 
+  import Checkbox from '$lib/ui/Checkbox.svelte';
+  import Spoiler from '$lib/ui/Spoiler.svelte';
+  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
   import AccountSelector from './AccountSelector.svelte';
   import AnotherCurrencyModal from './AnotherCurrencyModal.svelte';
   import CategorySelect from './CategorySelect.svelte';
@@ -88,6 +91,10 @@
   let anotherCurrencyModalOpened = false;
   let anotherCurrency: string | null = transaction?.anotherCurrency ?? null;
 
+  let additionalParametersHidden = true;
+
+  let excludeFromAnalysis = transaction?.excludeFromAnalysis ?? false;
+
   const handleSubmit = async (e: Event) => {
     try {
       const formData = new FormData(e.target as HTMLFormElement);
@@ -132,6 +139,7 @@
               anotherCurrencyAmount: checkNumberFormParameter(formData, 'destinationAmount'),
             }
           : {}),
+        ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
       });
 
       if (type === 'TRANSFER') {
@@ -140,11 +148,12 @@
           accountId: checkStringFormParameter(formData, 'destinationAccountId'),
           categoryId: SYSTEM_CATEGORY_TRANSFER_IN.id,
           date: datetime,
-          timeZone,
+          ...(timeZone ? { timeZone } : {}),
           amount: checkNumberFormParameter(formData, 'destinationAmount'),
           comment: checkStringOptionalFormParameter(formData, 'comment'),
           tagIds,
           linkedTransactionId: transactions[0].id,
+          ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
         });
         transactions[0].linkedTransactionId = transactions[1].id;
       }
@@ -300,6 +309,14 @@
         onEdit={(t) => operationTagsService.save(t)}
         onDelete={(t) => operationTagsService.delete(t)}
       />
+    </div>
+    <div class="flex-col gap-0.5">
+      <Spoiler hidden={additionalParametersHidden}>
+        <SpoilerToggle slot="spoiler-header" bind:hidden={additionalParametersHidden}>
+          {$translate('transactions.additional_parameters')}
+        </SpoilerToggle>
+        <Checkbox bind:checked={excludeFromAnalysis} label={$translate('transactions.exclude_from_analytics')} />
+      </Spoiler>
     </div>
     <slot />
     <slot name="button" />

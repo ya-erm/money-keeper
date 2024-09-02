@@ -257,6 +257,8 @@ export const enDict: Dictionary = {
   'transactions.feature_operations': 'Feature operations',
   'transactions.another_currency': 'Another currency',
   'transactions.same_currency': 'Same currency',
+  'transactions.additional_parameters': 'Additional parameters',
+  'transactions.exclude_from_analytics': 'Exclude from analytics',
   // Transactions import
   'transactions.import': 'Import',
   'transactions.import.title': 'Import operations',
