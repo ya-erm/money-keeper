@@ -20,6 +20,7 @@ type RouteKey =
   | 'analytics.accounts'
   | 'analytics.accounts.groupings'
   | 'analytics.accounts.groupings.edit'
+  | 'analytics.balance'
   | 'analytics.categories'
   | 'categories'
   | 'categories.create'
@@ -93,6 +94,10 @@ export const routes: { [key in RouteKey]: Route } = {
     path: '/analytics/accounts/groupings/edit',
     title: 'analytics.groupings.title',
   },
+  'analytics.balance': {
+    path: '/analytics/balance',
+    title: 'analytics.title',
+  },
   'analytics.categories': {
     path: '/analytics/categories',
     title: 'analytics.title',
@@ -156,7 +161,7 @@ export const routes: { [key in RouteKey]: Route } = {
 };
 
 export function findRoute(path: string) {
-  return Object.values(routes).find((route) => route.path == path);
+  return Object.values(routes).find((route) => route.path === path);
 }
 
 export function route(key: RouteKey) {

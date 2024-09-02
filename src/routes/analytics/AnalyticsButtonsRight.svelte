@@ -5,6 +5,6 @@
 </script>
 
 <div class="flex">
-  <HeaderButton icon="mdi:shape-outline" label={$translate('categories.title')} href={route('analytics.categories')} />
   <HeaderButton icon="mdi:briefcase-outline" label={$translate('accounts.title')} href={route('analytics.accounts')} />
+  <HeaderButton icon="mdi:chart-line" label={$translate('analytics.title')} href={route('analytics.balance')} />
 </div>

@@ -1,6 +1,6 @@
 import adapter from '@sveltejs/adapter-auto'; // https://github.com/sveltejs/kit/tree/master/packages/adapter-node#readme
 import autoprefixer from 'autoprefixer';
-import preprocess from 'svelte-preprocess';
+import { sveltePreprocess } from 'svelte-preprocess';
 
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -13,7 +13,7 @@ const pkg = JSON.parse(json);
 const config = {
   // Consult https://github.com/sveltejs/svelte-preprocess
   // for more information about preprocessors
-  preprocess: preprocess({
+  preprocess: sveltePreprocess({
     postcss: {
       plugins: [autoprefixer()],
     },
@@ -23,6 +23,11 @@ const config = {
     adapter: adapter(),
     version: {
       name: pkg.version,
+    },
+    alias: {
+      $lib: './src/lib',
+      '$lib/*': './src/lib/*',
+      '@tests/*': './tests/*',
     },
   },
 };

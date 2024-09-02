@@ -57,6 +57,7 @@
       showSuccessToast($translate('auth.registration_success'));
       await goto(route('login'));
     } catch (e) {
+      console.error(e);
       showErrorToast($translate('auth.registration_failure'));
     }
   };

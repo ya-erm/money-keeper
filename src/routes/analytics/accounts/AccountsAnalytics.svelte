@@ -13,10 +13,8 @@
   import Checkbox from '$lib/ui/Checkbox.svelte';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
-  import { groupBySelector } from '$lib/utils';
+  import { calculateBalance, findRate, groupBySelector, pastOperationsPredicate } from '$lib/utils';
 
-  import { calculateBalance, pastOperationsPredicate } from '../../accounts/utils';
-  import { findRate } from '../utils/findRate';
   import AccountsTableTable from './AccountsAnalyticsTable.svelte';
   import AddGroupingButton from './groupings/AddGroupingButton.svelte';
   import GroupingList from './groupings/GroupingList.svelte';
@@ -42,7 +40,7 @@
   $: accountSummaries = accounts.reduce((acc: Record<string, AccountSummary>, account: AccountViewModel, i) => {
     const balance = calculateBalance(operationsByAccount[account.id] ?? []);
     // skip zero-balance accounts
-    if ($hideZeroBalanceAccounts && Number(balance.toFixed(8)) == 0) {
+    if ($hideZeroBalanceAccounts && Number(balance.toFixed(8)) === 0) {
       return acc;
     }
     acc[account.id] = {

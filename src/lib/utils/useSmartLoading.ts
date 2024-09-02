@@ -17,13 +17,13 @@ export function useSmartLoading(loading: Readable<boolean>, delay = 300, minDura
       timer1 = setTimeout(() => {
         smartLoading.set(true);
         timer2 = setTimeout(() => {
-          !_value && smartLoading.set(false);
+          if (!_value) smartLoading.set(false);
           timer2 = undefined;
         }, minDuration);
       }, delay);
     } else {
-      timer1 && clearTimeout(timer1);
-      !timer2 && smartLoading.set(false);
+      if (timer1) clearTimeout(timer1);
+      if (!timer2) smartLoading.set(false);
     }
   });
 

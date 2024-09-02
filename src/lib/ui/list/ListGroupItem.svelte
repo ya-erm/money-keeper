@@ -35,6 +35,7 @@
   }
   .list-group-item > .item {
     min-height: 36px;
+    width: 100%;
     text-decoration: inherit;
     color: inherit;
     flex-grow: 1;

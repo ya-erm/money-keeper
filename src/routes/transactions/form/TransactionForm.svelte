@@ -3,7 +3,7 @@
   import { v4 as uuid } from 'uuid';
 
   import { page } from '$app/stores';
-  import { memberSettingsStore, membersService, operationTagsService } from '$lib/data';
+  import { memberSettingsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
@@ -11,7 +11,6 @@
   import Input from '$lib/ui/Input.svelte';
   import InputLabel from '$lib/ui/InputLabel.svelte';
   import Layout from '$lib/ui/Layout.svelte';
-  import Modal from '$lib/ui/Modal.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
   import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
@@ -24,7 +23,11 @@
   import TagsList from '$lib/widgets/TagsList.svelte';
   import TimeZoneList from '$lib/widgets/TimeZoneList.svelte';
 
+  import Checkbox from '$lib/ui/Checkbox.svelte';
+  import Spoiler from '$lib/ui/Spoiler.svelte';
+  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
   import AccountSelector from './AccountSelector.svelte';
+  import AnotherCurrencyModal from './AnotherCurrencyModal.svelte';
   import CategorySelect from './CategorySelect.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
 
@@ -44,11 +47,15 @@
   const destinationTransaction =
     isTransfer && transaction?.category.type === 'IN' ? transaction : transaction?.linkedTransaction;
 
-  let type = isTransfer ? 'TRANSFER' : transaction ? transaction.category.type : getSearchParam($page, 'type') ?? 'OUT';
+  let type = isTransfer
+    ? 'TRANSFER'
+    : transaction
+      ? transaction.category.type
+      : (getSearchParam($page, 'type') ?? 'OUT');
 
   let categoryId = transaction?.categoryId ?? getSearchParam($page, 'categoryId');
 
-  let timeZone = transaction ? transaction?.timeZone ?? undefined : dayjs.tz.guess();
+  let timeZone = transaction ? (transaction?.timeZone ?? undefined) : dayjs.tz.guess();
   let timeZoneShift = timeZone ? getTimeZoneOffset(timeZone) : undefined;
   let timeZoneListVisible = false;
 
@@ -60,7 +67,7 @@
 
   let accountId = isTransfer
     ? sourceTransaction?.accountId
-    : transaction?.accountId ?? getSearchParam($page, 'accountId');
+    : (transaction?.accountId ?? getSearchParam($page, 'accountId'));
   let destinationAccountId = isTransfer
     ? destinationTransaction?.accountId
     : getSearchParam($page, 'destinationAccountId');
@@ -83,6 +90,10 @@
 
   let anotherCurrencyModalOpened = false;
   let anotherCurrency: string | null = transaction?.anotherCurrency ?? null;
+
+  let additionalParametersHidden = true;
+
+  let excludeFromAnalysis = transaction?.excludeFromAnalysis ?? false;
 
   const handleSubmit = async (e: Event) => {
     try {
@@ -128,6 +139,7 @@
               anotherCurrencyAmount: checkNumberFormParameter(formData, 'destinationAmount'),
             }
           : {}),
+        ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
       });
 
       if (type === 'TRANSFER') {
@@ -136,11 +148,12 @@
           accountId: checkStringFormParameter(formData, 'destinationAccountId'),
           categoryId: SYSTEM_CATEGORY_TRANSFER_IN.id,
           date: datetime,
-          timeZone,
+          ...(timeZone ? { timeZone } : {}),
           amount: checkNumberFormParameter(formData, 'destinationAmount'),
           comment: checkStringOptionalFormParameter(formData, 'comment'),
           tagIds,
           linkedTransactionId: transactions[0].id,
+          ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
         });
         transactions[0].linkedTransactionId = transactions[1].id;
       }
@@ -197,7 +210,7 @@
         <Button appearance="link" underlined={false} on:click={() => (timeZoneListVisible = true)}>
           {#if timeZone}
             <div class="flex gap-0.25">
-              <span class="time-zone">{timeZone}</span>
+              <span class="time-zone text-ellipsis">{timeZone}</span>
               <span class="time-shift">(GMT{timeZoneShift})</span>
             </div>
           {:else}
@@ -297,39 +310,21 @@
         onDelete={(t) => operationTagsService.delete(t)}
       />
     </div>
+    <div class="flex-col gap-0.5">
+      <Spoiler hidden={additionalParametersHidden}>
+        <SpoilerToggle slot="spoiler-header" bind:hidden={additionalParametersHidden}>
+          {$translate('transactions.additional_parameters')}
+        </SpoilerToggle>
+        <Checkbox bind:checked={excludeFromAnalysis} label={$translate('transactions.exclude_from_analytics')} />
+      </Spoiler>
+    </div>
     <slot />
     <slot name="button" />
     <slot name="footer" />
   </div>
 </form>
 
-<Modal opened={anotherCurrencyModalOpened}>
-  <form
-    class="flex-col gap-1"
-    on:submit|preventDefault={async (e) => {
-      anotherCurrency = new FormData(e.currentTarget).get('another-currency')?.toString() ?? null;
-      if (anotherCurrency !== settings?.lastAnotherCurrency) {
-        await membersService.updateSettings({ lastAnotherCurrency: anotherCurrency });
-      }
-      anotherCurrencyModalOpened = false;
-    }}
-  >
-    <Input
-      label={$translate('transactions.another_currency')}
-      value={anotherCurrency}
-      name="another-currency"
-      clearable
-    />
-    <div class="grid-col-2 gap-1">
-      <Button
-        color="secondary"
-        text={$translate('common.cancel')}
-        on:click={() => (anotherCurrencyModalOpened = false)}
-      />
-      <Button text={$translate('common.save')} color="primary" type="submit" />
-    </div>
-  </form>
-</Modal>
+<AnotherCurrencyModal bind:opened={anotherCurrencyModalOpened} bind:anotherCurrency />
 
 <Portal visible={timeZoneListVisible}>
   <Layout
@@ -366,12 +361,6 @@
   }
   .time-zone {
     flex-shrink: 1;
-    text-align: left;
-    display: -webkit-box;
-    text-overflow: ellipsis;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-    overflow: hidden;
   }
   .time-shift {
     flex-shrink: 0;

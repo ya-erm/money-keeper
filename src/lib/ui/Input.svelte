@@ -18,12 +18,15 @@
   export let minlength: number | null = null;
   export let maxlength: number | null = null;
   export let error: string | null = null;
+  export let list: string | null = null;
   export let testId: string | null = 'Input';
 
   export let value: string | null = null;
   export let onChange: ((value: string) => void) | null = null;
   export let endText: string | null = null;
   export let clearable = false;
+
+  export let v2 = false;
 
   export let ref: HTMLInputElement | null = null;
 
@@ -40,7 +43,7 @@
 
 <label class="input-label" data-testId={`${testId}.Container`}>
   {#if label}
-    <InputLabel text={label} {optional} {disabled} {error} testId={`${testId}.Label`} />
+    <InputLabel text={label} {optional} {disabled} {error} testId={`${testId}.Label`} {v2} {value} />
   {/if}
   <div class="input-container flex-col">
     <input
@@ -59,6 +62,7 @@
       {required}
       {disabled}
       {value}
+      {list}
       {name}
     />
     <div class="end-slot flex items-center">

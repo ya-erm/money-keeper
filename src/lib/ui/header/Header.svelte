@@ -67,8 +67,6 @@
 
 <style>
   .navigation-back-button {
-    position: absolute;
-    left: 0;
     display: flex;
   }
   .navigation-back-button:hover {
@@ -78,7 +76,8 @@
     opacity: 0.8;
   }
   .navigation-bar {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     background-color: var(--header-background-color);
     border-bottom: 1px solid var(--border-color);
     align-items: center;
@@ -90,6 +89,8 @@
     font-weight: normal;
     text-align: center;
     font-size: 1.25rem;
+    background: var(--header-background-color);
+    z-index: 1;
   }
   .beta {
     color: var(--red-color);
@@ -98,7 +99,6 @@
     right: -1rem;
   }
   .navigation-right-button {
-    position: absolute;
-    right: 0;
+    justify-self: flex-end;
   }
 </style>

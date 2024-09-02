@@ -24,7 +24,11 @@ export function groupByKey<T extends Record<K, PropertyKey>, K extends keyof T>(
 export function groupByKeyToMap<T, K extends keyof T>(array: T[], key: K): Map<T[K], T[]> {
   return array.reduce((res, item) => {
     const group = item[key];
-    res.get(group)?.push(item) ?? res.set(group, [item]);
+    if (res.has(group)) {
+      res.get(group)?.push(item);
+    } else {
+      res.set(group, [item]);
+    }
     return res;
   }, new Map<T[K], T[]>());
 }
@@ -61,7 +65,11 @@ export function groupBySelectorToMap<T, K extends string | number | symbol>(
 ): Map<K, T[]> {
   return array.reduce((res, item) => {
     const group = selector(item);
-    res.get(group)?.push(item) ?? res.set(group, [item]);
+    if (res.has(group)) {
+      res.get(group)?.push(item);
+    } else {
+      res.set(group, [item]);
+    }
     return res;
   }, new Map<K, T[]>());
 }

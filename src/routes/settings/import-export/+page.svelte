@@ -76,37 +76,37 @@
       let count = 0;
 
       v2.categories?.filter(notExists(categoriesService.items)).forEach((category) => {
-        journalService.addOperationToQueue({ category }, { upload: false });
+        void journalService.addOperationToQueue({ category }, { upload: false });
         count += 1;
       });
 
       v2.accountTags?.filter(notExists(accountTagsService.items)).forEach((accountTag) => {
-        journalService.addOperationToQueue({ accountTag }, { upload: false });
+        void journalService.addOperationToQueue({ accountTag }, { upload: false });
         count += 1;
       });
 
       v2.accounts?.filter(notExists(accountsService.items)).forEach((account) => {
-        journalService.addOperationToQueue({ account }, { upload: false });
+        void journalService.addOperationToQueue({ account }, { upload: false });
         count += 1;
       });
 
       v2.operationTags?.filter(notExists(operationTagsService.items)).forEach((tag) => {
-        journalService.addOperationToQueue({ tag }, { upload: false });
+        void journalService.addOperationToQueue({ tag }, { upload: false });
         count += 1;
       });
 
       v2.currencyRates?.filter(notExists(currencyRatesService.items)).forEach((currencyRate) => {
-        journalService.addOperationToQueue({ currencyRate }, { upload: false });
+        void journalService.addOperationToQueue({ currencyRate }, { upload: false });
         count += 1;
       });
 
       v2.operations?.filter(notExists(operationsService.items)).forEach((transaction) => {
-        journalService.addOperationToQueue({ transaction }, { upload: false });
+        void journalService.addOperationToQueue({ transaction }, { upload: false });
         count += 1;
       });
 
       v2.groupings?.filter(notExists(groupingsService.items)).forEach((grouping) => {
-        journalService.addOperationToQueue({ grouping }, { upload: false });
+        void journalService.addOperationToQueue({ grouping }, { upload: false });
         count += 1;
       });
 

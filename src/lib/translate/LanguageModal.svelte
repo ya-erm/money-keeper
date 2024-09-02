@@ -20,7 +20,7 @@
     opened = false;
   };
 
-  const handleAccept = () => {
+  const handleApply = () => {
     opened = false;
   };
 </script>
@@ -46,7 +46,7 @@
   </ul>
   <div class="grid-col-2 gap-1">
     <Button text={$translate('common.cancel')} color="secondary" on:click={handleCancel} />
-    <Button text={$translate('common.accept')} color="primary" on:click={handleAccept} />
+    <Button text={$translate('common.apply')} color="primary" on:click={handleApply} />
   </div>
 </Modal>
 

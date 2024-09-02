@@ -19,14 +19,13 @@
 
   const handleSubmit = async (transactions: Transaction[]) => {
     transactions.forEach((transaction) => operationsService.save(transaction));
-    showSuccessToast($translate('common.save_changes_success'));
     onBack();
   };
 
   const handleDelete = () => {
     if (!transaction) return;
     const t = operationsService.getById(transaction.id);
-    t && operationsService.delete(t);
+    if (t) operationsService.delete(t);
     showSuccessToast($translate('transactions.delete_transaction_success'), {
       testId: 'DeleteTransactionSuccessToast',
     });

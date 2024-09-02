@@ -41,7 +41,7 @@ export class CalculationToken {
         return new this('rightBracket', text);
 
       default:
-        if (isNaN(parseFloat(text))) {
+        if (isNaN(Number.parseFloat(text))) {
           throw new Error(`Can't parse "${text}" as number token`);
         }
         return new this('number', text);

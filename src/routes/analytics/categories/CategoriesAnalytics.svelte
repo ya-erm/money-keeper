@@ -4,18 +4,17 @@
   import { categoriesStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
-  import { formatMoney, groupByKey } from '$lib/utils';
+  import { findRate, formatMoney, groupByKey } from '$lib/utils';
 
   import TransactionList from '../../transactions/TransactionList.svelte';
-  import { findRate } from '../utils/findRate';
 
   import MonthSelect from './MonthSelect.svelte';
   import { intervalEndStore, intervalStartStore, intervalTypeStore } from './store';
 
   const categories = $categoriesStore;
   const currencyRates = $currencyRatesStore;
-  const transactions = $operationsStore;
   const settings = $memberSettingsStore;
+  $: transactions = $operationsStore;
 
   const mainCurrency = settings?.currency ?? 'USD';
 
@@ -33,13 +32,17 @@
   const handleDateChange = (value: { startDate: Dayjs; endDate: Dayjs }) => {
     startDate = value.startDate;
     endDate = value.endDate;
-    selectedGroup = null;
+    selectedCategoryId = null;
   };
 
   $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
   $: filteredTransactions = transactions.filter(
-    (t) => dayjs(t.date).isAfter(startDate) && dayjs(t.date).isBefore(endDate) && !t.category.system,
+    (t) =>
+      dayjs(t.date).isAfter(startDate) &&
+      dayjs(t.date).isBefore(endDate) &&
+      !t.excludeFromAnalysis &&
+      !t.category.system,
   );
 
   $: transactionsByCategories = groupByKey(filteredTransactions, 'categoryId');
@@ -52,14 +55,15 @@
         transactions: transactions ?? [],
         sum:
           transactions?.reduce(
-            (sum, t) => sum + (t.category.type == 'IN' ? 1 : -1) * t.amount * findRateFn(t.account.currency),
+            (sum, t) => sum + (t.category.type === 'IN' ? 1 : -1) * t.amount * findRateFn(t.account.currency),
             0,
           ) ?? 0,
       };
     })
     .sort((a, b) => a.sum - b.sum);
 
-  let selectedGroup: (typeof groups)[number] | null = null;
+  let selectedCategoryId: string | null = null;
+  $: selectedGroup = groups.find((group) => group.categoryId === selectedCategoryId);
 </script>
 
 <div class="p-1">
@@ -68,8 +72,10 @@
   <div class="summary-by-categories">
     <ul class="list">
       {#each groups as group (group.categoryId)}
-        <li class="item" class:selected={selectedGroup === group} data-id={group.categoryId}>
-          <button on:click={() => (selectedGroup = selectedGroup !== group ? group : null)}>
+        <li class="item" class:selected={selectedCategoryId === group.categoryId} data-id={group.categoryId}>
+          <button
+            on:click={() => (selectedCategoryId = selectedCategoryId !== group.categoryId ? group.categoryId : null)}
+          >
             <div class="category">
               <Icon name={group.category?.icon ?? 'mdi:help'} />
               <span>{group.category?.name ?? group.categoryId}</span>

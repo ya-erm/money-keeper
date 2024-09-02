@@ -19,7 +19,7 @@
 
   $: id = getSearchParam($page, 'id');
 
-  useBackButton(route('analytics.accounts.groupings'));
+  useBackButton(route('analytics.accounts.groupings'), $translate('common.back'));
   useTitle($translate('analytics.groupings.new_grouping'));
 
   let notFound = false;

@@ -42,9 +42,6 @@ test.describe('Transactions with tags', () => {
 
     await createButton.click();
 
-    const successToast = page.getByTestId('CreateTransactionSuccessToast');
-    await successToast.waitFor({ state: 'visible' });
-
     await page.waitForURL(/accounts/, { waitUntil: 'networkidle' });
 
     const transactionItem = page.getByTestId('TransactionListItem').filter({ hasText: comment });

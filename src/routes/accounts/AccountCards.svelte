@@ -7,10 +7,15 @@
   import type { AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
-  import { getSearchParam, groupBySelector } from '$lib/utils';
+  import {
+    calculateBalance,
+    findCurrencyRate,
+    getSearchParam,
+    groupBySelector,
+    pastOperationsPredicate,
+  } from '$lib/utils';
 
   import AccountCard from './AccountCard.svelte';
-  import { calculateBalance, findCurrencyRate, pastOperationsPredicate } from './utils';
 
   export let onEdit: (account: AccountViewModel) => void;
 
@@ -33,7 +38,7 @@
   };
 
   const handleScroll = async () => {
-    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
     const index = accountListElement.scrollLeft / Math.min(26 * rem, accountsContainerElement.clientWidth - 1 * rem);
     if (Number.isInteger(index)) {
       if (index < accounts.length) {

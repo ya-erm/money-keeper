@@ -4,21 +4,22 @@
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import { useTitle } from '$lib/ui/header';
+  import HeaderBackButton from '$lib/ui/header/HeaderBackButton.svelte';
+  import { useLeftButton, useRightButton } from '$lib/ui/header/model';
 
-  import { showSuccessToast } from '$lib/ui/toasts';
+  import SaveTransactionButton from '../edit/SaveTransactionButton.svelte';
   import TransactionForm from '../form/TransactionForm.svelte';
 
   $: accounts = $accountsStore;
   $: categories = $categoriesStore;
   $: tags = $operationTagsStore;
 
+  useLeftButton(HeaderBackButton);
   useTitle($translate('transactions.new_transaction'));
+  useRightButton(SaveTransactionButton);
 
   const handleSubmit = async (transactions: Transaction[]) => {
     transactions.forEach((transaction) => operationsService.save(transaction));
-    showSuccessToast($translate('transactions.create_transaction_success'), {
-      testId: 'CreateTransactionSuccessToast',
-    });
     history.back();
   };
 </script>

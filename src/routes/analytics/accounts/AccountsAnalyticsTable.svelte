@@ -31,7 +31,7 @@
             <th class="text-left" colspan="2">
               <div class="flex gap-0.25 items-center">
                 <span class="color-badge" style:background={group?.color ?? '#bbb'} />
-                <span class="account-name">
+                <span class="text-ellipsis">
                   {group?.name ?? $translate('analytics.groupings.groups.other')}
                 </span>
               </div>
@@ -53,7 +53,7 @@
               <div class="flex gap-0.25 items-end">
                 <div class="flex gap-0.25 items-center">
                   <span class="color-badge" style:background={item.color} />
-                  <span class="account-name">{item.account.name}</span>
+                  <span class="account-name text-ellipsis-all">{item.account.name}</span>
                 </div>
                 <span class="original-currency secondary">{item.account.currency}</span>
               </div>
@@ -120,19 +120,12 @@
     width: 8px;
     height: 8px;
     border-radius: 100%;
+    flex-shrink: 0;
   }
   .name-cell {
     word-break: break-all;
     width: 100%;
     padding-right: 0.25rem;
-  }
-  .account-name {
-    text-align: left;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-    overflow: hidden;
   }
   .rated-balance {
     text-align: right;

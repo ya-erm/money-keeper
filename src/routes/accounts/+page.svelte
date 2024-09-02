@@ -4,6 +4,7 @@
   import { accountsStore } from '$lib/data';
   import type { AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
+  import ModalContainer from '$lib/ui/ModalContainer.svelte';
   import ReloadPageButton from '$lib/ui/ReloadPageButton.svelte';
   import { backLink, rightButton, title } from '$lib/ui/header';
   import { useLeftButton, useRightButton, useTitle } from '$lib/ui/header/model';
@@ -67,7 +68,9 @@
 </div>
 
 {#if opened}
-  <AccountModal account={action === 'create' ? null : account} bind:opened />
+  <ModalContainer>
+    <AccountModal account={action === 'create' ? null : account} bind:opened />
+  </ModalContainer>
 {/if}
 
 <style>

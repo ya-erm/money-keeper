@@ -4,5 +4,6 @@
   "cSpell.words": ["datetime", "dndzone", "iconify", "Initialisable", "networkidle"],
   "cSpell.language": "en,ru,en-US,en-GB",
   "eslint.validate": ["javascript", "typescript", "svelte"],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.tabSize": 2
 }
