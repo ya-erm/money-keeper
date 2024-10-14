@@ -3,7 +3,7 @@
   import { v4 as uuid } from 'uuid';
 
   import { page } from '$app/stores';
-  import { memberSettingsStore, operationTagsService } from '$lib/data';
+  import { memberSettingsStore, operationsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
@@ -95,6 +95,17 @@
 
   let excludeFromAnalysis = transaction?.excludeFromAnalysis ?? false;
 
+  $: suggestions =
+    comment.length >= 2
+      ? new Set(
+          $operationsStore
+            .filter((operation) => operation.comment?.startsWith(comment))
+            .map((operation) => operation.comment?.trim()),
+        )
+          .values()
+          .take(5)
+      : [];
+
   const handleSubmit = async (e: Event) => {
     try {
       const formData = new FormData(e.target as HTMLFormElement);
@@ -150,7 +161,7 @@
           date: datetime,
           ...(timeZone ? { timeZone } : {}),
           amount: checkNumberFormParameter(formData, 'destinationAmount'),
-          comment: checkStringOptionalFormParameter(formData, 'comment'),
+          comment: checkStringOptionalFormParameter(formData, 'comment')?.trim(),
           tagIds,
           linkedTransactionId: transactions[0].id,
           ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
@@ -293,8 +304,14 @@
       name="comment"
       value={transaction?.comment}
       onChange={(value) => (comment = value)}
+      list="suggestions"
       optional
     />
+    <datalist id="suggestions">
+      {#each suggestions as option}
+        <option value={option} />
+      {/each}
+    </datalist>
     {#if comment && replaceCalcExpressions(comment) !== comment}
       <div class="comment-preview">
         {replaceCalcExpressions(comment)}
