@@ -3,15 +3,19 @@
   import { v4 as uuid } from 'uuid';
 
   import { page } from '$app/stores';
-  import { memberSettingsStore, operationsStore, operationTagsService } from '$lib/data';
+  import { memberSettingsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
+  import { operationsCommentsStore } from '$lib/data/operations';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
+  import Checkbox from '$lib/ui/Checkbox.svelte';
   import Input from '$lib/ui/Input.svelte';
   import InputLabel from '$lib/ui/InputLabel.svelte';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
+  import Spoiler from '$lib/ui/Spoiler.svelte';
+  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
   import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
@@ -23,9 +27,6 @@
   import TagsList from '$lib/widgets/TagsList.svelte';
   import TimeZoneList from '$lib/widgets/TimeZoneList.svelte';
 
-  import Checkbox from '$lib/ui/Checkbox.svelte';
-  import Spoiler from '$lib/ui/Spoiler.svelte';
-  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
   import AccountSelector from './AccountSelector.svelte';
   import AnotherCurrencyModal from './AnotherCurrencyModal.svelte';
   import CategorySelect from './CategorySelect.svelte';
@@ -95,16 +96,25 @@
 
   let excludeFromAnalysis = transaction?.excludeFromAnalysis ?? false;
 
-  $: suggestions =
-    comment.length >= 2
-      ? new Set(
-          $operationsStore
-            .filter((operation) => operation.comment?.startsWith(comment))
-            .map((operation) => operation.comment?.trim()),
-        )
-          .values()
-          .take(5)
-      : [];
+  let suggestions: string[] = [];
+
+  const comments = $operationsCommentsStore;
+
+  const handleCommentChange = (value: string) => {
+    comment = value;
+    if (comment.length < 2) {
+      suggestions = [];
+      return;
+    }
+    const newSuggestions = comments.filter((item) => item.startsWith(comment)).slice(0, 3);
+    if (newSuggestions.length === 1 && newSuggestions[0] === comment) {
+      suggestions = [];
+      return;
+    }
+    if (newSuggestions.join(',') !== suggestions.join(',')) {
+      suggestions = newSuggestions;
+    }
+  };
 
   const handleSubmit = async (e: Event) => {
     try {
@@ -303,7 +313,7 @@
       label={$translate('transactions.comment')}
       name="comment"
       value={transaction?.comment}
-      onChange={(value) => (comment = value)}
+      onChange={handleCommentChange}
       list="suggestions"
       optional
     />

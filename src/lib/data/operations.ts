@@ -1,11 +1,10 @@
 import dayjs from 'dayjs';
-import { derived, get } from 'svelte/store';
+import { derived, get, type Readable } from 'svelte/store';
 
 import { translate } from '$lib/translate';
 import { showErrorToast } from '$lib/ui/toasts';
 import { Logger } from '$lib/utils/logger';
 
-import { store } from '$lib/store';
 import { accountsService, accountsStore } from './accounts';
 import {
   SYSTEM_CATEGORY_TRANSFER_IN,
@@ -21,11 +20,16 @@ import { BaseService } from './service';
 const logger = new Logger('OperationsService', { disabled: false });
 
 export class OperationsService extends BaseService<Transaction> {
-  private _operations = store<TransactionViewModel[]>([]);
+  private _operations: Readable<TransactionViewModel[]>;
+  private _comments: Readable<string[]>;
   private _errorToastShown = false;
 
   get $operations() {
     return this._operations;
+  }
+
+  get $comments() {
+    return this._comments;
   }
 
   constructor() {
@@ -33,10 +37,10 @@ export class OperationsService extends BaseService<Transaction> {
 
     accountsService.deleteAccountOperations = this.deleteTransactionsByAccount;
 
-    derived(
+    this._operations = derived(
       [this.$items, $initialized, accountsStore, categoriesStore, operationTagsStore],
       ([transactions, initialized, accounts, _categories, tags]) => {
-        if (!initialized) return null;
+        if (!initialized) return [];
 
         const categories = _categories.concat(SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT);
 
@@ -125,9 +129,11 @@ export class OperationsService extends BaseService<Transaction> {
 
         return items;
       },
-    ).subscribe((items) => {
-      if (items) this._operations.set(items);
-    });
+    );
+
+    this._comments = derived(this.$items, (items) =>
+      Array.from(new Set(items.map((item) => item.comment?.trim()).filter(Boolean) as string[])),
+    );
   }
 
   deleteTransactionsByAccount(accountId: string): void {
@@ -140,3 +146,4 @@ export class OperationsService extends BaseService<Transaction> {
 export const operationsService = new OperationsService();
 
 export const operationsStore = operationsService.$operations;
+export const operationsCommentsStore = operationsService.$comments;
