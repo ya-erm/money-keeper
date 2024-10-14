@@ -5,9 +5,9 @@
   import Button from '$lib/ui/Button.svelte';
   import { useTitle } from '$lib/ui/header';
   import HeaderBackButton from '$lib/ui/header/HeaderBackButton.svelte';
+  import HeaderFormSubmitButton from '$lib/ui/header/HeaderFormSubmitButton.svelte';
   import { useLeftButton, useRightButton } from '$lib/ui/header/model';
 
-  import SaveTransactionButton from '../edit/SaveTransactionButton.svelte';
   import TransactionForm from '../form/TransactionForm.svelte';
 
   $: accounts = $accountsStore;
@@ -16,7 +16,7 @@
 
   useLeftButton(HeaderBackButton);
   useTitle($translate('transactions.new_transaction'));
-  useRightButton(SaveTransactionButton);
+  useRightButton(HeaderFormSubmitButton);
 
   const handleSubmit = async (transactions: Transaction[]) => {
     transactions.forEach((transaction) => operationsService.save(transaction));
