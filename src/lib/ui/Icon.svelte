@@ -15,7 +15,7 @@
 
 <span class="icon-container" style:padding={_padding}>
   <span style:width={_width} style:height={_height}>
-    <Icon icon={name} width={_width} height={_height} {color} inline />
+    <Icon icon={name} style={`width:${_width}; height: ${_height}`} {color} inline />
   </span>
 </span>
 

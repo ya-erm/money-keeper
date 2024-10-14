@@ -8,11 +8,11 @@
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
+  import HeaderFormSubmitButton from '$lib/ui/header/HeaderFormSubmitButton.svelte';
   import { findCurrencyRate, getSearchParam, setSearchParam } from '$lib/utils';
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
   import EditTransaction from '../transactions/edit/EditTransaction.svelte';
-  import SaveTransactionButton from '../transactions/edit/SaveTransactionButton.svelte';
 
   $: currencyRates = $currencyRatesStore;
   $: settings = $memberSettingsStore;
@@ -55,7 +55,7 @@
         onClick: closeOperationForm,
       },
       leftButton: null,
-      rightButton: SaveTransactionButton,
+      rightButton: HeaderFormSubmitButton,
       title: $translate('transactions.edit_transaction'),
     }}
   >

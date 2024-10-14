@@ -3,13 +3,13 @@
 
   import { translate } from '$lib/translate';
   import { useRightButton, useTitle } from '$lib/ui/header';
+  import HeaderFormSubmitButton from '$lib/ui/header/HeaderFormSubmitButton.svelte';
   import { getSearchParam } from '$lib/utils';
 
   import EditTransaction from './EditTransaction.svelte';
-  import SaveTransactionButton from './SaveTransactionButton.svelte';
 
   useTitle($translate('transactions.edit_transaction'));
-  useRightButton(SaveTransactionButton);
+  useRightButton(HeaderFormSubmitButton);
 
   $: id = getSearchParam($page, 'id');
 </script>

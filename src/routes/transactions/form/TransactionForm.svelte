@@ -6,12 +6,16 @@
   import { memberSettingsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
+  import { operationsCommentsStore } from '$lib/data/operations';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
+  import Checkbox from '$lib/ui/Checkbox.svelte';
   import Input from '$lib/ui/Input.svelte';
   import InputLabel from '$lib/ui/InputLabel.svelte';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
+  import Spoiler from '$lib/ui/Spoiler.svelte';
+  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
   import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
@@ -23,9 +27,6 @@
   import TagsList from '$lib/widgets/TagsList.svelte';
   import TimeZoneList from '$lib/widgets/TimeZoneList.svelte';
 
-  import Checkbox from '$lib/ui/Checkbox.svelte';
-  import Spoiler from '$lib/ui/Spoiler.svelte';
-  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
   import AccountSelector from './AccountSelector.svelte';
   import AnotherCurrencyModal from './AnotherCurrencyModal.svelte';
   import CategorySelect from './CategorySelect.svelte';
@@ -95,6 +96,26 @@
 
   let excludeFromAnalysis = transaction?.excludeFromAnalysis ?? false;
 
+  let suggestions: string[] = [];
+
+  const comments = $operationsCommentsStore;
+
+  const handleCommentChange = (value: string) => {
+    comment = value;
+    if (comment.length < 2) {
+      suggestions = [];
+      return;
+    }
+    const newSuggestions = comments.filter((item) => item.startsWith(comment)).slice(0, 3);
+    if (newSuggestions.length === 1 && newSuggestions[0] === comment) {
+      suggestions = [];
+      return;
+    }
+    if (newSuggestions.join(',') !== suggestions.join(',')) {
+      suggestions = newSuggestions;
+    }
+  };
+
   const handleSubmit = async (e: Event) => {
     try {
       const formData = new FormData(e.target as HTMLFormElement);
@@ -150,7 +171,7 @@
           date: datetime,
           ...(timeZone ? { timeZone } : {}),
           amount: checkNumberFormParameter(formData, 'destinationAmount'),
-          comment: checkStringOptionalFormParameter(formData, 'comment'),
+          comment: checkStringOptionalFormParameter(formData, 'comment')?.trim(),
           tagIds,
           linkedTransactionId: transactions[0].id,
           ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
@@ -292,9 +313,15 @@
       label={$translate('transactions.comment')}
       name="comment"
       value={transaction?.comment}
-      onChange={(value) => (comment = value)}
+      onChange={handleCommentChange}
+      list="suggestions"
       optional
     />
+    <datalist id="suggestions">
+      {#each suggestions as option}
+        <option value={option} />
+      {/each}
+    </datalist>
     {#if comment && replaceCalcExpressions(comment) !== comment}
       <div class="comment-preview">
         {replaceCalcExpressions(comment)}

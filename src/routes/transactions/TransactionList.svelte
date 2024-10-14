@@ -9,11 +9,11 @@
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import ShowMoreContainer from '$lib/ui/ShowMoreContainer.svelte';
+  import HeaderFormSubmitButton from '$lib/ui/header/HeaderFormSubmitButton.svelte';
   import { findCurrencyRate, getSearchParam, setSearchParam } from '$lib/utils';
 
   import TransactionListItem from './TransactionListItem.svelte';
   import EditTransaction from './edit/EditTransaction.svelte';
-  import SaveTransactionButton from './edit/SaveTransactionButton.svelte';
 
   export let transactions: TransactionViewModel[];
   export let hideAccount: boolean = false;
@@ -61,7 +61,7 @@
         onClick: closeOperationForm,
       },
       leftButton: null,
-      rightButton: SaveTransactionButton,
+      rightButton: HeaderFormSubmitButton,
       title: $translate('transactions.edit_transaction'),
     }}
   >
