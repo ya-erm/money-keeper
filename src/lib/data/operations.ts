@@ -131,7 +131,7 @@ export class OperationsService extends BaseService<Transaction> {
       },
     );
 
-    this._comments = derived(this.$items, (items) =>
+    this._comments = derived(this.$operations, (items) =>
       Array.from(new Set(items.map((item) => item.comment?.trim()).filter(Boolean) as string[])),
     );
   }
