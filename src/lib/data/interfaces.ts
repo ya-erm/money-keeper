@@ -98,6 +98,7 @@ export type CurrencyRate = {
 };
 
 // TODO: rename to Operation
+// after adding new field don't forget to change function copyOperation
 export type Transaction = {
   id: string;
   accountId: string;

@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { derived, get, type Readable } from 'svelte/store';
+import { v4 as uuid } from 'uuid';
 
 import { translate } from '$lib/translate';
 import { showErrorToast } from '$lib/ui/toasts';
@@ -147,3 +148,53 @@ export const operationsService = new OperationsService();
 
 export const operationsStore = operationsService.$operations;
 export const operationsCommentsStore = operationsService.$comments;
+
+/** Delete operation and linked operation */
+export function deleteOperation(id: string) {
+  const item = operationsService.getById(id);
+  if (item) {
+    operationsService.delete(item);
+    if (item.linkedTransactionId) {
+      const linkedOperation = operationsService.getById(item.linkedTransactionId);
+      if (linkedOperation) {
+        operationsService.delete(linkedOperation);
+      }
+    }
+  }
+}
+
+/** Create a copy of operation (note: don't forget to change id if needed) */
+export function cloneOperation(item: Transaction): Transaction {
+  return {
+    id: item.id,
+    accountId: item.accountId,
+    categoryId: item.categoryId,
+    date: item.date,
+    timeZone: item.timeZone,
+    amount: item.amount,
+    comment: item.comment,
+    description: item.description,
+    linkedTransactionId: item.linkedTransactionId,
+    anotherCurrency: item.anotherCurrency,
+    anotherCurrencyAmount: item.anotherCurrencyAmount,
+    excludeFromAnalysis: item.excludeFromAnalysis,
+    tagIds: item.tagIds ? [...item.tagIds] : undefined,
+  };
+}
+
+/** Create a new copy of operation (also copy linked operation if it exists) */
+export function copyOperation(operation: Transaction) {
+  const copiedOperation = cloneOperation(operation);
+  copiedOperation.id = uuid();
+  if (operation.linkedTransactionId) {
+    const linkedOperation = operationsService.getById(operation.linkedTransactionId);
+    if (linkedOperation) {
+      const copiedLinkedOperation = cloneOperation(linkedOperation);
+      copiedLinkedOperation.id = uuid();
+      copiedLinkedOperation.linkedTransactionId = copiedOperation.id;
+      copiedOperation.linkedTransactionId = copiedLinkedOperation.id;
+      operationsService.save(copiedLinkedOperation);
+    }
+  }
+  operationsService.save(copiedOperation);
+}
