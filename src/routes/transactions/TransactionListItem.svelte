@@ -2,6 +2,7 @@
   import type { CurrencyRate, TransactionViewModel } from '$lib/data/interfaces';
   import { translate, type Messages } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
+  import { longPress } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
   import { formatMoney } from '$lib/utils/formatMoney';
 
@@ -9,6 +10,7 @@
   export let currencyRate: CurrencyRate | null = null;
   export let hideAccount: boolean = false;
   export let onClick: ((transaction: TransactionViewModel) => void) | null = null;
+  export let onLongPress: ((transaction: TransactionViewModel) => void) | null = null;
 
   $: incoming = transaction.category.type === 'IN';
   $: outgoing = transaction.category.type === 'OUT';
@@ -45,6 +47,7 @@
     data-testId="TransactionListItem"
     data-id={transaction.id}
     on:click={() => onClick?.(transaction)}
+    use:longPress={() => onLongPress?.(transaction)}
     class="flex gap-0.5 items-center justify-between"
   >
     <div class="icon flex-center" class:deleted={transaction.category.deleted}>

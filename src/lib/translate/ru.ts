@@ -41,6 +41,8 @@ export const ruDict: Dictionary = {
   'common.data_problems':
     '{count, plural, one {Обнаружена # ошибка} few {Обнаружено # ошибки} other {Обнаружено # ошибок}} при инициализации данных',
   'common.select_all': 'Выбрать все',
+  'common.additional_options': 'Дополнительные опции',
+  'common.duplicate': 'Дублировать',
   // Timezones
   'timezones.select_time_zone': 'Выберите часовой пояс',
   'timezones.current_time_zone': 'Текущий часовой пояс',

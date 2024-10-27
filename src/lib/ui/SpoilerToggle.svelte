@@ -3,6 +3,7 @@
   import Icon from '$lib/ui/Icon.svelte';
 
   export let hidden: boolean;
+  export let withoutText: boolean = false;
 </script>
 
 <button
@@ -14,7 +15,9 @@
     <slot />
   </h3>
   <div class="flex items-center">
-    <span>{$translate(hidden ? 'common.show' : 'common.hide')}</span>
+    {#if !withoutText}
+      <span>{$translate(hidden ? 'common.show' : 'common.hide')}</span>
+    {/if}
     <div class="spoiler-toggle-icon" class:shown={!hidden}>
       <Icon padding={0} name={'mdi:chevron-down'} />
     </div>

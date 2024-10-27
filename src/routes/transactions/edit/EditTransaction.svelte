@@ -1,6 +1,7 @@
 <script lang="ts">
   import { accountsStore, categoriesStore, operationsService, operationsStore, operationTagsStore } from '$lib/data';
   import type { Transaction } from '$lib/data/interfaces';
+  import { deleteOperation } from '$lib/data/operations';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import { showSuccessToast } from '$lib/ui/toasts';
@@ -24,8 +25,7 @@
 
   const handleDelete = () => {
     if (!transaction) return;
-    const t = operationsService.getById(transaction.id);
-    if (t) operationsService.delete(t);
+    deleteOperation(transaction.id);
     showSuccessToast($translate('transactions.delete_transaction_success'), {
       testId: 'DeleteTransactionSuccessToast',
     });

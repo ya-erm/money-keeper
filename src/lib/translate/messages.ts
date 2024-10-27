@@ -37,6 +37,8 @@ export type Messages =
   | 'common.hide'
   | 'common.data_problems'
   | 'common.select_all'
+  | 'common.additional_options'
+  | 'common.duplicate'
   // Timezones
   | 'timezones.select_time_zone'
   | 'timezones.current_time_zone'

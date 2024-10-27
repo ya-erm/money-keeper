@@ -13,6 +13,7 @@
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
   import EditTransaction from '../transactions/edit/EditTransaction.svelte';
+  import OperationOptionsModal from './OperationOptionsModal.svelte';
 
   $: currencyRates = $currencyRatesStore;
   $: settings = $memberSettingsStore;
@@ -32,6 +33,9 @@
   $: operationId = getSearchParam($page, 'operation-id');
   const openOperationForm = (id: string) => setSearchParam($page, 'operation-id', id, { replace: false });
   const closeOperationForm = () => history.back();
+
+  let optionsModalOpened = false;
+  let optionsModalOperation: TransactionViewModel | null = null;
 </script>
 
 <ul class="operations-list flex-col gap-1">
@@ -42,6 +46,10 @@
         hideAccount={!!account}
         currencyRate={currencyRate ?? findCurrencyRate(currencyRates, settings?.currency, transaction.account.currency)}
         onClick={() => openOperationForm(transaction.id)}
+        onLongPress={() => {
+          optionsModalOpened = true;
+          optionsModalOperation = transaction;
+        }}
         {transaction}
       />
     {/each}
@@ -62,6 +70,10 @@
     <EditTransaction id={operationId} onBack={closeOperationForm} />
   </Layout>
 </Portal>
+
+{#if optionsModalOperation}
+  <OperationOptionsModal bind:opened={optionsModalOpened} operation={optionsModalOperation} />
+{/if}
 
 <style>
   .operations-list {
