@@ -93,7 +93,7 @@
       />
       <datalist id="categories">
         {#each suggestions as option}
-          <option value={$translate(option)} />
+          <option value={$translate(option)}></option>
         {/each}
       </datalist>
       <div class="flex-col gap-0.5">

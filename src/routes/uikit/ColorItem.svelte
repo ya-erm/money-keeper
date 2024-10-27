@@ -3,7 +3,7 @@
 </script>
 
 <div class="color-item">
-  <div class="color" style:background-color={color.startsWith('--') ? `var(${color})` : color} />
+  <div class="color" style:background-color={color.startsWith('--') ? `var(${color})` : color}></div>
   <span>{color}</span>
 </div>
 

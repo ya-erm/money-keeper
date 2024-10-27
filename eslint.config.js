@@ -19,7 +19,7 @@ const compat = new FlatCompat({
 
 export default [
   {
-    ignores: ['**/*.js', '**/playwright.config.ts', '**/service-worker.ts'],
+    ignores: ['**/*.js', '**/playwright.config.ts', '**/service-worker.ts', '.svelte-kit/**'],
   },
   ...compat.extends(
     'eslint:recommended',

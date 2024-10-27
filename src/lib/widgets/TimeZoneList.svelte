@@ -68,4 +68,4 @@
   {/each}
 </ListGroup>
 
-<div class="pb-1" />
+<div class="pb-1"></div>

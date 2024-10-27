@@ -44,7 +44,7 @@
       {/if}
     </div>
   </div>
-  <div class="flex-grow self-stretch" />
+  <div class="flex-grow self-stretch"></div>
   <div class="flex gap-0.25 items-center">
     <div class="flex-col items-end gap-0.25">
       <div class="money-value flex gap-0.5">

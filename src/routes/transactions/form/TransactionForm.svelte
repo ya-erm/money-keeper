@@ -319,7 +319,7 @@
     />
     <datalist id="suggestions">
       {#each suggestions as option}
-        <option value={option} />
+        <option value={option}></option>
       {/each}
     </datalist>
     {#if comment && replaceCalcExpressions(comment) !== comment}

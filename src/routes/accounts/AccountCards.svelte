@@ -70,7 +70,7 @@
           currencyRate={findCurrencyRate(currencyRates, settings?.currency, account.currency)}
           {onEdit}
         />
-        <div id={`account-card-${account.id}`} class="account-card-anchor" />
+        <div id={`account-card-${account.id}`} class="account-card-anchor"></div>
       </div>
     {/each}
     {#if accounts.length === 0}

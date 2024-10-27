@@ -30,7 +30,7 @@
           <tr>
             <th class="text-left" colspan="2">
               <div class="flex gap-0.25 items-center">
-                <span class="color-badge" style:background={group?.color ?? '#bbb'} />
+                <span class="color-badge" style:background={group?.color ?? '#bbb'}></span>
                 <span class="text-ellipsis">
                   {group?.name ?? $translate('analytics.groupings.groups.other')}
                 </span>
@@ -52,7 +52,7 @@
             <td class="name-cell">
               <div class="flex gap-0.25 items-end">
                 <div class="flex gap-0.25 items-center">
-                  <span class="color-badge" style:background={item.color} />
+                  <span class="color-badge" style:background={item.color}></span>
                   <span class="account-name text-ellipsis-all">{item.account.name}</span>
                 </div>
                 <span class="original-currency secondary">{item.account.currency}</span>
@@ -71,10 +71,10 @@
         {/each}
       </tbody>
     {/each}
-    <tbody />
+    <tbody></tbody>
     <tfoot>
       <tr>
-        <td />
+        <td></td>
         <td>
           <div class="text-right">{$translate('analytics.accounts.total')}:</div>
         </td>

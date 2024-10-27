@@ -4,7 +4,7 @@
 
 <label class="switch" class:active={checked}>
   <input type="checkbox" bind:checked />
-  <div class="indicator" />
+  <div class="indicator"></div>
 </label>
 
 <style>
