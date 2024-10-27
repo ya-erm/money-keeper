@@ -19,8 +19,9 @@
   import MainCurrencyModal from './currency-rates/MainCurrencyModal.svelte';
 
   // TODO: selectedMember is not a user, it can be a group
+  const isGuest = membersService.isGuest;
   $: selectedMember = $selectedMemberStore;
-  $: userIsLoggedIn = selectedMember && !membersService.isGuest;
+  $: userIsLoggedIn = selectedMember && !isGuest;
 
   $: memberSettings = $memberSettingsStore;
 

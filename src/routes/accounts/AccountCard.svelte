@@ -49,7 +49,7 @@
       </div>
     {/if}
   </div>
-  <div class="flex footer" />
+  <div class="flex footer"></div>
 </div>
 
 <style>

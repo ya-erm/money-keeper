@@ -17,7 +17,7 @@
 <IntersectionObserver element={showMoreContainer} on:intersect={showMore}>
   <slot />
   <div class="show-more">
-    <div bind:this={showMoreContainer} class="show-more-before" />
+    <div bind:this={showMoreContainer} class="show-more-before"></div>
     {#if limit < total}
       <div class="flex-col px-1 pb-1">
         <Button color="white" on:click={showMore}>

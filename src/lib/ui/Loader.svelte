@@ -4,7 +4,7 @@
 
 <div class="loader">
   {#if visible}
-    <div class="indicator" />
+    <div class="indicator"></div>
   {/if}
 </div>
 

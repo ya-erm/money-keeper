@@ -11,7 +11,7 @@
     <span>{value}</span>
     <input type="radio" {checked} />
     {#if checked}
-      <span class="indicator" />
+      <span class="indicator"></span>
     {/if}
   </label>
 </ListGroupItem>

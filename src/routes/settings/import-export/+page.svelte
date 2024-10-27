@@ -147,7 +147,7 @@
   <h2>{$translate('import_export.import')}</h2>
   <label class="flex-col gap-0.5">
     <span>{$translate('import_export.raw_data_json')}:</span>
-    <textarea class="text-area-json" data-testId="ImportTextArea" bind:value={rawImport} />
+    <textarea class="text-area-json" data-testId="ImportTextArea" bind:value={rawImport}></textarea>
   </label>
 
   <button data-testId="ParseJsonButton" class="mt-1 w-full" on:click={parseInput}>
@@ -173,7 +173,7 @@
   <h2>{$translate('import_export.export')}</h2>
   <label class="flex-col gap-0.5">
     <span>{$translate('import_export.raw_data_json')}:</span>
-    <textarea class="text-area-json" value={currentJson} />
+    <textarea class="text-area-json" value={currentJson}></textarea>
   </label>
   <p>
     <span>{$translate('import_export.categories')}: <b>{current.categories?.length ?? 0}</b>,</span>

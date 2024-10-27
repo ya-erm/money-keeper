@@ -1,18 +1,4 @@
 <script lang="ts">
-  import { Line } from 'svelte-chartjs';
-
-  import {
-    CategoryScale,
-    Chart,
-    Filler,
-    Legend,
-    LineElement,
-    LinearScale,
-    PointElement,
-    Title,
-    Tooltip,
-    TimeScale,
-  } from 'chart.js';
   import dayjs from 'dayjs';
 
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
@@ -25,9 +11,8 @@
   import { findRate } from '$lib/utils';
 
   import BalanceChartLegend from './BalanceChartLegend.svelte';
+  import Chart from './Chart.svelte';
   import { getAccountBalanceChartData } from './chartData';
-
-  Chart.register(Title, Tooltip, Legend, LineElement, PointElement, TimeScale, CategoryScale, LinearScale, Filler);
 
   const currencyRates = $currencyRatesStore;
   const accounts = $accountsStore;
@@ -94,7 +79,19 @@
       <Icon name="mdi:format-list-bulleted" />
     </Button>
   </div>
-  <Line
+  <Chart
+    type="line"
+    updateMode="none"
+    data={{
+      labels: items.map((x) => dayjs(x.date).format('DD.MM')),
+      datasets: filteredAccounts.map((account) => ({
+        label: account.name,
+        data: items.map((item) => item.accountBalance[account.id].ratedBalance),
+        backgroundColor: account.color ?? 'gray',
+        fill: true,
+        pointRadius: 0,
+      })),
+    }}
     options={{
       responsive: true,
       maintainAspectRatio: false,
@@ -108,7 +105,7 @@
           grid: { z: 1 },
           ticks: {
             autoSkip: false,
-            callback(_value, index) {
+            callback: (_value, index) => {
               const sameDayOfMonth = dayjs(items[index].date).date() === 1;
               if (sameDayOfMonth) {
                 return dayjs(items[index].date).format('MMM');
@@ -129,16 +126,6 @@
           display: false,
         },
       },
-    }}
-    data={{
-      labels: items.map((x) => dayjs(x.date).format('DD.MM')),
-      datasets: filteredAccounts.map((account) => ({
-        label: account.name,
-        data: items.map((item) => item.accountBalance[account.id].ratedBalance),
-        backgroundColor: account.color ?? 'gray',
-        fill: true,
-        pointRadius: 0,
-      })),
     }}
   />
 </div>

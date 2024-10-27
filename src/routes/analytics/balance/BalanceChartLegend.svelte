@@ -31,7 +31,7 @@
       <li>
         <Checkbox checked={selectedAccounts.includes(account.id)} onChange={(value) => handleChange(account.id, value)}>
           <div class="py-0.5 flex gap-0.5">
-            <div class="color" style="background-color: {account.color}" />
+            <div class="color" style="background-color: {account.color}"></div>
             <span>{account.name}</span>
           </div>
         </Checkbox>

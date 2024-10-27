@@ -95,7 +95,7 @@
         <Button color={showFilters ? 'primary' : 'white'} bordered on:click={() => (showFilters = !showFilters)}>
           <Icon size={1.25} name="mdi:filter" />
           {#if selectedTags.length || selectedCurrencies.length || $hideZeroBalanceAccounts}
-            <span class="filter-badge" />
+            <span class="filter-badge"></span>
           {/if}
         </Button>
       </div>
