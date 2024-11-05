@@ -62,5 +62,10 @@
     "timezones-list": "^3.0.3",
     "uuid": "^11.0.2"
   },
-  "type": "module"
+  "type": "module",
+  "overrides": {
+    "@sveltejs/kit": {
+      "cookie": ">=0.7.0"
+    }
+  }
 }
