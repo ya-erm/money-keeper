@@ -321,3 +321,9 @@ a {
 .font-bold {
   font-weight: bold;
 }
+
+/* Text selection */
+.select-none {
+  -webkit-user-select: none;
+  user-select: none;
+}

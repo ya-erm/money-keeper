@@ -27,7 +27,7 @@
 </script>
 
 <Modal bind:opened header={$translate('common.additional_options')}>
-  <div class="flex-col gap-1">
+  <div class="flex-col gap-1 select-none">
     <Button appearance="transparent" bordered on:click={handleDuplicate}>
       <Icon name="mdi:content-copy" />
       <span>{$translate('common.duplicate')}</span>
