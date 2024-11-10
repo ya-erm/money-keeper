@@ -46,12 +46,19 @@
   <button
     data-testId="TransactionListItem"
     data-id={transaction.id}
+    class:interactive={!!onClick}
+    tabindex={!onClick ? -1 : undefined}
     on:click={() => onClick?.(transaction)}
     use:longPress={() => onLongPress?.(transaction)}
     class="flex gap-0.5 items-center justify-between"
   >
     <div class="icon flex-center" class:deleted={transaction.category.deleted}>
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />
+      {#if transaction.repeating}
+        <div class="repeating-icon">
+          <Icon name="mdi:repeat" size={1} />
+        </div>
+      {/if}
     </div>
     <div class="text flex-col flex-grow items-start">
       <div class="header flex items-center">
@@ -104,6 +111,9 @@
 </li>
 
 <style>
+  li {
+    list-style: none;
+  }
   button {
     padding: 0;
     font-size: 1rem;
@@ -115,13 +125,17 @@
     width: 100%;
   }
   @media (hover: hover) {
-    button:hover {
+    button.interactive:hover {
       opacity: 0.9;
     }
-    button:hover .icon,
-    button:hover .text,
-    button:hover .tags,
-    button:hover .amount {
+    button.interactive:focus-visible {
+      outline: 2px solid var(--active-color);
+      outline-offset: 2px;
+    }
+    button.interactive:hover .icon,
+    button.interactive:hover .text,
+    button.interactive:hover .tags,
+    button.interactive:hover .amount {
       color: var(--active-color);
     }
   }
@@ -135,6 +149,15 @@
   .icon {
     border-radius: 100%;
     background-color: var(--header-background-color);
+    position: relative;
+  }
+  .repeating-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    border-radius: 50%;
+    background: var(--background-color);
+    outline: 1px solid var(--background-color);
   }
   .text {
     overflow: hidden;

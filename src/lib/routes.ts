@@ -24,6 +24,7 @@ type RouteKey =
   | 'analytics.categories'
   | 'categories'
   | 'categories.create'
+  | 'repeatings'
   | 'transactions'
   | 'transactions.create'
   | 'transactions.import'
@@ -109,6 +110,10 @@ export const routes: { [key in RouteKey]: Route } = {
   'categories.create': {
     path: '/categories/create',
     title: 'categories.create_category',
+  },
+  repeatings: {
+    path: '/repeatings',
+    title: 'repeatings.title',
   },
   transactions: {
     path: '/transactions',

@@ -6,6 +6,7 @@
   export let color: 'primary' | 'secondary' | 'white' | 'success' | 'danger' = 'primary';
   export let underlined: boolean = appearance == 'link';
   export let type: 'button' | 'submit' = 'button';
+  export let align: 'left' | 'center' | 'right' = 'center';
   export let bordered: boolean = false;
   export let disabled: boolean = false;
   export let testId: string | null = 'Button';
@@ -24,11 +25,14 @@
   class:solid={appearance === 'solid'}
   class:transparent={appearance === 'transparent' || appearance === 'link'}
   class:border={bordered === true && appearance !== 'link'}
+  class:align-left={align === 'left'}
+  class:align-right={align === 'right'}
   class:link={appearance === 'link'}
   class:underlined
   data-testId={testId}
   {disabled}
   {type}
+  {...$$restProps}
 >
   <slot />
   {#if text}
@@ -60,6 +64,9 @@
   }
   button.border {
     box-shadow: 0 0 0 1px var(--border-color);
+  }
+  button:focus-visible {
+    outline: 2px solid var(--active-color);
   }
 
   /* Solid */
@@ -129,5 +136,16 @@
   }
   button.link {
     padding: 0;
+  }
+  button.link:focus-visible {
+    outline-offset: 2px;
+  }
+
+  /** Align */
+  .align-left {
+    justify-content: flex-start;
+  }
+  .align-right {
+    justify-content: flex-end;
   }
 </style>

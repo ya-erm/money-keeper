@@ -1,7 +1,7 @@
 {
   "browser-preview.startUrl": "http://127.0.0.1:5173/",
   "browser-preview.chromeExecutable": "/Applications/Yandex.app/Contents/MacOS/Yandex",
-  "cSpell.words": ["datetime", "dndzone", "iconify", "Initialisable", "networkidle"],
+  "cSpell.words": ["datetime", "dndzone", "iconify", "Initialisable", "networkidle", "repeatings"],
   "cSpell.language": "en,ru,en-US,en-GB",
   "eslint.validate": ["javascript", "typescript", "svelte"],
   "editor.defaultFormatter": "esbenp.prettier-vscode",

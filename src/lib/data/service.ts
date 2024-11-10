@@ -9,6 +9,7 @@ import type {
   JournalItem,
   JournalOperation,
   JournalSubscriber,
+  Repeating,
   Tag,
   Transaction,
 } from './interfaces';
@@ -16,9 +17,17 @@ import { journalService } from './journal';
 import { membersService } from './members';
 import { useDB } from './useDB';
 
-type StorageName = 'categories' | 'accounts' | 'transactions' | 'tags' | 'accountTags' | 'currencyRates' | 'groupings';
+type StorageName =
+  | 'categories'
+  | 'accounts'
+  | 'transactions'
+  | 'tags'
+  | 'accountTags'
+  | 'currencyRates'
+  | 'groupings'
+  | 'repeatings';
 
-type EntityType = Category | Account | Transaction | Tag | CurrencyRate;
+type EntityType = Category | Account | Transaction | Tag | CurrencyRate | Repeating;
 
 export class BaseService<T extends EntityType> implements Initialisable, JournalSubscriber {
   private _name: string;

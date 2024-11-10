@@ -54,8 +54,9 @@
     content: '';
     position: absolute;
     top: 0.5rem;
-    height: 1px;
+    height: 2px;
     width: calc(100% + 4px);
+    margin-top: -1px;
     margin-left: -2px;
     background: var(--header-background-color);
   }

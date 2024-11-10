@@ -16,6 +16,7 @@ import {
 import { $initialized } from './initialized';
 import type { Transaction, TransactionViewModel } from './interfaces';
 import { operationTagsService, operationTagsStore } from './operationTags';
+import { repeatingsService, repeatingsStore } from './repeatings';
 import { BaseService } from './service';
 
 const logger = new Logger('OperationsService', { disabled: false });
@@ -39,8 +40,8 @@ export class OperationsService extends BaseService<Transaction> {
     accountsService.deleteAccountOperations = this.deleteTransactionsByAccount;
 
     this._operations = derived(
-      [this.$items, $initialized, accountsStore, categoriesStore, operationTagsStore],
-      ([transactions, initialized, accounts, _categories, tags]) => {
+      [this.$items, $initialized, accountsStore, categoriesStore, operationTagsStore, repeatingsStore],
+      ([transactions, initialized, accounts, _categories, tags, repeatings]) => {
         if (!initialized) return [];
 
         const categories = _categories.concat(SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT);
@@ -86,6 +87,20 @@ export class OperationsService extends BaseService<Transaction> {
           return tag;
         }
 
+        function findRepeating(id?: string) {
+          if (!id) return undefined;
+          const repeating = repeatings.find((item) => item.id === id);
+          if (!repeating) {
+            const deletedRepeating = repeatingsService.deletedItems.find((item) => item.id === id);
+            if (!deletedRepeating) {
+              throw new Error(`Repeating ${id} not found`);
+            }
+            warnings.push(`Repeating "${deletedRepeating.id}" ${id} is deleted`);
+            return deletedRepeating;
+          }
+          return repeating;
+        }
+
         transactions.sort((a, b) => dayjs(b.date).diff(dayjs(a.date)));
 
         const problems: Array<{ transaction: Transaction; e: unknown }> = [];
@@ -109,6 +124,7 @@ export class OperationsService extends BaseService<Transaction> {
                     }
                   : undefined,
                 tags: transaction.tagIds?.map(findTag) || [],
+                repeating: findRepeating(transaction.repeatingId),
               };
               return viewModel;
             } catch (e) {
@@ -179,6 +195,7 @@ export function cloneOperation(item: Transaction): Transaction {
     anotherCurrencyAmount: item.anotherCurrencyAmount,
     excludeFromAnalysis: item.excludeFromAnalysis,
     tagIds: item.tagIds ? [...item.tagIds] : undefined,
+    repeatingId: item.repeatingId,
   };
 }
 

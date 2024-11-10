@@ -230,6 +230,14 @@ export const ruDict: Dictionary = {
   'groups.delete_group_confirm_description':
     'Будут удалены все связанные с этой группой счета, категории и операции. Это действие будет невозможно отменить.',
   'groups.failed_to_delete_group': 'Не удалось удалить группу',
+  // Repeatings
+  'repeatings.title': 'Повторяющиеся операции',
+  'repeatings.no_data': 'Ещё нет повторяющихся операций.',
+  'repeatings.active': 'Активные',
+  'repeatings.inactive': 'Завершённые',
+  'repeatings.operations': 'Список операций',
+  'repeatings.empty_repeating': 'Пусто',
+  'repeatings.empty_repeating.info': 'Добавьте операцию или удалите запись',
   // Transactions
   'transactions.title': 'Операции',
   'transactions.create_transaction': 'Создать операцию',
@@ -264,6 +272,33 @@ export const ruDict: Dictionary = {
   'transactions.show_more': 'Показать ещё',
   'transactions.additional_parameters': 'Дополнительные параметры',
   'transactions.exclude_from_analytics': 'Исключить из аналитики',
+  'transactions.repeatings': 'Повторять операцию',
+  'transactions.repeatings.configure': 'Настроить',
+  'transactions.repeatings.title': 'Настройка повторов',
+  'transactions.repeatings.create_new': 'Создать новый повтор',
+  'transactions.repeatings.select_existing': 'Выбрать существующий',
+  'transactions.repeatings.select_repeating': 'Выберите повтор',
+  'transactions.repeatings.interval': 'Интервал повторов',
+  'transactions.repeatings.interval.day': '{count, plural, one {день} few {дня} other {дней}}',
+  'transactions.repeatings.interval.week': '{count, plural, one {неделя} few {недели} other {недель}}',
+  'transactions.repeatings.interval.month': '{count, plural, one {месяц} few {месяца} other {месяцев}}',
+  'transactions.repeatings.interval.year': '{count, plural, one {год} few {года} other {лет}}',
+  'transactions.repeatings.every_x_days':
+    '{count, plural, =1 {Каждый день} one {Каждые # день} few {Каждые # дня} other {Каждые # дней}}',
+  'transactions.repeatings.every_x_weeks':
+    '{count, plural, =1 {Каждую неделю} one {Каждые # неделю} few {Каждые # недели} other {Каждые # недель}}',
+  'transactions.repeatings.every_x_years':
+    '{count, plural, =1 {Каждый год} one {Каждые # год} few {Каждые # года} other {Каждые # лет}} {date}',
+  'transactions.repeatings.every_x_day_of_month': 'Каждое {value}-е число месяца',
+  'transactions.repeatings.every_x_day_of_month.every': 'Каждое',
+  'transactions.repeatings.every_x_day_of_month.nth_day': '{value}-е число',
+  'transactions.repeatings.every_x_day_of_month.of_x_months':
+    '{count, plural, =1 {месяца} one {раз в # месяц} few {раз в # месяца} other {раз в # месяцев}}',
+  'transactions.repeatings.every_x_day_of_month.change': 'Изменить',
+  'transactions.repeatings.day_of_month.title': 'Число месяца',
+  'transactions.repeatings.day_of_month.info': 'Введите значение от 1 до 31',
+  'transactions.repeatings.end_date': 'Дата окончания',
+  'transactions.repeatings.operations_list': 'Показать список операций',
   // Transactions import
   'transactions.import': 'Импорт',
   'transactions.import.title': 'Импорт операций',
@@ -343,6 +378,7 @@ export const ruDict: Dictionary = {
   'settings.theme.dark': 'Тёмное',
   'settings.theme.system': 'Как в системе',
   'settings.import_export': 'Импорт / Экспорт',
+  'settings.repeatings': 'Повторяющиеся операции',
   'settings.profile': 'Профиль',
   'settings.profile.change_name': 'Изменить имя',
   'settings.profile.change_name_failure': 'Не удалось изменить имя',

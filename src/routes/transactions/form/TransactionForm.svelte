@@ -7,6 +7,7 @@
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
   import { operationsCommentsStore } from '$lib/data/operations';
+  import { repeatingsService, repeatingsStore } from '$lib/data/repeatings';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Checkbox from '$lib/ui/Checkbox.svelte';
@@ -27,9 +28,12 @@
   import TagsList from '$lib/widgets/TagsList.svelte';
   import TimeZoneList from '$lib/widgets/TimeZoneList.svelte';
 
+  import RepeatingModal from '../../repeatings/RepeatingModal.svelte';
+  import RepeatingsList from '../../repeatings/RepeatingsList.svelte';
   import AccountSelector from './AccountSelector.svelte';
   import AnotherCurrencyModal from './AnotherCurrencyModal.svelte';
   import CategorySelect from './CategorySelect.svelte';
+  import RepeatingTypeModal from './RepeatingTypeModal.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
 
   $: settings = $memberSettingsStore;
@@ -92,10 +96,6 @@
   let anotherCurrencyModalOpened = false;
   let anotherCurrency: string | null = transaction?.anotherCurrency ?? null;
 
-  let additionalParametersHidden = true;
-
-  let excludeFromAnalysis = transaction?.excludeFromAnalysis ?? false;
-
   let suggestions: string[] = [];
 
   const comments = $operationsCommentsStore;
@@ -113,6 +113,22 @@
     }
     if (newSuggestions.join(',') !== suggestions.join(',')) {
       suggestions = newSuggestions;
+    }
+  };
+
+  let additionalParametersHidden = transaction?.excludeFromAnalysis || transaction?.repeating ? false : true;
+
+  let excludeFromAnalysis = transaction?.excludeFromAnalysis ?? false;
+
+  let repeating = transaction?.repeating;
+  let repeatingChecked = transaction?.repeating ? true : false;
+  let repeatingTypeModalOpened = false;
+  let repeatingListVisible = false;
+  let repeatingModalOpened = false;
+
+  const handleRepeatingCheckboxChange = (checked: boolean) => {
+    if (checked && !repeating) {
+      repeatingTypeModalOpened = true;
     }
   };
 
@@ -161,6 +177,7 @@
             }
           : {}),
         ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
+        ...(repeatingChecked ? { repeatingId: repeating?.id } : {}),
       });
 
       if (type === 'TRANSFER') {
@@ -175,8 +192,13 @@
           tagIds,
           linkedTransactionId: transactions[0].id,
           ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
+          ...(repeatingChecked ? { repeatingId: repeating?.id } : {}),
         });
         transactions[0].linkedTransactionId = transactions[1].id;
+      }
+
+      if (repeating) {
+        repeatingsService.save(repeating);
       }
 
       onSubmit(transactions);
@@ -342,7 +364,23 @@
         <SpoilerToggle slot="spoiler-header" bind:hidden={additionalParametersHidden}>
           {$translate('transactions.additional_parameters')}
         </SpoilerToggle>
-        <Checkbox bind:checked={excludeFromAnalysis} label={$translate('transactions.exclude_from_analytics')} />
+        <div class="flex-col gap-1">
+          <Checkbox bind:checked={excludeFromAnalysis} label={$translate('transactions.exclude_from_analytics')} />
+          <div class="flex gap-1">
+            <div class="flex-grow">
+              <Checkbox
+                bind:checked={repeatingChecked}
+                onChange={handleRepeatingCheckboxChange}
+                label={$translate('transactions.repeatings')}
+              />
+            </div>
+            {#if repeatingChecked}
+              <Button appearance="link" underlined={false} on:click={() => (repeatingModalOpened = true)}>
+                {$translate('transactions.repeatings.configure')}
+              </Button>
+            {/if}
+          </div>
+        </div>
       </Spoiler>
     </div>
     <slot />
@@ -352,6 +390,67 @@
 </form>
 
 <AnotherCurrencyModal bind:opened={anotherCurrencyModalOpened} bind:anotherCurrency />
+
+{#if repeatingTypeModalOpened}
+  <RepeatingTypeModal
+    bind:opened={repeatingTypeModalOpened}
+    onCreateNew={() => {
+      repeatingModalOpened = true;
+      repeatingTypeModalOpened = false;
+    }}
+    onSelectExisting={() => {
+      repeatingListVisible = true;
+      repeatingTypeModalOpened = false;
+    }}
+    onCancel={() => {
+      if (!repeating) repeatingChecked = false;
+      repeatingTypeModalOpened = false;
+    }}
+  />
+{/if}
+
+{#if repeatingModalOpened}
+  <RepeatingModal
+    {repeating}
+    date={datetime}
+    opened={repeatingModalOpened}
+    onSubmit={(value) => {
+      repeating = value;
+      repeatingModalOpened = false;
+    }}
+    onCancel={() => {
+      if (!repeating) repeatingChecked = false;
+      repeatingModalOpened = false;
+    }}
+  />
+{/if}
+
+<Portal visible={repeatingListVisible}>
+  <Layout
+    header={{
+      title: $translate('transactions.repeatings.select_repeating'),
+      backButton: {
+        title: $translate('common.back'),
+        onClick: () => {
+          if (!repeating) repeatingChecked = false;
+          repeatingListVisible = false;
+        },
+      },
+      leftButton: null,
+      rightButton: null,
+    }}
+  >
+    <div class="p-1">
+      <RepeatingsList
+        repeatings={$repeatingsStore}
+        onClick={(item) => {
+          repeating = item;
+          repeatingListVisible = false;
+        }}
+      />
+    </div>
+  </Layout>
+</Portal>
 
 <Portal visible={timeZoneListVisible}>
   <Layout
