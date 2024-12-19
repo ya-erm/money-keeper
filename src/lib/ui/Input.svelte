@@ -1,5 +1,6 @@
 <script lang="ts">
   import { translate } from '$lib/translate';
+  import resizeObserver from '$lib/utils/resizeObserver';
 
   import Button from './Button.svelte';
   import Icon from './Icon.svelte';
@@ -23,12 +24,28 @@
 
   export let value: string | null = null;
   export let onChange: ((value: string) => void) | null = null;
+
+  export let align: 'left' | 'center' | 'right' = 'left';
+  export let icon: string | null = null;
   export let endText: string | null = null;
   export let clearable = false;
 
   export let v2 = false;
 
   export let ref: HTMLInputElement | null = null;
+
+  let startSlot: HTMLElement | null = null;
+  let endSlot: HTMLElement | null = null;
+
+  const onStartSlotResize = () => {
+    const startSlotWidth = startSlot?.getBoundingClientRect().width ?? 0;
+    ref?.style.setProperty('padding-left', startSlotWidth ? `${startSlotWidth}px` : '0.75rem');
+  };
+
+  const onEndSlotResize = () => {
+    const endSlotWidth = endSlot?.getBoundingClientRect().width ?? 0;
+    ref?.style.setProperty('padding-right', endSlotWidth ? `${endSlotWidth}px` : '0.75rem');
+  };
 
   const handleChange = (e: Event) => {
     value = (e.target as HTMLInputElement).value;
@@ -46,6 +63,18 @@
     <InputLabel text={label} {optional} {disabled} {error} testId={`${testId}.Label`} {v2} {value} />
   {/if}
   <div class="input-container flex-col">
+    <div
+      class="start-slot flex items-center"
+      bind:this={startSlot}
+      use:resizeObserver={{ onResize: onStartSlotResize }}
+    >
+      <slot name="start" />
+      {#if icon}
+        <div class="start-icon" class:error={!!error}>
+          <Icon name={icon} />
+        </div>
+      {/if}
+    </div>
     <input
       bind:this={ref}
       on:input={handleChange}
@@ -54,6 +83,9 @@
       type={type === 'color' ? 'text' : type}
       data-testId={testId}
       class:error={!!error}
+      class:withIcon={icon}
+      class:align-center={align === 'center'}
+      class:align-right={align === 'right'}
       class:clearable
       {placeholder}
       {minlength}
@@ -64,8 +96,9 @@
       {value}
       {list}
       {name}
+      {...$$restProps}
     />
-    <div class="end-slot flex items-center">
+    <div class="end-slot flex items-center" bind:this={endSlot} use:resizeObserver={{ onResize: onEndSlotResize }}>
       {#if type === 'color'}
         <input class="input-color" type="color" bind:value {disabled} />
       {/if}
@@ -81,6 +114,7 @@
             on:click={clearValue}
             appearance="link"
             color={error ? 'danger' : 'secondary'}
+            aria-label={$translate('common.clear')}
             testId={`${testId}.ClearButton`}
             {disabled}
           >
@@ -120,6 +154,7 @@
     font-size: 1rem;
     border-radius: 0.75rem;
     padding: 0.75rem;
+    min-height: 2.5rem;
     border: 1px solid var(--border-color);
     background-color: var(--header-background-color);
     color: var(--text-color);
@@ -134,8 +169,14 @@
   input[type='time'] {
     -webkit-appearance: none;
   }
+  input.withIcon {
+    padding-left: 36px;
+  }
   input:focus {
     border: 1px solid var(--active-color);
+  }
+  input:focus-visible {
+    outline: 1px solid var(--active-color);
   }
   input.error {
     color: var(--red-color);
@@ -150,6 +191,20 @@
   :global(body.dark-mode input) {
     color-scheme: dark;
   }
+  .start-slot {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    top: 0;
+  }
+  .start-icon {
+    padding: 0.5rem;
+    padding-right: 0.25rem;
+    color: var(--secondary-text-color);
+  }
+  .start-icon.error {
+    color: var(--red-color);
+  }
   .end-slot {
     position: absolute;
     right: 0;
@@ -162,5 +217,12 @@
   .error-text {
     font-size: 0.8rem;
     color: var(--red-color);
+  }
+
+  .align-center {
+    text-align: center;
+  }
+  .align-right {
+    text-align: right;
   }
 </style>

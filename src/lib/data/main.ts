@@ -14,6 +14,7 @@ import { journalService } from './journal';
 import { membersService } from './members';
 import { operationTagsService } from './operationTags';
 import { operationsService } from './operations';
+import { repeatingsService } from './repeatings';
 import { settingsService } from './settings';
 
 const logger = new Logger('MainService', { disabled: false, color: '#00cc55' });
@@ -51,6 +52,7 @@ class MainService implements Initialisable {
       operationsService,
       currencyRatesService,
       groupingsService,
+      repeatingsService,
     ];
 
     logger.log(`Initialise ${services.length} services to load data from local DB`);

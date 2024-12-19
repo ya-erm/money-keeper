@@ -66,6 +66,7 @@
     />
   {/if}
   <ListLinkItem title={$translate('settings.import_export')} href={route('settings.import_export')} />
+  <ListLinkItem title={$translate('settings.repeatings')} href={route('repeatings')} />
 </ListGroup>
 
 <ListGroup title={$translate('settings.debug_tools')}>

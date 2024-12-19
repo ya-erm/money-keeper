@@ -1,11 +1,12 @@
-export { accountTagsService, accountTagsStore } from './accountTags';
 export { accountsService, accountsStore } from './accounts';
+export { accountTagsService, accountTagsStore } from './accountTags';
 export { categoriesService, categoriesStore } from './categories';
 export { currencyRatesService, currencyRatesStore } from './currencyRates';
 export { groupingsService, groupingsStore } from './groupings';
 export { journalService } from './journal';
 export { mainService } from './main';
 export { memberSettingsStore, membersService, membersStore, selectedMemberStore } from './members';
-export { operationTagsService, operationTagsStore } from './operationTags';
 export { operationsService, operationsStore } from './operations';
+export { operationTagsService, operationTagsStore } from './operationTags';
+export { repeatingsService, repeatingsStore } from './repeatings';
 export { settingsService, settingsStore } from './settings';

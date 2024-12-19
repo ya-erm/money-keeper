@@ -50,6 +50,7 @@ export type JournalOperation = {
   categoriesInOrder?: string[];
   categoriesOutOrder?: string[];
   grouping?: Grouping;
+  repeating?: Repeating;
 };
 
 export type JournalSubscriber = {
@@ -113,6 +114,7 @@ export type Transaction = {
   anotherCurrencyAmount?: number | null;
   excludeFromAnalysis?: boolean;
   tagIds?: string[];
+  repeatingId?: string;
   deleted?: boolean;
 };
 
@@ -123,6 +125,7 @@ type TransactionWithAccountAndCategory = Transaction & {
 
 export type TransactionViewModel = TransactionWithAccountAndCategory & {
   linkedTransaction?: TransactionWithAccountAndCategory;
+  repeating?: Repeating;
   tags: Tag[];
 };
 
@@ -138,6 +141,15 @@ export type Group = {
   name: string;
   color?: string;
   accountIds?: string[];
+};
+
+export type Repeating = {
+  id: string;
+  count: number;
+  interval: 'day' | 'week' | 'month' | 'year';
+  dayOfMonth?: number;
+  endDate?: string;
+  deleted?: boolean;
 };
 
 export interface LocalDB extends DBSchema {
@@ -196,6 +208,11 @@ export interface LocalDB extends DBSchema {
   groupings: {
     key: string;
     value: WithOwner<Grouping>;
+    indexes: { 'by-owner': string };
+  };
+  repeatings: {
+    key: string;
+    value: WithOwner<Repeating>;
     indexes: { 'by-owner': string };
   };
 }
