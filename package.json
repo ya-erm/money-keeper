@@ -43,7 +43,7 @@
     "globals": "^15.11.0",
     "prettier": "^3.4.2",
     "prettier-plugin-svelte": "^3.3.2",
-    "prisma": "^5.22.0",
+    "prisma": "^6.1.0",
     "svelte": "^5.14.4",
     "svelte-check": "^4.1.1",
     "svelte-i18n": "^4.0.1",
@@ -53,7 +53,7 @@
     "vite": "^5.4.11"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0",
+    "@prisma/client": "^6.1.0",
     "@vercel/analytics": "^1.4.1",
     "bcrypt": "^5.1.1",
     "dayjs": "^1.11.13",
