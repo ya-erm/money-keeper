@@ -266,7 +266,7 @@ export const ruDict: Dictionary = {
   'transactions.delete_transaction': 'Удалить операцию',
   'transactions.delete_transaction_success': 'Операция удалена',
   'transactions.delete_transaction_failure': 'Не удалось удалить операцию',
-  'transactions.feature_operations': 'Будущие операции',
+  'transactions.future_operations': 'Будущие операции',
   'transactions.another_currency': 'Другая валюта',
   'transactions.same_currency': 'Та же валюта',
   'transactions.show_more': 'Показать ещё',

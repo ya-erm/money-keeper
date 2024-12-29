@@ -66,7 +66,7 @@
     {#if futureOperations.length > 0}
       <Spoiler hidden={featureOperationsHidden}>
         <SpoilerToggle slot="spoiler-header" bind:hidden={featureOperationsHidden}>
-          <span>{$translate('transactions.feature_operations')}</span>
+          <span>{$translate('transactions.future_operations')}</span>
           <span class="operations-count">
             {$translate('common.count', { values: { count: futureOperations.length } })}
           </span>
