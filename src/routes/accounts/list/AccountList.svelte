@@ -141,7 +141,7 @@
   {#if archivedAccounts.length > 0}
     <Spoiler hidden={archivedHidden}>
       <div slot="spoiler-header" class="mt-1 px-1">
-        <SpoilerToggle bind:hidden={archivedHidden}>
+        <SpoilerToggle bind:hidden={archivedHidden} translate={$translate}>
           <div class="ml-0.5 flex items-center gap-0.5">
             <Icon name="ri:archive-line" size={1.5} />
             <span class="text-ellipsis-all">{$translate('accounts.archived_accounts')}</span>

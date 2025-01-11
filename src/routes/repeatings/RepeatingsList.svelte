@@ -3,6 +3,7 @@
   import dayjs from 'dayjs';
 
   import Button from '@ya-erm/svelte-ui/Button';
+  import ButtonBase from '@ya-erm/svelte-ui/ButtonBase';
   import Icon from '@ya-erm/svelte-ui/Icon';
 
   import { currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
@@ -10,7 +11,6 @@
   import { copyOperation, operationsService } from '$lib/data/operations';
   import { getNextRepeatingDate, repeatingsService } from '$lib/data/repeatings';
   import { translate } from '$lib/translate';
-  import ButtonBase from '$lib/ui/ButtonBase.svelte';
   import { deleteSearchParam, findCurrencyRate, getSearchParam, groupBySelector, setSearchParam } from '$lib/utils';
   import { goBack } from '$lib/utils/goBack';
   import { maxBySelector } from '$lib/utils/minMax';

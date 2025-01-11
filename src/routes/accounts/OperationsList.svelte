@@ -1,12 +1,13 @@
 <script lang="ts">
+  import Spoiler from '@ya-erm/svelte-ui/Spoiler';
+  import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
+
   import { operationsStore } from '$lib/data';
   import type { Account } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
   import Input from '@ya-erm/svelte-ui/Input';
   import ShowMoreContainer from '$lib/ui/ShowMoreContainer.svelte';
-  import Spoiler from '$lib/ui/Spoiler.svelte';
-  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
   import { futureOperationsPredicate, pastOperationsPredicate } from '$lib/utils';
 
   import GroupedOperationsList from './GroupedOperationsList.svelte';
@@ -65,7 +66,7 @@
     </div>
     {#if futureOperations.length > 0}
       <Spoiler hidden={featureOperationsHidden}>
-        <SpoilerToggle slot="spoiler-header" bind:hidden={featureOperationsHidden}>
+        <SpoilerToggle slot="spoiler-header" bind:hidden={featureOperationsHidden} translate={$translate}>
           <span>{$translate('transactions.future_operations')}</span>
           <span class="operations-count">
             {$translate('common.count', { values: { count: futureOperations.length } })}

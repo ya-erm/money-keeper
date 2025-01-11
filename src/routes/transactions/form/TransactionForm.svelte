@@ -7,6 +7,8 @@
   import Checkbox from '@ya-erm/svelte-ui/Checkbox';
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+  import Spoiler from '@ya-erm/svelte-ui/Spoiler';
+  import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
 
   import { memberSettingsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
@@ -16,8 +18,6 @@
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
-  import Spoiler from '$lib/ui/Spoiler.svelte';
-  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
   import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
@@ -362,7 +362,7 @@
     </div>
     <div class="flex-col gap-0.5">
       <Spoiler hidden={additionalParametersHidden}>
-        <SpoilerToggle slot="spoiler-header" bind:hidden={additionalParametersHidden}>
+        <SpoilerToggle slot="spoiler-header" bind:hidden={additionalParametersHidden} translate={$translate}>
           {$translate('transactions.additional_parameters')}
         </SpoilerToggle>
         <div class="flex-col gap-1">
