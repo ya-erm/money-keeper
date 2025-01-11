@@ -1,12 +1,13 @@
 <script lang="ts">
   import { v4 as uuid } from 'uuid';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+  import Input from '@ya-erm/svelte-ui/Input';
+
   import { currencyRatesService } from '$lib/data';
   import type { CurrencyRate } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
-  import Input from '@ya-erm/svelte-ui/Input';
   import Modal from '$lib/ui/Modal.svelte';
 
   export let opened: boolean;
@@ -63,7 +64,7 @@
       step="any"
       required
     >
-      <Button slot="end" on:click={getGlobalRate} appearance="transparent">
+      <Button slot="end" onClick={getGlobalRate} appearance="transparent">
         <Icon name="mdi:cached" />
       </Button>
     </Input>
@@ -74,7 +75,7 @@
           <div>1 {cur1} = {rate} {cur2}</div>
           <div>1 {cur2} = {(1 / Number(rate)).toFixed(4)} {cur1}</div>
         </div>
-        <Button on:click={swapCurrencies} appearance="transparent" bordered>
+        <Button onClick={swapCurrencies} appearance="transparent" bordered>
           <Icon name="mdi:swap-vertical" />
         </Button>
       </div>
@@ -82,9 +83,9 @@
 
     <div class="grid-col-2 gap-1">
       {#if !!item}
-        <Button on:click={onDelete} text={$translate('common.delete')} color="danger" />
+        <Button onClick={onDelete} text={$translate('common.delete')} color="danger" />
       {:else}
-        <Button text={$translate('common.cancel')} color="secondary" on:click={() => (opened = false)} />
+        <Button text={$translate('common.cancel')} color="secondary" onClick={() => (opened = false)} />
       {/if}
       <Button text={$translate('common.save')} color="primary" type="submit" />
     </div>

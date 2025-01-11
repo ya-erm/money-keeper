@@ -1,9 +1,11 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+
   import type { Grouping } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
 
   export let grouping: Grouping;
   export let description = grouping.groups
@@ -42,7 +44,7 @@
     <Button
       appearance="link"
       underlined={false}
-      on:click={() => goto(route('analytics.accounts.groupings.edit') + '?id=' + grouping.id)}
+      onClick={() => goto(route('analytics.accounts.groupings.edit') + '?id=' + grouping.id)}
     >
       <Icon name="mdi:pencil" />
     </Button>

@@ -4,8 +4,8 @@
   import { accountTagsService, accountTagsStore, accountsService } from '$lib/data';
   import type { Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Modal from '$lib/ui/Modal.svelte';
@@ -96,7 +96,7 @@
             color="danger"
             appearance="transparent"
             text={$translate('common.delete')}
-            on:click={() => (deleteModalOpened = true)}
+            onClick={() => (deleteModalOpened = true)}
           />
         {:else}
           <Button
@@ -104,7 +104,7 @@
             color="secondary"
             appearance="transparent"
             text={$translate('accounts.archive')}
-            on:click={handleArchive}
+            onClick={handleArchive}
           />
         {/if}
       {:else}
@@ -113,11 +113,11 @@
           color="secondary"
           appearance="transparent"
           text={$translate('common.cancel')}
-          on:click={() => (opened = false)}
+          onClick={() => (opened = false)}
         />
       {/if}
       {#if archived}
-        <Button bordered text={$translate('accounts.restore')} on:click={handleRestore} />
+        <Button bordered text={$translate('accounts.restore')} onClick={handleRestore} />
       {:else}
         <Button bordered text={$translate('common.save')} type="submit" />
       {/if}

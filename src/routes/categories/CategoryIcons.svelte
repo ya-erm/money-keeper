@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
   import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
-  import MultiSwitch from '$lib/ui/MultiSwitch.svelte';
+  import MultiSwitch from '@ya-erm/svelte-ui/MultiSwitch';
+
+  import { translate } from '$lib/translate';
 
   import { categoryIcons } from './icons';
 
@@ -42,7 +43,7 @@
           <GridCircleItem icon={icon || 'mdi:folder-outline'} />
         </div>
       </div>
-      <Button on:click={() => onSelect(icon)}>{$translate('common.continue')}</Button>
+      <Button onClick={() => onSelect(icon)}>{$translate('common.continue')}</Button>
     </div>
   {/if}
 </div>

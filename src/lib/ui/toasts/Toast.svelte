@@ -1,6 +1,8 @@
 <script lang="ts">
-  import Icon from '$lib/ui/Icon.svelte';
   import { createEventDispatcher } from 'svelte';
+
+  import Icon from '@ya-erm/svelte-ui/Icon';
+
   import type { ToastType } from './toasts';
 
   const dispatch = createEventDispatcher();

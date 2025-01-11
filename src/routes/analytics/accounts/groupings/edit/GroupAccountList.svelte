@@ -1,8 +1,10 @@
 <script lang="ts">
+  import Button from '@ya-erm/svelte-ui/Button';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+
   import type { Group } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+
   import GroupAccountListItem from './GroupAccountListItem.svelte';
 
   export let group: Group;
@@ -23,7 +25,7 @@
       </li>
     {/each}
   </ul>
-  <Button color="white" on:click={() => onAddAccountToGroup(group.id)}>
+  <Button color="white" onClick={() => onAddAccountToGroup(group.id)}>
     {$translate('analytics.groupings.groups.accounts.add')}
   </Button>
 </div>

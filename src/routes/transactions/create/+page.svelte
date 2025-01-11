@@ -2,7 +2,7 @@
   import { accountsStore, categoriesStore, operationsService, operationTagsStore } from '$lib/data';
   import type { Transaction } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
   import { useTitle } from '$lib/ui/header';
   import HeaderBackButton from '$lib/ui/header/HeaderBackButton.svelte';
   import HeaderFormSubmitButton from '$lib/ui/header/HeaderFormSubmitButton.svelte';

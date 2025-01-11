@@ -1,12 +1,13 @@
 <script lang="ts">
   import dayjs, { type Dayjs } from 'dayjs';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import MultiSwitch from '@ya-erm/svelte-ui/MultiSwitch';
+
   import type { DateIntervalType } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Input from '@ya-erm/svelte-ui/Input';
   import Modal from '$lib/ui/Modal.svelte';
-  import MultiSwitch from '$lib/ui/MultiSwitch.svelte';
 
   export let opened = false;
 
@@ -59,8 +60,8 @@
       disabled={selectedIntervalType !== 'custom'}
     />
     <div class="grid-col-2 gap-1">
-      <Button text={$translate('common.cancel')} color="secondary" on:click={handleCancel} />
-      <Button text={$translate('common.save')} color="primary" on:click={handleAccept} />
+      <Button text={$translate('common.cancel')} color="secondary" onClick={handleCancel} />
+      <Button text={$translate('common.save')} color="primary" onClick={handleAccept} />
     </div>
   </form>
 </Modal>

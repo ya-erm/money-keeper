@@ -1,9 +1,10 @@
 <script lang="ts">
   import dayjs from 'dayjs';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+
   import type { Repeating } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
 
   export let count: number;
   export let interval: Repeating['interval'];
@@ -34,7 +35,7 @@
       appearance="link"
       underlined={false}
       text={$translate('transactions.repeatings.every_x_day_of_month.nth_day', { values: { value: dayOfMonth } })}
-      on:click={onDayOfMonthChangeClick}
+      onClick={onDayOfMonthChangeClick}
     />
   {:else}
     <span>{$translate('transactions.repeatings.every_x_day_of_month.nth_day', { values: { value: dayOfMonth } })}</span>
@@ -47,7 +48,7 @@
     appearance="link"
     underlined={false}
     text={$translate('transactions.repeatings.every_x_day_of_month.change')}
-    on:click={onDayOfMonthChangeClick}
+    onClick={onDayOfMonthChangeClick}
   /> -->
 {:else if interval === 'year'}
   <span>

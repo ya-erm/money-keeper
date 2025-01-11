@@ -4,7 +4,7 @@
   import { route } from '$lib/routes';
   import type { RegisterRequestData, RegisterResponseData } from '$lib/server/api/v2/auth';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
   import Loader from '$lib/ui/Loader.svelte';
   import Modal from '$lib/ui/Modal.svelte';

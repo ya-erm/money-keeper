@@ -1,6 +1,7 @@
 <script lang="ts">
+  import Button from '@ya-erm/svelte-ui/Button';
+
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
 
   const handleSave = () => {
     const form = document.querySelector('form');
@@ -13,4 +14,4 @@
   };
 </script>
 
-<Button appearance="transparent" on:click={handleSave} text={$translate('common.done')} />
+<Button appearance="transparent" onClick={handleSave} text={$translate('common.done')} />

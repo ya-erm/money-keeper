@@ -3,7 +3,10 @@
   import { v4 as uuid } from 'uuid';
   import { page } from '$app/stores';
 
+  import Button from '@ya-erm/svelte-ui/Button';
   import Checkbox from '@ya-erm/svelte-ui/Checkbox';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
 
   import { memberSettingsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
@@ -11,9 +14,6 @@
   import { operationsCommentsStore } from '$lib/data/operations';
   import { repeatingsService, repeatingsStore } from '$lib/data/repeatings';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Input from '@ya-erm/svelte-ui/Input';
-  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import Spoiler from '$lib/ui/Spoiler.svelte';
@@ -251,7 +251,7 @@
         <span class="flex-shrink-0">
           <InputLabel text={$translate('transactions.dateTime')} />
         </span>
-        <Button appearance="link" underlined={false} on:click={() => (timeZoneListVisible = true)}>
+        <Button appearance="link" underlined={false} onClick={() => (timeZoneListVisible = true)}>
           {#if timeZone}
             <div class="flex gap-0.25">
               <span class="time-zone text-ellipsis">{timeZone}</span>
@@ -276,7 +276,7 @@
             <Button
               appearance="link"
               underlined={false}
-              on:click={() => {
+              onClick={() => {
                 anotherCurrencyModalOpened = true;
                 anotherCurrency = settings?.lastAnotherCurrency ?? null;
               }}
@@ -284,7 +284,7 @@
               {$translate('transactions.another_currency')}
             </Button>
           {:else}
-            <Button appearance="link" underlined={false} on:click={() => (anotherCurrency = null)}>
+            <Button appearance="link" underlined={false} onClick={() => (anotherCurrency = null)}>
               {$translate('transactions.same_currency')}
             </Button>
           {/if}
@@ -376,7 +376,7 @@
               />
             </div>
             {#if repeatingChecked}
-              <Button appearance="link" underlined={false} on:click={() => (repeatingModalOpened = true)}>
+              <Button appearance="link" underlined={false} onClick={() => (repeatingModalOpened = true)}>
                 {$translate('transactions.repeatings.configure')}
               </Button>
             {/if}

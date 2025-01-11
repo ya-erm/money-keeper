@@ -1,7 +1,7 @@
 <script lang="ts">
   import { activeLocale, languages, translate, type Locales } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import Modal from '$lib/ui/Modal.svelte';
 
   export let opened: boolean;
@@ -45,8 +45,8 @@
     {/each}
   </ul>
   <div class="grid-col-2 gap-1">
-    <Button text={$translate('common.cancel')} color="secondary" on:click={handleCancel} />
-    <Button text={$translate('common.apply')} color="primary" on:click={handleApply} />
+    <Button text={$translate('common.cancel')} color="secondary" onClick={handleCancel} />
+    <Button text={$translate('common.apply')} color="primary" onClick={handleApply} />
   </div>
 </Modal>
 

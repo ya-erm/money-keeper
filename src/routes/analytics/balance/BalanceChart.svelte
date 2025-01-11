@@ -1,11 +1,12 @@
 <script lang="ts">
   import dayjs from 'dayjs';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import { type Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import { findRate } from '$lib/utils';
@@ -71,11 +72,11 @@
 
 <div class="chart-container">
   <div class="legend-button flex items-start gap-0.5">
-    <Button color="white" bordered on:click={changeInterval}>
+    <Button color="white" bordered onClick={changeInterval}>
       <Icon name="mdi:arrow-expand-horizontal" />
       {interval}M
     </Button>
-    <Button color="white" bordered on:click={() => (legendVisible = true)}>
+    <Button color="white" bordered onClick={() => (legendVisible = true)}>
       <Icon name="mdi:format-list-bulleted" />
     </Button>
   </div>

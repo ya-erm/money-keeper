@@ -1,6 +1,6 @@
 <script lang="ts">
   import { translate } from '$lib/translate';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Icon from '@ya-erm/svelte-ui/Icon';
 
   export let hidden: boolean;
   export let withoutText: boolean = false;

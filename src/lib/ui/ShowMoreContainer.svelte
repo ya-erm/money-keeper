@@ -1,6 +1,6 @@
 <script lang="ts">
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
   import IntersectionObserver from '$lib/ui/IntersectionObserver.svelte';
 
   export let limit: number;
@@ -20,7 +20,7 @@
     <div bind:this={showMoreContainer} class="show-more-before"></div>
     {#if limit < total}
       <div class="flex-col px-1 pb-1">
-        <Button color="white" on:click={showMore}>
+        <Button color="white" onClick={showMore}>
           {$translate('transactions.show_more')}
         </Button>
       </div>

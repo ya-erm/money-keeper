@@ -2,8 +2,8 @@
   import type { TransactionViewModel } from '$lib/data/interfaces';
   import { copyOperation, deleteOperation } from '$lib/data/operations';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import Modal from '$lib/ui/Modal.svelte';
   import { showSuccessToast } from '$lib/ui/toasts';
 

@@ -2,7 +2,7 @@
   import { translate } from '$lib/translate';
   import { longPress } from '$lib/utils';
   import Input from '@ya-erm/svelte-ui/Input';
-  import Button from './Button.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
   import Modal from './Modal.svelte';
 
   export let tags: { id: string; title: string }[];
@@ -81,9 +81,9 @@
       <div class="flex gap-1">
         <div class="flex-col flex-1">
           {#if mode === 'edit'}
-            <Button color="danger" text={$translate('common.delete')} on:click={handleDelete} />
+            <Button color="danger" text={$translate('common.delete')} onClick={handleDelete} />
           {:else}
-            <Button color="secondary" on:click={() => (opened = false)} text={$translate('common.cancel')} />
+            <Button color="secondary" onClick={() => (opened = false)} text={$translate('common.cancel')} />
           {/if}
         </div>
         <div class="flex-col flex-1">

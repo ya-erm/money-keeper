@@ -2,14 +2,15 @@
   import { page } from '$app/stores';
   import dayjs from 'dayjs';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+
   import { currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import type { Repeating, Transaction } from '$lib/data/interfaces';
   import { copyOperation, operationsService } from '$lib/data/operations';
   import { getNextRepeatingDate, repeatingsService } from '$lib/data/repeatings';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
   import ButtonBase from '$lib/ui/ButtonBase.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
   import { deleteSearchParam, findCurrencyRate, getSearchParam, groupBySelector, setSearchParam } from '$lib/utils';
   import { goBack } from '$lib/utils/goBack';
   import { maxBySelector } from '$lib/utils/minMax';
@@ -81,7 +82,7 @@
   {#each repeatingViewModels as repeating (repeating.id)}
     {@const repeatingOperations = operationsByRepeatings[repeating.id] ?? []}
     <li class="item flex-col">
-      <ButtonBase on:click={() => onClick(repeating)} class="w-full flex-col gap-0.5">
+      <ButtonBase onClick={() => onClick(repeating)} class="w-full flex-col gap-0.5">
         <div class="w-full flex items-center gap-0.5 justify-between">
           <span class="title">
             <RepeatingIntervalText
@@ -141,7 +142,7 @@
           </div>
         </div>
         {#if repeating.lastDate.isBefore(dayjs()) && (repeating.endDate ? repeating.nextDate.isBefore(dayjs(repeating.endDate)) : true)}
-          <Button on:click={() => createNextOperation(repeating)}>{$translate('common.create')}</Button>
+          <Button onClick={() => createNextOperation(repeating)}>{$translate('common.create')}</Button>
         {/if}
       </div>
     </li>
@@ -161,7 +162,7 @@
   >
     {#if !repeatingOperations.length}
       <Button
-        on:click={() => handleDeleteRepeating(selectedRepeating)}
+        onClick={() => handleDeleteRepeating(selectedRepeating)}
         text={$translate('common.delete')}
         appearance="transparent"
         color="danger"

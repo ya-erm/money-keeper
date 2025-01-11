@@ -1,7 +1,7 @@
 <script lang="ts">
   import { accountsStore } from '$lib/data';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
 
   $: accounts = $accountsStore;
 

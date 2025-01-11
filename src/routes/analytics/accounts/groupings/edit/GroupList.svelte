@@ -1,12 +1,13 @@
 <script lang="ts">
   import { v4 as uuid } from 'uuid';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+
   import { accountsStore } from '$lib/data';
   import type { Group } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Input from '@ya-erm/svelte-ui/Input';
-  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import { showErrorToast } from '$lib/ui/toasts';
@@ -58,12 +59,12 @@
         <Input label={$translate('analytics.groupings.groups.name')} bind:value={group.name} required />
         <Input label={$translate('analytics.groupings.groups.color')} bind:value={group.color} type="color" required />
         <GroupAccountList bind:group onAddAccountToGroup={addAccountToGroup} />
-        <Button color="danger" appearance="link" underlined={false} on:click={() => deleteGroup(group.id)}>
+        <Button color="danger" appearance="link" underlined={false} onClick={() => deleteGroup(group.id)}>
           {$translate('analytics.groupings.groups.delete')}
         </Button>
       </li>
     {/each}
-    <Button color="white" on:click={addGroup}>
+    <Button color="white" onClick={addGroup}>
       {$translate('analytics.groupings.groups.add')}
     </Button>
   </ul>

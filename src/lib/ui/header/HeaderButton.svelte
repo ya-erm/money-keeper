@@ -1,7 +1,8 @@
 <script lang="ts">
   import { replaceState } from '$app/navigation';
   import { page } from '$app/stores';
-  import Icon from '$lib/ui/Icon.svelte';
+
+  import Icon from '@ya-erm/svelte-ui/Icon';
 
   export let href: string;
   export let icon: string;

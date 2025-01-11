@@ -1,8 +1,9 @@
 <script lang="ts">
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Input from '@ya-erm/svelte-ui/Input';
+
   import { memberSettingsStore, membersService } from '$lib/data';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Input from '@ya-erm/svelte-ui/Input';
   import Modal from '$lib/ui/Modal.svelte';
 
   $: settings = $memberSettingsStore;
@@ -32,7 +33,7 @@
       <Button
         color="secondary"
         text={$translate('common.cancel')}
-        on:click={() => {
+        onClick={() => {
           opened = false;
           anotherCurrency = null;
         }}

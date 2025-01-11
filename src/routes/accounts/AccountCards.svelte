@@ -6,7 +6,7 @@
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import type { AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import {
     calculateBalance,
     findCurrencyRate,

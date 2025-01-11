@@ -2,12 +2,13 @@
   import dayjs from 'dayjs';
   import { v4 as uuid } from 'uuid';
 
-  import type { Repeating, TransactionViewModel } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+
+  import type { Repeating, TransactionViewModel } from '$lib/data/interfaces';
+  import { translate } from '$lib/translate';
   import Layout from '$lib/ui/Layout.svelte';
   import Modal from '$lib/ui/Modal.svelte';
   import Portal from '$lib/ui/Portal.svelte';
@@ -90,14 +91,14 @@
     </div>
     <Input label={$translate('transactions.repeatings.end_date')} type="date" bind:value={endDate} clearable />
     {#if operations?.length}
-      <Button appearance="link" underlined={false} on:click={() => (operationsListVisible = true)}>
+      <Button appearance="link" underlined={false} onClick={() => (operationsListVisible = true)}>
         <span>{$translate('transactions.repeatings.operations_list')}</span>
         <Icon name="mdi:chevron-right" />
       </Button>
     {/if}
     <slot />
     <div class="grid-col-2 gap-1">
-      <Button color="secondary" text={$translate('common.cancel')} on:click={onCancel} />
+      <Button color="secondary" text={$translate('common.cancel')} onClick={onCancel} />
       <Button text={$translate('common.save')} color="primary" type="submit" />
     </div>
   </form>
@@ -110,7 +111,7 @@
       <span class="info">{$translate('transactions.repeatings.day_of_month.info')}</span>
     </div>
     <div class="grid-col-2 gap-1">
-      <Button color="secondary" text={$translate('common.cancel')} on:click={() => (dayOfMonthModalOpened = false)} />
+      <Button color="secondary" text={$translate('common.cancel')} onClick={() => (dayOfMonthModalOpened = false)} />
       <Button text={$translate('common.apply')} color="primary" type="submit" />
     </div>
   </form>

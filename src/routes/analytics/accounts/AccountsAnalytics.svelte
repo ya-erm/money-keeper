@@ -11,7 +11,7 @@
   } from '$lib/data';
   import type { AccountViewModel, Grouping } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import { calculateBalance, findRate, groupBySelector, pastOperationsPredicate } from '$lib/utils';
@@ -121,7 +121,7 @@
 <div class="p-1 flex-col gap-1">
   <div>
     <span>{$translate('analytics.accounts.grouping')}:</span>
-    <Button appearance="link" on:click={() => (groupingSelecting = true)}>
+    <Button appearance="link" onClick={() => (groupingSelecting = true)}>
       {grouping?.name ?? $translate('analytics.accounts.grouping.not_selected')}
     </Button>
   </div>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { translate } from '$lib/translate';
   import LanguageButton from '$lib/translate/LanguageButton.svelte';
-  import Button from '$lib/ui/Button.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
   import { useRightButton, useTitle } from '$lib/ui/header';
 

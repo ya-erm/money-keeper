@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
 
   import LanguageModal from './LanguageModal.svelte';
 
@@ -8,7 +8,7 @@
   const openModal = () => (opened = true);
 </script>
 
-<Button appearance="transparent" on:click={openModal}>
+<Button appearance="transparent" onClick={openModal}>
   <Icon name="mdi:translate" />
 </Button>
 

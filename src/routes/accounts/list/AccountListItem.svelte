@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Account, AccountViewModel, CurrencyRate } from '$lib/data/interfaces';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import { formatMoney } from '$lib/utils/formatMoney';
 
   export let account: AccountViewModel;

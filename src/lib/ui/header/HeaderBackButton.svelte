@@ -1,8 +1,9 @@
 <script lang="ts">
-  import Icon from '$lib/ui/Icon.svelte';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+  import Button from '@ya-erm/svelte-ui/Button';
+
   import { findRoute } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import Button from '../Button.svelte';
 
   export let href: string | null = null;
   export let onClick: (() => void) | null = null;
@@ -19,7 +20,7 @@
     {title ?? $translate(findRoute(href)?.title ?? 'common.back')}
   </a>
 {:else}
-  <Button appearance="link" underlined={false} on:click={onClick ?? goBack}>
+  <Button appearance="link" underlined={false} onClick={onClick ?? goBack}>
     <div class="flex items-center">
       <Icon name="mdi:chevron-left" />
       <span>

@@ -2,9 +2,10 @@
   import { page } from '$app/stores';
   import { derived } from 'svelte/store';
 
+  import Icon from '@ya-erm/svelte-ui/Icon';
+
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import Icon from '$lib/ui/Icon.svelte';
   import { backLink } from '$lib/ui/header/model';
 
   import { menu } from './menu';

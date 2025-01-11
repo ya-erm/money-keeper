@@ -1,9 +1,10 @@
 <script lang="ts">
   import Checkbox from '@ya-erm/svelte-ui/Checkbox';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+
   import type { Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
 
   export let accounts: Account[];
   export let selectedAccounts: string[] = [];
@@ -39,7 +40,7 @@
       </li>
     {/each}
   </ul>
-  <Button on:click={() => onApply(selectedAccounts)}>
+  <Button onClick={() => onApply(selectedAccounts)}>
     {$translate('common.apply')}
   </Button>
 </div>

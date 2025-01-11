@@ -2,10 +2,11 @@
   import dayjs from 'dayjs';
   import { onMount } from 'svelte';
 
-  import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+
+  import { translate } from '$lib/translate';
   import Tags from '$lib/ui/Tags.svelte';
   import { LogLevel, logs } from '$lib/utils/logger';
 
@@ -44,7 +45,7 @@
 </script>
 
 <div class="p-1">
-  <Button appearance="link" underlined={false} on:click={() => (filtersVisible = !filtersVisible)}>
+  <Button appearance="link" underlined={false} onClick={() => (filtersVisible = !filtersVisible)}>
     <div class="flex items-center">
       <span>{$translate(filtersVisible ? 'settings.logs.hide_filters' : 'settings.logs.show_filters')}</span>
       <Icon padding={0} name={filtersVisible ? 'mdi:chevron-up' : 'mdi:chevron-down'} />
