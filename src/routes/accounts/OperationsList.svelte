@@ -3,7 +3,7 @@
   import type { Account } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import Input from '$lib/ui/Input.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
   import ShowMoreContainer from '$lib/ui/ShowMoreContainer.svelte';
   import Spoiler from '$lib/ui/Spoiler.svelte';
   import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';

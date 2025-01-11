@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Switch } from '@ya-erm/svelte-ui';
+  import Switch from '@ya-erm/svelte-ui/Switch';
 
   import ListGroupItem from './ListGroupItem.svelte';
 

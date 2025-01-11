@@ -32,7 +32,7 @@
         class="flex justify-between gap-0.5"
         class:active={$activeLocale === locale}
         on:click={() => selectLocale(locale)}
-        aria-hidden
+        aria-hidden={true}
       >
         <div class="flex gap-0.5">
           <Icon name={language.icon} />

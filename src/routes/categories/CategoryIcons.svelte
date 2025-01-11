@@ -3,7 +3,7 @@
   import Button from '$lib/ui/Button.svelte';
   import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
   import Icon from '$lib/ui/Icon.svelte';
-  import Input from '$lib/ui/Input.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
   import MultiSwitch from '$lib/ui/MultiSwitch.svelte';
 
   import { categoryIcons } from './icons';

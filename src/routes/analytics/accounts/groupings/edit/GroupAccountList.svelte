@@ -2,7 +2,7 @@
   import type { Group } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import GroupAccountListItem from './GroupAccountListItem.svelte';
 
   export let group: Group;

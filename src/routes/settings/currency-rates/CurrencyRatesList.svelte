@@ -5,7 +5,7 @@
   import type { CurrencyRate } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import { useRightButton, useTitle } from '$lib/ui/header';
-  import Input from '$lib/ui/Input.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
   import { deleteSearchParam, findRate, getSearchParam, groupByKeyToMap } from '$lib/utils';
 
   import AddCurrencyRateButton from './AddCurrencyRateButton.svelte';

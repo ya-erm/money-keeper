@@ -5,7 +5,7 @@
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Tags from '$lib/ui/Tags.svelte';
   import { LogLevel, logs } from '$lib/utils/logger';
 

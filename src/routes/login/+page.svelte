@@ -14,7 +14,7 @@
   import { translate } from '$lib/translate';
   import LanguageButton from '$lib/translate/LanguageButton.svelte';
   import Button from '$lib/ui/Button.svelte';
-  import Input from '$lib/ui/Input.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
   import Loader from '$lib/ui/Loader.svelte';
   import { useRightButton, useTitle } from '$lib/ui/header';
   import { showErrorToast } from '$lib/ui/toasts';

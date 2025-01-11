@@ -6,7 +6,7 @@
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
-  import Input from '$lib/ui/Input.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
   import Layout from '$lib/ui/Layout.svelte';
   import Modal from '$lib/ui/Modal.svelte';
   import MultiSwitch from '$lib/ui/MultiSwitch.svelte';

@@ -3,7 +3,7 @@
   import type { Category, CategoryType } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import ModalContainer from '$lib/ui/ModalContainer.svelte';
   import resizeObserver from '$lib/utils/resizeObserver';
 

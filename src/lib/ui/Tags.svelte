@@ -1,8 +1,8 @@
 <script lang="ts">
   import { translate } from '$lib/translate';
   import { longPress } from '$lib/utils';
+  import Input from '@ya-erm/svelte-ui/Input';
   import Button from './Button.svelte';
-  import Input from './Input.svelte';
   import Modal from './Modal.svelte';
 
   export let tags: { id: string; title: string }[];

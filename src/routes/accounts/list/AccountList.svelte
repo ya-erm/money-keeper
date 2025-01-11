@@ -7,7 +7,7 @@
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
-  import Input from '$lib/ui/Input.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
   import Spoiler from '$lib/ui/Spoiler.svelte';
   import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
   import { calculateBalance, findCurrencyRate, groupBySelector, pastOperationsPredicate } from '$lib/utils';

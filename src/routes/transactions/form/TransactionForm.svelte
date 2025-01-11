@@ -3,7 +3,7 @@
   import { v4 as uuid } from 'uuid';
   import { page } from '$app/stores';
 
-  import { Checkbox } from '@ya-erm/svelte-ui';
+  import Checkbox from '@ya-erm/svelte-ui/Checkbox';
 
   import { memberSettingsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
@@ -12,8 +12,8 @@
   import { repeatingsService, repeatingsStore } from '$lib/data/repeatings';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import Spoiler from '$lib/ui/Spoiler.svelte';

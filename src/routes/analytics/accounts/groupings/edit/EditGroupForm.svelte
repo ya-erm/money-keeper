@@ -4,7 +4,7 @@
   import type { Group, Grouping } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
-  import Input from '$lib/ui/Input.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
 
   import GroupList from './GroupList.svelte';
 

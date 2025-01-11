@@ -13,7 +13,7 @@
   const onClose = () => (opened = false);
 
   const handleDuplicate = () => {
-    copyOperation(operation);
+    copyOperation(operation, { save: true });
     onClose();
   };
 

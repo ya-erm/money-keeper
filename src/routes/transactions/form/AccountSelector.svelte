@@ -2,7 +2,7 @@
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import { translate } from '$lib/translate';
   import Icon from '$lib/ui/Icon.svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import { calculateBalance, findCurrencyRate, groupBySelector } from '$lib/utils';

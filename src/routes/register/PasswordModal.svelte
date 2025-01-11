@@ -5,7 +5,7 @@
   import type { RegisterRequestData, RegisterResponseData } from '$lib/server/api/v2/auth';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
-  import Input from '$lib/ui/Input.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
   import Loader from '$lib/ui/Loader.svelte';
   import Modal from '$lib/ui/Modal.svelte';
   import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';

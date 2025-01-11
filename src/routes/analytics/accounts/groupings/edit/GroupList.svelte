@@ -5,8 +5,8 @@
   import type { Group } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import { showErrorToast } from '$lib/ui/toasts';

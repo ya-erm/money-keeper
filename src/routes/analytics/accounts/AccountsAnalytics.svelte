@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Checkbox } from '@ya-erm/svelte-ui';
+  import Checkbox from '@ya-erm/svelte-ui/Checkbox';
 
   import {
     accountsStore,

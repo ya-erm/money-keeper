@@ -6,8 +6,8 @@
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import Icon from '$lib/ui/Icon.svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Modal from '$lib/ui/Modal.svelte';
   import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
   import TagsList from '$lib/widgets/TagsList.svelte';

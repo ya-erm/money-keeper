@@ -1,5 +1,5 @@
 <script>
-  import { Switch } from '@ya-erm/svelte-ui';
+  import Switch from '@ya-erm/svelte-ui/Switch';
 
   import { useTitle } from '$lib/ui/header';
   import { darkMode } from '$lib/ui/theme';

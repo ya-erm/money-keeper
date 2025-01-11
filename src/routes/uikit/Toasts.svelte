@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { Checkbox } from '@ya-erm/svelte-ui';
+  import Checkbox from '@ya-erm/svelte-ui/Checkbox';
 
   import Button from '$lib/ui/Button.svelte';
-  import Input from '$lib/ui/Input.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
   import { showToast } from '$lib/ui/toasts';
   import type { ToastType } from '$lib/ui/toasts/toasts';
 

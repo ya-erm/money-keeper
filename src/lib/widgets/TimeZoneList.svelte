@@ -4,7 +4,7 @@
 
   import { memberSettingsStore, membersService } from '$lib/data';
   import { translate } from '$lib/translate';
-  import Input from '$lib/ui/Input.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
   import ListGroup from '$lib/ui/list/ListGroup.svelte';
   import { showSuccessToast } from '$lib/ui/toasts';
 

@@ -2,7 +2,7 @@
   import { memberSettingsStore, membersService } from '$lib/data';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
-  import Input from '$lib/ui/Input.svelte';
+  import Input from '@ya-erm/svelte-ui/Input';
   import Modal from '$lib/ui/Modal.svelte';
 
   $: settings = $memberSettingsStore;

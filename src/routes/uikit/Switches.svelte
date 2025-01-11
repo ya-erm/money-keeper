@@ -1,7 +1,7 @@
 <script lang="ts">
   import { type ComponentProps } from 'svelte';
 
-  import { Checkbox } from '@ya-erm/svelte-ui';
+  import Checkbox from '@ya-erm/svelte-ui/Checkbox';
 
   import MultiSwitch from '$lib/ui/MultiSwitch.svelte';
 

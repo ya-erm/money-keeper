@@ -206,8 +206,4 @@
     font-size: 0.85rem;
     color: var(--secondary-text-color);
   }
-  .secondary {
-    font-size: 0.85rem;
-    color: var(--secondary-text-color);
-  }
 </style>
