@@ -11,9 +11,6 @@ importers:
 
   .:
     dependencies:
-      '@iconify/json':
-        specifier: ^2.2.294
-        version: 2.2.294
       '@prisma/client':
         specifier: ^6.2.1
         version: 6.2.1(prisma@6.2.1)
@@ -81,6 +78,9 @@ importers:
       '@vite-pwa/sveltekit':
         specifier: ^0.6.7
         version: 0.6.7(@sveltejs/kit@2.15.2(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.17.3)(vite@6.0.7(@types/node@22.10.5)(terser@5.37.0)))(svelte@5.17.3)(vite@6.0.7(@types/node@22.10.5)(terser@5.37.0)))(vite-plugin-pwa@0.21.1(vite@6.0.7(@types/node@22.10.5)(terser@5.37.0))(workbox-build@7.3.0)(workbox-window@7.3.0))
+      '@ya-erm/svelte-ui':
+        specifier: ^0.0.1
+        version: 0.0.1(svelte@5.17.3)
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.49)
@@ -993,9 +993,6 @@ packages:
     resolution: {integrity: sha512-c7hNEllBlenFTHBky65mhq8WD2kbN9Q6gk0bTk8lSBvc554jpXSkST1iePudpt7+A/AQvuHs9EMqjHDXMY1lrA==}
     engines: {node: '>=18.18'}
 
-  '@iconify/json@2.2.294':
-    resolution: {integrity: sha512-Vopidp3VQtscXYB6qUI8uJf15ihrzaJjwhvLnxHIMB3JYqvCKI1JHI+UMKaWkbOOJDsOg9b0rIXmRovShk8YrQ==}
-
   '@iconify/svelte@4.2.0':
     resolution: {integrity: sha512-fEl0T7SAPonK7xk6xUlRPDmFDZVDe2Z7ZstlqeDS/sS8ve2uyU+Qa8rTWbIqzZJlRvONkK5kVXiUf9nIc+6OOQ==}
     peerDependencies:
@@ -1400,6 +1397,11 @@ packages:
     peerDependenciesMeta:
       '@vite-pwa/assets-generator':
         optional: true
+
+  '@ya-erm/svelte-ui@0.0.1':
+    resolution: {integrity: sha512-al0uXbguCXH7gKRSmgF463J9zEnbkCEmGmlWFAYQf3viaIl7KgUCE8T8uhjJfGhVXRjSqe8iC4nd8Fmw2teHKQ==}
+    peerDependencies:
+      svelte: ^5.0.0
 
   abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
@@ -4061,11 +4063,6 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.1': {}
 
-  '@iconify/json@2.2.294':
-    dependencies:
-      '@iconify/types': 2.0.0
-      pathe: 1.1.2
-
   '@iconify/svelte@4.2.0(svelte@5.17.3)':
     dependencies:
       '@iconify/types': 2.0.0
@@ -4483,6 +4480,10 @@ snapshots:
       kolorist: 1.8.0
       tinyglobby: 0.2.10
       vite-plugin-pwa: 0.21.1(vite@6.0.7(@types/node@22.10.5)(terser@5.37.0))(workbox-build@7.3.0)(workbox-window@7.3.0)
+
+  '@ya-erm/svelte-ui@0.0.1(svelte@5.17.3)':
+    dependencies:
+      svelte: 5.17.3
 
   abbrev@1.1.1: {}
 

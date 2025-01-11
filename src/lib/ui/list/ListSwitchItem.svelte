@@ -1,5 +1,6 @@
 <script lang="ts">
-  import Switch from '$lib/ui/Switch.svelte';
+  import { Switch } from '@ya-erm/svelte-ui';
+
   import ListGroupItem from './ListGroupItem.svelte';
 
   export let checked: boolean;

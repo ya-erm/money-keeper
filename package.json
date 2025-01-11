@@ -34,6 +34,7 @@
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",
     "@vite-pwa/sveltekit": "^0.6.7",
+    "@ya-erm/svelte-ui": "^0.0.1",
     "autoprefixer": "^10.4.20",
     "chart.js": "^4.4.7",
     "dotenv": "^16.4.7",
@@ -53,7 +54,6 @@
     "vite": "^6.0.7"
   },
   "dependencies": {
-    "@iconify/json": "^2.2.294",
     "@prisma/client": "^6.2.1",
     "@vercel/analytics": "^1.4.1",
     "bcrypt": "^5.1.1",

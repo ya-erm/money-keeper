@@ -48,6 +48,7 @@ a {
   display: none;
 }
 
+/* Text ellipsis */
 .text-ellipsis,
 .text-ellipsis-all {
   text-align: left;
