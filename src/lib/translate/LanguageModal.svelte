@@ -1,10 +1,14 @@
 <script lang="ts">
-  import { activeLocale, languages, translate, type Locales } from '$lib/translate';
   import Button from '@ya-erm/svelte-ui/Button';
+  import ButtonBase from '@ya-erm/svelte-ui/ButtonBase';
   import Icon from '@ya-erm/svelte-ui/Icon';
-  import Modal from '$lib/ui/Modal.svelte';
+  import Modal from '@ya-erm/svelte-ui/Modal';
+
+  import { activeLocale, languages, translate, type Locales } from '$lib/translate';
 
   export let opened: boolean;
+
+  let accepted = false;
 
   let previousLocale: Locales;
   $: if (!previousLocale) {
@@ -15,54 +19,55 @@
     activeLocale.set(locale as Locales);
   };
 
-  const handleCancel = () => {
-    activeLocale.set(previousLocale);
+  const handleClose = () => {
+    if (!accepted) {
+      activeLocale.set(previousLocale);
+    }
     opened = false;
   };
 
-  const handleApply = () => {
+  const handleAccept = () => {
+    accepted = true;
     opened = false;
   };
 </script>
 
-<Modal header={$translate('language.select_language')} {opened} on:close={handleCancel}>
-  <ul class="flex-col">
+<Modal id="language-modal" header={$translate('language.select_language')} {opened} onClose={handleClose}>
+  <div class="items flex-col" role="listbox">
     {#each Object.entries(languages) as [locale, language] (locale)}
-      <li
-        class="flex justify-between gap-0.5"
-        class:active={$activeLocale === locale}
-        on:click={() => selectLocale(locale)}
-        aria-hidden={true}
-      >
-        <div class="flex gap-0.5">
-          <Icon name={language.icon} />
-          <span>{language.name}</span>
+      {@const selected = $activeLocale === locale}
+      <ButtonBase onClick={() => selectLocale(locale)} role="option" aria-selected={selected}>
+        <div class="option w-full flex justify-between gap-0.5 p-0.5" class:active={selected}>
+          <div class="flex gap-0.5">
+            <Icon name={language.icon} />
+            <span>{language.name}</span>
+          </div>
+          {#if selected}
+            <Icon name="mdi:check" />
+          {/if}
         </div>
-        {#if $activeLocale === locale}
-          <Icon name="mdi:check" />
-        {/if}
-      </li>
+      </ButtonBase>
     {/each}
-  </ul>
+  </div>
   <div class="grid-col-2 gap-1">
-    <Button text={$translate('common.cancel')} color="secondary" onClick={handleCancel} />
-    <Button text={$translate('common.apply')} color="primary" onClick={handleApply} />
+    <Button text={$translate('common.cancel')} color="secondary" onClick={handleClose} />
+    <Button text={$translate('common.accept')} color="primary" onClick={handleAccept} />
   </div>
 </Modal>
 
 <style>
-  ul {
+  .items {
     padding: 0;
+    margin: 1rem 0;
     min-width: 14rem;
+    list-style: none;
+    gap: 0.25rem;
   }
-  li {
-    padding: 0.5rem;
-  }
-  li.active {
+  .active {
     color: var(--active-color);
   }
   @media (hover: hover) {
-    li:hover {
+    .option:hover {
       background: var(--hover-background-color);
     }
   }
