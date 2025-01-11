@@ -1,15 +1,18 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import dayjs from 'dayjs';
 
   import { currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
-  import type { Repeating } from '$lib/data/interfaces';
-  import { repeatingsService } from '$lib/data/repeatings';
+  import type { Repeating, Transaction } from '$lib/data/interfaces';
+  import { copyOperation, operationsService } from '$lib/data/operations';
+  import { getNextRepeatingDate, repeatingsService } from '$lib/data/repeatings';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
   import ButtonBase from '$lib/ui/ButtonBase.svelte';
   import Icon from '$lib/ui/Icon.svelte';
   import { deleteSearchParam, findCurrencyRate, getSearchParam, groupBySelector, setSearchParam } from '$lib/utils';
   import { goBack } from '$lib/utils/goBack';
+  import { maxBySelector } from '$lib/utils/minMax';
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
   import RepeatingIntervalText from './RepeatingIntervalText.svelte';
@@ -26,6 +29,25 @@
 
   $: operationsByRepeatings = groupBySelector(operations ?? [], (operation) => operation.repeatingId ?? 'none');
 
+  $: repeatingViewModels = repeatings.map((repeating) => {
+    const lastOperation = maxBySelector(operationsByRepeatings[repeating.id] ?? [], (operation: Transaction) =>
+      dayjs(operation.date).unix(),
+    );
+    const lastDate = dayjs(lastOperation.date);
+    const nextDate = getNextRepeatingDate(repeating, lastDate);
+
+    return {
+      ...repeating,
+      lastOperation,
+      lastDate,
+      nextDate,
+    };
+  });
+
+  $: repeatingViewModels.sort((a, b) => {
+    return a.nextDate?.isBefore(b.nextDate) ? -1 : 1;
+  });
+
   $: repeatingId = getSearchParam($page, 'repeating-id');
   const openRepeatingModal = (id: string) => setSearchParam($page, 'repeating-id', id, { replace: false });
   const closeRepeatingModal = () => goBack(() => void deleteSearchParam($page, 'repeating-id'));
@@ -39,10 +61,24 @@
     if (!repeating) return;
     repeatingsService.delete(repeating);
   };
+
+  // TODO: это должно выполняться автоматически
+  const createNextOperation = (repeating: (typeof repeatingViewModels)[0]) => {
+    if (repeating.endDate && repeating.nextDate.isAfter(dayjs(repeating.endDate))) {
+      return;
+    }
+    const [copiedOperation, copiedLinkedOperation] = copyOperation(repeating.lastOperation, { save: false });
+    copiedOperation.date = repeating.nextDate.format(); // TODO: timezone?
+    operationsService.save(copiedOperation);
+    if (copiedLinkedOperation) {
+      copiedLinkedOperation.date = repeating.nextDate.format(); // TODO: timezone?
+      operationsService.save(copiedLinkedOperation);
+    }
+  };
 </script>
 
 <ul class="flex-col gap-1">
-  {#each repeatings as repeating (repeating.id)}
+  {#each repeatingViewModels as repeating (repeating.id)}
     {@const repeatingOperations = operationsByRepeatings[repeating.id] ?? []}
     <li class="item flex-col">
       <ButtonBase on:click={() => onClick(repeating)} class="w-full flex-col gap-0.5">
@@ -80,6 +116,34 @@
           {/if}
         </div>
       </ButtonBase>
+      <!-- <div class="flex gap-0.25 secondary">
+        <Icon name="mdi:repeat" size={1} />
+        <RepeatingIntervalText
+          count={repeating.count}
+          interval={repeating.interval}
+          dayOfMonth={repeating.dayOfMonth}
+          date={repeatingOperations[0]?.date}
+        />
+      </div> -->
+      <div class="flex gap-1 items-center">
+        <div class="flex-1 info">
+          <div>
+            Last: {repeating.lastDate.format('D MMMM YYYY')}
+            {#if repeating.lastDate.isAfter(dayjs())}
+              <span> - in future</span>
+            {/if}
+          </div>
+          <div>
+            Next: {repeating.nextDate.format('D MMMM YYYY')}
+            {#if repeating.nextDate.isBefore(dayjs())}
+              <span> - ⚠️ in past</span>
+            {/if}
+          </div>
+        </div>
+        {#if repeating.lastDate.isBefore(dayjs()) && (repeating.endDate ? repeating.nextDate.isBefore(dayjs(repeating.endDate)) : true)}
+          <Button on:click={() => createNextOperation(repeating)}>{$translate('common.create')}</Button>
+        {/if}
+      </div>
     </li>
   {/each}
 </ul>
@@ -139,6 +203,10 @@
     background-color: var(--header-background-color);
   }
   .info {
+    font-size: 0.85rem;
+    color: var(--secondary-text-color);
+  }
+  .secondary {
     font-size: 0.85rem;
     color: var(--secondary-text-color);
   }

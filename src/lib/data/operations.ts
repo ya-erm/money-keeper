@@ -199,10 +199,12 @@ export function cloneOperation(item: Transaction): Transaction {
   };
 }
 
-/** Create a new copy of operation (also copy linked operation if it exists) */
-export function copyOperation(operation: Transaction) {
+/** Create a new copy of operation (also copy linked operation if it exists).*/
+export function copyOperation(operation: Transaction, { save }: { save: boolean }): Transaction[] {
+  const newOperations: Transaction[] = [];
   const copiedOperation = cloneOperation(operation);
   copiedOperation.id = uuid();
+  newOperations.push(copiedOperation);
   if (operation.linkedTransactionId) {
     const linkedOperation = operationsService.getById(operation.linkedTransactionId);
     if (linkedOperation) {
@@ -210,8 +212,11 @@ export function copyOperation(operation: Transaction) {
       copiedLinkedOperation.id = uuid();
       copiedLinkedOperation.linkedTransactionId = copiedOperation.id;
       copiedOperation.linkedTransactionId = copiedLinkedOperation.id;
-      operationsService.save(copiedLinkedOperation);
+      newOperations.push(copiedLinkedOperation);
     }
   }
-  operationsService.save(copiedOperation);
+  if (save) {
+    newOperations.forEach((operation) => operationsService.save(operation));
+  }
+  return newOperations;
 }

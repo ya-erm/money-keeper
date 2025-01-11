@@ -7,6 +7,7 @@
   import RepeatingsList from './RepeatingsList.svelte';
 
   $: repeatings = $repeatingsStore;
+  // TODO: если дата следующего повторения больше чем repeating.endDate, то уже можно считать его неактивным
   $: activeRepeatings = repeatings.filter((item) => !item.endDate || dayjs(item.endDate).isAfter(dayjs()));
   $: inactiveRepeatings = repeatings.filter((item) => dayjs(item.endDate).isBefore(dayjs()));
 </script>
