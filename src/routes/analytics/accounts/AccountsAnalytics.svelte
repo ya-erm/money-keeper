@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Checkbox } from '@ya-erm/svelte-ui';
+
   import {
     accountsStore,
     currencyRatesStore,
@@ -10,7 +12,6 @@
   import type { AccountViewModel, Grouping } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
-  import Checkbox from '$lib/ui/Checkbox.svelte';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import { calculateBalance, findRate, groupBySelector, pastOperationsPredicate } from '$lib/utils';

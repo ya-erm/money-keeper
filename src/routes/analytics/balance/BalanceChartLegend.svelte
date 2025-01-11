@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { Checkbox } from '@ya-erm/svelte-ui';
+
   import type { Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
-  import Checkbox from '$lib/ui/Checkbox.svelte';
 
   export let accounts: Account[];
   export let selectedAccounts: string[] = [];

@@ -1,8 +1,10 @@
 <script lang="ts">
   import dayjs from 'dayjs';
   import { v4 as uuid } from 'uuid';
-
   import { page } from '$app/stores';
+
+  import { Checkbox } from '@ya-erm/svelte-ui';
+
   import { memberSettingsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
@@ -10,7 +12,6 @@
   import { repeatingsService, repeatingsStore } from '$lib/data/repeatings';
   import { translate } from '$lib/translate';
   import Button from '$lib/ui/Button.svelte';
-  import Checkbox from '$lib/ui/Checkbox.svelte';
   import Input from '$lib/ui/Input.svelte';
   import InputLabel from '$lib/ui/InputLabel.svelte';
   import Layout from '$lib/ui/Layout.svelte';
