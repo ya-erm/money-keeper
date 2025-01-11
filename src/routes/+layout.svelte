@@ -1,6 +1,6 @@
 <script lang="ts">
   import { dev } from '$app/environment';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { inject } from '@vercel/analytics';
 
   import '$lib/icons';
@@ -17,7 +17,7 @@
 
   inject({ mode: dev ? 'development' : 'production', debug: false });
 
-  if (!$page.url.pathname.startsWith(routes.login.path) && membersService.isGuest) {
+  if (!page.url.pathname.startsWith(routes.login.path) && membersService.isGuest) {
     showInfoToast($translate('auth.logged_in_as_guest_info'));
   }
 </script>
@@ -27,13 +27,5 @@
 <Layout>
   <slot />
 </Layout>
-<ThemeProvider />
 
-<style>
-  :global(body) {
-    margin: 0;
-    overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
-      'Helvetica Neue', sans-serif;
-  }
-</style>
+<ThemeProvider />
