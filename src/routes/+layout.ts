@@ -7,10 +7,12 @@ import { browser } from '$app/environment';
 import { journalService, mainService, membersService } from '$lib/data';
 import { handleError } from '$lib/utils';
 
+import type { LayoutLoad } from './$types';
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export const load = async () => {
+export const load: LayoutLoad = async () => {
   if (!browser) {
     return;
   }

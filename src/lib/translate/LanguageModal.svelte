@@ -4,13 +4,17 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Modal from '@ya-erm/svelte-ui/Modal';
 
-  import { activeLocale, languages, translate, type Locales } from '$lib/translate';
+  import { activeLocale, translate } from '$lib/translate';
+  import { languages } from '$lib/translate/constants';
+  import type { Locales } from '$lib/translate/types';
+  import { setCookie } from '$lib/utils/cookie';
 
   export let opened: boolean;
 
   let accepted = false;
 
-  let previousLocale: Locales;
+  let previousLocale: Locales | null;
+
   $: if (!previousLocale) {
     previousLocale = $activeLocale;
   }
@@ -27,6 +31,9 @@
   };
 
   const handleAccept = () => {
+    if ($activeLocale) {
+      setCookie('locale', $activeLocale);
+    }
     accepted = true;
     opened = false;
   };

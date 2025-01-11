@@ -388,7 +388,3 @@ export type Messages =
   | 'settings.report_problem'
   | 'settings.version'
   | 'settings.uikit';
-
-export type Dictionary = { [key in Messages]: string };
-
-export type Locales = 'ru-RU' | 'en-US';

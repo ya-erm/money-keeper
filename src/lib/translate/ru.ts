@@ -1,5 +1,6 @@
 import { addMessages } from 'svelte-i18n';
-import type { Dictionary } from './messages';
+
+import type { Dictionary } from './types';
 
 export const ruDict: Dictionary = {
   'app.title': 'Money Keeper',
