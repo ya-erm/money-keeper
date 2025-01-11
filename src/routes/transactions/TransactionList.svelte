@@ -3,12 +3,13 @@
 
   import { page } from '$app/stores';
 
+  import ShowMoreContainer from '@ya-erm/svelte-ui/ShowMoreContainer';
+
   import { currencyRatesStore, memberSettingsStore } from '$lib/data';
   import type { TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
-  import ShowMoreContainer from '$lib/ui/ShowMoreContainer.svelte';
   import HeaderFormSubmitButton from '$lib/ui/header/HeaderFormSubmitButton.svelte';
   import { findCurrencyRate, getSearchParam, setSearchParam } from '$lib/utils';
 
@@ -38,7 +39,7 @@
   const closeOperationForm = () => history.back();
 </script>
 
-<ShowMoreContainer bind:limit step={20} total={sortedTransactions.length}>
+<ShowMoreContainer bind:limit step={20} total={sortedTransactions.length} translate={$translate}>
   <ul class="flex-col gap-1">
     {#each Object.entries(transactionsByDate) as [date, transactions] (date)}
       <div>{dayjs(date).format('DD MMMM YYYY')}</div>

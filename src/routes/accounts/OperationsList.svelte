@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Input from '@ya-erm/svelte-ui/Input';
+  import ShowMoreContainer from '@ya-erm/svelte-ui/ShowMoreContainer';
   import Spoiler from '@ya-erm/svelte-ui/Spoiler';
   import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
 
@@ -6,8 +8,6 @@
   import type { Account } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import Input from '@ya-erm/svelte-ui/Input';
-  import ShowMoreContainer from '$lib/ui/ShowMoreContainer.svelte';
   import { futureOperationsPredicate, pastOperationsPredicate } from '$lib/utils';
 
   import GroupedOperationsList from './GroupedOperationsList.svelte';
@@ -38,7 +38,7 @@
   $: futureOperations = filteredOperations.filter(futureOperationsPredicate());
 </script>
 
-<ShowMoreContainer bind:limit step={20} total={allFilteredOperations.length}>
+<ShowMoreContainer bind:limit step={20} total={allFilteredOperations.length} translate={$translate}>
   <div class="operations-container p-1">
     <div class="flex gap-1">
       <h3 class="m-0 flex-grow font-normal">
