@@ -22,7 +22,8 @@ export function initI18N(
   localeFromHeader?: string,
   localeFromNavigator = getLocaleFromNavigator(),
 ) {
-  initialLocale = findLocale(localeFromCookie ?? localeFromHeader ?? localeFromNavigator);
+  initialLocale =
+    findLocale(localeFromCookie) ?? findLocale(localeFromHeader) ?? findLocale(localeFromNavigator) ?? 'en-US';
 
   logger.debug('init', { localeFromCookie, localeFromHeader, localeFromNavigator }, '=>', initialLocale);
 

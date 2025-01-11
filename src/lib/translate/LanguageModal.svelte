@@ -1,4 +1,6 @@
 <script lang="ts">
+  import dayjs from 'dayjs';
+
   import Button from '@ya-erm/svelte-ui/Button';
   import ButtonBase from '@ya-erm/svelte-ui/ButtonBase';
   import Icon from '@ya-erm/svelte-ui/Icon';
@@ -32,7 +34,7 @@
 
   const handleAccept = () => {
     if ($activeLocale) {
-      setCookie('locale', $activeLocale);
+      setCookie('locale', $activeLocale, { expires: dayjs().add(1, 'year').toDate() });
     }
     accepted = true;
     opened = false;
