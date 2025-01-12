@@ -1,4 +1,5 @@
-import { getLocaleFromAcceptLanguageHeader, initI18N } from '$lib/translate/init';
+import { activeLocale } from '$lib/translate';
+import { getLocaleFromAcceptLanguageHeader, initI18N, initialLocale } from '$lib/translate/init';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ cookies, request }) => {
@@ -8,4 +9,6 @@ export const load: LayoutServerLoad = async ({ cookies, request }) => {
   const localeFromHeader = getLocaleFromAcceptLanguageHeader(acceptLanguagesHeader);
 
   initI18N(localeFromCookie, localeFromHeader);
+
+  activeLocale.set(initialLocale);
 };
