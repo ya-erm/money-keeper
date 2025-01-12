@@ -337,6 +337,7 @@
       name="comment"
       value={transaction?.comment}
       onChange={handleCommentChange}
+      translate={$translate}
       list="suggestions"
       optional
     />
@@ -351,7 +352,7 @@
       </div>
     {/if}
     <div class="flex-col gap-0.5">
-      <InputLabel text={$translate('transactions.tags')} optional />
+      <InputLabel text={$translate('transactions.tags')} optional translate={$translate} />
       <TagsList
         bind:tags
         bind:selectedTags

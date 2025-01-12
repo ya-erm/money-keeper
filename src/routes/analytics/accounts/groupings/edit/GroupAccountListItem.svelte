@@ -13,7 +13,7 @@
   <span>
     {accounts.find((x) => x.id === accountId)?.name}
   </span>
-  <Button color="danger" appearance="link" underlined={false} on:click={onDelete}>
+  <Button color="danger" appearance="link" underlined={false} onClick={onDelete}>
     {$translate('common.delete')}
   </Button>
 </div>

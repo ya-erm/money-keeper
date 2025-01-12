@@ -28,15 +28,15 @@
 
 <Modal bind:opened header={$translate('common.additional_options')}>
   <div class="flex-col gap-1 select-none">
-    <Button appearance="transparent" bordered on:click={handleDuplicate}>
+    <Button appearance="transparent" bordered onClick={handleDuplicate}>
       <Icon name="mdi:content-copy" />
       <span>{$translate('common.duplicate')}</span>
     </Button>
-    <Button color="danger" appearance="transparent" bordered on:click={handleDelete}>
+    <Button color="danger" appearance="transparent" bordered onClick={handleDelete}>
       <Icon name="mdi:delete-outline" />
       <span>{$translate('common.delete')}</span>
     </Button>
-    <Button color="white" bordered on:click={onClose}>
+    <Button color="white" bordered onClick={onClose}>
       <span>{$translate('common.cancel')}</span>
     </Button>
   </div>

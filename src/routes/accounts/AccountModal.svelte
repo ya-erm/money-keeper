@@ -72,14 +72,21 @@
   <form class="flex-col gap-1" data-testId="AccountForm" on:submit|preventDefault={handleSave}>
     <Input label={$translate('accounts.name')} name="name" bind:value={name} required />
     <Input label={$translate('accounts.currency')} name="currency" bind:value={currency} required />
-    <Input label={$translate('accounts.icon')} name="icon" bind:value={icon} optional>
+    <Input label={$translate('accounts.icon')} name="icon" bind:value={icon} optional translate={$translate}>
       <a slot="end" href="https://icon-sets.iconify.design/" target="_blank" rel="noopener noreferrer">
         <Icon name="mdi:open-in-new" padding={0.5} />
       </a>
     </Input>
-    <Input label={$translate('accounts.color')} type="color" name="color" bind:value={color} optional />
+    <Input
+      label={$translate('accounts.color')}
+      type="color"
+      name="color"
+      bind:value={color}
+      translate={$translate}
+      optional
+    />
     <div class="flex-col gap-0.5">
-      <InputLabel text={$translate('accounts.tags')} optional />
+      <InputLabel text={$translate('accounts.tags')} optional translate={$translate} />
       <TagsList
         bind:selectedTags
         tags={accountTags}
