@@ -4,7 +4,7 @@
   import { deleteOperation } from '$lib/data/operations';
   import { translate } from '$lib/translate';
   import Button from '@ya-erm/svelte-ui/Button';
-  import { showSuccessToast } from '$lib/ui/toasts';
+  import { showSuccessToast } from '@ya-erm/svelte-ui/toasts';
 
   import TransactionForm from '../form/TransactionForm.svelte';
 

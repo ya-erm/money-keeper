@@ -10,7 +10,7 @@
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/Layout.svelte';
   import Portal from '$lib/ui/Portal.svelte';
-  import { showErrorToast } from '$lib/ui/toasts';
+  import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 
   import AccountList from '../../../../accounts/list/AccountList.svelte';
   import GroupAccountList from './GroupAccountList.svelte';

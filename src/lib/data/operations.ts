@@ -3,7 +3,7 @@ import { derived, get, type Readable } from 'svelte/store';
 import { v4 as uuid } from 'uuid';
 
 import { translate } from '$lib/translate';
-import { showErrorToast } from '$lib/ui/toasts';
+import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 import { Logger } from '$lib/utils/logger';
 
 import { accountsService, accountsStore } from './accounts';

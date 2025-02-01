@@ -5,7 +5,7 @@ import type {
 } from '$lib/server/api/v2/journal';
 import type { GetJournalRequest } from '$lib/server/api/v2/journal/getJournal';
 import { store } from '$lib/store';
-import { showErrorToast } from '$lib/ui/toasts';
+import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 import { unexpectedCase } from '$lib/utils';
 import { Logger } from '$lib/utils/logger';
 import { useFetch } from '$lib/utils/useFetch';

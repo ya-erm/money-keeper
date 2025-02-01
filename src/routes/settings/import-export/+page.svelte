@@ -16,7 +16,7 @@
   } from '$lib/data';
   import type { Account, Category, CurrencyRate, Grouping, Tag, Transaction } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import { showErrorToast, showInfoToast, showSuccessToast } from '$lib/ui/toasts';
+  import { showErrorToast, showInfoToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
   import { Logger, deepEqual, groupByKey, keyTransactions } from '$lib/utils';
 
   const logger = new Logger('Import/Export');

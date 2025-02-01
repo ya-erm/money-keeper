@@ -2,9 +2,7 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Checkbox from '@ya-erm/svelte-ui/Checkbox';
   import Input from '@ya-erm/svelte-ui/Input';
-
-  import { showToast } from '$lib/ui/toasts';
-  import type { ToastType } from '$lib/ui/toasts/toasts';
+  import { showToast, type ToastType } from '@ya-erm/svelte-ui/toasts';
 
   let dismissible = true;
   let message = 'This is example of toast';

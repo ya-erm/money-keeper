@@ -11,7 +11,7 @@
   import { translate } from '$lib/translate';
   import Loader from '$lib/ui/Loader.svelte';
   import Modal from '$lib/ui/Modal.svelte';
-  import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
+  import { showErrorToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
   import { useFetch } from '$lib/utils/useFetch';
 
   export let login: string;

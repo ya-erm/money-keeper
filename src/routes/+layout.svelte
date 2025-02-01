@@ -6,14 +6,15 @@
   import '$lib/icons';
   import '$lib/translate';
 
+  import Toasts from '@ya-erm/svelte-ui/toasts/Toasts';
+  import { showInfoToast } from '@ya-erm/svelte-ui/toasts';
+
   import { membersService } from '$lib/data';
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import { showInfoToast } from '$lib/ui/toasts';
 
   import Layout from '$lib/ui/Layout.svelte';
   import ThemeProvider from '$lib/ui/theme/ThemeProvider.svelte';
-  import Toasts from '$lib/ui/toasts/Toasts.svelte';
 
   inject({ mode: dev ? 'development' : 'production', debug: false });
 

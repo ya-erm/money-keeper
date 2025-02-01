@@ -9,7 +9,7 @@
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Modal from '$lib/ui/Modal.svelte';
-  import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
+  import { showErrorToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
   import TagsList from '$lib/widgets/TagsList.svelte';
 
   import DeleteAccountModal from './DeleteAccountModal.svelte';

@@ -17,7 +17,7 @@
   import Input from '@ya-erm/svelte-ui/Input';
   import Loader from '$lib/ui/Loader.svelte';
   import { useRightButton, useTitle } from '$lib/ui/header';
-  import { showErrorToast } from '$lib/ui/toasts';
+  import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
   import { useFetch, useSmartLoading } from '$lib/utils';
 
   useTitle($translate('auth.login.title'));

@@ -8,7 +8,7 @@
   import Input from '@ya-erm/svelte-ui/Input';
   import Loader from '$lib/ui/Loader.svelte';
   import Modal from '$lib/ui/Modal.svelte';
-  import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
+  import { showErrorToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
   import { useFetch } from '$lib/utils/useFetch';
   import { v4 as uuid } from 'uuid';
 
