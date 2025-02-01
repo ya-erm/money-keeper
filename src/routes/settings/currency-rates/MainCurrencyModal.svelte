@@ -21,7 +21,7 @@
   };
 </script>
 
-<Modal id="main-currency-modal" header={$translate('currency_rates.default_currency')} {opened} on:close={handleClose}>
+<Modal id="main-currency-modal" header={$translate('currency_rates.default_currency')} {opened} onClose={handleClose}>
   <form class="flex-col gap-1" on:submit|preventDefault={handleSaveCurrency}>
     <Input name="currency" bind:value={currency} />
     <div class="flex-grow grid-col-2 gap-1">

@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { translate } from '$lib/translate';
-  import { longPress } from '$lib/utils';
   import Input from '@ya-erm/svelte-ui/Input';
   import Button from '@ya-erm/svelte-ui/Button';
-  import Modal from './Modal.svelte';
+  import Modal from '@ya-erm/svelte-ui/Modal';
+
+  import { translate } from '$lib/translate';
+  import { longPress } from '$lib/utils';
 
   export let tags: { id: string; title: string }[];
   export let selected: string[];
@@ -70,11 +71,7 @@
 </div>
 
 {#if !readOnly}
-  <Modal
-    {opened}
-    header={$translate(mode === 'add' ? 'tags.add_modal_header' : 'tags.edit_modal_header')}
-    on:close={() => (opened = false)}
-  >
+  <Modal bind:opened header={$translate(mode === 'add' ? 'tags.add_modal_header' : 'tags.edit_modal_header')}>
     <form on:submit|preventDefault={handleSubmit} class="flex-col gap-1" data-testId="AddTagForm">
       <Input label={$translate('tags.title')} bind:value={title} name="title" required />
 

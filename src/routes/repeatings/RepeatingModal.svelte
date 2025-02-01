@@ -6,11 +6,11 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+  import Modal from '@ya-erm/svelte-ui/Modal';
 
   import type { Repeating, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/Layout.svelte';
-  import Modal from '$lib/ui/Modal.svelte';
   import Portal from '$lib/ui/Portal.svelte';
   import Select from '$lib/ui/Select.svelte';
   import { checkNumberFormParameter } from '$lib/utils/checkFormParams';
@@ -62,7 +62,7 @@
   width={20}
   opened={opened && !operationsListVisible}
   header={$translate('transactions.repeatings.title')}
-  on:close={onCancel}
+  onClose={onCancel}
 >
   <form class="flex-col gap-1" on:submit|preventDefault={handleSubmit}>
     <div class="flex-col gap-0.5">
