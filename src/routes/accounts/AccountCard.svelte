@@ -35,7 +35,7 @@
       </div>
       <div class="account-tags">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
     </div>
-    <Button appearance="link" color="white" onClick={handleEdit}>
+    <Button appearance="link" color="white" onClick={handleEdit} title={$translate('accounts.edit_account')}>
       <Icon name="mdi:pencil" padding={0.5} />
     </Button>
   </div>
