@@ -4,13 +4,13 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+  import Portal from '@ya-erm/svelte-ui/Portal';
+  import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 
   import { accountsStore } from '$lib/data';
   import type { Group } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/Layout.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
-  import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 
   import AccountList from '../../../../accounts/list/AccountList.svelte';
   import GroupAccountList from './GroupAccountList.svelte';

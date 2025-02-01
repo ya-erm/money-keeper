@@ -5,6 +5,7 @@
   import type { HeaderConfig } from './header/config';
 
   export let header: HeaderConfig = {};
+  export let hideMenu = false;
 </script>
 
 <main>
@@ -12,7 +13,9 @@
   <div class="page">
     <slot />
   </div>
-  <Menu />
+  {#if !hideMenu}
+    <Menu />
+  {/if}
 </main>
 
 <style>

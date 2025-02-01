@@ -1,7 +1,8 @@
 <script lang="ts">
-  import Input from '@ya-erm/svelte-ui/Input';
   import Button from '@ya-erm/svelte-ui/Button';
-  import Modal from '@ya-erm/svelte-ui/Modal';
+  import Input from '@ya-erm/svelte-ui/Input';
+  // import Modal from '@ya-erm/svelte-ui/Modal'; // TODO: разобраться почему ломается при ssr
+  import Modal from '$lib/ui/Modal.svelte';
 
   import { translate } from '$lib/translate';
   import { longPress } from '$lib/utils';

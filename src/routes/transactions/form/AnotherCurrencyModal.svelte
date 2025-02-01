@@ -1,10 +1,10 @@
 <script lang="ts">
   import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
+  import Modal from '@ya-erm/svelte-ui/Modal';
 
   import { memberSettingsStore, membersService } from '$lib/data';
   import { translate } from '$lib/translate';
-  import Modal from '$lib/ui/Modal.svelte';
 
   $: settings = $memberSettingsStore;
 

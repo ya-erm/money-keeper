@@ -13,7 +13,8 @@
   import { translate } from '$lib/translate';
   import Button from '@ya-erm/svelte-ui/Button';
   import Layout from '$lib/ui/Layout.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
+  import Portal from '@ya-erm/svelte-ui/Portal';
+
   import { calculateBalance, findRate, groupBySelector, pastOperationsPredicate } from '$lib/utils';
 
   import AccountsTableTable from './AccountsAnalyticsTable.svelte';

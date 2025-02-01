@@ -4,12 +4,12 @@
   import { page } from '$app/stores';
 
   import ShowMoreContainer from '@ya-erm/svelte-ui/ShowMoreContainer';
+  import Portal from '@ya-erm/svelte-ui/Portal';
 
   import { currencyRatesStore, memberSettingsStore } from '$lib/data';
   import type { TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/Layout.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
   import HeaderFormSubmitButton from '$lib/ui/header/HeaderFormSubmitButton.svelte';
   import { findCurrencyRate, getSearchParam, setSearchParam } from '$lib/utils';
 
@@ -65,6 +65,7 @@
       rightButton: HeaderFormSubmitButton,
       title: $translate('transactions.edit_transaction'),
     }}
+    hideMenu
   >
     <EditTransaction id={operationId} onBack={closeOperationForm} />
   </Layout>

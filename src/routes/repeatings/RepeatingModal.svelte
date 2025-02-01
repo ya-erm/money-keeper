@@ -7,11 +7,11 @@
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Modal from '@ya-erm/svelte-ui/Modal';
+  import Portal from '@ya-erm/svelte-ui/Portal';
 
   import type { Repeating, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/Layout.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
   import Select from '$lib/ui/Select.svelte';
   import { checkNumberFormParameter } from '$lib/utils/checkFormParams';
 
@@ -102,19 +102,19 @@
       <Button text={$translate('common.save')} color="primary" type="submit" />
     </div>
   </form>
-</Modal>
 
-<Modal bind:opened={dayOfMonthModalOpened} header={$translate('transactions.repeatings.day_of_month.title')}>
-  <form class="flex-col gap-1" on:submit|preventDefault={handleDayOfMonthSubmit}>
-    <div class="flex-col gap-0.5">
-      <Input name="dayOfMonth" type="number" min={1} max={31} value={dayOfMonth.toString()} required />
-      <span class="info">{$translate('transactions.repeatings.day_of_month.info')}</span>
-    </div>
-    <div class="grid-col-2 gap-1">
-      <Button color="secondary" text={$translate('common.cancel')} onClick={() => (dayOfMonthModalOpened = false)} />
-      <Button text={$translate('common.apply')} color="primary" type="submit" />
-    </div>
-  </form>
+  <Modal bind:opened={dayOfMonthModalOpened} header={$translate('transactions.repeatings.day_of_month.title')}>
+    <form class="flex-col gap-1" on:submit|preventDefault={handleDayOfMonthSubmit}>
+      <div class="flex-col gap-0.5">
+        <Input name="dayOfMonth" type="number" min={1} max={31} value={dayOfMonth.toString()} required />
+        <span class="info">{$translate('transactions.repeatings.day_of_month.info')}</span>
+      </div>
+      <div class="grid-col-2 gap-1">
+        <Button color="secondary" text={$translate('common.cancel')} onClick={() => (dayOfMonthModalOpened = false)} />
+        <Button text={$translate('common.apply')} color="primary" type="submit" />
+      </div>
+    </form>
+  </Modal>
 </Modal>
 
 <Portal visible={operationsListVisible}>
@@ -128,6 +128,7 @@
       leftButton: null,
       rightButton: null,
     }}
+    hideMenu
   >
     <div class="p-1">
       <GroupedOperationsList operations={operations ?? []} />

@@ -3,12 +3,13 @@
 
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
+  import Portal from '@ya-erm/svelte-ui/Portal';
 
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import { type Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/Layout.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
+
   import { findRate } from '$lib/utils';
 
   import BalanceChartLegend from './BalanceChartLegend.svelte';

@@ -4,13 +4,13 @@
 
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
+  import Portal from '@ya-erm/svelte-ui/Portal';
 
   import { membersService, selectedMemberStore, settingsService, memberSettingsStore } from '$lib/data';
   import { route, routes } from '$lib/routes';
   import { activeLocaleName, translate } from '$lib/translate';
   import LanguageModal from '$lib/translate/LanguageModal.svelte';
   import Loader from '$lib/ui/Loader.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
   import ListGroup from '$lib/ui/list/ListGroup.svelte';
   import ListLinkItem from '$lib/ui/list/ListLinkItem.svelte';
   import ListSelectItem from '$lib/ui/list/ListSelectItem.svelte';

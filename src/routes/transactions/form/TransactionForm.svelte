@@ -7,6 +7,7 @@
   import Checkbox from '@ya-erm/svelte-ui/Checkbox';
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+  import Portal from '@ya-erm/svelte-ui/Portal';
   import Spoiler from '@ya-erm/svelte-ui/Spoiler';
   import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
 
@@ -17,7 +18,6 @@
   import { repeatingsService, repeatingsStore } from '$lib/data/repeatings';
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/Layout.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
   import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
@@ -393,39 +393,35 @@
 
 <AnotherCurrencyModal bind:opened={anotherCurrencyModalOpened} bind:anotherCurrency />
 
-{#if repeatingTypeModalOpened}
-  <RepeatingTypeModal
-    bind:opened={repeatingTypeModalOpened}
-    onCreateNew={() => {
-      repeatingModalOpened = true;
-      repeatingTypeModalOpened = false;
-    }}
-    onSelectExisting={() => {
-      repeatingListVisible = true;
-      repeatingTypeModalOpened = false;
-    }}
-    onCancel={() => {
-      if (!repeating) repeatingChecked = false;
-      repeatingTypeModalOpened = false;
-    }}
-  />
-{/if}
+<RepeatingTypeModal
+  bind:opened={repeatingTypeModalOpened}
+  onCreateNew={() => {
+    repeatingModalOpened = true;
+    repeatingTypeModalOpened = false;
+  }}
+  onSelectExisting={() => {
+    repeatingListVisible = true;
+    repeatingTypeModalOpened = false;
+  }}
+  onCancel={() => {
+    if (!repeating) repeatingChecked = false;
+    repeatingTypeModalOpened = false;
+  }}
+/>
 
-{#if repeatingModalOpened}
-  <RepeatingModal
-    {repeating}
-    date={datetime}
-    opened={repeatingModalOpened}
-    onSubmit={(value) => {
-      repeating = value;
-      repeatingModalOpened = false;
-    }}
-    onCancel={() => {
-      if (!repeating) repeatingChecked = false;
-      repeatingModalOpened = false;
-    }}
-  />
-{/if}
+<RepeatingModal
+  {repeating}
+  date={datetime}
+  opened={repeatingModalOpened}
+  onSubmit={(value) => {
+    repeating = value;
+    repeatingModalOpened = false;
+  }}
+  onCancel={() => {
+    if (!repeating) repeatingChecked = false;
+    repeatingModalOpened = false;
+  }}
+/>
 
 <Portal visible={repeatingListVisible}>
   <Layout
@@ -441,6 +437,7 @@
       leftButton: null,
       rightButton: null,
     }}
+    hideMenu
   >
     <div class="p-1">
       <RepeatingsList
@@ -462,6 +459,7 @@
       leftButton: null,
       rightButton: null,
     }}
+    hideMenu
   >
     <TimeZoneList
       onClick={(tz, shift) => {
