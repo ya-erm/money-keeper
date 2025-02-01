@@ -60,7 +60,7 @@
 
 <div class="flex-col gap-1">
   <div class="flex-grow">
-    <Input bind:value={search} placeholder={$translate('common.search')} clearable />
+    <Input bind:value={search} icon="mdi:search" placeholder={$translate('common.search')} clearable />
   </div>
   {#each currenciesGroups as currency}
     <h4 class="m-0">{currency}</h4>

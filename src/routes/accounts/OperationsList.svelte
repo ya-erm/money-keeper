@@ -56,7 +56,7 @@
     </div>
     <div class="operations-search-container flex gap-0.5">
       <div class="flex-grow">
-        <Input bind:value={search} placeholder={$translate('common.search')} clearable />
+        <Input bind:value={search} icon="mdi:search" placeholder={$translate('common.search')} clearable />
       </div>
       <!-- 
     <Button appearance="transparent" bordered>
