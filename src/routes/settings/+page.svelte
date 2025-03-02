@@ -1,10 +1,10 @@
 <script lang="ts">
   import { translate } from '$lib/translate';
-  import { useTitle } from '$lib/ui/header';
+  import Layout from '$lib/ui/layout/Layout.svelte';
 
   import Settings from './Settings.svelte';
-
-  useTitle($translate('settings.title'));
 </script>
 
-<Settings />
+<Layout title={$translate('settings.title')}>
+  <Settings />
+</Layout>

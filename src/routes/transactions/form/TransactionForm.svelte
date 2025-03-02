@@ -17,7 +17,7 @@
   import { operationsCommentsStore } from '$lib/data/operations';
   import { repeatingsService, repeatingsStore } from '$lib/data/repeatings';
   import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/Layout.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
   import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
@@ -425,17 +425,10 @@
 
 <Portal visible={repeatingListVisible}>
   <Layout
-    header={{
-      title: $translate('transactions.repeatings.select_repeating'),
-      backButton: {
-        title: $translate('common.back'),
-        onClick: () => {
-          if (!repeating) repeatingChecked = false;
-          repeatingListVisible = false;
-        },
-      },
-      leftButton: null,
-      rightButton: null,
+    title={$translate('transactions.repeatings.select_repeating')}
+    onBack={() => {
+      if (!repeating) repeatingChecked = false;
+      repeatingListVisible = false;
     }}
     hideMenu
   >
@@ -452,15 +445,7 @@
 </Portal>
 
 <Portal visible={timeZoneListVisible}>
-  <Layout
-    header={{
-      title: $translate('timezones.select_time_zone'),
-      backButton: { title: $translate('common.back'), onClick: () => (timeZoneListVisible = false) },
-      leftButton: null,
-      rightButton: null,
-    }}
-    hideMenu
-  >
+  <Layout title={$translate('timezones.select_time_zone')} onBack={() => (timeZoneListVisible = false)} hideMenu>
     <TimeZoneList
       onClick={(tz, shift) => {
         timeZone = tz;

@@ -12,9 +12,9 @@
   import type { AccountViewModel, Grouping } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Button from '@ya-erm/svelte-ui/Button';
-  import Layout from '$lib/ui/Layout.svelte';
   import Portal from '@ya-erm/svelte-ui/Portal';
 
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import { calculateBalance, findRate, groupBySelector, pastOperationsPredicate } from '$lib/utils';
 
   import AccountsTableTable from './AccountsAnalyticsTable.svelte';
@@ -135,14 +135,9 @@
 
 <Portal visible={groupingSelecting}>
   <Layout
-    header={{
-      backButton: {
-        onClick: () => (groupingSelecting = false),
-      },
-      leftButton: null,
-      rightButton: AddGroupingButton,
-      title: $translate('analytics.accounts.grouping.select_grouping'),
-    }}
+    title={$translate('analytics.accounts.grouping.select_grouping')}
+    onBack={() => (groupingSelecting = false)}
+    rightSlot={AddGroupingButton}
   >
     <GroupingList onClick={handleGroupingSelect} withUnselectedValue />
   </Layout>

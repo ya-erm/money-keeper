@@ -8,7 +8,7 @@
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import { type Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/Layout.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
 
   import { findRate } from '$lib/utils';
 
@@ -133,16 +133,7 @@
 </div>
 
 <Portal visible={legendVisible}>
-  <Layout
-    header={{
-      backButton: {
-        onClick: () => (legendVisible = false),
-      },
-      leftButton: null,
-      rightButton: null,
-      title: $translate('analytics.balance.legend'),
-    }}
-  >
+  <Layout title={$translate('analytics.balance.legend')} onBack={() => (legendVisible = false)}>
     <BalanceChartLegend
       accounts={sortedAccounts.slice().reverse()}
       onApply={handleAccountCheckedApply}

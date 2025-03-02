@@ -1,7 +1,7 @@
 <script lang="ts">
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import HeaderButton from '$lib/ui/header/HeaderButton.svelte';
+  import HeaderButton from '$lib/ui/layout/HeaderButton.svelte';
 </script>
 
 <HeaderButton

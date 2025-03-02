@@ -1,18 +1,14 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Input from '@ya-erm/svelte-ui/Input';
+
   import { currencyRatesStore, memberSettingsStore } from '$lib/data';
   import type { CurrencyRate } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import { useRightButton, useTitle } from '$lib/ui/header';
-  import Input from '@ya-erm/svelte-ui/Input';
   import { deleteSearchParam, findRate, getSearchParam, groupByKeyToMap } from '$lib/utils';
 
-  import AddCurrencyRateButton from './AddCurrencyRateButton.svelte';
   import CurrencyRateModal from './CurrencyRateModal.svelte';
-
-  useTitle($translate('currency_rates.title'));
-  useRightButton(AddCurrencyRateButton);
 
   $: currencyRates = $currencyRatesStore;
   $: settings = $memberSettingsStore;

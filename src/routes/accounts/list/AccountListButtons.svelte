@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
 
   import { translate } from '$lib/translate';
-  import HeaderButton from '$lib/ui/header/HeaderButton.svelte';
+  import HeaderButton from '$lib/ui/layout/HeaderButton.svelte';
   import { getSearchParam } from '$lib/utils';
 
   $: action = getSearchParam($page, 'action');

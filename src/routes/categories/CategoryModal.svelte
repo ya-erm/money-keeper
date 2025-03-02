@@ -10,7 +10,7 @@
   import type { Category, CategoryType } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
-  import Layout from '$lib/ui/Layout.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import Modal from '$lib/ui/Modal.svelte';
   import { deleteSearchParam, getSearchParam, setSearchParam } from '$lib/utils';
 
@@ -112,17 +112,7 @@
   </form>
 
   <Portal visible={iconSelecting}>
-    <Layout
-      header={{
-        backButton: {
-          onClick: closeIconSelecting,
-        },
-        leftButton: null,
-        rightButton: null,
-        title: $translate('icons.select_icon'),
-      }}
-      hideMenu
-    >
+    <Layout title={$translate('icons.select_icon')} onBack={closeIconSelecting} hideMenu>
       <CategoryIcons
         icon={icon ?? null}
         onSelect={(value) => {

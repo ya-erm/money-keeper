@@ -4,22 +4,22 @@
 
   import Icon from '@ya-erm/svelte-ui/Icon';
 
-  export let href: string;
+  export let href: string | null = null;
   export let icon: string;
   export let label: string;
   export let disabled: boolean = false;
   export let onClick: (() => void) | null = null;
 </script>
 
-{#if onClick}
-  <button title={label} aria-label={label} on:click={onClick} {disabled}>
-    <Icon name={icon} padding={1} />
-  </button>
-{:else}
+{#if href}
   <button {disabled}>
     <a title={label} aria-label={label} {href} on:click={() => replaceState(href, $page.state)}>
       <Icon name={icon} padding={1} />
     </a>
+  </button>
+{:else}
+  <button title={label} aria-label={label} on:click={onClick} {disabled}>
+    <Icon name={icon} padding={1} />
   </button>
 {/if}
 

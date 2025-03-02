@@ -6,7 +6,6 @@
 
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import { backLink } from '$lib/ui/header/model';
 
   import { menu } from './menu';
 
@@ -21,13 +20,7 @@
 
 <div class="menu-bar" class:hidden={$hidden}>
   {#each $menu as item}
-    <a
-      href={item.path}
-      class="menu-item"
-      data-testId="MenuItem"
-      class:active={$isActive(item.path)}
-      on:click={() => backLink.set(null)}
-    >
+    <a href={item.path} class="menu-item" data-testId="MenuItem" class:active={$isActive(item.path)}>
       <Icon name={item.icon} size={1.5} />
       <span class="text">{$translate(item.title)}</span>
     </a>

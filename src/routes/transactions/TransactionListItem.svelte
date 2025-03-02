@@ -2,7 +2,8 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
 
   import type { CurrencyRate, TransactionViewModel } from '$lib/data/interfaces';
-  import { translate, type Messages } from '$lib/translate';
+  import { translate } from '$lib/translate';
+  import type { Messages } from '$lib/translate/messages';
   import { longPress } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
   import { formatMoney } from '$lib/utils/formatMoney';

@@ -6,7 +6,7 @@
 
   export let title: string;
   export let href: string | undefined = undefined;
-  export let value: string | undefined = undefined;
+  export let value: string | null | undefined = undefined;
   export let disabled = false;
   export let onClick: (() => void) | undefined = undefined;
 </script>

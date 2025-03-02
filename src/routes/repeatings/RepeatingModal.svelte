@@ -11,7 +11,7 @@
 
   import type { Repeating, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/Layout.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import Select from '$lib/ui/Select.svelte';
   import { checkNumberFormParameter } from '$lib/utils/checkFormParams';
 
@@ -118,18 +118,7 @@
 </Modal>
 
 <Portal visible={operationsListVisible}>
-  <Layout
-    header={{
-      title: $translate('repeatings.operations'),
-      backButton: {
-        title: $translate('common.back'),
-        onClick: () => (operationsListVisible = false),
-      },
-      leftButton: null,
-      rightButton: null,
-    }}
-    hideMenu
-  >
+  <Layout title={$translate('repeatings.operations')} onBack={() => (operationsListVisible = false)} hideMenu>
     <div class="p-1">
       <GroupedOperationsList operations={operations ?? []} />
     </div>

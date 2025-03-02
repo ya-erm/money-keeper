@@ -8,8 +8,8 @@
   import type { Grouping } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import { useTitle } from '$lib/ui/header';
-  import { title, useBackButton } from '$lib/ui/header/model';
+  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import { getSearchParam } from '$lib/utils';
 
   import EditGroupForm from './EditGroupForm.svelte';
@@ -19,8 +19,7 @@
 
   $: id = getSearchParam($page, 'id');
 
-  useBackButton(route('analytics.accounts.groupings'), $translate('common.back'));
-  useTitle($translate('analytics.groupings.new_grouping'));
+  let title = $translate('analytics.groupings.new_grouping');
 
   let notFound = false;
   let grouping: Grouping | null = null;
@@ -32,7 +31,7 @@
         notFound = true;
         return;
       }
-      title.set(grouping.name);
+      title = grouping.name;
     } else {
       grouping = {
         id: uuid(),
@@ -47,10 +46,12 @@
   };
 </script>
 
-{#if notFound}
-  <GroupingNotFound />
-{:else if grouping}
-  <div class="p-1">
-    <EditGroupForm {grouping} onSave={handleSave} />
-  </div>
-{/if}
+<Layout {title} leftSlot={HeaderBackButton}>
+  {#if notFound}
+    <GroupingNotFound />
+  {:else if grouping}
+    <div class="p-1">
+      <EditGroupForm {grouping} onSave={handleSave} />
+    </div>
+  {/if}
+</Layout>

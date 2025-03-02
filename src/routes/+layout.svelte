@@ -13,7 +13,6 @@
   import { routes } from '$lib/routes';
   import { translate } from '$lib/translate';
 
-  import Layout from '$lib/ui/Layout.svelte';
   import ThemeProvider from '$lib/ui/theme/ThemeProvider.svelte';
 
   inject({ mode: dev ? 'development' : 'production', debug: false });
@@ -24,9 +23,6 @@
 </script>
 
 <Toasts />
-
-<Layout>
-  <slot />
-</Layout>
-
 <ThemeProvider />
+
+<slot />

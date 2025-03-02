@@ -10,7 +10,7 @@
   import { accountsStore } from '$lib/data';
   import type { Group } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/Layout.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
 
   import AccountList from '../../../../accounts/list/AccountList.svelte';
   import GroupAccountList from './GroupAccountList.svelte';
@@ -71,16 +71,7 @@
 </div>
 
 <Portal visible={!!groupIdForAddAccount} testId={`Grouping.AccountSelecting.Portal`}>
-  <Layout
-    header={{
-      backButton: {
-        onClick: () => (groupIdForAddAccount = null),
-      },
-      leftButton: null,
-      rightButton: null,
-      title: $translate('transactions.select_account'),
-    }}
-  >
+  <Layout title={$translate('transactions.select_account')} onBack={() => (groupIdForAddAccount = null)} hideMenu>
     <AccountList {accounts} onClick={handelSelectAccount} />
   </Layout>
 </Portal>

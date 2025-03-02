@@ -8,8 +8,8 @@
   import { currencyRatesStore, memberSettingsStore } from '$lib/data';
   import type { Account, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/Layout.svelte';
-  import HeaderFormSubmitButton from '$lib/ui/header/HeaderFormSubmitButton.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
+  import HeaderFormSubmitButton from '$lib/ui/layout/HeaderFormSubmitButton.svelte';
   import { findCurrencyRate, getSearchParam, setSearchParam } from '$lib/utils';
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
@@ -59,14 +59,9 @@
 
 <Portal visible={operationId !== null}>
   <Layout
-    header={{
-      backButton: {
-        onClick: closeOperationForm,
-      },
-      leftButton: null,
-      rightButton: HeaderFormSubmitButton,
-      title: $translate('transactions.edit_transaction'),
-    }}
+    title={$translate('transactions.edit_transaction')}
+    onBack={closeOperationForm}
+    rightSlot={HeaderFormSubmitButton}
     hideMenu
   >
     <EditTransaction id={operationId} onBack={closeOperationForm} />

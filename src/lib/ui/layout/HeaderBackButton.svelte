@@ -2,7 +2,6 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Button from '@ya-erm/svelte-ui/Button';
 
-  import { findRoute } from '$lib/routes';
   import { translate } from '$lib/translate';
 
   export let href: string | null = null;
@@ -15,23 +14,21 @@
 </script>
 
 {#if href}
-  <a {href} on:click={onClick}>
-    <Icon name="mdi:chevron-left" />
-    {title ?? $translate(findRoute(href)?.title ?? 'common.back')}
+  <a class="link" {href} on:click={onClick}>
+    <Icon name="mdi:chevron-left" padding="1rem 0" />
+    {title ?? $translate('common.back')}
   </a>
 {:else}
   <Button appearance="link" underlined={false} onClick={onClick ?? goBack}>
     <div class="flex items-center">
-      <Icon name="mdi:chevron-left" />
-      <span>
-        {title ?? $translate('common.back')}
-      </span>
+      <Icon name="mdi:chevron-left" padding="1rem 0" />
+      {title ?? $translate('common.back')}
     </div>
   </Button>
 {/if}
 
 <style>
-  a {
+  .link {
     display: flex;
     align-items: center;
     color: var(--active-color);

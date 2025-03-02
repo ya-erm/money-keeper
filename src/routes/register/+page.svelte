@@ -3,12 +3,10 @@
   import LanguageButton from '$lib/translate/LanguageButton.svelte';
   import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
-  import { useRightButton, useTitle } from '$lib/ui/header';
+
+  import Layout from '$lib/ui/layout/Layout.svelte';
 
   import PasswordModal from './PasswordModal.svelte';
-
-  useTitle($translate('auth.register.title'));
-  useRightButton(LanguageButton);
 
   let login = '';
 
@@ -19,14 +17,16 @@
   }
 </script>
 
-<div class="content">
-  <form on:submit|preventDefault={handleSubmit}>
-    <Input label={$translate('auth.login')} bind:value={login} name="login" required />
-    <Button text={$translate('common.continue')} type="submit" />
-  </form>
-  <a class="flex-center" href="/login">{$translate('auth.sign_in')}</a>
-  <a class="flex-center" href="/">{$translate('auth.continue_as_guest')}</a>
-</div>
+<Layout title={$translate('auth.register.title')} rightSlot={LanguageButton}>
+  <div class="content">
+    <form on:submit|preventDefault={handleSubmit}>
+      <Input label={$translate('auth.login')} bind:value={login} name="login" required />
+      <Button text={$translate('common.continue')} type="submit" />
+    </form>
+    <a class="flex-center" href="/login">{$translate('auth.sign_in')}</a>
+    <a class="flex-center" href="/">{$translate('auth.continue_as_guest')}</a>
+  </div>
+</Layout>
 
 <PasswordModal {login} bind:opened />
 

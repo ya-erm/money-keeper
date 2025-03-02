@@ -5,7 +5,7 @@
 
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/Layout.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import { calculateBalance, findCurrencyRate, groupBySelector } from '$lib/utils';
 
   import AccountList from '../../accounts/list/AccountList.svelte';
@@ -59,17 +59,7 @@
 </label>
 
 <Portal visible={selecting} testId={`${testId}.Portal`}>
-  <Layout
-    header={{
-      backButton: {
-        onClick: () => (selecting = false),
-      },
-      leftButton: null,
-      rightButton: null,
-      title: $translate('transactions.select_account'),
-    }}
-    hideMenu
-  >
+  <Layout title={$translate('transactions.select_account')} onBack={() => (selecting = false)} hideMenu>
     <AccountList {accounts} onClick={selectAccount} />
   </Layout>
 </Portal>
