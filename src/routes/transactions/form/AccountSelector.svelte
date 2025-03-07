@@ -1,10 +1,11 @@
 <script lang="ts">
+  import Icon from '@ya-erm/svelte-ui/Icon';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+  import Portal from '@ya-erm/svelte-ui/Portal';
+
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import { translate } from '$lib/translate';
-  import Icon from '$lib/ui/Icon.svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
-  import Layout from '$lib/ui/Layout.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import { calculateBalance, findCurrencyRate, groupBySelector } from '$lib/utils';
 
   import AccountList from '../../accounts/list/AccountList.svelte';
@@ -58,16 +59,7 @@
 </label>
 
 <Portal visible={selecting} testId={`${testId}.Portal`}>
-  <Layout
-    header={{
-      backButton: {
-        onClick: () => (selecting = false),
-      },
-      leftButton: null,
-      rightButton: null,
-      title: $translate('transactions.select_account'),
-    }}
-  >
+  <Layout title={$translate('transactions.select_account')} onBack={() => (selecting = false)} hideMenu>
     <AccountList {accounts} onClick={selectAccount} />
   </Layout>
 </Portal>

@@ -2,11 +2,10 @@
   import { accountsStore, categoriesStore, operationsService, operationTagsStore } from '$lib/data';
   import type { Transaction } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import { useTitle } from '$lib/ui/header';
-  import HeaderBackButton from '$lib/ui/header/HeaderBackButton.svelte';
-  import HeaderFormSubmitButton from '$lib/ui/header/HeaderFormSubmitButton.svelte';
-  import { useLeftButton, useRightButton } from '$lib/ui/header/model';
+  import Button from '@ya-erm/svelte-ui/Button';
+  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
+  import HeaderFormSubmitButton from '$lib/ui/layout/HeaderFormSubmitButton.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
 
   import TransactionForm from '../form/TransactionForm.svelte';
 
@@ -14,16 +13,19 @@
   $: categories = $categoriesStore;
   $: tags = $operationTagsStore;
 
-  useLeftButton(HeaderBackButton);
-  useTitle($translate('transactions.new_transaction'));
-  useRightButton(HeaderFormSubmitButton);
-
   const handleSubmit = async (transactions: Transaction[]) => {
     transactions.forEach((transaction) => operationsService.save(transaction));
     history.back();
   };
 </script>
 
-<TransactionForm {accounts} {categories} {tags} onSubmit={handleSubmit}>
-  <Button text={$translate('common.create')} type="submit" testId="CreateTransactionButton" />
-</TransactionForm>
+<Layout
+  title={$translate('transactions.new_transaction')}
+  leftSlot={HeaderBackButton}
+  rightSlot={HeaderFormSubmitButton}
+  hideMenu
+>
+  <TransactionForm {accounts} {categories} {tags} onSubmit={handleSubmit}>
+    <Button text={$translate('common.create')} type="submit" testId="CreateTransactionButton" />
+  </TransactionForm>
+</Layout>

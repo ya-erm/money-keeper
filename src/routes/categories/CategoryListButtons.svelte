@@ -1,6 +1,6 @@
 <script lang="ts">
   import { translate } from '$lib/translate';
-  import HeaderButton from '$lib/ui/header/HeaderButton.svelte';
+  import HeaderButton from '$lib/ui/layout/HeaderButton.svelte';
 </script>
 
 <div class="flex">

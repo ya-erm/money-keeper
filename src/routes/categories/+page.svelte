@@ -5,16 +5,13 @@
   import { categoriesService, categoriesStore, memberSettingsStore, membersService } from '$lib/data';
   import type { Category } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import { useRightButton, useTitle } from '$lib/ui/header';
   import ModalContainer from '$lib/ui/ModalContainer.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import { deleteSearchParam, getSearchParam } from '$lib/utils';
 
   import CategoryList from './CategoryList.svelte';
   import CategoryListButtons from './CategoryListButtons.svelte';
   import CategoryModal from './CategoryModal.svelte';
-
-  useTitle($translate('categories.title'));
-  useRightButton(CategoryListButtons);
 
   $: categories = $categoriesStore;
   $: settings = $memberSettingsStore;
@@ -70,11 +67,13 @@
   });
 </script>
 
-<h2>{$translate('categories.incomings')}</h2>
-<CategoryList items={incomings} {onClick} sortable onSort={(order) => (categoriesInOrder = order)} />
+<Layout title={$translate('categories.title')} rightSlot={CategoryListButtons}>
+  <h2>{$translate('categories.incomings')}</h2>
+  <CategoryList items={incomings} {onClick} sortable onSort={(order) => (categoriesInOrder = order)} />
 
-<h2 class="mt-2">{$translate('categories.outgoings')}</h2>
-<CategoryList items={outgoings} {onClick} sortable onSort={(order) => (categoriesOutOrder = order)} />
+  <h2 class="mt-2">{$translate('categories.outgoings')}</h2>
+  <CategoryList items={outgoings} {onClick} sortable onSort={(order) => (categoriesOutOrder = order)} />
+</Layout>
 
 {#if opened}
   <ModalContainer>

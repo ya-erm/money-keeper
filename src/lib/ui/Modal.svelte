@@ -29,7 +29,7 @@
     in:fade={{ duration: 300 }}
     out:fade={{ duration: 300 }}
     on:click={close}
-    aria-hidden
+    aria-hidden={true}
   >
     <div
       class="modal"
@@ -40,7 +40,7 @@
       in:fade={{ duration: 100 }}
       out:fade={{ duration: 100 }}
       style:width={typeof width === 'string' ? width : `${width}rem`}
-      aria-hidden
+      aria-hidden={true}
     >
       {#if $$slots.header}
         <slot name="header" />

@@ -1,22 +1,26 @@
 <script lang="ts">
   import dayjs from 'dayjs';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import { showErrorToast, showInfoToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
+
   import {
     accountTagsService,
     accountsService,
     categoriesService,
     currencyRatesService,
+    groupingsService,
     journalService,
     mainService,
     membersService,
     operationTagsService,
     operationsService,
     operationsStore,
-    groupingsService,
   } from '$lib/data';
   import type { Account, Category, CurrencyRate, Grouping, Tag, Transaction } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import { showErrorToast, showInfoToast, showSuccessToast } from '$lib/ui/toasts';
+  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import { Logger, deepEqual, groupByKey, keyTransactions } from '$lib/utils';
 
   const logger = new Logger('Import/Export');
@@ -143,58 +147,70 @@
   };
 </script>
 
-<div class="container p-1">
-  <h2>{$translate('import_export.import')}</h2>
-  <label class="flex-col gap-0.5">
-    <span>{$translate('import_export.raw_data_json')}:</span>
-    <textarea class="text-area-json" data-testId="ImportTextArea" bind:value={rawImport}></textarea>
-  </label>
+<Layout title={$translate('import_export.title')} leftSlot={HeaderBackButton}>
+  <div class="container p-1">
+    <h2>{$translate('import_export.import')}</h2>
+    <label class="flex-col gap-0.5">
+      <span>{$translate('import_export.raw_data_json')}:</span>
+      <textarea class="text-area-json" data-testId="ImportTextArea" bind:value={rawImport}></textarea>
+    </label>
 
-  <button data-testId="ParseJsonButton" class="mt-1 w-full" on:click={parseInput}>
-    {$translate('import_export.parse_data')}
-  </button>
+    <Button data-testId="ParseJsonButton" class="mt-1 w-full" onClick={parseInput} color="white" bordered>
+      {$translate('import_export.parse_data')}
+    </Button>
 
-  {#if parsed}
+    {#if parsed}
+      <p>
+        <span>{$translate('import_export.categories')}: <b>{v2.categories?.length ?? 0}</b>,</span>
+        <span>{$translate('import_export.account_tags')}: <b>{v2.accountTags?.length ?? 0}</b>,</span>
+        <span>{$translate('import_export.accounts')}: <b>{v2.accounts?.length ?? 0}</b>,</span>
+        <span>{$translate('import_export.operation_tags')}: <b>{v2.operationTags?.length ?? 0}</b>,</span>
+        <span>{$translate('import_export.operations')}: <b>{v2.operations?.length ?? 0}</b>,</span>
+        <span>{$translate('import_export.currency_rates')}: <b>{v2.currencyRates?.length ?? 0}</b></span>
+        <span>{$translate('import_export.groupings')}: <b>{v2.groupings?.length ?? 0}</b></span>
+      </p>
+
+      <Button data-testId="AddToJournalButton" disabled={uploading} class="w-full" onClick={addToJournal}>
+        {$translate(uploading ? 'import_export.uploading' : 'import_export.start_import')}
+      </Button>
+    {/if}
+
+    <h2>{$translate('import_export.export')}</h2>
+    <label class="flex-col gap-0.5">
+      <span>{$translate('import_export.raw_data_json')}:</span>
+      <textarea class="text-area-json" value={currentJson}></textarea>
+    </label>
     <p>
-      <span>{$translate('import_export.categories')}: <b>{v2.categories?.length ?? 0}</b>,</span>
-      <span>{$translate('import_export.account_tags')}: <b>{v2.accountTags?.length ?? 0}</b>,</span>
-      <span>{$translate('import_export.accounts')}: <b>{v2.accounts?.length ?? 0}</b>,</span>
-      <span>{$translate('import_export.operation_tags')}: <b>{v2.operationTags?.length ?? 0}</b>,</span>
-      <span>{$translate('import_export.operations')}: <b>{v2.operations?.length ?? 0}</b>,</span>
-      <span>{$translate('import_export.currency_rates')}: <b>{v2.currencyRates?.length ?? 0}</b></span>
-      <span>{$translate('import_export.groupings')}: <b>{v2.groupings?.length ?? 0}</b></span>
+      <span>{$translate('import_export.categories')}: <b>{current.categories?.length ?? 0}</b>,</span>
+      <span>{$translate('import_export.account_tags')}: <b>{current.accountTags?.length ?? 0}</b>,</span>
+      <span>{$translate('import_export.accounts')}: <b>{current.accounts?.length ?? 0}</b>,</span>
+      <span>{$translate('import_export.operation_tags')}: <b>{current.operationTags?.length ?? 0}</b>,</span>
+      <span>{$translate('import_export.operations')}: <b>{current.operations?.length ?? 0}</b>,</span>
+      <span>{$translate('import_export.currency_rates')}: <b>{current.currencyRates?.length ?? 0}</b></span>
+      <span>{$translate('import_export.groupings')}: <b>{current.groupings?.length ?? 0}</b></span>
     </p>
+    <a href={URL.createObjectURL(currentJsonFile)} download={`export-${dayjs().format('YYYY-MM-DD')}.json`}>
+      <Button class="w-full">{$translate('import_export.save')}</Button>
+    </a>
 
-    <button data-testId="AddToJournalButton" disabled={uploading} class="w-full" on:click={addToJournal}>
-      {$translate(uploading ? 'import_export.uploading' : 'import_export.start_import')}
-    </button>
-  {/if}
-
-  <h2>{$translate('import_export.export')}</h2>
-  <label class="flex-col gap-0.5">
-    <span>{$translate('import_export.raw_data_json')}:</span>
-    <textarea class="text-area-json" value={currentJson}></textarea>
-  </label>
-  <p>
-    <span>{$translate('import_export.categories')}: <b>{current.categories?.length ?? 0}</b>,</span>
-    <span>{$translate('import_export.account_tags')}: <b>{current.accountTags?.length ?? 0}</b>,</span>
-    <span>{$translate('import_export.accounts')}: <b>{current.accounts?.length ?? 0}</b>,</span>
-    <span>{$translate('import_export.operation_tags')}: <b>{current.operationTags?.length ?? 0}</b>,</span>
-    <span>{$translate('import_export.operations')}: <b>{current.operations?.length ?? 0}</b>,</span>
-    <span>{$translate('import_export.currency_rates')}: <b>{current.currencyRates?.length ?? 0}</b></span>
-    <span>{$translate('import_export.groupings')}: <b>{current.groupings?.length ?? 0}</b></span>
-  </p>
-  <a href={URL.createObjectURL(currentJsonFile)} download={`export-${dayjs().format('YYYY-MM-DD')}.json`}>
-    <button class="w-full">{$translate('import_export.save')}</button>
-  </a>
-
-  <h3>{$translate('import_export.other_features')}</h3>
-  <button on:click={logOperationsKeys}>{$translate('import_export.log_operations_keys')}</button>
-</div>
+    <h3>{$translate('import_export.other_features')}</h3>
+    <Button onClick={logOperationsKeys} color="white" bordered>
+      {$translate('import_export.log_operations_keys')}
+    </Button>
+  </div>
+</Layout>
 
 <style>
   .container {
     height: 100%;
+  }
+  textarea {
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+  }
+  :global(body.dark-mode textarea) {
+    color-scheme: dark;
   }
   .text-area-json {
     resize: vertical;

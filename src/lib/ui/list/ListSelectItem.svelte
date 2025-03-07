@@ -1,12 +1,12 @@
 <script lang="ts">
   import { translate } from '$lib/translate';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Icon from '@ya-erm/svelte-ui/Icon';
 
   import ListGroupItem from './ListGroupItem.svelte';
 
   export let title: string;
   export let href: string | undefined = undefined;
-  export let value: string | undefined = undefined;
+  export let value: string | null | undefined = undefined;
   export let disabled = false;
   export let onClick: (() => void) | undefined = undefined;
 </script>

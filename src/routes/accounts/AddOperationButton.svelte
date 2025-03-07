@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
 
   import { routes } from '$lib/routes';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import { getSearchParam } from '$lib/utils';
 
   $: cardId = getSearchParam($page, 'account-card');

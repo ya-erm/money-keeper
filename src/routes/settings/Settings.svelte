@@ -2,20 +2,22 @@
   import { version } from '$app/environment';
   import { goto } from '$app/navigation';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+  import Portal from '@ya-erm/svelte-ui/Portal';
+
   import { membersService, selectedMemberStore, settingsService, memberSettingsStore } from '$lib/data';
   import { route, routes } from '$lib/routes';
   import { activeLocaleName, translate } from '$lib/translate';
   import LanguageModal from '$lib/translate/LanguageModal.svelte';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
   import Loader from '$lib/ui/Loader.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
   import ListGroup from '$lib/ui/list/ListGroup.svelte';
   import ListLinkItem from '$lib/ui/list/ListLinkItem.svelte';
   import ListSelectItem from '$lib/ui/list/ListSelectItem.svelte';
   import ListSwitchItem from '$lib/ui/list/ListSwitchItem.svelte';
   import { darkMode } from '$lib/ui/theme';
   import createBooleanStore from '$lib/utils/createBooleanStore';
+
   import MainCurrencyModal from './currency-rates/MainCurrencyModal.svelte';
 
   // TODO: selectedMember is not a user, it can be a group
@@ -81,7 +83,7 @@
       color="danger"
       appearance="link"
       underlined={false}
-      on:click={logout}
+      onClick={logout}
       text={$translate('settings.profile.logout')}
     />
   {/if}
@@ -96,7 +98,7 @@
   <div class="build-info">
     <span>{$translate('settings.version', { values: { version } })}</span>
     <span>•</span>
-    <Button appearance="link" underlined={false} text="UI Kit" on:click={() => goto(routes.uikit.path)} />
+    <Button appearance="link" underlined={false} text="UI Kit" onClick={() => goto(routes.uikit.path)} />
   </div>
 </div>
 

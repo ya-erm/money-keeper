@@ -1,6 +1,7 @@
 <script lang="ts">
-  import Checkbox from '$lib/ui/Checkbox.svelte';
-  import Input from '$lib/ui/Input.svelte';
+  import Checkbox from '@ya-erm/svelte-ui/Checkbox';
+
+  import Input from '@ya-erm/svelte-ui/Input';
 
   let v2 = false;
   let withIcon = false;

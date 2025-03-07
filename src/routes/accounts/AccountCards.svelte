@@ -6,7 +6,7 @@
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import type { AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import {
     calculateBalance,
     findCurrencyRate,
@@ -63,7 +63,7 @@
 <div class="accounts-container" bind:this={accountsContainerElement}>
   <div class="accounts-list" bind:this={accountListElement} on:scroll={handleScroll}>
     {#each accounts as account (account.id)}
-      <div class="account-card" on:click={() => scrollToCard(account.id)} aria-hidden>
+      <div class="account-card" on:click={() => scrollToCard(account.id)} aria-hidden={true}>
         <AccountCard
           {account}
           balance={calculateBalance(operationsByAccount[account.id]?.filter(pastOperationsPredicate()) ?? [])}

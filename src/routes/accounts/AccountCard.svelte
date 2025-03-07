@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { AccountViewModel, CurrencyRate } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import { formatMoney } from '$lib/utils/formatMoney';
 
   export let account: AccountViewModel;
@@ -35,7 +35,7 @@
       </div>
       <div class="account-tags">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
     </div>
-    <Button appearance="link" color="white" on:click={handleEdit}>
+    <Button appearance="link" color="white" onClick={handleEdit} title={$translate('accounts.edit_account')}>
       <Icon name="mdi:pencil" padding={0.5} />
     </Button>
   </div>

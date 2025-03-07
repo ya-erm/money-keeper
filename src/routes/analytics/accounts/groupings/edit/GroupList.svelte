@@ -1,15 +1,16 @@
 <script lang="ts">
   import { v4 as uuid } from 'uuid';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+  import Portal from '@ya-erm/svelte-ui/Portal';
+  import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
+
   import { accountsStore } from '$lib/data';
   import type { Group } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
-  import Layout from '$lib/ui/Layout.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
-  import { showErrorToast } from '$lib/ui/toasts';
+  import Layout from '$lib/ui/layout/Layout.svelte';
 
   import AccountList from '../../../../accounts/list/AccountList.svelte';
   import GroupAccountList from './GroupAccountList.svelte';
@@ -58,28 +59,19 @@
         <Input label={$translate('analytics.groupings.groups.name')} bind:value={group.name} required />
         <Input label={$translate('analytics.groupings.groups.color')} bind:value={group.color} type="color" required />
         <GroupAccountList bind:group onAddAccountToGroup={addAccountToGroup} />
-        <Button color="danger" appearance="link" underlined={false} on:click={() => deleteGroup(group.id)}>
+        <Button color="danger" appearance="link" underlined={false} onClick={() => deleteGroup(group.id)}>
           {$translate('analytics.groupings.groups.delete')}
         </Button>
       </li>
     {/each}
-    <Button color="white" on:click={addGroup}>
+    <Button color="white" onClick={addGroup}>
       {$translate('analytics.groupings.groups.add')}
     </Button>
   </ul>
 </div>
 
 <Portal visible={!!groupIdForAddAccount} testId={`Grouping.AccountSelecting.Portal`}>
-  <Layout
-    header={{
-      backButton: {
-        onClick: () => (groupIdForAddAccount = null),
-      },
-      leftButton: null,
-      rightButton: null,
-      title: $translate('transactions.select_account'),
-    }}
-  >
+  <Layout title={$translate('transactions.select_account')} onBack={() => (groupIdForAddAccount = null)} hideMenu>
     <AccountList {accounts} onClick={handelSelectAccount} />
   </Layout>
 </Portal>

@@ -2,6 +2,10 @@
   import { goto } from '$app/navigation';
   import { derived } from 'svelte/store';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
+
   import { ApiError, isApiError } from '$lib/api/ApiError';
   import { journalService, mainService, membersService, settingsService } from '$lib/data';
   import { createKeyFromPassword, decryptAes, decryptRsa } from '$lib/data/crypto';
@@ -13,15 +17,9 @@
   } from '$lib/server/api/v2/auth';
   import { translate } from '$lib/translate';
   import LanguageButton from '$lib/translate/LanguageButton.svelte';
-  import Button from '$lib/ui/Button.svelte';
-  import Input from '$lib/ui/Input.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import Loader from '$lib/ui/Loader.svelte';
-  import { useRightButton, useTitle } from '$lib/ui/header';
-  import { showErrorToast } from '$lib/ui/toasts';
   import { useFetch, useSmartLoading } from '$lib/utils';
-
-  useTitle($translate('auth.login.title'));
-  useRightButton(LanguageButton);
 
   let login = '';
   let password = '';
@@ -111,24 +109,26 @@
   }
 </script>
 
-<div class="content">
-  <form on:submit|preventDefault={handleSubmit}>
-    <Input label={$translate('auth.login')} bind:value={login} name="login" testId="LoginInput" required />
-    <Input
-      label={$translate('auth.password')}
-      bind:value={password}
-      testId="PasswordInput"
-      name="password"
-      type="password"
-      autocomplete
-      required
-    />
-    <Button text={$translate('auth.sign_in')} type="submit" testId="SignInButton" />
-    <a class="flex-center" href="/register">{$translate('auth.register')}</a>
-    <a class="flex-center" href="/">{$translate('auth.continue_as_guest')}</a>
-    <Loader visible={$smartLoading} />
-  </form>
-</div>
+<Layout title={$translate('auth.login.title')} rightSlot={LanguageButton}>
+  <div class="content">
+    <form on:submit|preventDefault={handleSubmit}>
+      <Input label={$translate('auth.login')} bind:value={login} name="login" testId="LoginInput" required />
+      <Input
+        label={$translate('auth.password')}
+        bind:value={password}
+        testId="PasswordInput"
+        name="password"
+        type="password"
+        autocomplete
+        required
+      />
+      <Button text={$translate('auth.sign_in')} type="submit" testId="SignInButton" />
+      <a class="flex-center" href="/register">{$translate('auth.register')}</a>
+      <a class="flex-center" href="/">{$translate('auth.continue_as_guest')}</a>
+      <Loader visible={$smartLoading} />
+    </form>
+  </div>
+</Layout>
 
 <style>
   .content {

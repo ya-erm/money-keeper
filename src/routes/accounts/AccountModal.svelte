@@ -4,12 +4,12 @@
   import { accountTagsService, accountTagsStore, accountsService } from '$lib/data';
   import type { Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Modal from '$lib/ui/Modal.svelte';
-  import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
+  import { showErrorToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
   import TagsList from '$lib/widgets/TagsList.svelte';
 
   import DeleteAccountModal from './DeleteAccountModal.svelte';
@@ -72,14 +72,21 @@
   <form class="flex-col gap-1" data-testId="AccountForm" on:submit|preventDefault={handleSave}>
     <Input label={$translate('accounts.name')} name="name" bind:value={name} required />
     <Input label={$translate('accounts.currency')} name="currency" bind:value={currency} required />
-    <Input label={$translate('accounts.icon')} name="icon" bind:value={icon} optional>
+    <Input label={$translate('accounts.icon')} name="icon" bind:value={icon} optional translate={$translate}>
       <a slot="end" href="https://icon-sets.iconify.design/" target="_blank" rel="noopener noreferrer">
         <Icon name="mdi:open-in-new" padding={0.5} />
       </a>
     </Input>
-    <Input label={$translate('accounts.color')} type="color" name="color" bind:value={color} optional />
+    <Input
+      label={$translate('accounts.color')}
+      type="color"
+      name="color"
+      bind:value={color}
+      translate={$translate}
+      optional
+    />
     <div class="flex-col gap-0.5">
-      <InputLabel text={$translate('accounts.tags')} optional />
+      <InputLabel text={$translate('accounts.tags')} optional translate={$translate} />
       <TagsList
         bind:selectedTags
         tags={accountTags}
@@ -96,7 +103,7 @@
             color="danger"
             appearance="transparent"
             text={$translate('common.delete')}
-            on:click={() => (deleteModalOpened = true)}
+            onClick={() => (deleteModalOpened = true)}
           />
         {:else}
           <Button
@@ -104,7 +111,7 @@
             color="secondary"
             appearance="transparent"
             text={$translate('accounts.archive')}
-            on:click={handleArchive}
+            onClick={handleArchive}
           />
         {/if}
       {:else}
@@ -113,11 +120,11 @@
           color="secondary"
           appearance="transparent"
           text={$translate('common.cancel')}
-          on:click={() => (opened = false)}
+          onClick={() => (opened = false)}
         />
       {/if}
       {#if archived}
-        <Button bordered text={$translate('accounts.restore')} on:click={handleRestore} />
+        <Button bordered text={$translate('accounts.restore')} onClick={handleRestore} />
       {:else}
         <Button bordered text={$translate('common.save')} type="submit" />
       {/if}

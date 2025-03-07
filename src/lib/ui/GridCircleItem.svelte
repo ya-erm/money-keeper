@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$lib/ui/Icon.svelte';
+  import Icon from '@ya-erm/svelte-ui/Icon';
 
   export let icon: string;
   export let text: string | null = null;

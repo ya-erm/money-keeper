@@ -1,23 +1,24 @@
 <script lang="ts">
   import dayjs from 'dayjs';
   import { v4 as uuid } from 'uuid';
-
   import { page } from '$app/stores';
+
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Checkbox from '@ya-erm/svelte-ui/Checkbox';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+  import Portal from '@ya-erm/svelte-ui/Portal';
+  import Spoiler from '@ya-erm/svelte-ui/Spoiler';
+  import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
+
   import { memberSettingsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
   import { operationsCommentsStore } from '$lib/data/operations';
   import { repeatingsService, repeatingsStore } from '$lib/data/repeatings';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Checkbox from '$lib/ui/Checkbox.svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
-  import Layout from '$lib/ui/Layout.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
-  import Spoiler from '$lib/ui/Spoiler.svelte';
-  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
-  import { showErrorToast } from '$lib/ui/toasts';
+  import Layout from '$lib/ui/layout/Layout.svelte';
+  import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
   import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
   import {
@@ -250,7 +251,7 @@
         <span class="flex-shrink-0">
           <InputLabel text={$translate('transactions.dateTime')} />
         </span>
-        <Button appearance="link" underlined={false} on:click={() => (timeZoneListVisible = true)}>
+        <Button appearance="link" underlined={false} onClick={() => (timeZoneListVisible = true)}>
           {#if timeZone}
             <div class="flex gap-0.25">
               <span class="time-zone text-ellipsis">{timeZone}</span>
@@ -275,7 +276,7 @@
             <Button
               appearance="link"
               underlined={false}
-              on:click={() => {
+              onClick={() => {
                 anotherCurrencyModalOpened = true;
                 anotherCurrency = settings?.lastAnotherCurrency ?? null;
               }}
@@ -283,7 +284,7 @@
               {$translate('transactions.another_currency')}
             </Button>
           {:else}
-            <Button appearance="link" underlined={false} on:click={() => (anotherCurrency = null)}>
+            <Button appearance="link" underlined={false} onClick={() => (anotherCurrency = null)}>
               {$translate('transactions.same_currency')}
             </Button>
           {/if}
@@ -336,6 +337,7 @@
       name="comment"
       value={transaction?.comment}
       onChange={handleCommentChange}
+      translate={$translate}
       list="suggestions"
       optional
     />
@@ -350,7 +352,7 @@
       </div>
     {/if}
     <div class="flex-col gap-0.5">
-      <InputLabel text={$translate('transactions.tags')} optional />
+      <InputLabel text={$translate('transactions.tags')} optional translate={$translate} />
       <TagsList
         bind:tags
         bind:selectedTags
@@ -361,7 +363,7 @@
     </div>
     <div class="flex-col gap-0.5">
       <Spoiler hidden={additionalParametersHidden}>
-        <SpoilerToggle slot="spoiler-header" bind:hidden={additionalParametersHidden}>
+        <SpoilerToggle slot="spoiler-header" bind:hidden={additionalParametersHidden} translate={$translate}>
           {$translate('transactions.additional_parameters')}
         </SpoilerToggle>
         <div class="flex-col gap-1">
@@ -375,7 +377,7 @@
               />
             </div>
             {#if repeatingChecked}
-              <Button appearance="link" underlined={false} on:click={() => (repeatingModalOpened = true)}>
+              <Button appearance="link" underlined={false} onClick={() => (repeatingModalOpened = true)}>
                 {$translate('transactions.repeatings.configure')}
               </Button>
             {/if}
@@ -391,54 +393,44 @@
 
 <AnotherCurrencyModal bind:opened={anotherCurrencyModalOpened} bind:anotherCurrency />
 
-{#if repeatingTypeModalOpened}
-  <RepeatingTypeModal
-    bind:opened={repeatingTypeModalOpened}
-    onCreateNew={() => {
-      repeatingModalOpened = true;
-      repeatingTypeModalOpened = false;
-    }}
-    onSelectExisting={() => {
-      repeatingListVisible = true;
-      repeatingTypeModalOpened = false;
-    }}
-    onCancel={() => {
-      if (!repeating) repeatingChecked = false;
-      repeatingTypeModalOpened = false;
-    }}
-  />
-{/if}
+<RepeatingTypeModal
+  bind:opened={repeatingTypeModalOpened}
+  onCreateNew={() => {
+    repeatingModalOpened = true;
+    repeatingTypeModalOpened = false;
+  }}
+  onSelectExisting={() => {
+    repeatingListVisible = true;
+    repeatingTypeModalOpened = false;
+  }}
+  onCancel={() => {
+    if (!repeating) repeatingChecked = false;
+    repeatingTypeModalOpened = false;
+  }}
+/>
 
-{#if repeatingModalOpened}
-  <RepeatingModal
-    {repeating}
-    date={datetime}
-    opened={repeatingModalOpened}
-    onSubmit={(value) => {
-      repeating = value;
-      repeatingModalOpened = false;
-    }}
-    onCancel={() => {
-      if (!repeating) repeatingChecked = false;
-      repeatingModalOpened = false;
-    }}
-  />
-{/if}
+<RepeatingModal
+  {repeating}
+  date={datetime}
+  opened={repeatingModalOpened}
+  onSubmit={(value) => {
+    repeating = value;
+    repeatingModalOpened = false;
+  }}
+  onCancel={() => {
+    if (!repeating) repeatingChecked = false;
+    repeatingModalOpened = false;
+  }}
+/>
 
 <Portal visible={repeatingListVisible}>
   <Layout
-    header={{
-      title: $translate('transactions.repeatings.select_repeating'),
-      backButton: {
-        title: $translate('common.back'),
-        onClick: () => {
-          if (!repeating) repeatingChecked = false;
-          repeatingListVisible = false;
-        },
-      },
-      leftButton: null,
-      rightButton: null,
+    title={$translate('transactions.repeatings.select_repeating')}
+    onBack={() => {
+      if (!repeating) repeatingChecked = false;
+      repeatingListVisible = false;
     }}
+    hideMenu
   >
     <div class="p-1">
       <RepeatingsList
@@ -453,14 +445,7 @@
 </Portal>
 
 <Portal visible={timeZoneListVisible}>
-  <Layout
-    header={{
-      title: $translate('timezones.select_time_zone'),
-      backButton: { title: $translate('common.back'), onClick: () => (timeZoneListVisible = false) },
-      leftButton: null,
-      rightButton: null,
-    }}
-  >
+  <Layout title={$translate('timezones.select_time_zone')} onBack={() => (timeZoneListVisible = false)} hideMenu>
     <TimeZoneList
       onClick={(tz, shift) => {
         timeZone = tz;

@@ -4,10 +4,9 @@
   import { accountsStore } from '$lib/data';
   import type { AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import ModalContainer from '$lib/ui/ModalContainer.svelte';
   import ReloadPageButton from '$lib/ui/ReloadPageButton.svelte';
-  import { backLink, rightButton, title } from '$lib/ui/header';
-  import { useLeftButton, useRightButton, useTitle } from '$lib/ui/header/model';
   import { deleteSearchParam, getSearchParam } from '$lib/utils';
 
   import AccountButtons from './AccountButtons.svelte';
@@ -15,11 +14,6 @@
   import AccountModal from './AccountModal.svelte';
   import AddOperationButton from './AddOperationButton.svelte';
   import OperationsList from './OperationsList.svelte';
-
-  backLink.set(null);
-  useLeftButton(ReloadPageButton);
-  useTitle($translate('accounts.title'));
-  useRightButton(AccountButtons);
 
   $: accounts = $accountsStore;
 
@@ -45,27 +39,33 @@
   let operationsContainer: HTMLDivElement;
   let header: 'accounts' | 'operations' = 'accounts';
 
+  let title = $translate('accounts.title');
+  let leftSlot = ReloadPageButton;
+  let rightSlot = AccountButtons;
+
   function handlePageScroll(e: Event) {
     const scrollTop = (e.target as HTMLElement).scrollTop;
     const operationsContainerPosition = operationsContainer.offsetTop;
     if (scrollTop > operationsContainerPosition && header !== 'operations') {
-      title.set($translate('transactions.title'));
-      rightButton.set(AddOperationButton);
+      title = $translate('transactions.title');
+      rightSlot = AddOperationButton;
       header = 'operations';
     } else if (scrollTop < operationsContainerPosition && header !== 'accounts') {
-      title.set($translate('accounts.title'));
-      rightButton.set(AccountButtons);
+      title = $translate('accounts.title');
+      rightSlot = AccountButtons;
       header = 'accounts';
     }
   }
 </script>
 
-<div class="container" on:scroll={handlePageScroll}>
-  <AccountCards onEdit={handleAccountEdit} />
-  <div bind:this={operationsContainer}>
-    <OperationsList {account} />
+<Layout {title} {leftSlot} {rightSlot}>
+  <div class="container" on:scroll={handlePageScroll}>
+    <AccountCards onEdit={handleAccountEdit} />
+    <div bind:this={operationsContainer}>
+      <OperationsList {account} />
+    </div>
   </div>
-</div>
+</Layout>
 
 {#if opened}
   <ModalContainer>

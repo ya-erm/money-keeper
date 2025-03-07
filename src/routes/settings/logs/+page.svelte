@@ -2,10 +2,13 @@
   import dayjs from 'dayjs';
   import { onMount } from 'svelte';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
+  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import Tags from '$lib/ui/Tags.svelte';
   import { LogLevel, logs } from '$lib/utils/logger';
 
@@ -43,55 +46,57 @@
   }
 </script>
 
-<div class="p-1">
-  <Button appearance="link" underlined={false} on:click={() => (filtersVisible = !filtersVisible)}>
-    <div class="flex items-center">
-      <span>{$translate(filtersVisible ? 'settings.logs.hide_filters' : 'settings.logs.show_filters')}</span>
-      <Icon padding={0} name={filtersVisible ? 'mdi:chevron-up' : 'mdi:chevron-down'} />
-    </div>
-  </Button>
-  {#if filtersVisible}
-    <div class="mt-0.5 flex-col gap-0.5">
-      <InputLabel text="Levels:" />
-      <Tags
-        tags={levelsOptions}
-        selected={selectedLevels}
-        onChange={(id, selected) =>
-          (selectedLevels = selected ? selectedLevels.concat(id) : selectedLevels.filter((x) => x !== id))}
-        readOnly
-      />
-    </div>
-
-    <div class="mt-0.5 flex-col gap-0.5">
-      <InputLabel text="Loggers:" />
-      <Tags
-        tags={loggerOptions}
-        selected={selectedLoggers}
-        onChange={(id, selected) =>
-          (selectedLoggers = selected ? selectedLoggers.concat(id) : selectedLoggers.filter((x) => x !== id))}
-        readOnly
-      />
-    </div>
-  {/if}
-</div>
-
-<ul class="flex-col gap-1">
-  {#each filteredLogs as log}
-    <li class="flex-col">
-      <div class="flex gap-0.5 header">
-        <span>
-          <span>{dayjs(log.timestamp).format('HH:mm:ss')}</span>
-          <span class="ms">{dayjs(log.timestamp).format('.SSS')}</span>
-        </span>
-        <span>|</span>
-        <span style:color={log.logger.color}>{log.logger.name}</span>
-        <span>|</span>
-        <span class={`level-${log.level}`}>{mapLogLevel(log.level)}</span>
+<Layout title={$translate('settings.logs')} leftSlot={HeaderBackButton}>
+  <div class="p-1">
+    <Button appearance="link" underlined={false} onClick={() => (filtersVisible = !filtersVisible)}>
+      <div class="flex items-center">
+        <span>{$translate(filtersVisible ? 'settings.logs.hide_filters' : 'settings.logs.show_filters')}</span>
+        <Icon padding={0} name={filtersVisible ? 'mdi:chevron-up' : 'mdi:chevron-down'} />
       </div>
-      <pre class="message">{log.args.map((x) => JSON.stringify(x, undefined, 2)).join(' ')}</pre>
-    </li>
-  {/each}
-</ul>
+    </Button>
+    {#if filtersVisible}
+      <div class="mt-0.5 flex-col gap-0.5">
+        <InputLabel text="Levels:" />
+        <Tags
+          tags={levelsOptions}
+          selected={selectedLevels}
+          onChange={(id, selected) =>
+            (selectedLevels = selected ? selectedLevels.concat(id) : selectedLevels.filter((x) => x !== id))}
+          readOnly
+        />
+      </div>
+
+      <div class="mt-0.5 flex-col gap-0.5">
+        <InputLabel text="Loggers:" />
+        <Tags
+          tags={loggerOptions}
+          selected={selectedLoggers}
+          onChange={(id, selected) =>
+            (selectedLoggers = selected ? selectedLoggers.concat(id) : selectedLoggers.filter((x) => x !== id))}
+          readOnly
+        />
+      </div>
+    {/if}
+  </div>
+
+  <ul class="flex-col gap-1">
+    {#each filteredLogs as log}
+      <li class="flex-col">
+        <div class="flex gap-0.5 header">
+          <span>
+            <span>{dayjs(log.timestamp).format('HH:mm:ss')}</span>
+            <span class="ms">{dayjs(log.timestamp).format('.SSS')}</span>
+          </span>
+          <span>|</span>
+          <span style:color={log.logger.color}>{log.logger.name}</span>
+          <span>|</span>
+          <span class={`level-${log.level}`}>{mapLogLevel(log.level)}</span>
+        </div>
+        <pre class="message">{log.args.map((x) => JSON.stringify(x, undefined, 2)).join(' ')}</pre>
+      </li>
+    {/each}
+  </ul>
+</Layout>
 
 <style>
   ul {

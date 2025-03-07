@@ -1,16 +1,18 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { v4 as uuid } from 'uuid';
+
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Input from '@ya-erm/svelte-ui/Input';
+
   import { createKeyFromPassword, encryptAes, generateRsaKeys } from '$lib/data/crypto';
   import { route } from '$lib/routes';
   import type { RegisterRequestData, RegisterResponseData } from '$lib/server/api/v2/auth';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Input from '$lib/ui/Input.svelte';
   import Loader from '$lib/ui/Loader.svelte';
   import Modal from '$lib/ui/Modal.svelte';
-  import { showErrorToast, showSuccessToast } from '$lib/ui/toasts';
+  import { showErrorToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
   import { useFetch } from '$lib/utils/useFetch';
-  import { v4 as uuid } from 'uuid';
 
   export let login: string;
   export let opened = false;
@@ -79,7 +81,7 @@
           <li>If you forgot password, it will be impossible to restore your data.</li>
         </ol>
       </div>
-      <Button on:click={() => (step = 2)}>Continue</Button>
+      <Button onClick={() => (step = 2)}>Continue</Button>
     </div>
   {:else if step === 2}
     <form on:submit|preventDefault={encryptKey} class="flex-col gap-1">

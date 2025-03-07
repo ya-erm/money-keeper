@@ -1,6 +1,8 @@
 <script>
-  import { useTitle } from '$lib/ui/header';
-  import Switch from '$lib/ui/Switch.svelte';
+  import Switch from '@ya-erm/svelte-ui/Switch';
+
+  import Layout from '$lib/ui/layout/Layout.svelte';
+  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
   import { darkMode } from '$lib/ui/theme';
 
   import Buttons from './Buttons.svelte';
@@ -11,24 +13,24 @@
   import Switches from './Switches.svelte';
   import Tags from './Tags.svelte';
   import Toasts from './Toasts.svelte';
-
-  useTitle('UI Kit');
 </script>
 
-<div class="p-1">
-  <h1>Theme</h1>
-  <div class="flex gap-1 items-center">
-    <Switch bind:checked={$darkMode} />
-    <span>Dark mode</span>
-  </div>
-  <Colors />
+<Layout title="UI Kit" leftSlot={HeaderBackButton}>
+  <div class="p-1">
+    <h1>Theme</h1>
+    <label class="flex gap-1 items-center">
+      <Switch bind:checked={$darkMode} />
+      <span>Dark mode</span>
+    </label>
+    <Colors />
 
-  <h1>Components</h1>
-  <Buttons />
-  <Inputs />
-  <Toasts />
-  <Modals />
-  <Spoilers />
-  <Switches />
-  <Tags />
-</div>
+    <h1>Components</h1>
+    <Buttons />
+    <Inputs />
+    <Toasts />
+    <Modals />
+    <Spoilers />
+    <Switches />
+    <Tags />
+  </div>
+</Layout>

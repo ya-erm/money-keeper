@@ -1,8 +1,10 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+
+  import MultiSwitch from '@ya-erm/svelte-ui/MultiSwitch';
+
   import { translate } from '$lib/translate';
-  import MultiSwitch from '$lib/ui/MultiSwitch.svelte';
   import { getSearchParam } from '$lib/utils';
 
   export let type: 'IN' | 'OUT' | 'TRANSFER' | string = getSearchParam($page, 'type') ?? 'OUT';

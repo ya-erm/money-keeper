@@ -1,9 +1,11 @@
 <script lang="ts">
   import type { Dayjs } from 'dayjs';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+
   import type { DateIntervalType } from '$lib/data/interfaces';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
+
   import DateIntervalModal from './DateIntervalModal.svelte';
   import { intervalEndStore, intervalStartStore, intervalTypeStore } from './store';
 
@@ -37,12 +39,12 @@
 
 <div class="month-selector flex gap-1 items-center justify-between">
   {#if intervalType !== 'custom'}
-    <Button color="white" bordered on:click={prevMonth}>
+    <Button color="white" bordered onClick={prevMonth}>
       <Icon name="mdi:chevron-left" />
     </Button>
   {/if}
   <div class="flex-1 flex-col">
-    <Button color="white" appearance="transparent" on:click={() => (opened = true)}>
+    <Button color="white" appearance="transparent" onClick={() => (opened = true)}>
       <h2 class="m-0">
         {#if intervalType === 'custom'}
           {startDate.format('DD.MM.YYYY')} - {endDate.format('DD.MM.YYYY')}
@@ -53,7 +55,7 @@
     </Button>
   </div>
   {#if intervalType !== 'custom'}
-    <Button color="white" bordered on:click={nextMonth}>
+    <Button color="white" bordered onClick={nextMonth}>
       <Icon name="mdi:chevron-right" />
     </Button>
   {/if}

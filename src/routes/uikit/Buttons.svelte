@@ -1,7 +1,8 @@
 <script lang="ts">
-  import Button from '$lib/ui/Button.svelte';
-  import Checkbox from '$lib/ui/Checkbox.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
+  import Checkbox from '@ya-erm/svelte-ui/Checkbox';
+
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
 
   let bordered = false;
 </script>

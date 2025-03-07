@@ -1,7 +1,7 @@
 const RSA_ALG = 'RSA-OAEP';
 const AES_ALG = 'AES-CBC';
 
-function arrayBufferToBase64(arrayBuffer: ArrayBuffer) {
+function arrayBufferToBase64(arrayBuffer: Uint8Array<ArrayBuffer> | ArrayBuffer) {
   let binary = '';
   const bytes = new Uint8Array(arrayBuffer);
   const len = bytes.byteLength;

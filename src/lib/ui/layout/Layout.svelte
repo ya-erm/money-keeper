@@ -1,18 +1,24 @@
 <script lang="ts">
-  import Header from '$lib/ui/header/Header.svelte';
   import Menu from '$lib/ui/menu/Menu.svelte';
+  import type { Component } from 'svelte';
+  import Header from './Header.svelte';
 
-  import type { HeaderConfig } from './header/config';
+  export let title: string;
+  export let onBack: VoidFunction | null = null;
+  export let leftSlot: Component | null = null;
+  export let rightSlot: Component | null = null;
 
-  export let header: HeaderConfig = {};
+  export let hideMenu = false;
 </script>
 
 <main>
-  <Header config={header} />
+  <Header {title} {onBack} {leftSlot} {rightSlot} />
   <div class="page">
     <slot />
   </div>
-  <Menu />
+  {#if !hideMenu}
+    <Menu />
+  {/if}
 </main>
 
 <style>

@@ -1,5 +1,6 @@
 import { addMessages } from 'svelte-i18n';
-import type { Dictionary } from './messages';
+
+import type { Dictionary } from './types';
 
 export const ruDict: Dictionary = {
   'app.title': 'Money Keeper',
@@ -248,7 +249,7 @@ export const ruDict: Dictionary = {
   'transactions.from': 'Откуда',
   'transactions.to': 'Куда',
   'transactions.account': 'Счёт',
-  'transactions.select_account': 'Выбрать счёт',
+  'transactions.select_account': 'Выберите счёт',
   'transactions.account_is_required': 'Сначала выберите счёт',
   'transactions.destination_account_is_required': 'Сначала выберите счёт назначения',
   'transactions.accounts_must_be_different': 'Выберите разные счета',
@@ -266,7 +267,7 @@ export const ruDict: Dictionary = {
   'transactions.delete_transaction': 'Удалить операцию',
   'transactions.delete_transaction_success': 'Операция удалена',
   'transactions.delete_transaction_failure': 'Не удалось удалить операцию',
-  'transactions.feature_operations': 'Будущие операции',
+  'transactions.future_operations': 'Будущие операции',
   'transactions.another_currency': 'Другая валюта',
   'transactions.same_currency': 'Та же валюта',
   'transactions.show_more': 'Показать ещё',

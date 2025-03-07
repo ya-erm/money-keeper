@@ -48,11 +48,11 @@ class MainService implements Initialisable {
       categoriesService,
       accountTagsService,
       accountsService,
+      repeatingsService,
       operationTagsService,
       operationsService,
       currencyRatesService,
       groupingsService,
-      repeatingsService,
     ];
 
     logger.log(`Initialise ${services.length} services to load data from local DB`);

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { useLeftButton, useRightButton } from '$lib/ui/header';
+  import { translate } from '$lib/translate';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import AnalyticsButtonsLeft from '../AnalyticsButtonsLeft.svelte';
   import AnalyticsButtonsRight from '../AnalyticsButtonsRight.svelte';
   import AccountsAnalytics from './AccountsAnalytics.svelte';
-
-  useLeftButton(AnalyticsButtonsLeft);
-  useRightButton(AnalyticsButtonsRight);
 </script>
 
-<AccountsAnalytics />
+<Layout title={$translate('analytics.title')} leftSlot={AnalyticsButtonsLeft} rightSlot={AnalyticsButtonsRight}>
+  <AccountsAnalytics />
+</Layout>

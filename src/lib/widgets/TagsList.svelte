@@ -4,7 +4,7 @@
   import type { Tag } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Tags from '$lib/ui/Tags.svelte';
-  import { showErrorToast } from '$lib/ui/toasts';
+  import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 
   export let tags: Tag[];
   export let selectedTags: string[] = [];

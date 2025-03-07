@@ -2,14 +2,15 @@
   import { dndzone, type DndEvent } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import Spoiler from '@ya-erm/svelte-ui/Spoiler';
+  import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
+
   import { currencyRatesStore, memberSettingsStore, membersService, operationsStore } from '$lib/data';
   import type { Account, AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import Spoiler from '$lib/ui/Spoiler.svelte';
-  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
   import { calculateBalance, findCurrencyRate, groupBySelector, pastOperationsPredicate } from '$lib/utils';
 
   import { hideZeroBalanceAccounts } from './store';
@@ -78,10 +79,10 @@
     <div class="sorting flex-center px-1 gap-1" class:left={!sortable}>
       <span>{$translate('common.sorting')}</span>
       <div class="grid-col-2 gap-1">
-        <Button color="white" on:click={restoreAccountsOrder}>
+        <Button color="white" onClick={restoreAccountsOrder}>
           {$translate('common.cancel')}
         </Button>
-        <Button color="primary" on:click={saveAccountsOrder}>
+        <Button color="primary" onClick={saveAccountsOrder}>
           {$translate('common.save')}
         </Button>
       </div>
@@ -92,7 +93,7 @@
         <div class="flex-grow">
           <Input bind:value={search} placeholder={$translate('common.search')} clearable />
         </div>
-        <Button color={showFilters ? 'primary' : 'white'} bordered on:click={() => (showFilters = !showFilters)}>
+        <Button color={showFilters ? 'primary' : 'white'} bordered onClick={() => (showFilters = !showFilters)}>
           <Icon size={1.25} name="mdi:filter" />
           {#if selectedTags.length || selectedCurrencies.length || $hideZeroBalanceAccounts}
             <span class="filter-badge"></span>
@@ -140,7 +141,7 @@
   {#if archivedAccounts.length > 0}
     <Spoiler hidden={archivedHidden}>
       <div slot="spoiler-header" class="mt-1 px-1">
-        <SpoilerToggle bind:hidden={archivedHidden}>
+        <SpoilerToggle bind:hidden={archivedHidden} translate={$translate}>
           <div class="ml-0.5 flex items-center gap-0.5">
             <Icon name="ri:archive-line" size={1.5} />
             <span class="text-ellipsis-all">{$translate('accounts.archived_accounts')}</span>

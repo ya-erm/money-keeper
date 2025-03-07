@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import HeaderButton from '$lib/ui/header/HeaderButton.svelte';
+  import HeaderButton from '$lib/ui/layout/HeaderButton.svelte';
 
   $: createUrl = (() => {
     const url = new URL($page.url);

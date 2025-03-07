@@ -1,7 +1,7 @@
 <script lang="ts">
   import { accountsStore } from '$lib/data';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
 
   $: accounts = $accountsStore;
 
@@ -13,7 +13,7 @@
   <span>
     {accounts.find((x) => x.id === accountId)?.name}
   </span>
-  <Button color="danger" appearance="link" underlined={false} on:click={onDelete}>
+  <Button color="danger" appearance="link" underlined={false} onClick={onDelete}>
     {$translate('common.delete')}
   </Button>
 </div>

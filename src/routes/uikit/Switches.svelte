@@ -1,8 +1,8 @@
 <script lang="ts">
   import { type ComponentProps } from 'svelte';
 
-  import MultiSwitch from '$lib/ui/MultiSwitch.svelte';
-  import Checkbox from '$lib/ui/Checkbox.svelte';
+  import Checkbox from '@ya-erm/svelte-ui/Checkbox';
+  import MultiSwitch from '@ya-erm/svelte-ui/MultiSwitch';
 
   let sameSize = false;
 

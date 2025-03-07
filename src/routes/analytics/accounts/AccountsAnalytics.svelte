@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Checkbox from '@ya-erm/svelte-ui/Checkbox';
+
   import {
     accountsStore,
     currencyRatesStore,
@@ -9,10 +11,10 @@
   } from '$lib/data';
   import type { AccountViewModel, Grouping } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Checkbox from '$lib/ui/Checkbox.svelte';
-  import Layout from '$lib/ui/Layout.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Portal from '@ya-erm/svelte-ui/Portal';
+
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import { calculateBalance, findRate, groupBySelector, pastOperationsPredicate } from '$lib/utils';
 
   import AccountsTableTable from './AccountsAnalyticsTable.svelte';
@@ -120,7 +122,7 @@
 <div class="p-1 flex-col gap-1">
   <div>
     <span>{$translate('analytics.accounts.grouping')}:</span>
-    <Button appearance="link" on:click={() => (groupingSelecting = true)}>
+    <Button appearance="link" onClick={() => (groupingSelecting = true)}>
       {grouping?.name ?? $translate('analytics.accounts.grouping.not_selected')}
     </Button>
   </div>
@@ -133,14 +135,9 @@
 
 <Portal visible={groupingSelecting}>
   <Layout
-    header={{
-      backButton: {
-        onClick: () => (groupingSelecting = false),
-      },
-      leftButton: null,
-      rightButton: AddGroupingButton,
-      title: $translate('analytics.accounts.grouping.select_grouping'),
-    }}
+    title={$translate('analytics.accounts.grouping.select_grouping')}
+    onBack={() => (groupingSelecting = false)}
+    rightSlot={AddGroupingButton}
   >
     <GroupingList onClick={handleGroupingSelect} withUnselectedValue />
   </Layout>

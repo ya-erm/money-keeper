@@ -1,7 +1,8 @@
 <script lang="ts">
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Modal from '@ya-erm/svelte-ui/Modal';
+
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Modal from '$lib/ui/Modal.svelte';
 
   export let opened: boolean;
   export let onCreateNew: () => void;
@@ -11,8 +12,8 @@
 
 <Modal bind:opened header={$translate('transactions.repeatings.title')}>
   <div class="flex-col gap-1">
-    <Button text={$translate('transactions.repeatings.create_new')} on:click={onCreateNew} />
-    <Button text={$translate('transactions.repeatings.select_existing')} on:click={onSelectExisting} />
-    <Button text={$translate('common.cancel')} on:click={onCancel} color="secondary" />
+    <Button text={$translate('transactions.repeatings.create_new')} onClick={onCreateNew} />
+    <Button text={$translate('transactions.repeatings.select_existing')} onClick={onSelectExisting} />
+    <Button text={$translate('common.cancel')} onClick={onCancel} color="secondary" />
   </div>
 </Modal>

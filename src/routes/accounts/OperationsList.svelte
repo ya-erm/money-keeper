@@ -1,12 +1,13 @@
 <script lang="ts">
+  import Input from '@ya-erm/svelte-ui/Input';
+  import ShowMoreContainer from '@ya-erm/svelte-ui/ShowMoreContainer';
+  import Spoiler from '@ya-erm/svelte-ui/Spoiler';
+  import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
+
   import { operationsStore } from '$lib/data';
   import type { Account } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import Input from '$lib/ui/Input.svelte';
-  import ShowMoreContainer from '$lib/ui/ShowMoreContainer.svelte';
-  import Spoiler from '$lib/ui/Spoiler.svelte';
-  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
   import { futureOperationsPredicate, pastOperationsPredicate } from '$lib/utils';
 
   import GroupedOperationsList from './GroupedOperationsList.svelte';
@@ -37,7 +38,7 @@
   $: futureOperations = filteredOperations.filter(futureOperationsPredicate());
 </script>
 
-<ShowMoreContainer bind:limit step={20} total={allFilteredOperations.length}>
+<ShowMoreContainer bind:limit step={20} total={allFilteredOperations.length} translate={$translate}>
   <div class="operations-container p-1">
     <div class="flex gap-1">
       <h3 class="m-0 flex-grow font-normal">
@@ -55,7 +56,7 @@
     </div>
     <div class="operations-search-container flex gap-0.5">
       <div class="flex-grow">
-        <Input bind:value={search} placeholder={$translate('common.search')} clearable />
+        <Input bind:value={search} icon="mdi:search" placeholder={$translate('common.search')} clearable />
       </div>
       <!-- 
     <Button appearance="transparent" bordered>
@@ -65,8 +66,8 @@
     </div>
     {#if futureOperations.length > 0}
       <Spoiler hidden={featureOperationsHidden}>
-        <SpoilerToggle slot="spoiler-header" bind:hidden={featureOperationsHidden}>
-          <span>{$translate('transactions.feature_operations')}</span>
+        <SpoilerToggle slot="spoiler-header" bind:hidden={featureOperationsHidden} translate={$translate}>
+          <span>{$translate('transactions.future_operations')}</span>
           <span class="operations-count">
             {$translate('common.count', { values: { count: futureOperations.length } })}
           </span>

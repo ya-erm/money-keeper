@@ -3,13 +3,15 @@
 
   import { page } from '$app/stores';
 
+  import Portal from '@ya-erm/svelte-ui/Portal';
+  import ShowMoreContainer from '@ya-erm/svelte-ui/ShowMoreContainer';
+
   import { currencyRatesStore, memberSettingsStore } from '$lib/data';
   import type { TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/Layout.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
-  import ShowMoreContainer from '$lib/ui/ShowMoreContainer.svelte';
-  import HeaderFormSubmitButton from '$lib/ui/header/HeaderFormSubmitButton.svelte';
+  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
+  import HeaderFormSubmitButton from '$lib/ui/layout/HeaderFormSubmitButton.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import { findCurrencyRate, getSearchParam, setSearchParam } from '$lib/utils';
 
   import TransactionListItem from './TransactionListItem.svelte';
@@ -38,7 +40,7 @@
   const closeOperationForm = () => history.back();
 </script>
 
-<ShowMoreContainer bind:limit step={20} total={sortedTransactions.length}>
+<ShowMoreContainer bind:limit step={20} total={sortedTransactions.length} translate={$translate}>
   <ul class="flex-col gap-1">
     {#each Object.entries(transactionsByDate) as [date, transactions] (date)}
       <div>{dayjs(date).format('DD MMMM YYYY')}</div>
@@ -56,14 +58,10 @@
 
 <Portal visible={operationId !== null}>
   <Layout
-    header={{
-      backButton: {
-        onClick: closeOperationForm,
-      },
-      leftButton: null,
-      rightButton: HeaderFormSubmitButton,
-      title: $translate('transactions.edit_transaction'),
-    }}
+    title={$translate('transactions.edit_transaction')}
+    leftSlot={HeaderBackButton}
+    rightSlot={HeaderFormSubmitButton}
+    hideMenu
   >
     <EditTransaction id={operationId} onBack={closeOperationForm} />
   </Layout>

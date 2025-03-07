@@ -1,9 +1,11 @@
 <script lang="ts">
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Input from '@ya-erm/svelte-ui/Input';
+  // import Modal from '@ya-erm/svelte-ui/Modal'; // TODO: разобраться почему ломается при ssr
+  import Modal from '$lib/ui/Modal.svelte';
+
   import { translate } from '$lib/translate';
   import { longPress } from '$lib/utils';
-  import Button from './Button.svelte';
-  import Input from './Input.svelte';
-  import Modal from './Modal.svelte';
 
   export let tags: { id: string; title: string }[];
   export let selected: string[];
@@ -70,20 +72,16 @@
 </div>
 
 {#if !readOnly}
-  <Modal
-    {opened}
-    header={$translate(mode === 'add' ? 'tags.add_modal_header' : 'tags.edit_modal_header')}
-    on:close={() => (opened = false)}
-  >
+  <Modal bind:opened header={$translate(mode === 'add' ? 'tags.add_modal_header' : 'tags.edit_modal_header')}>
     <form on:submit|preventDefault={handleSubmit} class="flex-col gap-1" data-testId="AddTagForm">
       <Input label={$translate('tags.title')} bind:value={title} name="title" required />
 
       <div class="flex gap-1">
         <div class="flex-col flex-1">
           {#if mode === 'edit'}
-            <Button color="danger" text={$translate('common.delete')} on:click={handleDelete} />
+            <Button color="danger" text={$translate('common.delete')} onClick={handleDelete} />
           {:else}
-            <Button color="secondary" on:click={() => (opened = false)} text={$translate('common.cancel')} />
+            <Button color="secondary" onClick={() => (opened = false)} text={$translate('common.cancel')} />
           {/if}
         </div>
         <div class="flex-col flex-1">

@@ -1,11 +1,13 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+
   import { accountsStore } from '$lib/data';
   import type { Account } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import { useBackButton, useRightButton, useTitle } from '$lib/ui/header/model';
+  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import { deleteSearchParam, getSearchParam } from '$lib/utils';
 
   import AccountModal from '../AccountModal.svelte';
@@ -13,10 +15,6 @@
   import AccountListButtons from './AccountListButtons.svelte';
 
   $: accounts = $accountsStore;
-
-  useBackButton(route('accounts'), $translate('common.back'));
-  useTitle($translate('accounts.title'));
-  useRightButton(AccountListButtons);
 
   let opened = false;
 
@@ -40,7 +38,9 @@
   };
 </script>
 
-<AccountList {accounts} {onClick} bind:sortable />
+<Layout title={$translate('accounts.title')} leftSlot={HeaderBackButton} rightSlot={AccountListButtons}>
+  <AccountList {accounts} {onClick} bind:sortable />
+</Layout>
 
 {#if opened}
   <AccountModal account={null} bind:opened />

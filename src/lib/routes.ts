@@ -1,4 +1,4 @@
-import type { Messages } from '$lib/translate';
+import type { Messages } from '$lib/translate/messages';
 
 type Route = {
   path: string;

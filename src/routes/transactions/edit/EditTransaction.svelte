@@ -3,8 +3,8 @@
   import type { Transaction } from '$lib/data/interfaces';
   import { deleteOperation } from '$lib/data/operations';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import { showSuccessToast } from '$lib/ui/toasts';
+  import Button from '@ya-erm/svelte-ui/Button';
+  import { showSuccessToast } from '@ya-erm/svelte-ui/toasts';
 
   import TransactionForm from '../form/TransactionForm.svelte';
 
@@ -37,7 +37,7 @@
   <Button text={$translate('common.save')} type="submit" testId="SaveTransactionButton" />
   <Button
     slot="footer"
-    on:click={handleDelete}
+    onClick={handleDelete}
     text={$translate('transactions.delete_transaction')}
     testId="DeleteTransactionButton"
     appearance="transparent"

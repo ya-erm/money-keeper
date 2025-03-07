@@ -2,15 +2,16 @@
   import dayjs from 'dayjs';
   import { v4 as uuid } from 'uuid';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+  import Modal from '@ya-erm/svelte-ui/Modal';
+  import Portal from '@ya-erm/svelte-ui/Portal';
+
   import type { Repeating, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
-  import Icon from '$lib/ui/Icon.svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import InputLabel from '$lib/ui/InputLabel.svelte';
-  import Layout from '$lib/ui/Layout.svelte';
-  import Modal from '$lib/ui/Modal.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import Select from '$lib/ui/Select.svelte';
   import { checkNumberFormParameter } from '$lib/utils/checkFormParams';
 
@@ -61,7 +62,7 @@
   width={20}
   opened={opened && !operationsListVisible}
   header={$translate('transactions.repeatings.title')}
-  on:close={onCancel}
+  onClose={onCancel}
 >
   <form class="flex-col gap-1" on:submit|preventDefault={handleSubmit}>
     <div class="flex-col gap-0.5">
@@ -90,44 +91,34 @@
     </div>
     <Input label={$translate('transactions.repeatings.end_date')} type="date" bind:value={endDate} clearable />
     {#if operations?.length}
-      <Button appearance="link" underlined={false} on:click={() => (operationsListVisible = true)}>
+      <Button appearance="link" underlined={false} onClick={() => (operationsListVisible = true)}>
         <span>{$translate('transactions.repeatings.operations_list')}</span>
         <Icon name="mdi:chevron-right" />
       </Button>
     {/if}
     <slot />
     <div class="grid-col-2 gap-1">
-      <Button color="secondary" text={$translate('common.cancel')} on:click={onCancel} />
+      <Button color="secondary" text={$translate('common.cancel')} onClick={onCancel} />
       <Button text={$translate('common.save')} color="primary" type="submit" />
     </div>
   </form>
-</Modal>
 
-<Modal bind:opened={dayOfMonthModalOpened} header={$translate('transactions.repeatings.day_of_month.title')}>
-  <form class="flex-col gap-1" on:submit|preventDefault={handleDayOfMonthSubmit}>
-    <div class="flex-col gap-0.5">
-      <Input name="dayOfMonth" type="number" min={1} max={31} value={dayOfMonth.toString()} required />
-      <span class="info">{$translate('transactions.repeatings.day_of_month.info')}</span>
-    </div>
-    <div class="grid-col-2 gap-1">
-      <Button color="secondary" text={$translate('common.cancel')} on:click={() => (dayOfMonthModalOpened = false)} />
-      <Button text={$translate('common.apply')} color="primary" type="submit" />
-    </div>
-  </form>
+  <Modal bind:opened={dayOfMonthModalOpened} header={$translate('transactions.repeatings.day_of_month.title')}>
+    <form class="flex-col gap-1" on:submit|preventDefault={handleDayOfMonthSubmit}>
+      <div class="flex-col gap-0.5">
+        <Input name="dayOfMonth" type="number" min={1} max={31} value={dayOfMonth.toString()} required />
+        <span class="info">{$translate('transactions.repeatings.day_of_month.info')}</span>
+      </div>
+      <div class="grid-col-2 gap-1">
+        <Button color="secondary" text={$translate('common.cancel')} onClick={() => (dayOfMonthModalOpened = false)} />
+        <Button text={$translate('common.apply')} color="primary" type="submit" />
+      </div>
+    </form>
+  </Modal>
 </Modal>
 
 <Portal visible={operationsListVisible}>
-  <Layout
-    header={{
-      title: $translate('repeatings.operations'),
-      backButton: {
-        title: $translate('common.back'),
-        onClick: () => (operationsListVisible = false),
-      },
-      leftButton: null,
-      rightButton: null,
-    }}
-  >
+  <Layout title={$translate('repeatings.operations')} onBack={() => (operationsListVisible = false)} hideMenu>
     <div class="p-1">
       <GroupedOperationsList operations={operations ?? []} />
     </div>

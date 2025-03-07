@@ -2,13 +2,12 @@
   import { goto } from '$app/navigation';
   import type { Group } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
-  import { useBackButton, useRightButton } from '$lib/ui/header/model';
+  import { translate } from '$lib/translate';
+  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
 
   import AddGroupingButton from './AddGroupingButton.svelte';
   import GroupingList from './GroupingList.svelte';
-
-  useBackButton(route('analytics.accounts'));
-  useRightButton(AddGroupingButton);
 
   const onClick = async (group: Group | null) => {
     if (group) {
@@ -17,4 +16,6 @@
   };
 </script>
 
-<GroupingList {onClick} />
+<Layout title={$translate('analytics.groupings.title')} leftSlot={HeaderBackButton} rightSlot={AddGroupingButton}>
+  <GroupingList {onClick} />
+</Layout>

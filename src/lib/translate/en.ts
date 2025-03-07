@@ -1,5 +1,6 @@
 import { addMessages } from 'svelte-i18n';
-import type { Dictionary } from './messages';
+
+import type { Dictionary } from './types';
 
 export const enDict: Dictionary = {
   'app.title': 'Money Keeper',
@@ -265,7 +266,7 @@ export const enDict: Dictionary = {
   'transactions.delete_transaction': 'Delete operation',
   'transactions.delete_transaction_success': 'Operation was deleted',
   'transactions.delete_transaction_failure': 'Failed to delete operation',
-  'transactions.feature_operations': 'Feature operations',
+  'transactions.future_operations': 'Future operations',
   'transactions.another_currency': 'Another currency',
   'transactions.same_currency': 'Same currency',
   'transactions.additional_parameters': 'Additional parameters',

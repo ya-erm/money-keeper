@@ -2,15 +2,16 @@
   import { page } from '$app/stores';
   import { v4 as uuid } from 'uuid';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import MultiSwitch from '@ya-erm/svelte-ui/MultiSwitch';
+  import Portal from '@ya-erm/svelte-ui/Portal';
+
   import type { Category, CategoryType } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Button from '$lib/ui/Button.svelte';
   import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import Layout from '$lib/ui/Layout.svelte';
+  import Layout from '$lib/ui/layout/Layout.svelte';
   import Modal from '$lib/ui/Modal.svelte';
-  import MultiSwitch from '$lib/ui/MultiSwitch.svelte';
-  import Portal from '$lib/ui/Portal.svelte';
   import { deleteSearchParam, getSearchParam, setSearchParam } from '$lib/utils';
 
   import CategoryIcons from './CategoryIcons.svelte';
@@ -102,25 +103,16 @@
     </div>
     <div class="w-full grid-col-2 gap-1">
       {#if !!category && onDelete}
-        <Button color="danger" text={$translate('common.delete')} on:click={handleDelete} />
+        <Button color="danger" text={$translate('common.delete')} onClick={handleDelete} />
       {:else}
-        <Button color="secondary" text={$translate('common.cancel')} on:click={() => (opened = false)} />
+        <Button color="secondary" text={$translate('common.cancel')} onClick={() => (opened = false)} />
       {/if}
       <Button text={$translate('common.save')} type="submit" />
     </div>
   </form>
 
   <Portal visible={iconSelecting}>
-    <Layout
-      header={{
-        backButton: {
-          onClick: closeIconSelecting,
-        },
-        leftButton: null,
-        rightButton: null,
-        title: $translate('icons.select_icon'),
-      }}
-    >
+    <Layout title={$translate('icons.select_icon')} onBack={closeIconSelecting} hideMenu>
       <CategoryIcons
         icon={icon ?? null}
         onSelect={(value) => {

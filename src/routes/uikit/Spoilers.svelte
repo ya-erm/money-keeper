@@ -1,6 +1,7 @@
 <script>
-  import Spoiler from '$lib/ui/Spoiler.svelte';
-  import SpoilerToggle from '$lib/ui/SpoilerToggle.svelte';
+  import Spoiler from '@ya-erm/svelte-ui/Spoiler';
+  import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
+
   let hidden = true;
 </script>
 
