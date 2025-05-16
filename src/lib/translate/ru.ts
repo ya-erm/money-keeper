@@ -348,7 +348,7 @@ export const ruDict: Dictionary = {
   // Import and Export
   'import_export.title': 'Импорт / Экспорт',
   'import_export.import': 'Импорт',
-  'import_export.export': 'Export',
+  'import_export.export': 'Экспорт',
   'import_export.raw_data_json': 'RAW данные (json)',
   'import_export.parse_data': 'Проверить данные',
   'import_export.start_import': 'Импортировать',
@@ -368,6 +368,7 @@ export const ruDict: Dictionary = {
     '{count, plural, one {Импортирован # элемент} few {Импортировано # элемента} other {Импортировано # элементов}}',
   'import_export.import_failure': 'Не выполнить импорт',
   'import_export.operations_keys_logged': 'Ключи операций залогированы. Смотри логи или консоль',
+  'import_export.show_textbox': 'Показать',
   // Settings
   'settings.title': 'Настройки',
   'settings.language': 'Язык',

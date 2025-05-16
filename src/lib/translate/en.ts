@@ -361,6 +361,7 @@ export const enDict: Dictionary = {
   'import_export.import_success': '{count, plural, =1 {# item was} other {# items were}} added',
   'import_export.import_failure': 'Failed to import items',
   'import_export.operations_keys_logged': 'Operations keys were logged. See logs or console',
+  'import_export.show_textbox': 'Show',
   // Settings
   'settings.title': 'Settings',
   'settings.language': 'Language',

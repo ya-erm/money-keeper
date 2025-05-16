@@ -351,6 +351,7 @@ export type Messages =
   | 'import_export.import_success'
   | 'import_export.import_failure'
   | 'import_export.operations_keys_logged'
+  | 'import_export.show_textbox'
   // Settings
   | 'settings.title'
   | 'settings.common'
