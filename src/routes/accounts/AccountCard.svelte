@@ -4,6 +4,9 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import { formatMoney } from '$lib/utils/formatMoney';
+  import { longPress } from '$lib/utils';
+
+  import AccountOptionsModal from './AccountOptionsModal.svelte';
 
   export let account: AccountViewModel;
   export let balance: number | null = null;
@@ -17,9 +20,15 @@
   const handleEdit = () => {
     onEdit?.(account);
   };
+
+  let showAdditionalOptions = false;
 </script>
 
-<div class="w-full h-full p-1 flex-col items-center justify-between" data-testId="AccountCard">
+<div
+  use:longPress={() => (showAdditionalOptions = true)}
+  class="w-full h-full p-1 flex-col items-center justify-between"
+  data-testId="AccountCard"
+>
   <div class="w-full flex items-center gap-0.5">
     <div class="account-icon flex items-center justify-center" style:background={account.color}>
       <Icon name={account.icon || 'mdi:briefcase-outline'} padding={0.5} />
@@ -51,6 +60,10 @@
   </div>
   <div class="flex footer"></div>
 </div>
+
+{#if showAdditionalOptions}
+  <AccountOptionsModal bind:opened={showAdditionalOptions} {account} {balance} />
+{/if}
 
 <style>
   .archived {

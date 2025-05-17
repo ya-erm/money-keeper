@@ -115,6 +115,11 @@ export const ruDict: Dictionary = {
   'accounts.archive': 'В архив',
   'accounts.archived': 'В архиве',
   'accounts.restore': 'Восстановить',
+  'accounts.correct_balance': 'Коррекция суммы',
+  'accounts.current_balance': 'Текущая сумма',
+  'accounts.new_balance': 'Новая сумма',
+  'accounts.difference': 'Разница',
+  'accounts.correct_balance_failure': 'Не удалось скорректировать сумму',
   // Analytics
   'analytics.title': 'Аналитика',
   'analytics.categories.start_date': 'Начало интервала',

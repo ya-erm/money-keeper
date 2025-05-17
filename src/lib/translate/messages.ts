@@ -109,6 +109,11 @@ export type Messages =
   | 'accounts.archive'
   | 'accounts.archived'
   | 'accounts.restore'
+  | 'accounts.correct_balance'
+  | 'accounts.current_balance'
+  | 'accounts.new_balance'
+  | 'accounts.difference'
+  | 'accounts.correct_balance_failure'
   // Analytics
   | 'analytics.title'
   | 'analytics.categories.start_date'
