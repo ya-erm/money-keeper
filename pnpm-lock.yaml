@@ -79,8 +79,8 @@ importers:
         specifier: ^0.6.7
         version: 0.6.7(@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.19.6)(vite@6.1.6(@types/node@22.10.5)(terser@5.39.0)))(svelte@5.19.6)(vite@6.1.6(@types/node@22.10.5)(terser@5.39.0)))(vite-plugin-pwa@0.21.1(vite@6.1.6(@types/node@22.10.5)(terser@5.39.0))(workbox-build@7.3.0)(workbox-window@7.3.0))
       '@ya-erm/svelte-ui':
-        specifier: ^0.0.14
-        version: 0.0.14(svelte@5.19.6)
+        specifier: ^0.0.16
+        version: 0.0.16(svelte@5.19.6)
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.49)
@@ -1504,8 +1504,8 @@ packages:
       '@vite-pwa/assets-generator':
         optional: true
 
-  '@ya-erm/svelte-ui@0.0.14':
-    resolution: {integrity: sha512-biHSYdRlu9Sd8ywOxeVaFkz0jqmJ1ehv7+B8m/8/ykSxqfg4G5/+bC4xqjPdhGk7UWNrPaMAq66RR3LRIO1TRQ==}
+  '@ya-erm/svelte-ui@0.0.16':
+    resolution: {integrity: sha512-3aW8AkjPrjgirA/+yvXqvoeChAIT/c55AT5CV5hkAKSzbL+yEQVHIaDXsUosZk5uJAaw/jKtlATBuWNm+Tz+rA==}
     peerDependencies:
       svelte: ^5.0.0
 
@@ -2886,6 +2886,7 @@ packages:
   source-map@0.8.0-beta.0:
     resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
     engines: {node: '>= 8'}
+    deprecated: The work that was done in this beta branch won't be included in future versions
 
   sourcemap-codec@1.4.8:
     resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
@@ -4692,7 +4693,7 @@ snapshots:
       tinyglobby: 0.2.10
       vite-plugin-pwa: 0.21.1(vite@6.1.6(@types/node@22.10.5)(terser@5.39.0))(workbox-build@7.3.0)(workbox-window@7.3.0)
 
-  '@ya-erm/svelte-ui@0.0.14(svelte@5.19.6)':
+  '@ya-erm/svelte-ui@0.0.16(svelte@5.19.6)':
     dependencies:
       svelte: 5.19.6
 
