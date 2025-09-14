@@ -22,8 +22,7 @@
   export let balance: number | null = null;
 
   let newBalance = '';
-
-  $: diff = Number(newBalance) - (balance ?? 0);
+  $: diff = parseFloat((Number(newBalance) - (balance ?? 0)).toFixed(10));
 
   const onClose = () => (opened = false);
 
