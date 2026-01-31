@@ -79,8 +79,8 @@ importers:
         specifier: ^0.6.7
         version: 0.6.7(@sveltejs/kit@2.50.1(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.19.6)(vite@6.4.1(@types/node@22.10.5)(terser@5.39.0)))(svelte@5.19.6)(typescript@5.7.3)(vite@6.4.1(@types/node@22.10.5)(terser@5.39.0)))(vite-plugin-pwa@0.21.1(vite@6.4.1(@types/node@22.10.5)(terser@5.39.0))(workbox-build@7.3.0)(workbox-window@7.3.0))
       '@ya-erm/svelte-ui':
-        specifier: ^0.0.13
-        version: 0.0.13(svelte@5.19.6)
+        specifier: ^0.0.16
+        version: 0.0.16(svelte@5.19.6)
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.49)
@@ -1525,8 +1525,8 @@ packages:
       '@vite-pwa/assets-generator':
         optional: true
 
-  '@ya-erm/svelte-ui@0.0.13':
-    resolution: {integrity: sha512-nzGvO5h8WYAY2spbJBNPk4ciKPSBMuHmvRdmVPOkpnCJHb3NRUMZ3q3K2RF6EI/ERFLowYDBYebHMy1LP00yjQ==}
+  '@ya-erm/svelte-ui@0.0.16':
+    resolution: {integrity: sha512-3aW8AkjPrjgirA/+yvXqvoeChAIT/c55AT5CV5hkAKSzbL+yEQVHIaDXsUosZk5uJAaw/jKtlATBuWNm+Tz+rA==}
     peerDependencies:
       svelte: ^5.0.0
 
@@ -4727,7 +4727,7 @@ snapshots:
       tinyglobby: 0.2.10
       vite-plugin-pwa: 0.21.1(vite@6.4.1(@types/node@22.10.5)(terser@5.39.0))(workbox-build@7.3.0)(workbox-window@7.3.0)
 
-  '@ya-erm/svelte-ui@0.0.13(svelte@5.19.6)':
+  '@ya-erm/svelte-ui@0.0.16(svelte@5.19.6)':
     dependencies:
       svelte: 5.19.6
 

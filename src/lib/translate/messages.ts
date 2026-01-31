@@ -109,6 +109,11 @@ export type Messages =
   | 'accounts.archive'
   | 'accounts.archived'
   | 'accounts.restore'
+  | 'accounts.correct_balance'
+  | 'accounts.current_balance'
+  | 'accounts.new_balance'
+  | 'accounts.difference'
+  | 'accounts.correct_balance_failure'
   // Analytics
   | 'analytics.title'
   | 'analytics.categories.start_date'
@@ -351,6 +356,7 @@ export type Messages =
   | 'import_export.import_success'
   | 'import_export.import_failure'
   | 'import_export.operations_keys_logged'
+  | 'import_export.show_textbox'
   // Settings
   | 'settings.title'
   | 'settings.common'
