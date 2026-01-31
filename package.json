@@ -51,7 +51,7 @@
     "svelte-preprocess": "^6.0.3",
     "tslib": "^2.8.1",
     "typescript": "^5.7.3",
-    "vite": "^6.1.6"
+    "vite": "^6.4.1"
   },
   "dependencies": {
     "@prisma/client": "^6.3.0",
