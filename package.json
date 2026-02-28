@@ -45,7 +45,7 @@
     "prettier": "^3.4.2",
     "prettier-plugin-svelte": "^3.3.3",
     "prisma": "^6.3.0",
-    "svelte": "^5.51.5",
+    "svelte": "^5.53.5",
     "svelte-check": "^4.1.4",
     "svelte-i18n": "^4.0.1",
     "svelte-preprocess": "^6.0.3",
