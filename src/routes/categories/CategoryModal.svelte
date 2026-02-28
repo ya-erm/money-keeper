@@ -93,7 +93,7 @@
         v2
       />
       <datalist id="categories">
-        {#each suggestions as option}
+        {#each suggestions as option (option)}
           <option value={$translate(option)}></option>
         {/each}
       </datalist>

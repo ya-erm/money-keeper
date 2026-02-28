@@ -80,7 +80,7 @@
   </div>
 
   <ul class="flex-col gap-1">
-    {#each filteredLogs as log}
+    {#each filteredLogs as log (log.id)}
       <li class="flex-col">
         <div class="flex gap-0.5 header">
           <span>

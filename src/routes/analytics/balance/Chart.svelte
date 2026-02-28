@@ -34,8 +34,11 @@
     updateMode?: UpdateMode;
   }
 
-  interface $$Props<TType extends ChartType = ChartType, TData = DefaultDataPoint<TType>, TLabel = unknown>
-    extends ChartBaseProps<TType, TData, TLabel> {
+  interface $$Props<
+    TType extends ChartType = ChartType,
+    TData = DefaultDataPoint<TType>,
+    TLabel = unknown,
+  > extends ChartBaseProps<TType, TData, TLabel> {
     chart?: ChartJS<TType, TData, TLabel> | null;
   }
 

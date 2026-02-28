@@ -50,7 +50,7 @@
   {:else}
     <button class="select-account-button flex gap-0.5 items-center" type="button" on:click={openPortal}>
       <div class="account-icon">
-        <Icon name={'material-symbols:question-mark'} padding={0.5} />
+        <Icon name="material-symbols:question-mark" padding={0.5} />
       </div>
       <span class="flex-grow text-left">{$translate('transactions.select_account')}</span>
       <Icon name="mdi:chevron-right" />

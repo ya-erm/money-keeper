@@ -126,7 +126,7 @@ export class JournalService implements Initialisable {
     const fetcher = useFetch<GetJournalRequest, GetJournalResponse>('POST', '/api/v2/journal/get-updates');
     const { journal } = await fetcher.fetch({ start: this.syncNumber });
     const items = await Promise.all(
-      journal.map(async (item) => {
+      journal.map(async (item: { order: number; data: string; encryption: string }) => {
         const encryption = item.encryption as EncryptionVersion;
         switch (encryption) {
           case 'none': {
@@ -152,7 +152,7 @@ export class JournalService implements Initialisable {
         }
       }),
     );
-    items.sort((a, b) => a.order - b.order);
+    items.sort((a: JournalItem, b: JournalItem) => a.order - b.order);
     logger.debug('Updates:', items);
     if (items.length > 0) {
       this._syncNumber.set(items[items.length - 1].order);
