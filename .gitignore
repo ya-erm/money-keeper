@@ -13,3 +13,4 @@ screenshots/raw
 .ipynb_checkpoints
 .idea
 .vercel
+.pnpm-store
