@@ -74,7 +74,7 @@
       </div>
     {/each}
     {#if accounts.length === 0}
-      <a id="create-account" href={'?action=create'} class="account-card dashed text-decoration-none">
+      <a id="create-account" href="?action=create" class="account-card dashed text-decoration-none">
         <span class="flex items-center gap-0.25">
           <Icon name="mdi:plus" />
           {$translate('accounts.create_account')}

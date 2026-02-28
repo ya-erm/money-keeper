@@ -70,7 +70,7 @@
   </ul>
 </div>
 
-<Portal visible={!!groupIdForAddAccount} testId={`Grouping.AccountSelecting.Portal`}>
+<Portal visible={!!groupIdForAddAccount} testId="Grouping.AccountSelecting.Portal">
   <Layout title={$translate('transactions.select_account')} onBack={() => (groupIdForAddAccount = null)} hideMenu>
     <AccountList {accounts} onClick={handelSelectAccount} />
   </Layout>

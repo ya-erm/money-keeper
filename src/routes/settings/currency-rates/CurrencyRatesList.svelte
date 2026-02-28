@@ -58,7 +58,7 @@
   <div class="flex-grow">
     <Input bind:value={search} icon="mdi:search" placeholder={$translate('common.search')} clearable />
   </div>
-  {#each currenciesGroups as currency}
+  {#each currenciesGroups as currency (currency)}
     <h4 class="m-0">{currency}</h4>
     <div class="container">
       {#each currencyRateByCurrency.get(currency) ?? [] as item (item.id)}

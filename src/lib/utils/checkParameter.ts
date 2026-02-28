@@ -19,7 +19,7 @@ export function checkParameter<T>(parameter: unknown, name: string, options: Che
 
   if (hasValue && options.type) {
     let failed = false;
-    let value: unknown = null;
+    let value: unknown;
     switch (options.type) {
       case 'number': {
         value = Number.parseFloat(parameter as string);

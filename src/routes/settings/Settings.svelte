@@ -74,7 +74,7 @@
 <ListGroup title={$translate('settings.debug_tools')}>
   <ListLinkItem title={$translate('settings.logs')} href={route('settings.logs')} />
   <ListLinkItem title={$translate('settings.report_problem')} href="https://github.com/ya-erm/money-keeper/issues" />
-  <ListLinkItem title={'UI Kit'} href={route('uikit')} />
+  <ListLinkItem title="UI Kit" href={route('uikit')} />
 </ListGroup>
 
 <div class="mt-1 flex-col items-center gap-0.5">

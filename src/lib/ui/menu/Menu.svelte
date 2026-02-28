@@ -19,7 +19,7 @@
 </script>
 
 <div class="menu-bar" class:hidden={$hidden}>
-  {#each $menu as item}
+  {#each $menu as item (item.path)}
     <a href={item.path} class="menu-item" data-testId="MenuItem" class:active={$isActive(item.path)}>
       <Icon name={item.icon} size={1.5} />
       <span class="text">{$translate(item.title)}</span>
