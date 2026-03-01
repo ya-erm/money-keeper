@@ -14,7 +14,7 @@
   import { memberSettingsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
-  import { operationsCommentsStore } from '$lib/data/operations';
+  import { operationsCommentsStore, operationsStore } from '$lib/data/operations';
   import { repeatingsService, repeatingsStore } from '$lib/data/repeatings';
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/layout/Layout.svelte';
@@ -140,9 +140,18 @@
         showErrorToast($translate('transactions.account_is_required'), { testId: 'AccountIsRequiredErrorToast' });
         return;
       }
-      if ((type === 'IN' || type === 'OUT') && !formData.get('categoryId')) {
-        showErrorToast($translate('transactions.category_is_required'), { testId: 'CategoryIsRequiredErrorToast' });
-        return;
+      let resolvedCategoryId = formData.get('categoryId') as string | null;
+      if ((type === 'IN' || type === 'OUT') && !resolvedCategoryId) {
+        const matchingOperation = comment.trim()
+          ? $operationsStore.find((op) => op.comment?.trim() === comment.trim() && op.category.type === type)
+          : undefined;
+        if (matchingOperation) {
+          resolvedCategoryId = matchingOperation.categoryId;
+          categoryId = resolvedCategoryId;
+        } else {
+          showErrorToast($translate('transactions.category_is_required'), { testId: 'CategoryIsRequiredErrorToast' });
+          return;
+        }
       }
       if (type === 'TRANSFER' && !formData.get('destinationAccountId')) {
         showErrorToast($translate('transactions.destination_account_is_required'), {
@@ -165,7 +174,9 @@
         id: transaction?.id ?? uuid(),
         accountId: checkStringFormParameter(formData, 'accountId'),
         categoryId:
-          type === 'TRANSFER' ? SYSTEM_CATEGORY_TRANSFER_OUT.id : checkStringFormParameter(formData, 'categoryId'),
+          type === 'TRANSFER'
+            ? SYSTEM_CATEGORY_TRANSFER_OUT.id
+            : (resolvedCategoryId ?? checkStringFormParameter(formData, 'categoryId')),
         date: datetime,
         ...(timeZone ? { timeZone } : {}),
         amount: checkNumberFormParameter(formData, 'amount'),
@@ -342,7 +353,7 @@
       optional
     />
     <datalist id="suggestions">
-      {#each suggestions as option}
+      {#each suggestions as option (option)}
         <option value={option}></option>
       {/each}
     </datalist>

@@ -66,11 +66,13 @@
   "overrides": {
     "@sveltejs/kit": {
       "cookie": ">=0.7.0"
-    }
+    },
+    "serialize-javascript": ">=7.0.3"
   },
   "pnpm": {
     "overrides": {
-      "cookie": ">=0.7.0"
+      "cookie": ">=0.7.0",
+      "serialize-javascript": ">=7.0.3"
     }
   },
   "packageManager": "pnpm@9.7.0+sha256.b35018fbfa8f583668b2649e407922a721355cd81f61beeb4ac1d4258e585559"
