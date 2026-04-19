@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { dev } from '$app/environment';
+  import { browser, dev } from '$app/environment';
   import { page } from '$app/state';
   import { inject } from '@vercel/analytics';
 
@@ -17,7 +17,9 @@
 
   inject({ mode: dev ? 'development' : 'production', debug: false });
 
-  if (!page.url.pathname.startsWith(routes.login.path) && membersService.isGuest) {
+  const isAutomatedBrowser = browser && navigator.webdriver;
+
+  if (!page.url.pathname.startsWith(routes.login.path) && membersService.isGuest && !isAutomatedBrowser) {
     showInfoToast($translate('auth.logged_in_as_guest_info'));
   }
 </script>

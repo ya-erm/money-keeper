@@ -1,4 +1,5 @@
-import test, { expect, type Page } from '@playwright/test';
+import { expect, test } from '@tests/fixtures';
+import type { Page } from '@playwright/test';
 import { openGuestAppAsync } from '@tests/helpers';
 
 const getLocators = (page: Page) => {
@@ -27,13 +28,15 @@ test.describe('Accounts > Create', () => {
 
     const { nameInput, currencyInput, submitButton, accountCardName } = getLocators(page);
 
-    const accountName = `Account-${Date.now()}`;
+    const accountName = 'Account E2E';
 
     await nameInput.fill(accountName);
     await currencyInput.fill('TST');
+    await expect(page).toHaveScreenshot('account-create-form-filled.png');
     await submitButton.click();
 
     await expect(accountCardName.filter({ hasText: accountName })).toBeVisible();
+    await expect(page).toHaveScreenshot('account-created-card.png');
 
     await page.reload({ waitUntil: 'networkidle' });
 

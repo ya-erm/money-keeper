@@ -1,4 +1,4 @@
-import test, { expect } from '@playwright/test';
+import { expect, test } from '@tests/fixtures';
 import {
   assertTransactionNotVisibleAsync,
   importMockDataAsync,
@@ -117,8 +117,12 @@ test.describe('Transactions > Create', () => {
       await accountButton.click();
 
       await amountInput.fill('100');
-      const comment = `Test ${new Date().toISOString()}`;
+      const comment = 'E2E incoming';
       await commentInput.fill(comment);
+      await page.getByRole('heading', { level: 1, name: 'New operation' }).click();
+      await expect(page).toHaveScreenshot('incoming-transaction-form-filled.png', {
+        maxDiffPixels: 30,
+      });
 
       await createButton.click();
 
@@ -126,11 +130,17 @@ test.describe('Transactions > Create', () => {
 
       const transactionListItem = page.getByTestId('TransactionListItem').filter({ hasText: comment });
       await transactionListItem.waitFor({ state: 'visible' });
+      await expect(page).toHaveScreenshot('incoming-transaction-created.png', {
+        maxDiffPixels: 1000,
+      });
 
       const transactionId = await transactionListItem.getAttribute('data-id');
       await transactionListItem.click();
 
       await page.waitForURL(new RegExp(`operation-id=${transactionId}`));
+      await expect(page).toHaveScreenshot('incoming-transaction-edit-opened.png', {
+        maxDiffPixels: 1000,
+      });
 
       await page.getByTestId('DeleteTransactionButton').click();
 

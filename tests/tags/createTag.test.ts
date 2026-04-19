@@ -1,4 +1,5 @@
-import test, { expect, type Page } from '@playwright/test';
+import { expect, test } from '@tests/fixtures';
+import type { Page } from '@playwright/test';
 import { openGuestAppAsync } from '@tests/helpers';
 
 const getLocators = (page: Page) => {

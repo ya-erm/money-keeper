@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@tests/fixtures';
+import type { Page } from '@playwright/test';
 
 const runAuthE2E = process.env.RUN_AUTH_E2E === 'true';
 

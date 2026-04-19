@@ -14,3 +14,4 @@ screenshots/raw
 .idea
 .vercel
 .pnpm-store
+test-results
