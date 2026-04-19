@@ -27,7 +27,7 @@
     "@playwright/test": "^1.58.2",
     "@sveltejs/adapter-auto": "^7.0.1",
     "@sveltejs/adapter-node": "^5.5.4",
-    "@sveltejs/kit": "^2.53.4",
+    "@sveltejs/kit": "^2.57.1",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@types/bcrypt": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
