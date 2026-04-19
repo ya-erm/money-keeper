@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
+const runAuthE2E = process.env.RUN_AUTH_E2E === 'true';
+
 const getLocators = (page: Page) => ({
   form: page.getByTestId('LoginForm'),
   loginInput: page.getByTestId('LoginInput'),
@@ -8,6 +10,8 @@ const getLocators = (page: Page) => ({
 });
 
 test.describe('Login page', () => {
+  test.skip(!runAuthE2E, 'Auth e2e is disabled by default because the main CI flow uses guest/indexedDB mode.');
+
   test('login page has expected inputs', async ({ page }) => {
     await page.goto('/login');
 

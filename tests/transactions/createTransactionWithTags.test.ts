@@ -1,10 +1,10 @@
 import test from '@playwright/test';
+import { assertTransactionVisibleAsync, importMockDataAsync, openGuestAppAsync, selectAccountAsync } from '@tests/helpers';
 import { getTransactionFormLocators } from '@tests/transactions/utils';
-import { importMockDataAsync, useAuthAsync } from '@tests/utils';
 
 test.describe('Transactions with tags', () => {
-  test('create transaction with tag', async ({ page, context }) => {
-    await useAuthAsync(page, context);
+  test('create transaction with imported tag', async ({ page }) => {
+    await openGuestAppAsync(page);
     await importMockDataAsync(page);
 
     await page.locator('a[href="/accounts"]').click();
@@ -15,18 +15,14 @@ test.describe('Transactions with tags', () => {
     const {
       categorySelect,
       sourceAccountSelect,
-      sourceAccountSelectPortal,
       amountInput,
       commentInput,
       createButton,
       tags,
     } = getTransactionFormLocators(page);
 
-    const selectorButton = sourceAccountSelect.getByRole('button');
-    await selectorButton.click();
-
-    const accountButton = sourceAccountSelectPortal.getByRole('button').filter({ hasText: 'T_TST' });
-    await accountButton.click();
+    await sourceAccountSelect.waitFor({ state: 'visible' });
+    await selectAccountAsync(page, 'SourceAccountSelect', 'T_TST');
 
     const categoryButton = categorySelect.getByRole('button').filter({ hasText: 'T_Shop' });
     await categoryButton.click();
@@ -43,6 +39,8 @@ test.describe('Transactions with tags', () => {
     await createButton.click();
 
     await page.waitForURL(/accounts/, { waitUntil: 'networkidle' });
+
+    await assertTransactionVisibleAsync(page, comment);
 
     const transactionItem = page.getByTestId('TransactionListItem').filter({ hasText: comment });
     const tag = transactionItem.getByText(`#${tagName}`);

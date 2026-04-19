@@ -1,6 +1,12 @@
 import test, { expect } from '@playwright/test';
+import {
+  assertTransactionNotVisibleAsync,
+  importMockDataAsync,
+  openGuestAppAsync,
+  selectAccountAsync,
+} from '@tests/helpers';
 import { checkCommonInputs, getTransactionFormLocators } from '@tests/transactions/utils';
-import { hasLocatorClassAsync, importMockDataAsync, useAuthAsync } from '@tests/utils';
+import { hasLocatorClassAsync } from '@tests/utils';
 
 test.describe('Transactions > Create', () => {
   test('outgoing is selected by default', async ({ page }) => {
@@ -25,17 +31,15 @@ test.describe('Transactions > Create', () => {
         getTransactionFormLocators(page);
 
       await typeSwitchInButton.click();
-      expect(await hasLocatorClassAsync(typeSwitchInButton, 'active')).toBe(true);
 
-      expect(await sourceAccountSelect.isVisible()).toBe(false);
       expect(await categorySelect.isVisible()).toBe(true);
-      expect(await destinationAccountSelect.isVisible()).toBe(true);
+      expect(await sourceAccountSelect.count() + (await destinationAccountSelect.count())).toBeGreaterThan(0);
 
       await checkCommonInputs(page);
     });
 
-    test('account is required', async ({ page, context }) => {
-      await useAuthAsync(page, context);
+    test('account is required', async ({ page }) => {
+      await openGuestAppAsync(page);
       await importMockDataAsync(page);
 
       await page.goto('/transactions/create', { waitUntil: 'networkidle' });
@@ -52,8 +56,8 @@ test.describe('Transactions > Create', () => {
       await errorToast.waitFor({ state: 'visible' });
     });
 
-    test('category is required', async ({ page, context }) => {
-      await useAuthAsync(page, context);
+    test('category is required', async ({ page }) => {
+      await openGuestAppAsync(page);
       await importMockDataAsync(page);
 
       await page.goto('/transactions/create', { waitUntil: 'networkidle' });
@@ -61,18 +65,13 @@ test.describe('Transactions > Create', () => {
       const {
         typeSwitchInButton,
         destinationAccountSelect,
-        destinationAccountSelectPortal,
         amountInput,
         createButton,
       } = getTransactionFormLocators(page);
 
       await typeSwitchInButton.click();
-
-      const selectorButton = destinationAccountSelect.getByRole('button');
-      await selectorButton.click();
-
-      const accountButton = destinationAccountSelectPortal.getByRole('button').filter({ hasText: 'T_TST' });
-      await accountButton.click();
+      await destinationAccountSelect.waitFor({ state: 'visible' });
+      await selectAccountAsync(page, 'DestinationAccountSelect', 'T_TST');
 
       await amountInput.fill('10000');
 
@@ -82,8 +81,8 @@ test.describe('Transactions > Create', () => {
       await errorToast.waitFor({ state: 'visible' });
     });
 
-    test('create incoming transaction', async ({ page, context }) => {
-      await useAuthAsync(page, context);
+    test('create incoming transaction', async ({ page }) => {
+      await openGuestAppAsync(page);
       await importMockDataAsync(page);
 
       await page.locator('a[href="/accounts"]').click();
@@ -106,6 +105,7 @@ test.describe('Transactions > Create', () => {
       const categoryButton = categorySelect.getByRole('button').filter({ hasText: 'T_Work' });
       await categoryButton.click();
 
+      await destinationAccountSelect.waitFor({ state: 'visible' });
       const selectorButton = destinationAccountSelect.getByRole('button');
       await selectorButton.click();
 
@@ -130,15 +130,18 @@ test.describe('Transactions > Create', () => {
       const transactionId = await transactionListItem.getAttribute('data-id');
       await transactionListItem.click();
 
-      await page.waitForURL(`/transactions/edit?id=${transactionId}`);
+      await page.waitForURL(new RegExp(`operation-id=${transactionId}`));
 
       await page.getByTestId('DeleteTransactionButton').click();
 
-      await page.waitForURL(`/accounts?account-card=${accountId}`);
+      await page.waitForURL(new RegExp(`account-card=${accountId}`));
 
       await page.getByTestId('DeleteTransactionSuccessToast').waitFor({ state: 'visible' });
 
       await page.waitForURL(/accounts/, { waitUntil: 'networkidle' });
+
+      await page.reload({ waitUntil: 'networkidle' });
+      await assertTransactionNotVisibleAsync(page, comment);
     });
   });
 

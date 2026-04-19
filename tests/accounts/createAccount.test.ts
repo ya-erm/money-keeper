@@ -1,4 +1,5 @@
 import test, { expect, type Page } from '@playwright/test';
+import { openGuestAppAsync } from '@tests/helpers';
 
 const getLocators = (page: Page) => {
   const form = page.getByTestId('AccountForm');
@@ -13,7 +14,7 @@ const getLocators = (page: Page) => {
 
 test.describe('Accounts > Create', () => {
   test('name and currency are required', async ({ page }) => {
-    await page.goto('/accounts?action=create');
+    await openGuestAppAsync(page, '/accounts?action=create');
 
     const { nameInput, currencyInput } = getLocators(page);
 
@@ -21,17 +22,21 @@ test.describe('Accounts > Create', () => {
     expect(await currencyInput.getAttribute('required')).toBe('');
   });
 
-  test.skip('create new account', async ({ page }) => {
-    await page.goto('/accounts?action=create');
+  test('create new account in guest mode', async ({ page }) => {
+    await openGuestAppAsync(page, '/accounts?action=create');
 
     const { nameInput, currencyInput, submitButton, accountCardName } = getLocators(page);
 
-    await nameInput.fill('Account-1');
+    const accountName = `Account-${Date.now()}`;
+
+    await nameInput.fill(accountName);
     await currencyInput.fill('TST');
     await submitButton.click();
 
-    await page.waitForURL(/accounts/);
+    await expect(accountCardName.filter({ hasText: accountName })).toBeVisible();
 
-    await accountCardName.filter({ hasText: 'Account-1' }).waitFor({ state: 'visible' });
+    await page.reload({ waitUntil: 'networkidle' });
+
+    await expect(accountCardName.filter({ hasText: accountName })).toBeVisible();
   });
 });

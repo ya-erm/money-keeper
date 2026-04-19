@@ -12,8 +12,12 @@ const config: PlaywrightTestConfig = {
     storageState: './tests/storageState.json',
   },
   */
+  use: {
+    baseURL: 'http://127.0.0.1:4173',
+    testIdAttribute: 'data-testId',
+  },
   webServer: {
-    command: 'npm run build && npm run preview',
+    command: 'npm run dev -- --host 127.0.0.1 --port 4173',
     reuseExistingServer: true,
     port: 4173,
   },
