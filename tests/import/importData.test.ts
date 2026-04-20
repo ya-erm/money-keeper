@@ -10,12 +10,12 @@ test.describe('Import / Export', () => {
     await expect(page.getByText('Categories: 3,')).toBeVisible();
     await expect(page.getByText('Accounts: 2,')).toBeVisible();
     await expect(page.getByText('Operations: 4,')).toBeVisible();
-    await expect(page).toHaveScreenshot('import-summary.png');
+    await expect(page).toHaveScreenshot('1-import-summary.png');
 
     await page.goto('/transactions', { waitUntil: 'networkidle' });
 
     await expect(page.getByTestId('TransactionListItem').filter({ hasText: 'Income' })).toBeVisible();
     await expect(page.getByTestId('TransactionListItem').filter({ hasText: 'Food for pets' })).toBeVisible();
-    await expect(page).toHaveScreenshot('imported-transactions-list.png');
+    await expect(page).toHaveScreenshot('2-imported-transactions-list.png');
   });
 });

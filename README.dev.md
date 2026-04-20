@@ -37,11 +37,21 @@ E2E tests run with Playwright in guest mode and use local IndexedDB, so database
 
 ### Run all e2e tests
 
+This is the same command that runs in CI. It runs Playwright inside the official Linux container, so screenshot assertions use Linux baselines both locally and in GitHub Actions.
+
+Start Docker locally with Colima first:
+
+```sh
+colima start
+```
+
 ```sh
 pnpm test
 ```
 
-### Run tests with browser UI
+### Debug tests with browser UI
+
+This runs Playwright on the host machine and is intended for local debugging, not for the CI-equivalent test pass.
 
 ```sh
 pnpm test:headed
@@ -52,7 +62,7 @@ pnpm test:headed
 Use this after intentional UI changes in user flows:
 
 ```sh
-pnpm exec playwright test --update-snapshots
+pnpm test -- --update-snapshots
 ```
 
 ### Where to look at results
