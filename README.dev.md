@@ -68,5 +68,7 @@ pnpm test -- --update-snapshots
 ### Where to look at results
 
 - Failed run artifacts are written to `test-results/`.
+- Pull request runs publish the HTML report to GitHub Pages and update a PR comment with the report link.
+- Published reports keep the latest 5 runs per PR and the latest 200 runs overall.
 - Screenshot baselines for visual checks are stored рядом с тестами в папках `tests/**/*.test.ts-snapshots/`.
 - The Playwright dev server is started automatically by the test runner.
