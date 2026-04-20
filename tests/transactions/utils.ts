@@ -39,3 +39,19 @@ export async function checkCommonInputs(page: Page) {
 
   expect(await commentInput.isVisible()).toBe(true);
 }
+
+export async function selectAccountAsync(page: Page, testId: string, accountName: string) {
+  const select = page.getByTestId(testId);
+  await select.getByRole('button').click();
+  await page.getByTestId(`${testId}.Portal`).getByRole('button').filter({ hasText: accountName }).click();
+}
+
+export async function assertTransactionVisibleAsync(page: Page, comment: string) {
+  const item = page.getByTestId('TransactionListItem').filter({ hasText: comment });
+  await expect(item).toBeVisible();
+}
+
+export async function assertTransactionNotVisibleAsync(page: Page, comment: string) {
+  const item = page.getByTestId('TransactionListItem').filter({ hasText: comment });
+  await expect(item).toHaveCount(0);
+}

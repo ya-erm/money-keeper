@@ -20,29 +20,28 @@ export const mockData = `
       "icon": "mdi:cat"
     }
   ],
+  "accountTags": [],
   "accounts": [
     {
       "id": "f6ddb1f2-d708-4ff4-bc0c-5d7df732aee6",
       "name": "T_TST",
       "icon": null,
-      "currency": "TST",
-      "order": 1
+      "currency": "TST"
     },
     {
       "id": "6594012d-eee7-4579-810d-43b0b0bdae14",
       "name": "T_USD",
       "icon": "mdi:cash",
-      "currency": "USD",
-      "order": 2
+      "currency": "USD"
     }
   ],
-  "tags": [
+  "operationTags": [
     {
       "id": "7c105d05-f428-487e-9d62-0e9ca7702680",
       "name": "T_Cat"
     }
   ],
-  "transactions": [
+  "operations": [
     {
       "id": "89bca32a-3b19-4e0c-8a3e-569d0f2cc9cd",
       "accountId": "f6ddb1f2-d708-4ff4-bc0c-5d7df732aee6",
@@ -82,6 +81,7 @@ export const mockData = `
       "tagIds": []
     }
   ],
-  "currencyRates": []
+  "currencyRates": [],
+  "groupings": []
 }
 `;

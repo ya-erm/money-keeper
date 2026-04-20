@@ -1,10 +1,14 @@
-import test from '@playwright/test';
-import { getTransactionFormLocators } from '@tests/transactions/utils';
-import { importMockDataAsync, useAuthAsync } from '@tests/utils';
+import { expect, test } from '@tests/fixtures';
+import { importMockDataAsync, openPathAsync } from '@tests/helpers';
+import {
+  assertTransactionVisibleAsync,
+  getTransactionFormLocators,
+  selectAccountAsync,
+} from '@tests/transactions/utils';
 
 test.describe('Transactions with tags', () => {
-  test('create transaction with tag', async ({ page, context }) => {
-    await useAuthAsync(page, context);
+  test('create transaction with imported tag', async ({ page }) => {
+    await openPathAsync(page);
     await importMockDataAsync(page);
 
     await page.locator('a[href="/accounts"]').click();
@@ -12,39 +16,36 @@ test.describe('Transactions with tags', () => {
 
     await page.getByTestId('AddOperationButton').click();
 
-    const {
-      categorySelect,
-      sourceAccountSelect,
-      sourceAccountSelectPortal,
-      amountInput,
-      commentInput,
-      createButton,
-      tags,
-    } = getTransactionFormLocators(page);
+    const { categorySelect, sourceAccountSelect, amountInput, commentInput, createButton, tags } =
+      getTransactionFormLocators(page);
 
-    const selectorButton = sourceAccountSelect.getByRole('button');
-    await selectorButton.click();
-
-    const accountButton = sourceAccountSelectPortal.getByRole('button').filter({ hasText: 'T_TST' });
-    await accountButton.click();
+    await sourceAccountSelect.waitFor({ state: 'visible' });
+    await selectAccountAsync(page, 'SourceAccountSelect', 'T_TST');
 
     const categoryButton = categorySelect.getByRole('button').filter({ hasText: 'T_Shop' });
     await categoryButton.click();
 
     await amountInput.fill('150');
 
-    const comment = `T_WithTag ${new Date().toISOString()}`;
+    const comment = 'E2E tag transaction';
     await commentInput.fill(comment);
 
     const tagButton = tags.getByRole('button').filter({ hasText: 'T_Cat' });
     const tagName = await tagButton.textContent();
     await tagButton.click();
+    await page.getByRole('heading', { level: 1, name: 'New operation' }).click();
+    await expect(page).toHaveScreenshot('1-transaction-tag-selected.png', {
+      maxDiffPixels: 30,
+    });
 
     await createButton.click();
 
     await page.waitForURL(/accounts/, { waitUntil: 'networkidle' });
 
+    await assertTransactionVisibleAsync(page, comment);
+
     const transactionItem = page.getByTestId('TransactionListItem').filter({ hasText: comment });
+    await expect(page).toHaveScreenshot('2-transaction-with-tag-created.png');
     const tag = transactionItem.getByText(`#${tagName}`);
 
     await tag.waitFor({ state: 'visible' });

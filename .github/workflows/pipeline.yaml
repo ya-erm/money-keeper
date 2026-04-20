@@ -1,15 +1,36 @@
-name: Deploy Pipeline
+name: CI
 
 on:
+  pull_request:
   push:
     branches: [master]
 
 jobs:
-  build:
+  e2e:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run e2e tests in Linux container
+        run: pnpm test
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
 
       # - name: Create SSH key
       #   run: |
