@@ -28,7 +28,7 @@
     "@playwright/test": "^1.58.2",
     "@sveltejs/adapter-auto": "^7.0.1",
     "@sveltejs/adapter-node": "^5.5.4",
-    "@sveltejs/kit": "^2.53.4",
+    "@sveltejs/kit": "^2.57.1",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@types/bcrypt": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
@@ -51,7 +51,7 @@
     "svelte-preprocess": "^6.0.3",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.2"
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",
