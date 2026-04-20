@@ -5,6 +5,12 @@ on:
   push:
     branches: [master]
 
+permissions:
+  actions: read
+  contents: write
+  issues: write
+  pull-requests: write
+
 jobs:
   e2e:
     runs-on: ubuntu-latest
@@ -22,6 +28,7 @@ jobs:
         run: pnpm test
 
       - name: Upload Playwright report
+        id: upload-playwright-report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
@@ -31,6 +38,93 @@ jobs:
             test-results/
           if-no-files-found: ignore
           retention-days: 7
+
+      - name: Publish Playwright report to GitHub Pages
+        if: ${{ github.event_name == 'pull_request' && !cancelled() && hashFiles('playwright-report/index.html') != '' }}
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PLAYWRIGHT_REPORTS_KEEP_PER_PR: 5
+          PLAYWRIGHT_REPORTS_KEEP_TOTAL: 200
+        run: |
+          set -euo pipefail
+
+          pages_dir="$(mktemp -d)"
+
+          git fetch origin gh-pages || true
+
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git worktree add -B gh-pages-publish "$pages_dir" refs/remotes/origin/gh-pages
+          else
+            git worktree add --detach "$pages_dir"
+            git -C "$pages_dir" checkout --orphan gh-pages-publish
+            git -C "$pages_dir" rm -rf . >/dev/null 2>&1 || true
+          fi
+
+          report_dir="$pages_dir/reports/pr-$PR_NUMBER/$GITHUB_RUN_ID"
+          rm -rf "$report_dir"
+          mkdir -p "$report_dir"
+          cp -R playwright-report/. "$report_dir/"
+
+          touch "$pages_dir/.nojekyll"
+          node .github/scripts/cleanup-playwright-reports.mjs "$pages_dir/reports"
+
+          git -C "$pages_dir" config user.name "github-actions[bot]"
+          git -C "$pages_dir" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$pages_dir" add -A
+
+          if git -C "$pages_dir" diff --cached --quiet; then
+            echo "No Playwright report changes to publish."
+          else
+            git -C "$pages_dir" commit -m "Publish Playwright report for PR #$PR_NUMBER run $GITHUB_RUN_ID"
+            git -C "$pages_dir" push origin HEAD:gh-pages
+          fi
+
+      - name: Comment Playwright report link
+        if: ${{ github.event_name == 'pull_request' && !cancelled() && hashFiles('playwright-report/index.html') != '' }}
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- playwright-report-link -->';
+            const reportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/reports/pr-${context.issue.number}/${context.runId}/`;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            const body = [
+              marker,
+              `Playwright report: [open HTML report](${reportUrl})`,
+              '',
+              `Run: [${context.runId}](${runUrl})`,
+            ].join('\n');
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+
+            const existing = comments.find((comment) =>
+              comment.user.type === 'Bot' && comment.body.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
 
       # - name: Create SSH key
       #   run: |
