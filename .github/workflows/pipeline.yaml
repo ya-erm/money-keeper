@@ -9,7 +9,7 @@ permissions:
   actions: read
   contents: write
   issues: write
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   e2e:
@@ -81,6 +81,7 @@ jobs:
 
       - name: Comment Playwright report link
         if: ${{ github.event_name == 'pull_request' && !cancelled() && hashFiles('playwright-report/index.html') != '' }}
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           script: |
