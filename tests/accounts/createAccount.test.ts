@@ -1,13 +1,15 @@
 import { expect, test } from '@tests/fixtures';
 import type { Page } from '@playwright/test';
-import { openGuestAppAsync } from '@tests/helpers';
+import { openPathAsync } from '@tests/helpers';
 
 const getLocators = (page: Page) => {
   const form = page.getByTestId('AccountForm');
   return {
     form,
     nameInput: form.locator('input[name="name"]'),
+    iconInput: form.locator('input[name="icon"]'),
     currencyInput: form.locator('input[name="currency"]'),
+    colorInput: form.locator('input[name="color"]'),
     submitButton: form.locator('button[type="submit"]'),
     accountCardName: page.locator('[data-testId="AccountName"]'),
   };
@@ -15,7 +17,7 @@ const getLocators = (page: Page) => {
 
 test.describe('Accounts > Create', () => {
   test('name and currency are required', async ({ page }) => {
-    await openGuestAppAsync(page, '/accounts?action=create');
+    await openPathAsync(page, '/accounts?action=create');
 
     const { nameInput, currencyInput } = getLocators(page);
 
@@ -23,20 +25,22 @@ test.describe('Accounts > Create', () => {
     expect(await currencyInput.getAttribute('required')).toBe('');
   });
 
-  test('create new account in guest mode', async ({ page }) => {
-    await openGuestAppAsync(page, '/accounts?action=create');
+  test('create new account', async ({ page }) => {
+    await openPathAsync(page, '/accounts?action=create');
 
-    const { nameInput, currencyInput, submitButton, accountCardName } = getLocators(page);
+    const { nameInput, currencyInput, iconInput, colorInput, submitButton, accountCardName } = getLocators(page);
 
-    const accountName = 'Account E2E';
+    const accountName = 'Bank card';
 
     await nameInput.fill(accountName);
-    await currencyInput.fill('TST');
-    await expect(page).toHaveScreenshot('account-create-form-filled.png');
+    await currencyInput.fill('USD');
+    await iconInput.fill('mdi:credit-card');
+    await colorInput.fill('#cccccc');
+    await expect(page).toHaveScreenshot('1-account-create-form-filled.png');
     await submitButton.click();
 
     await expect(accountCardName.filter({ hasText: accountName })).toBeVisible();
-    await expect(page).toHaveScreenshot('account-created-card.png');
+    await expect(page).toHaveScreenshot('2-account-created-card.png');
 
     await page.reload({ waitUntil: 'networkidle' });
 

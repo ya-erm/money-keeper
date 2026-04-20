@@ -1,15 +1,14 @@
 import { expect, test } from '@tests/fixtures';
+import { importMockDataAsync, openPathAsync } from '@tests/helpers';
 import {
   assertTransactionVisibleAsync,
-  importMockDataAsync,
-  openGuestAppAsync,
+  getTransactionFormLocators,
   selectAccountAsync,
-} from '@tests/helpers';
-import { getTransactionFormLocators } from '@tests/transactions/utils';
+} from '@tests/transactions/utils';
 
 test.describe('Transactions with tags', () => {
   test('create transaction with imported tag', async ({ page }) => {
-    await openGuestAppAsync(page);
+    await openPathAsync(page);
     await importMockDataAsync(page);
 
     await page.locator('a[href="/accounts"]').click();
@@ -17,14 +16,8 @@ test.describe('Transactions with tags', () => {
 
     await page.getByTestId('AddOperationButton').click();
 
-    const {
-      categorySelect,
-      sourceAccountSelect,
-      amountInput,
-      commentInput,
-      createButton,
-      tags,
-    } = getTransactionFormLocators(page);
+    const { categorySelect, sourceAccountSelect, amountInput, commentInput, createButton, tags } =
+      getTransactionFormLocators(page);
 
     await sourceAccountSelect.waitFor({ state: 'visible' });
     await selectAccountAsync(page, 'SourceAccountSelect', 'T_TST');
@@ -41,7 +34,7 @@ test.describe('Transactions with tags', () => {
     const tagName = await tagButton.textContent();
     await tagButton.click();
     await page.getByRole('heading', { level: 1, name: 'New operation' }).click();
-    await expect(page).toHaveScreenshot('transaction-tag-selected.png', {
+    await expect(page).toHaveScreenshot('1-transaction-tag-selected.png', {
       maxDiffPixels: 30,
     });
 
@@ -52,7 +45,7 @@ test.describe('Transactions with tags', () => {
     await assertTransactionVisibleAsync(page, comment);
 
     const transactionItem = page.getByTestId('TransactionListItem').filter({ hasText: comment });
-    await expect(page).toHaveScreenshot('transaction-with-tag-created.png');
+    await expect(page).toHaveScreenshot('2-transaction-with-tag-created.png');
     const tag = transactionItem.getByText(`#${tagName}`);
 
     await tag.waitFor({ state: 'visible' });

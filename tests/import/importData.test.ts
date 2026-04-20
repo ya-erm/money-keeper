@@ -1,10 +1,10 @@
 import { expect, test } from '@tests/fixtures';
 
-import { importMockDataAsync, openGuestAppAsync } from '@tests/helpers';
+import { importMockDataAsync, openPathAsync } from '@tests/helpers';
 
 test.describe('Import / Export', () => {
   test('imports seed data into guest indexedDB and shows it in the UI', async ({ page }) => {
-    await openGuestAppAsync(page);
+    await openPathAsync(page);
     await importMockDataAsync(page);
 
     await expect(page.getByText('Categories: 3,')).toBeVisible();

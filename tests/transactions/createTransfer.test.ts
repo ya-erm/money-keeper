@@ -1,16 +1,16 @@
 import { expect, test } from '@tests/fixtures';
+import { importMockDataAsync, openPathAsync } from '@tests/helpers';
 import {
   assertTransactionVisibleAsync,
-  importMockDataAsync,
-  openGuestAppAsync,
+  checkCommonInputs,
+  getTransactionFormLocators,
   selectAccountAsync,
-} from '@tests/helpers';
-import { checkCommonInputs, getTransactionFormLocators } from '@tests/transactions/utils';
+} from '@tests/transactions/utils';
 import { hasLocatorClassAsync } from '@tests/utils';
 
 test.describe('Transactions. Create. Transfer', () => {
   test('page has all required inputs', async ({ page }) => {
-    await openGuestAppAsync(page, '/transactions/create');
+    await openPathAsync(page, '/transactions/create');
 
     const {
       form,
@@ -40,7 +40,7 @@ test.describe('Transactions. Create. Transfer', () => {
   });
 
   test('create transfer between imported accounts', async ({ page }) => {
-    await openGuestAppAsync(page);
+    await openPathAsync(page);
     await importMockDataAsync(page);
 
     await page.goto('/accounts', { waitUntil: 'networkidle' });
@@ -49,7 +49,6 @@ test.describe('Transactions. Create. Transfer', () => {
     const {
       typeSwitchTransferButton,
       sourceAccountSelect,
-      destinationAccountSelect,
       amountInput,
       destinationAmountInput,
       commentInput,
@@ -67,7 +66,7 @@ test.describe('Transactions. Create. Transfer', () => {
     const comment = 'E2E transfer';
     await commentInput.fill(comment);
     await page.getByRole('heading', { level: 1, name: 'New operation' }).click();
-    await expect(page).toHaveScreenshot('transfer-form-filled.png', {
+    await expect(page).toHaveScreenshot('1-transfer-form-filled.png', {
       maxDiffPixels: 30,
     });
 
@@ -77,7 +76,7 @@ test.describe('Transactions. Create. Transfer', () => {
     await assertTransactionVisibleAsync(page, comment);
 
     const transactionItem = page.getByTestId('TransactionListItem').filter({ hasText: comment });
-    await expect(page).toHaveScreenshot('transfer-created.png');
+    await expect(page).toHaveScreenshot('2-transfer-created.png');
     await expect(transactionItem).toContainText('T_TST');
     await expect(transactionItem).toContainText('T_USD');
   });

@@ -1,11 +1,11 @@
 import { expect, test } from '@tests/fixtures';
 import {
   assertTransactionNotVisibleAsync,
-  importMockDataAsync,
-  openGuestAppAsync,
+  checkCommonInputs,
+  getTransactionFormLocators,
   selectAccountAsync,
-} from '@tests/helpers';
-import { checkCommonInputs, getTransactionFormLocators } from '@tests/transactions/utils';
+} from '@tests/transactions/utils';
+import { importMockDataAsync, openPathAsync } from '@tests/helpers';
 import { hasLocatorClassAsync } from '@tests/utils';
 
 test.describe('Transactions > Create', () => {
@@ -33,13 +33,13 @@ test.describe('Transactions > Create', () => {
       await typeSwitchInButton.click();
 
       expect(await categorySelect.isVisible()).toBe(true);
-      expect(await sourceAccountSelect.count() + (await destinationAccountSelect.count())).toBeGreaterThan(0);
+      expect((await sourceAccountSelect.count()) + (await destinationAccountSelect.count())).toBeGreaterThan(0);
 
       await checkCommonInputs(page);
     });
 
     test('account is required', async ({ page }) => {
-      await openGuestAppAsync(page);
+      await openPathAsync(page);
       await importMockDataAsync(page);
 
       await page.goto('/transactions/create', { waitUntil: 'networkidle' });
@@ -57,17 +57,13 @@ test.describe('Transactions > Create', () => {
     });
 
     test('category is required', async ({ page }) => {
-      await openGuestAppAsync(page);
+      await openPathAsync(page);
       await importMockDataAsync(page);
 
       await page.goto('/transactions/create', { waitUntil: 'networkidle' });
 
-      const {
-        typeSwitchInButton,
-        destinationAccountSelect,
-        amountInput,
-        createButton,
-      } = getTransactionFormLocators(page);
+      const { typeSwitchInButton, destinationAccountSelect, amountInput, createButton } =
+        getTransactionFormLocators(page);
 
       await typeSwitchInButton.click();
       await destinationAccountSelect.waitFor({ state: 'visible' });
@@ -82,7 +78,7 @@ test.describe('Transactions > Create', () => {
     });
 
     test('create incoming transaction', async ({ page }) => {
-      await openGuestAppAsync(page);
+      await openPathAsync(page);
       await importMockDataAsync(page);
 
       await page.locator('a[href="/accounts"]').click();
@@ -120,7 +116,7 @@ test.describe('Transactions > Create', () => {
       const comment = 'E2E incoming';
       await commentInput.fill(comment);
       await page.getByRole('heading', { level: 1, name: 'New operation' }).click();
-      await expect(page).toHaveScreenshot('incoming-transaction-form-filled.png', {
+      await expect(page).toHaveScreenshot('1-incoming-transaction-form-filled.png', {
         maxDiffPixels: 30,
       });
 
@@ -130,7 +126,7 @@ test.describe('Transactions > Create', () => {
 
       const transactionListItem = page.getByTestId('TransactionListItem').filter({ hasText: comment });
       await transactionListItem.waitFor({ state: 'visible' });
-      await expect(page).toHaveScreenshot('incoming-transaction-created.png', {
+      await expect(page).toHaveScreenshot('2-incoming-transaction-created.png', {
         maxDiffPixels: 1000,
       });
 
@@ -138,7 +134,7 @@ test.describe('Transactions > Create', () => {
       await transactionListItem.click();
 
       await page.waitForURL(new RegExp(`operation-id=${transactionId}`));
-      await expect(page).toHaveScreenshot('incoming-transaction-edit-opened.png', {
+      await expect(page).toHaveScreenshot('3-incoming-transaction-edit-opened.png', {
         maxDiffPixels: 1000,
       });
 
