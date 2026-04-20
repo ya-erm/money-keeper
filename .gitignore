@@ -15,3 +15,4 @@ screenshots/raw
 .vercel
 .pnpm-store
 test-results
+playwright-report
