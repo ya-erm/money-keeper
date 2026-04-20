@@ -49,7 +49,7 @@
       </h3>
       <a
         href={route('transactions.create') + (account?.id ? `?accountId=${account?.id}` : '')}
-        data-testID="AddOperationButton"
+        data-testId="AddOperationButton"
       >
         {$translate('common.add')}
       </a>

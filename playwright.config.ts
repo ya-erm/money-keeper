@@ -5,6 +5,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const config: PlaywrightTestConfig = {
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+  ],
   /*
   globalSetup: './tests/global-setup',
   use: {
@@ -12,8 +16,23 @@ const config: PlaywrightTestConfig = {
     storageState: './tests/storageState.json',
   },
   */
+  expect: {
+    toHaveScreenshot: {
+      animations: 'disabled',
+      scale: 'css',
+    },
+  },
+  use: {
+    baseURL: 'http://127.0.0.1:4173',
+    testIdAttribute: 'data-testId',
+    timezoneId: 'Europe/Moscow',
+    viewport: {
+      width: 390,
+      height: 844,
+    },
+  },
   webServer: {
-    command: 'npm run build && npm run preview',
+    command: 'npm run dev -- --host 127.0.0.1 --port 4173',
     reuseExistingServer: true,
     port: 4173,
   },

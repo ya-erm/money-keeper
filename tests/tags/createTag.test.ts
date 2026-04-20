@@ -1,4 +1,6 @@
-import test, { expect, type Page } from '@playwright/test';
+import { expect, test } from '@tests/fixtures';
+import type { Page } from '@playwright/test';
+import { openPathAsync } from '@tests/helpers';
 
 const getLocators = (page: Page) => {
   const addTagForm = page.getByTestId('AddTagForm');
@@ -28,7 +30,7 @@ test.describe('Tags', () => {
   });
 
   test('create new tag', async ({ page }) => {
-    await page.goto('/transactions/create');
+    await openPathAsync(page, '/transactions/create');
 
     const { tagsContainer, addTagButton, addTagForm, titleInput, submitButton } = getLocators(page);
 
