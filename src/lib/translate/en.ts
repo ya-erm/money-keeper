@@ -132,6 +132,8 @@ export const enDict: Dictionary = {
   'analytics.accounts.grouping.select_grouping': 'Select grouping',
   'analytics.accounts.hide_zero_balance_accounts': 'Hide zero balance accounts',
   'analytics.balance.legend': 'Legend',
+  'analytics.income_expenses.title': 'Income / Expenses',
+  'analytics.income_expenses.total_diff': 'Income - expenses for 12 months',
   'analytics.groupings.title': 'Groupings',
   'analytics.groupings.create_grouping': 'Add grouping',
   'analytics.groupings.new_grouping': 'New grouping',
