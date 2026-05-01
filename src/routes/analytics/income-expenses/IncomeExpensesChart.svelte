@@ -46,7 +46,7 @@
 
 <div class="chart-container">
   <Chart
-    type="bar"
+    type="line"
     updateMode="none"
     data={{
       labels: monthStats.map((x) => x.month.format('MMM YY')),
@@ -54,14 +54,20 @@
         {
           label: $translate('categories.incomings'),
           data: monthStats.map((item) => item.income),
-          backgroundColor: '#16a34a',
-          borderRadius: 6,
+          borderColor: '#16a34a',
+          backgroundColor: 'rgba(22, 163, 74, 0.15)',
+          fill: false,
+          tension: 0.35,
+          pointRadius: 3,
         },
         {
           label: $translate('categories.outgoings'),
           data: monthStats.map((item) => item.expenses),
-          backgroundColor: '#dc2626',
-          borderRadius: 6,
+          borderColor: '#dc2626',
+          backgroundColor: 'rgba(220, 38, 38, 0.15)',
+          fill: false,
+          tension: 0.35,
+          pointRadius: 3,
         },
       ],
     }}
