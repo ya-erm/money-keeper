@@ -127,6 +127,8 @@ export type Messages =
   | 'analytics.accounts.grouping.select_grouping'
   | 'analytics.accounts.hide_zero_balance_accounts'
   | 'analytics.balance.legend'
+  | 'analytics.income_expenses.title'
+  | 'analytics.income_expenses.total_diff'
   | 'analytics.groupings.title'
   | 'analytics.groupings.create_grouping'
   | 'analytics.groupings.new_grouping'
