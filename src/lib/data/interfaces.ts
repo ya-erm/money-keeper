@@ -32,7 +32,6 @@ export type MemberSettings = {
   lastAnotherCurrency?: string | null;
   favoriteTimeZones?: string[];
   groupingId?: string | null;
-  tokenExpiresAt?: string | null;
 };
 
 export type JournalItem = {

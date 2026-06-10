@@ -89,14 +89,13 @@
         privateKey: decryptedKey,
       });
       // Save as default member
-      await settingsService.updateSettings({ selectedMember: member.uuid });
+      void settingsService.updateSettings({ selectedMember: member.uuid });
 
       const privateKey: JsonWebKey = JSON.parse(decryptedKey);
       const decryptedToken = await decryptRsa(privateKey, encryptedToken.base64Data);
-      const { tokenExpiresAt } = await loginConfirmFetcher.fetch({ token: decryptedToken, uuid: member.uuid });
+      await loginConfirmFetcher.fetch({ token: decryptedToken, uuid: member.uuid });
       // Initialize main service asynchronously
       await mainService.initServices();
-      await membersService.updateSettings({ tokenExpiresAt });
       // Fetch updates from server
       void journalService.syncWithServer();
       // Go to default route
