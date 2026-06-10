@@ -3,6 +3,8 @@ import { encryptRsa } from '$lib/data/crypto';
 import { db } from '$lib/server';
 import { checkStringParameter } from '$lib/utils';
 
+import { createMemberToken } from './token';
+
 export type LoginRequestData = {
   login: string;
 };
@@ -16,17 +18,7 @@ export async function login(data: LoginRequestData) {
     throw new ApiError(404, 'USER_NOT_FOUND', `User with login "${login}" not found`);
   }
 
-  let memberToken = await db.memberToken.findFirst({
-    where: { AND: { memberUuid: member.uuid, invalidated: false } },
-  });
-  if (!memberToken) {
-    memberToken = await db.memberToken.create({
-      data: {
-        value: crypto.randomUUID(),
-        memberUuid: member.uuid,
-      },
-    });
-  }
+  const memberToken = await createMemberToken(member.uuid);
 
   const publicKey = JSON.parse(member.publicKey) as JsonWebKey;
   const encryptedToken = await encryptRsa(publicKey, memberToken.value);

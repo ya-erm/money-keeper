@@ -1,3 +1,7 @@
+import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
+
+import { TOKEN_REFRESH_THRESHOLD_MS } from '$lib/auth/session';
+import type { RefreshTokenResponseData } from '$lib/server/api/v2/auth';
 import type {
   GetJournalResponse,
   PostManyJournalRequestData,
@@ -5,7 +9,6 @@ import type {
 } from '$lib/server/api/v2/journal';
 import type { GetJournalRequest } from '$lib/server/api/v2/journal/getJournal';
 import { store } from '$lib/store';
-import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 import { unexpectedCase } from '$lib/utils';
 import { Logger } from '$lib/utils/logger';
 import { useFetch } from '$lib/utils/useFetch';
@@ -94,6 +97,8 @@ export class JournalService implements Initialisable {
 
   /** Synchronize updates with server */
   async syncWithServer() {
+    await this.refreshAuthTokenIfNeeded();
+
     logger.log('Fetch updates from server, sync number:', this.syncNumber);
     await this.tryFetchUpdates();
 
@@ -110,6 +115,20 @@ export class JournalService implements Initialisable {
       logger.log('Upload queue to server');
       await this.tryUploadQueue();
     }
+  }
+
+  /** Refresh auth token shortly before it expires */
+  private async refreshAuthTokenIfNeeded() {
+    const expiresAt = membersService.selectedMemberSettings?.tokenExpiresAt;
+    const expiresSoon = !expiresAt || new Date(expiresAt).getTime() - Date.now() <= TOKEN_REFRESH_THRESHOLD_MS;
+
+    if (!expiresSoon) {
+      return;
+    }
+
+    const fetcher = useFetch<undefined, RefreshTokenResponseData>('POST', '/api/v2/auth/refresh');
+    const result = await fetcher.fetch();
+    await membersService.updateSettings({ tokenExpiresAt: result.tokenExpiresAt });
   }
 
   /** Apply changes to subscribers */

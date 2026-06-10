@@ -1,7 +1,6 @@
 import type { Cookies } from '@sveltejs/kit';
 
-import { ApiError } from '$lib/api';
-import { db } from '$lib/server';
+import { getValidSessionToken } from '$lib/server/api/v2/auth/token';
 
 /**
  * Check session token
@@ -9,16 +8,6 @@ import { db } from '$lib/server';
  * @throws error if token is not exists or invalidated
  */
 export async function checkAuth(cookies: Cookies) {
-  const session = cookies.get('session.v2');
-
-  if (session) {
-    const token = await db.memberToken.findFirst({
-      where: { value: session },
-    });
-    if (token && !token.invalidated) {
-      return { uuid: token.memberUuid };
-    }
-  }
-
-  throw new ApiError(401, 'UNAUTHORIZED', 'You are not logged in');
+  const token = await getValidSessionToken(cookies);
+  return { uuid: token.memberUuid };
 }
