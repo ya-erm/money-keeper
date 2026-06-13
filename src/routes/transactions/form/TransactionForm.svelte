@@ -94,6 +94,10 @@
 
   let comment = transaction?.comment ?? '';
 
+  let locationLat = transaction?.locationLat ?? null;
+  let locationLng = transaction?.locationLng ?? null;
+  let locationLoading = false;
+
   let anotherCurrencyModalOpened = false;
   let anotherCurrency: string | null = transaction?.anotherCurrency ?? null;
 
@@ -132,6 +136,30 @@
       repeatingTypeModalOpened = true;
     }
   };
+
+
+  const requestLocation = () => {
+    if (typeof window === 'undefined' || !window.navigator.geolocation) {
+      showErrorToast($translate('transactions.geolocation_not_supported'));
+      return;
+    }
+    locationLoading = true;
+    window.navigator.geolocation.getCurrentPosition(
+      (position) => {
+        locationLat = position.coords.latitude;
+        locationLng = position.coords.longitude;
+        locationLoading = false;
+      },
+      () => {
+        showErrorToast($translate('transactions.geolocation_failed'));
+        locationLoading = false;
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
+
+  $: locationUrl =
+    locationLat !== null && locationLng !== null ? `https://maps.google.com/?q=${locationLat},${locationLng}` : null;
 
   const handleSubmit = async (e: Event) => {
     try {
@@ -190,6 +218,7 @@
           : {}),
         ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
         ...(repeatingChecked ? { repeatingId: repeating?.id } : {}),
+        ...(locationLat !== null && locationLng !== null ? { locationLat, locationLng } : {}),
       });
 
       if (type === 'TRANSFER') {
@@ -205,6 +234,7 @@
           linkedTransactionId: transactions[0].id,
           ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
           ...(repeatingChecked ? { repeatingId: repeating?.id } : {}),
+          ...(locationLat !== null && locationLng !== null ? { locationLat, locationLng } : {}),
         });
         transactions[0].linkedTransactionId = transactions[1].id;
       }
@@ -396,6 +426,26 @@
         </div>
       </Spoiler>
     </div>
+
+    <div class="flex-col gap-0.5">
+      <div class="flex justify-between items-center gap-1">
+        <InputLabel text={$translate('transactions.geolocation')} optional translate={$translate} />
+        <Button appearance="link" underlined={false} onClick={requestLocation} disabled={locationLoading}>
+          {locationLoading ? $translate('common.loading') : $translate('transactions.detect_geolocation')}
+        </Button>
+      </div>
+      {#if locationLat !== null && locationLng !== null}
+        <div class="location-value">
+          <span>{locationLat.toFixed(6)}, {locationLng.toFixed(6)}</span>
+          {#if locationUrl}
+            <a class="location-link" href={locationUrl} target="_blank" rel="noreferrer">
+              {$translate('transactions.open_geolocation')}
+            </a>
+          {/if}
+        </div>
+      {/if}
+    </div>
+
     <slot />
     <slot name="button" />
     <slot name="footer" />
@@ -487,5 +537,15 @@
   .time-shift {
     flex-shrink: 0;
     font-size: 0.9rem;
+  }
+  .location-value {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--secondary-text-color);
+  }
+  .location-link {
+    color: var(--link-color);
   }
 </style>
