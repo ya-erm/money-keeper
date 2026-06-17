@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { AccountViewModel, CurrencyRate } from '$lib/data/interfaces';
-  import { settingsService, settingsStore } from '$lib/data';
+  import { settingsStore } from '$lib/data';
   import { translate } from '$lib/translate';
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
@@ -25,11 +25,6 @@
 
   $: balancesHidden = $settingsStore.hideBalances ?? false;
 
-  const toggleBalancesVisibility = async (event: MouseEvent) => {
-    event.stopPropagation();
-    await settingsService.updateSettings({ hideBalances: !balancesHidden });
-  };
-
   let showAdditionalOptions = false;
 </script>
 
@@ -53,15 +48,6 @@
       </div>
       <div class="account-tags">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
     </div>
-    <Button
-      appearance="link"
-      color="white"
-      onClick={toggleBalancesVisibility}
-      title={$translate(balancesHidden ? 'privacy.show_balances' : 'privacy.hide_balances')}
-      aria-label={$translate(balancesHidden ? 'privacy.show_balances' : 'privacy.hide_balances')}
-    >
-      <Icon name={balancesHidden ? 'mdi:eye-off-outline' : 'mdi:eye-outline'} padding={0.5} />
-    </Button>
     <Button appearance="link" color="white" onClick={handleEdit} title={$translate('accounts.edit_account')}>
       <Icon name="mdi:pencil" padding={0.5} />
     </Button>
