@@ -62,6 +62,7 @@
     groupings: groupingsService.items,
   };
 
+  // eslint-disable-next-line svelte/no-immutable-reactive-statements
   $: currentJson = JSON.stringify(current, null, 2);
   $: currentJsonFile = new Blob([currentJson], { type: 'text/json' });
 

@@ -1,6 +1,6 @@
 {
   "name": "money-keeper",
-  "version": "2.10.3",
+  "version": "2.12.0",
   "private": true,
   "scripts": {
     "dev": "vite dev",
@@ -13,7 +13,8 @@
     "test:codegen": "npx playwright codegen http://localhost:5173",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "tsc --noemit && prettier --check . && eslint .",
+    "lint": "tsc --noemit && prettier --check . && eslint ./src",
+    "tsc": "tsc --noemit",
     "eslint": "eslint ./src",
     "format": "prettier --write .",
     "generate:icons": "node ./pack-icons.js && prettier --write ./src/lib/icons.ts",
@@ -31,6 +32,7 @@
     "@sveltejs/kit": "^2.60.1",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@types/bcrypt": "^6.0.0",
+    "@types/node": "25.3.2",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
     "@vite-pwa/sveltekit": "^1.1.0",

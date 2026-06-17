@@ -5,45 +5,47 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Portal from '@ya-erm/svelte-ui/Portal';
 
-  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
+  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { type Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/layout/Layout.svelte';
 
-  import { findRate } from '$lib/utils';
+  import { findRate, formatHiddenMoney, formatMoney } from '$lib/utils';
 
   import BalanceChartLegend from './BalanceChartLegend.svelte';
   import Chart from './Chart.svelte';
   import { getAccountBalanceChartData } from './chartData';
 
-  const currencyRates = $currencyRatesStore;
-  const accounts = $accountsStore;
-  const operations = $operationsStore;
-  const settings = $memberSettingsStore;
+  $: currencyRates = $currencyRatesStore ?? [];
+  $: accounts = $accountsStore ?? [];
+  $: operations = $operationsStore ?? [];
+  $: settings = $memberSettingsStore;
 
-  const accountsOrder = settings?.accountsOrder ?? [];
+  $: accountsOrder = settings?.accountsOrder ?? [];
 
   const getAccountOrder = (account: Account) => {
     const index = accountsOrder.findIndex((id) => id === account.id);
     return index < 0 ? accounts.length : index;
   };
 
-  const sortedAccounts = accounts
+  $: sortedAccounts = accounts
     .slice()
     .sort((a, b) => getAccountOrder(a) - getAccountOrder(b))
     .reverse();
 
-  const mainCurrency = settings?.currency ?? 'USD';
+  $: mainCurrency = settings?.currency ?? 'USD';
+  $: balancesHidden = $settingsStore?.hideBalances ?? false;
 
-  const findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
+  $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
-  let interval: 12 | 6 | 3 | 1 = 12;
+  let interval: 1 | 3 | 6 | 12 | 24 = 12;
 
   const changeInterval = () => {
-    if (interval === 12) interval = 6;
-    else if (interval === 6) interval = 3;
-    else if (interval === 3) interval = 1;
-    else interval = 12;
+    if (interval === 1) interval = 3;
+    else if (interval === 3) interval = 6;
+    else if (interval === 6) interval = 12;
+    else if (interval === 12) interval = 24;
+    else interval = 1;
   };
 
   const endDate = dayjs();
@@ -102,6 +104,9 @@
           stacked: true,
           position: 'right',
           grid: { z: 1 },
+          ticks: {
+            callback: (value) => (balancesHidden ? '' : value),
+          },
         },
         x: {
           grid: { z: 1 },
@@ -126,6 +131,14 @@
       plugins: {
         legend: {
           display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) =>
+              balancesHidden
+                ? `${context.dataset.label}: ${formatHiddenMoney(mainCurrency)}`
+                : `${context.dataset.label}: ${formatMoney(context.parsed.y ?? 0, { currency: mainCurrency })}`,
+          },
         },
       },
     }}

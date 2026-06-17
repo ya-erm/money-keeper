@@ -8,9 +8,11 @@
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import type { AccountViewModel, Transaction } from '$lib/data/interfaces';
 
+  import { settingsStore } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import { operationsService } from '$lib/data/operations';
   import { translate } from '$lib/translate';
+  import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
   import Modal from '$lib/ui/Modal.svelte';
   import { formatMoney } from '$lib/utils';
   import { Logger } from '$lib/utils/logger';
@@ -23,6 +25,7 @@
 
   let newBalance = '';
   $: diff = parseFloat((Number(newBalance) - (balance ?? 0)).toFixed(10));
+  $: balancesHidden = $settingsStore.hideBalances ?? false;
 
   const onClose = () => (opened = false);
 
@@ -55,7 +58,11 @@
     <label class="flex-col gap-0.5">
       <InputLabel text={$translate('accounts.current_balance')} />
       <div class="current-balance">
-        {formatMoney(balance ?? 0, { currency: account.currency })}
+        {#if balancesHidden}
+          <HiddenMoney currency={account.currency} />
+        {:else}
+          {formatMoney(balance ?? 0, { currency: account.currency })}
+        {/if}
       </div>
     </label>
     <Input

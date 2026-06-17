@@ -6,7 +6,7 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Portal from '@ya-erm/svelte-ui/Portal';
 
-  import { membersService, selectedMemberStore, settingsService, memberSettingsStore } from '$lib/data';
+  import { membersService, selectedMemberStore, settingsService, settingsStore, memberSettingsStore } from '$lib/data';
   import { route, routes } from '$lib/routes';
   import { activeLocaleName, translate } from '$lib/translate';
   import LanguageModal from '$lib/translate/LanguageModal.svelte';
@@ -29,12 +29,19 @@
 
   const [languageModalOpened, openLanguageModal] = createBooleanStore();
   const [currencyModalOpened, openCurrencyModal] = createBooleanStore();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [changeNameModalOpened, openChangeNameModal] = createBooleanStore();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [changeLoginModalOpened, openChangeLoginModal] = createBooleanStore();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [changePasswordModalOpened, openChangePasswordModal] = createBooleanStore();
-  const [selectGroupModalOpened, openSelectGroupModal] = createBooleanStore();
 
   let showLogoutPortal = false;
+  $: balancesHidden = $settingsStore.hideBalances ?? false;
+
+  const handleHideBalancesChange = async (value: boolean) => {
+    await settingsService.updateSettings({ hideBalances: value });
+  };
 
   async function logout() {
     await settingsService.updateSettings({ selectedMember: null });
@@ -49,6 +56,11 @@
 <ListGroup title={$translate('settings.common')}>
   <ListSelectItem title={$translate('settings.language')} value={$activeLocaleName} onClick={openLanguageModal} />
   <ListSwitchItem title={$translate('settings.darkMode')} bind:checked={$darkMode} />
+  <ListSwitchItem
+    title={$translate('settings.hideBalances')}
+    bind:checked={balancesHidden}
+    onChange={handleHideBalancesChange}
+  />
   <ListLinkItem title={$translate('currency_rates.title')} href={route('settings.currency_rates')} />
   <ListSelectItem
     title={$translate('currency_rates.default_currency')}
@@ -71,9 +83,13 @@
   <ListLinkItem title={$translate('settings.repeatings')} href={route('repeatings')} />
 </ListGroup>
 
+<ListGroup title={$translate('settings.about')}>
+  <ListLinkItem title={$translate('settings.changelog')} href={route('settings.changelog')} />
+  <ListLinkItem title={$translate('settings.report_problem')} href="https://github.com/ya-erm/money-keeper/issues" />
+</ListGroup>
+
 <ListGroup title={$translate('settings.debug_tools')}>
   <ListLinkItem title={$translate('settings.logs')} href={route('settings.logs')} />
-  <ListLinkItem title={$translate('settings.report_problem')} href="https://github.com/ya-erm/money-keeper/issues" />
   <ListLinkItem title="UI Kit" href={route('uikit')} />
 </ListGroup>
 

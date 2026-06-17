@@ -5,9 +5,15 @@
 
   export let checked: boolean;
   export let title: string;
+  export let onChange: ((checked: boolean) => void) | undefined = undefined;
+
+  const toggle = () => {
+    checked = !checked;
+    onChange?.(checked);
+  };
 </script>
 
-<ListGroupItem onClick={() => (checked = !checked)}>
+<ListGroupItem onClick={toggle}>
   <div class="theme-switch">
     <input type="checkbox" bind:checked />
     <span>{title}</span>

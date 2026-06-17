@@ -121,6 +121,10 @@ export const enDict: Dictionary = {
   'accounts.correct_balance_failure': 'Failed to correct balance',
   // Analytics
   'analytics.title': 'Analytics',
+  'analytics.cards.categories': 'By category',
+  'analytics.cards.accounts': 'Account list',
+  'analytics.cards.balance': 'Total balance',
+  'analytics.cards.income_expenses': 'Income / Expenses',
   'analytics.categories.start_date': 'Start date',
   'analytics.categories.end_date': 'End date',
   'analytics.categories.monthly_interval': 'Monthly',
@@ -131,7 +135,10 @@ export const enDict: Dictionary = {
   'analytics.accounts.grouping.not_selected.description': 'Show all accounts',
   'analytics.accounts.grouping.select_grouping': 'Select grouping',
   'analytics.accounts.hide_zero_balance_accounts': 'Hide zero balance accounts',
+  'analytics.balance.title': 'Balance',
   'analytics.balance.legend': 'Legend',
+  'analytics.income_expenses.title': 'Income / Expenses',
+  'analytics.income_expenses.total_diff': 'Result for period',
   'analytics.groupings.title': 'Groupings',
   'analytics.groupings.create_grouping': 'Add grouping',
   'analytics.groupings.new_grouping': 'New grouping',
@@ -373,6 +380,7 @@ export const enDict: Dictionary = {
   'settings.select_language': 'Select language',
   'settings.common': 'Common',
   'settings.darkMode': 'Dark mode',
+  'settings.hideBalances': 'Hide amounts',
   'settings.theme': 'Theme',
   'settings.theme.light': 'Light',
   'settings.theme.dark': 'Dark',
@@ -390,6 +398,8 @@ export const enDict: Dictionary = {
   'settings.profile.change_workspace': 'Select workspace',
   'settings.profile.change_workspace_failure': 'Failed to select workspace',
   'settings.profile.logout': 'Log out',
+  'settings.about': 'About',
+  'settings.changelog': "What's new",
   'settings.collaboration': 'Collaboration',
   'settings.collaboration.workspace': 'Workspace',
   'settings.collaboration.workspaces': 'Workspaces',
@@ -404,6 +414,9 @@ export const enDict: Dictionary = {
   'settings.report_problem': 'Report a problem',
   'settings.version': 'Version: {version}',
   'settings.uikit': 'UI Kit',
+  'privacy.hidden_amount': 'Amount hidden',
+  'privacy.hide_balances': 'Hide amounts',
+  'privacy.show_balances': 'Show amounts',
 };
 
 addMessages('en-US', enDict);

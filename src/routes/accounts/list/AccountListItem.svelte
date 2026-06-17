@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { Account, AccountViewModel, CurrencyRate } from '$lib/data/interfaces';
+  import { settingsStore } from '$lib/data';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import { formatMoney } from '$lib/utils/formatMoney';
+  import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
 
   export let account: AccountViewModel;
   export let balance: number | null = null;
@@ -19,6 +21,8 @@
     }
     onClick(account);
   };
+
+  $: balancesHidden = $settingsStore.hideBalances ?? false;
 </script>
 
 <button
@@ -48,11 +52,19 @@
   <div class="flex gap-0.25 items-center">
     <div class="flex-col items-end gap-0.25">
       <div class="money-value flex gap-0.5">
-        {formatMoney(balance ?? 0, { currency: account.currency })}
+        {#if balancesHidden}
+          <HiddenMoney currency={account.currency} />
+        {:else}
+          {formatMoney(balance ?? 0, { currency: account.currency })}
+        {/if}
       </div>
       {#if currencyRate && balance !== null}
         <div class="other-money-value">
-          {formatMoney(balance * rate, { currency: otherCurrency })}
+          {#if balancesHidden}
+            <HiddenMoney currency={otherCurrency} size="sm" />
+          {:else}
+            {formatMoney(balance * rate, { currency: otherCurrency })}
+          {/if}
         </div>
       {/if}
     </div>

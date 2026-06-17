@@ -1,10 +1,11 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { memberSettingsStore } from '$lib/data';
+  import { memberSettingsStore, settingsStore } from '$lib/data';
   import { currencySymbols } from '$lib/data/currencySymbols';
   import type { AccountViewModel } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
+  import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
   import { formatMoney } from '$lib/utils';
 
   import type { GroupSummary } from './interfaces';
@@ -16,6 +17,7 @@
   const settings = $memberSettingsStore;
 
   const mainCurrency = settings?.currency ?? 'USD';
+  $: balancesHidden = $settingsStore.hideBalances ?? false;
 
   const onClick = async (item: AccountViewModel) => {
     await goto(`${route('accounts')}?account-card=${item.id}`);
@@ -37,7 +39,14 @@
               </div>
             </th>
             <th class="text-right">
-              {formatMoney(ratedBalance, { maxPrecision: 0, currency: currencySymbols[mainCurrency] ?? mainCurrency })}
+              {#if balancesHidden}
+                <HiddenMoney currency={currencySymbols[mainCurrency] ?? mainCurrency} size="sm" />
+              {:else}
+                {formatMoney(ratedBalance, {
+                  maxPrecision: 0,
+                  currency: currencySymbols[mainCurrency] ?? mainCurrency,
+                })}
+              {/if}
             </th>
             <th class="percentages">
               {formatMoney(percentages, { maxPrecision: percentages > 10 ? 0 : 1 }) + '%'}
@@ -60,7 +69,13 @@
             </td>
             <td class="rated-balance">
               <div class="flex gap-0.25 items-baseline justify-end">
-                <span>{formatMoney(item.ratedBalance, { maxPrecision: 0 })}</span>
+                <span>
+                  {#if balancesHidden}
+                    <HiddenMoney size="sm" />
+                  {:else}
+                    {formatMoney(item.ratedBalance, { maxPrecision: 0 })}
+                  {/if}
+                </span>
                 <span class="main-currency">{currencySymbols[mainCurrency] ?? mainCurrency}</span>
               </div>
             </td>
@@ -80,7 +95,13 @@
         </td>
         <td>
           <div class="flex gap-0.25 items-baseline justify-end">
-            <span>{formatMoney(totalBalance, { maxPrecision: 0 })}</span>
+            <span>
+              {#if balancesHidden}
+                <HiddenMoney size="sm" />
+              {:else}
+                {formatMoney(totalBalance, { maxPrecision: 0 })}
+              {/if}
+            </span>
           </div>
         </td>
         <td>{mainCurrency} </td>

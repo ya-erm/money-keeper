@@ -15,13 +15,13 @@
 
 {#if href}
   <a class="link" {href} on:click={onClick}>
-    <Icon name="mdi:chevron-left" padding="1rem 0" />
+    <Icon name="mdi:chevron-left" />
     {title ?? $translate('common.back')}
   </a>
 {:else}
   <Button appearance="link" underlined={false} onClick={onClick ?? goBack}>
     <div class="flex items-center">
-      <Icon name="mdi:chevron-left" padding="1rem 0" />
+      <Icon name="mdi:chevron-left" />
       {title ?? $translate('common.back')}
     </div>
   </Button>
@@ -33,6 +33,5 @@
     align-items: center;
     color: var(--active-color);
     text-decoration: none;
-    padding: 0.5rem;
   }
 </style>

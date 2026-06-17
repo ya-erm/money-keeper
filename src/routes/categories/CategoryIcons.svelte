@@ -26,7 +26,7 @@
   <MultiSwitch options={tabs} selected={selectedTab} onChange={(value) => (selectedTab = value)} />
   {#if selectedTab.id === 'recommended'}
     <div class="w-full grid">
-      {#each icons as item}
+      {#each icons as item (item)}
         <GridCircleItem icon={item} text="" onClick={() => onSelect(item)} selected={item === icon} />
       {/each}
     </div>

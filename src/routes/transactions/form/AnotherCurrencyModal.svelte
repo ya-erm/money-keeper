@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { SvelteSet } from 'svelte/reactivity';
+
   import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
   import Modal from '@ya-erm/svelte-ui/Modal';
@@ -14,7 +16,7 @@
   $: anotherCurrencyInputValue = anotherCurrency;
 
   const lastUsedCurrencies = (() => {
-    const currencies = new Set<string>();
+    const currencies = new SvelteSet<string>();
     for (const operation of $operationsStore) {
       if (operation.anotherCurrency) {
         currencies.add(operation.anotherCurrency);

@@ -122,6 +122,10 @@ export const ruDict: Dictionary = {
   'accounts.correct_balance_failure': 'Не удалось скорректировать сумму',
   // Analytics
   'analytics.title': 'Аналитика',
+  'analytics.cards.categories': 'По категориям',
+  'analytics.cards.accounts': 'Список счетов',
+  'analytics.cards.balance': 'Общий баланс',
+  'analytics.cards.income_expenses': 'Доходы / Расходы',
   'analytics.categories.start_date': 'Начало интервала',
   'analytics.categories.end_date': 'Конец интервала',
   'analytics.categories.monthly_interval': 'По месяцам',
@@ -132,7 +136,10 @@ export const ruDict: Dictionary = {
   'analytics.accounts.grouping.not_selected.description': 'Отображать все счета',
   'analytics.accounts.grouping.select_grouping': 'Выбрать группировку',
   'analytics.accounts.hide_zero_balance_accounts': 'Скрыть счета с нулевым балансом',
+  'analytics.balance.title': 'Баланс',
   'analytics.balance.legend': 'Легенда',
+  'analytics.income_expenses.title': 'Доходы / Расходы',
+  'analytics.income_expenses.total_diff': 'Результат период',
   'analytics.groupings.title': 'Группировки',
   'analytics.groupings.create_grouping': 'Добавить группировку',
   'analytics.groupings.new_grouping': 'Новая группировка',
@@ -380,6 +387,7 @@ export const ruDict: Dictionary = {
   'settings.select_language': 'Выберите язык',
   'settings.common': 'Общее',
   'settings.darkMode': 'Тёмная тема',
+  'settings.hideBalances': 'Скрывать суммы',
   'settings.theme': 'Оформление',
   'settings.theme.light': 'Светлое',
   'settings.theme.dark': 'Тёмное',
@@ -397,6 +405,8 @@ export const ruDict: Dictionary = {
   'settings.profile.change_workspace': 'Выберите пространство',
   'settings.profile.change_workspace_failure': 'Не удалось выбрать рабочее пространство',
   'settings.profile.logout': 'Выйти из системы',
+  'settings.about': 'О приложении',
+  'settings.changelog': 'Что нового',
   'settings.collaboration': 'Совместная работа',
   'settings.collaboration.workspace': 'Рабочее пространство',
   'settings.collaboration.workspaces': 'Рабочие пространства',
@@ -411,6 +421,9 @@ export const ruDict: Dictionary = {
   'settings.report_problem': 'Сообщить о проблеме',
   'settings.version': 'Версия: {version}',
   'settings.uikit': 'UI Kit',
+  'privacy.hidden_amount': 'Сумма скрыта',
+  'privacy.hide_balances': 'Скрыть суммы',
+  'privacy.show_balances': 'Показать суммы',
 };
 
 addMessages('ru-RU', ruDict);
