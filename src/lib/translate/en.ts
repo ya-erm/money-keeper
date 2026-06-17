@@ -133,7 +133,7 @@ export const enDict: Dictionary = {
   'analytics.accounts.hide_zero_balance_accounts': 'Hide zero balance accounts',
   'analytics.balance.legend': 'Legend',
   'analytics.income_expenses.title': 'Income / Expenses',
-  'analytics.income_expenses.total_diff': 'Income - expenses for selected period',
+  'analytics.income_expenses.total_diff': 'Result for period',
   'analytics.groupings.title': 'Groupings',
   'analytics.groupings.create_grouping': 'Add grouping',
   'analytics.groupings.new_grouping': 'New grouping',

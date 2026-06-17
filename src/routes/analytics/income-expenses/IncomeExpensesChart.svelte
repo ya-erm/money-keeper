@@ -10,6 +10,31 @@
 
   import Chart from '../balance/Chart.svelte';
 
+  type GradientContext = {
+    chart: {
+      ctx: CanvasRenderingContext2D;
+      chartArea?: {
+        top: number;
+        bottom: number;
+      };
+    };
+  };
+
+  const createLineGradient =
+    (topColor: string, bottomColor: string, fallbackColor: string) =>
+    ({ chart }: GradientContext) => {
+      if (!chart.chartArea) return fallbackColor;
+
+      const gradient = chart.ctx.createLinearGradient(0, chart.chartArea.top, 0, chart.chartArea.bottom);
+      gradient.addColorStop(0, topColor);
+      gradient.addColorStop(1, bottomColor);
+
+      return gradient;
+    };
+
+  const incomeLineGradient = createLineGradient('rgba(22, 163, 74, 0.28)', 'rgba(22, 163, 74, 0)', '#16a34a');
+  const expensesLineGradient = createLineGradient('rgba(220, 38, 38, 0.26)', 'rgba(220, 38, 38, 0)', '#dc2626');
+
   const currencyRates = $currencyRatesStore;
   const settings = $memberSettingsStore;
   $: operations = $operationsStore;
@@ -19,11 +44,16 @@
   $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
   let interval: 6 | 12 | 24 = 12;
+  let chartType: 'line' | 'bar' = 'line';
 
   const changeInterval = () => {
     if (interval === 6) interval = 12;
     else if (interval === 12) interval = 24;
     else interval = 6;
+  };
+
+  const changeChartType = () => {
+    chartType = chartType === 'line' ? 'bar' : 'line';
   };
 
   $: startMonth = dayjs()
@@ -54,6 +84,8 @@
   });
 
   $: balanceDiff = monthStats.reduce((sum, item) => sum + item.income - item.expenses, 0);
+
+  $: isLineChart = chartType === 'line';
 </script>
 
 <div class="chart-container">
@@ -62,46 +94,59 @@
       <Icon name="mdi:arrow-expand-horizontal" />
       {interval}M
     </Button>
+    <Button
+      color="white"
+      bordered
+      onClick={changeChartType}
+      title={isLineChart ? 'Показать столбики' : 'Показать линии'}
+      aria-label={isLineChart ? 'Показать столбики' : 'Показать линии'}
+    >
+      <Icon name={isLineChart ? 'mdi:chart-bar' : 'mdi:chart-line'} />
+    </Button>
   </div>
-  <Chart
-    type="line"
-    updateMode="none"
-    data={{
-      labels: monthStats.map((x) => x.month.format('MMM YY')),
-      datasets: [
-        {
-          label: $translate('categories.incomings'),
-          data: monthStats.map((item) => item.income),
-          borderColor: '#16a34a',
-          backgroundColor: 'rgba(22, 163, 74, 0.15)',
-          fill: false,
-          tension: 0.35,
-          pointRadius: 3,
+  {#key chartType}
+    <Chart
+      type={chartType}
+      updateMode="none"
+      data={{
+        labels: monthStats.map((x) => x.month.format('MMM YY')),
+        datasets: [
+          {
+            label: $translate('categories.incomings'),
+            data: monthStats.map((item) => item.income),
+            borderColor: '#16a34a',
+            backgroundColor: isLineChart ? incomeLineGradient : '#16a34a',
+            fill: isLineChart,
+            tension: isLineChart ? 0.35 : 0,
+            pointRadius: isLineChart ? 3 : 0,
+            borderRadius: isLineChart ? 0 : 4,
+          },
+          {
+            label: $translate('categories.outgoings'),
+            data: monthStats.map((item) => item.expenses),
+            borderColor: '#dc2626',
+            backgroundColor: isLineChart ? expensesLineGradient : '#dc2626',
+            fill: isLineChart,
+            tension: isLineChart ? 0.35 : 0,
+            pointRadius: isLineChart ? 3 : 0,
+            borderRadius: isLineChart ? 0 : 4,
+          },
+        ],
+      }}
+      options={{
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
         },
-        {
-          label: $translate('categories.outgoings'),
-          data: monthStats.map((item) => item.expenses),
-          borderColor: '#dc2626',
-          backgroundColor: 'rgba(220, 38, 38, 0.15)',
-          fill: false,
-          tension: 0.35,
-          pointRadius: 3,
+        scales: {
+          y: {
+            position: 'right',
+          },
         },
-      ],
-    }}
-    options={{
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: {
-        intersect: false,
-      },
-      scales: {
-        y: {
-          position: 'right',
-        },
-      },
-    }}
-  />
+      }}
+    />
+  {/key}
 </div>
 
 <div class="summary">
