@@ -1,0 +1,104 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - main [ref=e3]:
+    - generic [ref=e4]:
+      - button [ref=e6] [cursor=pointer]:
+        - img [ref=e9]
+      - generic [ref=e11]:
+        - heading "Accounts" [level=1] [ref=e12]
+        - generic: Synchronizing
+      - generic [ref=e14]:
+        - button "Account list" [ref=e15] [cursor=pointer]:
+          - link "Account list" [ref=e16]:
+            - /url: /accounts/list
+            - img [ref=e19]
+        - button "Create account" [ref=e21] [cursor=pointer]:
+          - link "Create account" [ref=e22]:
+            - /url: http://127.0.0.1:4173/accounts?account-card=f6ddb1f2-d708-4ff4-bc0c-5d7df732aee6&action=create
+            - img [ref=e25]
+    - generic [ref=e28]:
+      - generic [ref=e30]:
+        - generic [ref=e32] [cursor=pointer]:
+          - generic [ref=e33]:
+            - img [ref=e37]
+            - generic [ref=e40]: T_TST
+            - button [ref=e41]:
+              - img [ref=e44]
+            - button [ref=e46]:
+              - img [ref=e49]
+          - generic [ref=e52]: 399.50 TST
+        - generic [ref=e54] [cursor=pointer]:
+          - generic [ref=e55]:
+            - img [ref=e59]
+            - generic [ref=e62]: T_USD
+            - button [ref=e63]:
+              - img [ref=e66]
+            - button [ref=e68]:
+              - img [ref=e71]
+          - generic [ref=e74]: 100 USD
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - heading "Operations 4 pcs." [level=3] [ref=e78]
+          - link "Add" [ref=e79] [cursor=pointer]:
+            - /url: /transactions/create?accountId=f6ddb1f2-d708-4ff4-bc0c-5d7df732aee6
+        - generic [ref=e83]:
+          - img [ref=e88]
+          - textbox [ref=e90]:
+            - /placeholder: Search
+        - list [ref=e91]:
+          - generic [ref=e92]: 03 February 2024, Saturday
+          - listitem [ref=e93]:
+            - 'button "T_Shop E2E tag transaction #T_Cat -150 TST" [ref=e94] [cursor=pointer]':
+              - img [ref=e98]
+              - generic [ref=e100]:
+                - generic [ref=e102]: T_Shop
+                - generic [ref=e103]: E2E tag transaction
+                - generic [ref=e104]: "#T_Cat"
+              - generic [ref=e106]: "-150 TST"
+          - generic [ref=e107]: 26 May 2023, Friday
+          - listitem [ref=e108]:
+            - button "T_TST T_USD Transfer -400 TST" [ref=e109] [cursor=pointer]:
+              - img [ref=e113]
+              - generic [ref=e115]:
+                - generic [ref=e116]:
+                  - generic [ref=e117]: T_TST
+                  - img [ref=e120]
+                  - generic [ref=e122]: T_USD
+                - generic [ref=e123]: Transfer
+              - generic [ref=e125]: "-400 TST"
+          - listitem [ref=e126]:
+            - 'button "T_Pets Food for pets #T_Cat -50.50 TST" [ref=e127] [cursor=pointer]':
+              - img [ref=e131]
+              - generic [ref=e133]:
+                - generic [ref=e135]: T_Pets
+                - generic [ref=e136]: Food for pets
+                - generic [ref=e137]: "#T_Cat"
+              - generic [ref=e139]: "-50.50 TST"
+          - listitem [ref=e140]:
+            - button "T_Work Income +1 000 TST" [ref=e141] [cursor=pointer]:
+              - img [ref=e145]
+              - generic [ref=e147]:
+                - generic [ref=e149]: T_Work
+                - generic [ref=e150]: Income
+              - generic [ref=e152]: +1 000 TST
+    - generic [ref=e153]:
+      - link "Categories" [ref=e154] [cursor=pointer]:
+        - /url: /categories
+        - img [ref=e157]
+        - generic [ref=e159]: Categories
+      - link "Accounts" [ref=e160] [cursor=pointer]:
+        - /url: /accounts
+        - img [ref=e163]
+        - generic [ref=e165]: Accounts
+      - link "Analytics" [ref=e166] [cursor=pointer]:
+        - /url: /analytics
+        - img [ref=e169]
+        - generic [ref=e171]: Analytics
+      - link "Settings" [ref=e172] [cursor=pointer]:
+        - /url: /settings
+        - img [ref=e175]
+        - generic [ref=e177]: Settings
+  - generic [ref=e178]: Accounts
+```
