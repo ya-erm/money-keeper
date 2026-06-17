@@ -21,6 +21,7 @@ type RouteKey =
   | 'analytics.accounts.groupings'
   | 'analytics.accounts.groupings.edit'
   | 'analytics.balance'
+  | 'analytics.income_expenses'
   | 'analytics.categories'
   | 'categories'
   | 'categories.create'
@@ -97,6 +98,10 @@ export const routes: { [key in RouteKey]: Route } = {
   },
   'analytics.balance': {
     path: '/analytics/balance',
+    title: 'analytics.title',
+  },
+  'analytics.income_expenses': {
+    path: '/analytics/income-expenses',
     title: 'analytics.title',
   },
   'analytics.categories': {
