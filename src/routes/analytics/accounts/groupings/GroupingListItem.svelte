@@ -17,6 +17,7 @@
   export let editable = true;
 
   // TODO: on grouping click
+  // eslint-disable-next-line no-console
   export let onClick: (grouping: Grouping) => void = () => console.log('onClick', grouping);
 
   const handleClick = () => {

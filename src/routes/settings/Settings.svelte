@@ -29,10 +29,12 @@
 
   const [languageModalOpened, openLanguageModal] = createBooleanStore();
   const [currencyModalOpened, openCurrencyModal] = createBooleanStore();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [changeNameModalOpened, openChangeNameModal] = createBooleanStore();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [changeLoginModalOpened, openChangeLoginModal] = createBooleanStore();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [changePasswordModalOpened, openChangePasswordModal] = createBooleanStore();
-  const [selectGroupModalOpened, openSelectGroupModal] = createBooleanStore();
 
   let showLogoutPortal = false;
   $: balancesHidden = $settingsStore.hideBalances ?? false;

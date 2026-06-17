@@ -24,13 +24,13 @@
   import { hideZeroBalanceAccounts } from './store';
   import { countPreviousItems } from './utils';
 
-  const currencyRates = $currencyRatesStore;
-  const accounts = $accountsStore;
-  const operations = $operationsStore;
-  const groupings = $groupingsStore;
-  const settings = $memberSettingsStore;
+  $: currencyRates = $currencyRatesStore ?? [];
+  $: accounts = $accountsStore ?? [];
+  $: operations = $operationsStore ?? [];
+  $: groupings = $groupingsStore ?? [];
+  $: settings = $memberSettingsStore;
 
-  const mainCurrency = settings?.currency ?? 'USD';
+  $: mainCurrency = settings?.currency ?? 'USD';
 
   $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
@@ -56,6 +56,16 @@
 
   $: totalBalance = Object.values(accountSummaries).reduce((sum, item) => sum + item.ratedBalance, 0);
 
+  $: groupingId = settings?.groupingId;
+  $: grouping = (groupingId ? groupings.find((g) => g.id === groupingId) : null) ?? null;
+
+  let groupingSelecting = false;
+
+  const handleGroupingSelect = async (value: Grouping | null) => {
+    await membersService.updateSettings({ groupingId: value?.id });
+    groupingSelecting = false;
+  };
+
   // Account summaries sorted by percentages
   $: sortedItems = Object.values(accountSummaries)
     .map((item) => ({
@@ -64,17 +74,6 @@
       group: grouping?.groups?.find((g) => g.accountIds?.includes(item.account.id)),
     }))
     .sort((a, b) => b.percentages - a.percentages);
-
-  let groupingId = settings?.groupingId;
-  let grouping: Grouping | null = (groupingId ? groupings.find((g) => g.id === groupingId) : null) ?? null;
-
-  let groupingSelecting = false;
-
-  const handleGroupingSelect = async (value: Grouping | null) => {
-    await membersService.updateSettings({ groupingId: value?.id });
-    groupingSelecting = false;
-    grouping = value;
-  };
 
   // Dictionary of grouped summaries keyed by groupId
   $: groupSummaries = sortedItems.reduce((acc: Record<string, GroupSummary>, item) => {

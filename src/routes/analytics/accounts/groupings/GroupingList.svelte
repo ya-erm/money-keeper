@@ -8,7 +8,7 @@
   export let withUnselectedValue: boolean = false;
   export let onClick: (grouping: Grouping | null) => void;
 
-  const groupings = $groupingsStore;
+  $: groupings = $groupingsStore ?? [];
 </script>
 
 <ul class="flex-col gap-1">

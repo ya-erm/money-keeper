@@ -12,12 +12,12 @@
   import MonthSelect from './MonthSelect.svelte';
   import { intervalEndStore, intervalStartStore, intervalTypeStore } from './store';
 
-  const categories = $categoriesStore;
-  const currencyRates = $currencyRatesStore;
-  const settings = $memberSettingsStore;
+  $: categories = $categoriesStore;
+  $: currencyRates = $currencyRatesStore;
+  $: settings = $memberSettingsStore;
   $: transactions = $operationsStore;
 
-  const mainCurrency = settings?.currency ?? 'USD';
+  $: mainCurrency = settings?.currency ?? 'USD';
   $: balancesHidden = $settingsStore.hideBalances ?? false;
 
   let startDate = dayjs().startOf('month');

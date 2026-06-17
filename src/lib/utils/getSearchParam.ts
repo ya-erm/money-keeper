@@ -1,4 +1,5 @@
 import { goto } from '$app/navigation';
+import { resolve } from '$app/paths';
 import type { Page } from '@sveltejs/kit';
 
 export function getNumberSearchParam(page: Page, name: string) {
@@ -17,11 +18,11 @@ export async function setSearchParam(
 ) {
   const searchParams = new URLSearchParams(page.url.searchParams);
   searchParams.set(name, value);
-  await goto(`?${searchParams.toString()}`, { replaceState: replace });
+  await goto(resolve(`?${searchParams.toString()}`, {}), { replaceState: replace });
 }
 
 export async function deleteSearchParam(page: Page, name: string) {
   const searchParams = new URLSearchParams(page.url.searchParams);
   searchParams.delete(name);
-  await goto(`?${searchParams.toString()}`, { replaceState: true });
+  await goto(resolve(`?${searchParams.toString()}`, {}), { replaceState: true });
 }

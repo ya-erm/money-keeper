@@ -37,11 +37,11 @@
   const incomeLineGradient = createLineGradient('rgba(22, 163, 74, 0.28)', 'rgba(22, 163, 74, 0)', '#16a34a');
   const expensesLineGradient = createLineGradient('rgba(220, 38, 38, 0.26)', 'rgba(220, 38, 38, 0)', '#dc2626');
 
-  const currencyRates = $currencyRatesStore;
-  const settings = $memberSettingsStore;
+  $: currencyRates = $currencyRatesStore;
+  $: settings = $memberSettingsStore;
   $: operations = $operationsStore;
 
-  const mainCurrency = settings?.currency ?? 'USD';
+  $: mainCurrency = settings?.currency ?? 'USD';
   $: balancesHidden = $settingsStore.hideBalances ?? false;
 
   $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);

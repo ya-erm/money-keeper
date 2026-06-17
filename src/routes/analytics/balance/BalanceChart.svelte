@@ -16,27 +16,27 @@
   import Chart from './Chart.svelte';
   import { getAccountBalanceChartData } from './chartData';
 
-  const currencyRates = $currencyRatesStore;
-  const accounts = $accountsStore;
-  const operations = $operationsStore;
-  const settings = $memberSettingsStore;
+  $: currencyRates = $currencyRatesStore ?? [];
+  $: accounts = $accountsStore ?? [];
+  $: operations = $operationsStore ?? [];
+  $: settings = $memberSettingsStore;
 
-  const accountsOrder = settings?.accountsOrder ?? [];
+  $: accountsOrder = settings?.accountsOrder ?? [];
 
   const getAccountOrder = (account: Account) => {
     const index = accountsOrder.findIndex((id) => id === account.id);
     return index < 0 ? accounts.length : index;
   };
 
-  const sortedAccounts = accounts
+  $: sortedAccounts = accounts
     .slice()
     .sort((a, b) => getAccountOrder(a) - getAccountOrder(b))
     .reverse();
 
-  const mainCurrency = settings?.currency ?? 'USD';
-  $: balancesHidden = $settingsStore.hideBalances ?? false;
+  $: mainCurrency = settings?.currency ?? 'USD';
+  $: balancesHidden = $settingsStore?.hideBalances ?? false;
 
-  const findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
+  $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
   let interval: 1 | 3 | 6 | 12 | 24 = 12;
 
