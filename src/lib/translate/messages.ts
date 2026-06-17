@@ -116,6 +116,10 @@ export type Messages =
   | 'accounts.correct_balance_failure'
   // Analytics
   | 'analytics.title'
+  | 'analytics.cards.categories'
+  | 'analytics.cards.accounts'
+  | 'analytics.cards.balance'
+  | 'analytics.cards.income_expenses'
   | 'analytics.categories.start_date'
   | 'analytics.categories.end_date'
   | 'analytics.categories.monthly_interval'
@@ -126,6 +130,7 @@ export type Messages =
   | 'analytics.accounts.grouping.not_selected.description'
   | 'analytics.accounts.grouping.select_grouping'
   | 'analytics.accounts.hide_zero_balance_accounts'
+  | 'analytics.balance.title'
   | 'analytics.balance.legend'
   | 'analytics.income_expenses.title'
   | 'analytics.income_expenses.total_diff'

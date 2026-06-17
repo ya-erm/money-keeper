@@ -121,6 +121,10 @@ export const enDict: Dictionary = {
   'accounts.correct_balance_failure': 'Failed to correct balance',
   // Analytics
   'analytics.title': 'Analytics',
+  'analytics.cards.categories': 'By category',
+  'analytics.cards.accounts': 'Account list',
+  'analytics.cards.balance': 'Total balance',
+  'analytics.cards.income_expenses': 'Income / Expenses',
   'analytics.categories.start_date': 'Start date',
   'analytics.categories.end_date': 'End date',
   'analytics.categories.monthly_interval': 'Monthly',
@@ -131,6 +135,7 @@ export const enDict: Dictionary = {
   'analytics.accounts.grouping.not_selected.description': 'Show all accounts',
   'analytics.accounts.grouping.select_grouping': 'Select grouping',
   'analytics.accounts.hide_zero_balance_accounts': 'Hide zero balance accounts',
+  'analytics.balance.title': 'Balance',
   'analytics.balance.legend': 'Legend',
   'analytics.income_expenses.title': 'Income / Expenses',
   'analytics.income_expenses.total_diff': 'Result for period',

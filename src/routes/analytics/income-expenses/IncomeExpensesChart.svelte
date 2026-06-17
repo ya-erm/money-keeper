@@ -139,6 +139,11 @@
         interaction: {
           intersect: false,
         },
+        plugins: {
+          legend: {
+            position: 'bottom',
+          },
+        },
         scales: {
           y: {
             position: 'right',

@@ -15,7 +15,7 @@
 </svelte:head>
 
 <div class="navigation-bar">
-  <div class="navigation-back-button">
+  <div class="navigation-back-button h-full">
     {#if leftSlot !== null}
       <svelte:component this={leftSlot} />
     {:else if onBack !== null}
