@@ -83,9 +83,13 @@
   <ListLinkItem title={$translate('settings.repeatings')} href={route('repeatings')} />
 </ListGroup>
 
+<ListGroup title={$translate('settings.about')}>
+  <ListLinkItem title={$translate('settings.changelog')} href={route('settings.changelog')} />
+  <ListLinkItem title={$translate('settings.report_problem')} href="https://github.com/ya-erm/money-keeper/issues" />
+</ListGroup>
+
 <ListGroup title={$translate('settings.debug_tools')}>
   <ListLinkItem title={$translate('settings.logs')} href={route('settings.logs')} />
-  <ListLinkItem title={$translate('settings.report_problem')} href="https://github.com/ya-erm/money-keeper/issues" />
   <ListLinkItem title="UI Kit" href={route('uikit')} />
 </ListGroup>
 

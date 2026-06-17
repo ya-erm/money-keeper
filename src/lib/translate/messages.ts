@@ -388,6 +388,8 @@ export type Messages =
   | 'settings.profile.change_workspace'
   | 'settings.profile.change_workspace_failure'
   | 'settings.profile.logout'
+  | 'settings.about'
+  | 'settings.changelog'
   | 'settings.collaboration'
   | 'settings.collaboration.workspace'
   | 'settings.collaboration.workspaces'

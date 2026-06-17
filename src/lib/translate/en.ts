@@ -398,6 +398,8 @@ export const enDict: Dictionary = {
   'settings.profile.change_workspace': 'Select workspace',
   'settings.profile.change_workspace_failure': 'Failed to select workspace',
   'settings.profile.logout': 'Log out',
+  'settings.about': 'About',
+  'settings.changelog': "What's new",
   'settings.collaboration': 'Collaboration',
   'settings.collaboration.workspace': 'Workspace',
   'settings.collaboration.workspaces': 'Workspaces',

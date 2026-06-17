@@ -405,6 +405,8 @@ export const ruDict: Dictionary = {
   'settings.profile.change_workspace': 'Выберите пространство',
   'settings.profile.change_workspace_failure': 'Не удалось выбрать рабочее пространство',
   'settings.profile.logout': 'Выйти из системы',
+  'settings.about': 'О приложении',
+  'settings.changelog': 'Что нового',
   'settings.collaboration': 'Совместная работа',
   'settings.collaboration.workspace': 'Рабочее пространство',
   'settings.collaboration.workspaces': 'Рабочие пространства',
