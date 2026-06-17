@@ -10,6 +10,11 @@ export function getSearchParam(page: Page, name: string) {
   return page.url.searchParams.get(name);
 }
 
+function getPathWithSearchParams(page: Page, searchParams: URLSearchParams) {
+  const query = searchParams.toString();
+  return query ? `${page.url.pathname}?${query}` : page.url.pathname;
+}
+
 export async function setSearchParam(
   page: Page,
   name: string,
@@ -18,11 +23,11 @@ export async function setSearchParam(
 ) {
   const searchParams = new URLSearchParams(page.url.searchParams);
   searchParams.set(name, value);
-  await goto(resolve(`?${searchParams.toString()}`, {}), { replaceState: replace });
+  await goto(resolve(getPathWithSearchParams(page, searchParams), {}), { replaceState: replace });
 }
 
 export async function deleteSearchParam(page: Page, name: string) {
   const searchParams = new URLSearchParams(page.url.searchParams);
   searchParams.delete(name);
-  await goto(resolve(`?${searchParams.toString()}`, {}), { replaceState: true });
+  await goto(resolve(getPathWithSearchParams(page, searchParams), {}), { replaceState: true });
 }

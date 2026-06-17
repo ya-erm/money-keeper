@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.12.1 - 2026-06-17
+
+### Fixed
+
+- Fixed opening operation edit forms from query-parameter based lists.
+
 ## 2.12.0 - 2026-06-17
 
 ### Added
