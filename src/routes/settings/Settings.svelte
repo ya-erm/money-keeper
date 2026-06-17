@@ -6,7 +6,7 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Portal from '@ya-erm/svelte-ui/Portal';
 
-  import { membersService, selectedMemberStore, settingsService, memberSettingsStore } from '$lib/data';
+  import { membersService, selectedMemberStore, settingsService, settingsStore, memberSettingsStore } from '$lib/data';
   import { route, routes } from '$lib/routes';
   import { activeLocaleName, translate } from '$lib/translate';
   import LanguageModal from '$lib/translate/LanguageModal.svelte';
@@ -35,6 +35,11 @@
   const [selectGroupModalOpened, openSelectGroupModal] = createBooleanStore();
 
   let showLogoutPortal = false;
+  $: balancesHidden = $settingsStore.hideBalances ?? false;
+
+  const handleHideBalancesChange = async (value: boolean) => {
+    await settingsService.updateSettings({ hideBalances: value });
+  };
 
   async function logout() {
     await settingsService.updateSettings({ selectedMember: null });
@@ -49,6 +54,11 @@
 <ListGroup title={$translate('settings.common')}>
   <ListSelectItem title={$translate('settings.language')} value={$activeLocaleName} onClick={openLanguageModal} />
   <ListSwitchItem title={$translate('settings.darkMode')} bind:checked={$darkMode} />
+  <ListSwitchItem
+    title={$translate('settings.hideBalances')}
+    bind:checked={balancesHidden}
+    onChange={handleHideBalancesChange}
+  />
   <ListLinkItem title={$translate('currency_rates.title')} href={route('settings.currency_rates')} />
   <ListSelectItem
     title={$translate('currency_rates.default_currency')}

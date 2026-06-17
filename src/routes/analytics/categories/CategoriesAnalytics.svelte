@@ -1,9 +1,10 @@
 <script lang="ts">
   import dayjs, { type Dayjs } from 'dayjs';
 
-  import { categoriesStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
+  import { categoriesStore, currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { translate } from '$lib/translate';
   import Icon from '@ya-erm/svelte-ui/Icon';
+  import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
   import { findRate, formatMoney, groupByKey } from '$lib/utils';
 
   import TransactionList from '../../transactions/TransactionList.svelte';
@@ -17,6 +18,7 @@
   $: transactions = $operationsStore;
 
   const mainCurrency = settings?.currency ?? 'USD';
+  $: balancesHidden = $settingsStore.hideBalances ?? false;
 
   let startDate = dayjs().startOf('month');
   let endDate = dayjs().endOf('month');
@@ -81,7 +83,11 @@
               <span>{group.category?.name ?? group.categoryId}</span>
             </div>
             <span>
-              {formatMoney(group.sum, { currency: mainCurrency })}
+              {#if balancesHidden}
+                <HiddenMoney currency={mainCurrency} />
+              {:else}
+                {formatMoney(group.sum, { currency: mainCurrency })}
+              {/if}
             </span>
           </button>
         </li>
@@ -92,17 +98,25 @@
       <div class="total">
         <div>{$translate('categories.incomings')}:</div>
         <div>
-          {formatMoney(
-            groups.filter((g) => g.category?.type === 'IN').reduce((sum, g) => sum + g.sum, 0),
-            { currency: mainCurrency },
-          )}
+          {#if balancesHidden}
+            <HiddenMoney currency={mainCurrency} />
+          {:else}
+            {formatMoney(
+              groups.filter((g) => g.category?.type === 'IN').reduce((sum, g) => sum + g.sum, 0),
+              { currency: mainCurrency },
+            )}
+          {/if}
         </div>
         <div>{$translate('categories.outgoings')}:</div>
         <div>
-          {formatMoney(
-            groups.filter((g) => g.category?.type === 'OUT').reduce((sum, g) => sum + g.sum, 0),
-            { currency: mainCurrency },
-          )}
+          {#if balancesHidden}
+            <HiddenMoney currency={mainCurrency} />
+          {:else}
+            {formatMoney(
+              groups.filter((g) => g.category?.type === 'OUT').reduce((sum, g) => sum + g.sum, 0),
+              { currency: mainCurrency },
+            )}
+          {/if}
         </div>
       </div>
     </div>

@@ -16,6 +16,7 @@ export { filterNotEmpty } from './filterNotEmpty';
 export { findCurrencyRate } from './findCurrencyRate';
 export { findRate } from './findRate';
 export { formatMoney } from './formatMoney';
+export { formatHiddenMoney } from './formatHiddenMoney';
 export {
   futureOperationsPredicate,
   operationAfterDatePredicate,

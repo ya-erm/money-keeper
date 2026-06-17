@@ -380,6 +380,7 @@ export const enDict: Dictionary = {
   'settings.select_language': 'Select language',
   'settings.common': 'Common',
   'settings.darkMode': 'Dark mode',
+  'settings.hideBalances': 'Hide amounts',
   'settings.theme': 'Theme',
   'settings.theme.light': 'Light',
   'settings.theme.dark': 'Dark',
@@ -411,6 +412,9 @@ export const enDict: Dictionary = {
   'settings.report_problem': 'Report a problem',
   'settings.version': 'Version: {version}',
   'settings.uikit': 'UI Kit',
+  'privacy.hidden_amount': 'Amount hidden',
+  'privacy.hide_balances': 'Hide amounts',
+  'privacy.show_balances': 'Show amounts',
 };
 
 addMessages('en-US', enDict);

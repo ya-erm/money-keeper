@@ -370,6 +370,7 @@ export type Messages =
   | 'settings.language'
   | 'settings.select_language'
   | 'settings.darkMode'
+  | 'settings.hideBalances'
   | 'settings.theme'
   | 'settings.theme.light'
   | 'settings.theme.dark'
@@ -400,4 +401,7 @@ export type Messages =
   | 'settings.logs.hide_filters'
   | 'settings.report_problem'
   | 'settings.version'
-  | 'settings.uikit';
+  | 'settings.uikit'
+  | 'privacy.hidden_amount'
+  | 'privacy.hide_balances'
+  | 'privacy.show_balances';
