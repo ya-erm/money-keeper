@@ -1,6 +1,9 @@
 <script lang="ts">
   import dayjs from 'dayjs';
 
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+
   import { currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
   import { translate } from '$lib/translate';
   import { findRate, formatMoney } from '$lib/utils';
@@ -15,10 +18,19 @@
 
   $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
-  const monthsCount = 12;
-  const startMonth = dayjs().startOf('month').subtract(monthsCount - 1, 'month');
+  let interval: 6 | 12 | 24 = 12;
 
-  $: months = Array.from({ length: monthsCount }, (_, index) => startMonth.add(index, 'month'));
+  const changeInterval = () => {
+    if (interval === 6) interval = 12;
+    else if (interval === 12) interval = 24;
+    else interval = 6;
+  };
+
+  $: startMonth = dayjs()
+    .startOf('month')
+    .subtract(interval - 1, 'month');
+
+  $: months = Array.from({ length: interval }, (_, index) => startMonth.add(index, 'month'));
 
   $: monthStats = months.map((month) => {
     const monthOperations = operations.filter(
@@ -45,6 +57,12 @@
 </script>
 
 <div class="chart-container">
+  <div class="interval-button flex items-start gap-0.5">
+    <Button color="white" bordered onClick={changeInterval}>
+      <Icon name="mdi:arrow-expand-horizontal" />
+      {interval}M
+    </Button>
+  </div>
   <Chart
     type="line"
     updateMode="none"
@@ -97,6 +115,12 @@
     height: calc(100% - 3rem);
     width: 100%;
     padding: 1rem;
+  }
+  .interval-button {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1;
   }
   .summary {
     display: flex;

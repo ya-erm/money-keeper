@@ -37,13 +37,12 @@
 
   const findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
-  let interval: 12 | 6 | 3 | 1 = 12;
+  let interval: 6 | 12 | 24 = 12;
 
   const changeInterval = () => {
-    if (interval === 12) interval = 6;
-    else if (interval === 6) interval = 3;
-    else if (interval === 3) interval = 1;
-    else interval = 12;
+    if (interval === 6) interval = 12;
+    else if (interval === 12) interval = 24;
+    else interval = 6;
   };
 
   const endDate = dayjs();
