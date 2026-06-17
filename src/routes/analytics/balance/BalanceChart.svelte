@@ -5,12 +5,12 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Portal from '@ya-erm/svelte-ui/Portal';
 
-  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
+  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { type Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/layout/Layout.svelte';
 
-  import { findRate } from '$lib/utils';
+  import { findRate, formatHiddenMoney, formatMoney } from '$lib/utils';
 
   import BalanceChartLegend from './BalanceChartLegend.svelte';
   import Chart from './Chart.svelte';
@@ -34,6 +34,7 @@
     .reverse();
 
   const mainCurrency = settings?.currency ?? 'USD';
+  $: balancesHidden = $settingsStore.hideBalances ?? false;
 
   const findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
@@ -103,6 +104,9 @@
           stacked: true,
           position: 'right',
           grid: { z: 1 },
+          ticks: {
+            callback: (value) => (balancesHidden ? '' : value),
+          },
         },
         x: {
           grid: { z: 1 },
@@ -127,6 +131,14 @@
       plugins: {
         legend: {
           display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) =>
+              balancesHidden
+                ? `${context.dataset.label}: ${formatHiddenMoney(mainCurrency)}`
+                : `${context.dataset.label}: ${formatMoney(context.parsed.y ?? 0, { currency: mainCurrency })}`,
+          },
         },
       },
     }}

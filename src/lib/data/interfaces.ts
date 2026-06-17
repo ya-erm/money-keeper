@@ -11,6 +11,7 @@ export type Service = Initialisable & JournalSubscriber;
 export type GlobalSettings = {
   id: 'global';
   selectedMember?: string | null;
+  hideBalances?: boolean;
 };
 
 export type Member = {

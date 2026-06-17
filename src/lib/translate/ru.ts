@@ -387,6 +387,7 @@ export const ruDict: Dictionary = {
   'settings.select_language': 'Выберите язык',
   'settings.common': 'Общее',
   'settings.darkMode': 'Тёмная тема',
+  'settings.hideBalances': 'Скрывать суммы',
   'settings.theme': 'Оформление',
   'settings.theme.light': 'Светлое',
   'settings.theme.dark': 'Тёмное',
@@ -418,6 +419,9 @@ export const ruDict: Dictionary = {
   'settings.report_problem': 'Сообщить о проблеме',
   'settings.version': 'Версия: {version}',
   'settings.uikit': 'UI Kit',
+  'privacy.hidden_amount': 'Сумма скрыта',
+  'privacy.hide_balances': 'Скрыть суммы',
+  'privacy.show_balances': 'Показать суммы',
 };
 
 addMessages('ru-RU', ruDict);

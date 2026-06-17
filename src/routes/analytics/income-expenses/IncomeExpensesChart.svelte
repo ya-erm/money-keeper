@@ -4,9 +4,11 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
 
-  import { currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
+  import { currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { translate } from '$lib/translate';
+  import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
   import { findRate, formatMoney } from '$lib/utils';
+  import { formatHiddenMoney } from '$lib/utils/formatHiddenMoney';
 
   import Chart from '../balance/Chart.svelte';
 
@@ -40,6 +42,7 @@
   $: operations = $operationsStore;
 
   const mainCurrency = settings?.currency ?? 'USD';
+  $: balancesHidden = $settingsStore.hideBalances ?? false;
 
   $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
@@ -143,10 +146,21 @@
           legend: {
             position: 'bottom',
           },
+          tooltip: {
+            callbacks: {
+              label: (context) =>
+                balancesHidden
+                  ? `${context.dataset.label}: ${formatHiddenMoney(mainCurrency)}`
+                  : `${context.dataset.label}: ${formatMoney(context.parsed.y ?? 0, { currency: mainCurrency })}`,
+            },
+          },
         },
         scales: {
           y: {
             position: 'right',
+            ticks: {
+              callback: (value) => (balancesHidden ? '' : value),
+            },
           },
         },
       }}
@@ -156,7 +170,13 @@
 
 <div class="summary">
   <span>{$translate('analytics.income_expenses.total_diff')}:</span>
-  <strong class:negative={balanceDiff < 0}>{formatMoney(balanceDiff, { currency: mainCurrency })}</strong>
+  <strong class:negative={!balancesHidden && balanceDiff < 0}>
+    {#if balancesHidden}
+      <HiddenMoney currency={mainCurrency} />
+    {:else}
+      {formatMoney(balanceDiff, { currency: mainCurrency })}
+    {/if}
+  </strong>
 </div>
 
 <style>

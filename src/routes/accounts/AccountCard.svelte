@@ -1,10 +1,12 @@
 <script lang="ts">
   import type { AccountViewModel, CurrencyRate } from '$lib/data/interfaces';
+  import { settingsService, settingsStore } from '$lib/data';
   import { translate } from '$lib/translate';
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import { formatMoney } from '$lib/utils/formatMoney';
   import { longPress } from '$lib/utils';
+  import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
 
   import AccountOptionsModal from './AccountOptionsModal.svelte';
 
@@ -19,6 +21,13 @@
 
   const handleEdit = () => {
     onEdit?.(account);
+  };
+
+  $: balancesHidden = $settingsStore.hideBalances ?? false;
+
+  const toggleBalancesVisibility = async (event: MouseEvent) => {
+    event.stopPropagation();
+    await settingsService.updateSettings({ hideBalances: !balancesHidden });
   };
 
   let showAdditionalOptions = false;
@@ -44,17 +53,34 @@
       </div>
       <div class="account-tags">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
     </div>
+    <Button
+      appearance="link"
+      color="white"
+      onClick={toggleBalancesVisibility}
+      title={$translate(balancesHidden ? 'privacy.show_balances' : 'privacy.hide_balances')}
+      aria-label={$translate(balancesHidden ? 'privacy.show_balances' : 'privacy.hide_balances')}
+    >
+      <Icon name={balancesHidden ? 'mdi:eye-off-outline' : 'mdi:eye-outline'} padding={0.5} />
+    </Button>
     <Button appearance="link" color="white" onClick={handleEdit} title={$translate('accounts.edit_account')}>
       <Icon name="mdi:pencil" padding={0.5} />
     </Button>
   </div>
   <div class="flex-col items-center gap-0.25">
     <div class="money-value">
-      {formatMoney(balance ?? 0, { currency: account.currency })}
+      {#if balancesHidden}
+        <HiddenMoney currency={account.currency} size="lg" />
+      {:else}
+        {formatMoney(balance ?? 0, { currency: account.currency })}
+      {/if}
     </div>
     {#if currencyRate && balance !== null}
       <div class="other-money-value">
-        {formatMoney(balance * rate, { currency: otherCurrency })}
+        {#if balancesHidden}
+          <HiddenMoney currency={otherCurrency} size="sm" />
+        {:else}
+          {formatMoney(balance * rate, { currency: otherCurrency })}
+        {/if}
       </div>
     {/if}
   </div>
