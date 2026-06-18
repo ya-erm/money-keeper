@@ -186,9 +186,9 @@
   }
   .category-values {
     display: grid;
-    grid-template-columns: minmax(6rem, auto) minmax(3.5rem, auto);
+    grid-template-columns: minmax(6rem, auto) minmax(2.75rem, max-content);
     align-items: center;
-    column-gap: 0.75rem;
+    column-gap: 0.5rem;
     flex-shrink: 0;
     text-align: right;
   }
