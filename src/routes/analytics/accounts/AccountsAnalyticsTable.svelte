@@ -8,7 +8,7 @@
   import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
   import { formatMoney, hasHiddenBalanceAccount, isBalanceHidden } from '$lib/utils';
 
-  import { hideVisibleAnalyticsBalances, showHiddenAnalyticsBalances } from '../store';
+  import { analyticsBalancesVisibilityMode } from '../store';
   import type { GroupSummary } from './interfaces';
   import { countPreviousItems } from './utils';
 
@@ -20,8 +20,8 @@
   const mainCurrency = settings?.currency ?? 'USD';
   $: balancesHidden = $settingsStore.hideBalances ?? false;
   $: totalBalanceHidden =
-    $hideVisibleAnalyticsBalances ||
-    (!$showHiddenAnalyticsBalances &&
+    $analyticsBalancesVisibilityMode === 'hide' ||
+    ($analyticsBalancesVisibilityMode !== 'show' &&
       (balancesHidden ||
         hasHiddenBalanceAccount(
           null,
@@ -29,8 +29,8 @@
         )));
 
   const isGroupBalanceHidden = (accountSummaries: GroupSummary['accountSummaries']) =>
-    $hideVisibleAnalyticsBalances ||
-    (!$showHiddenAnalyticsBalances &&
+    $analyticsBalancesVisibilityMode === 'hide' ||
+    ($analyticsBalancesVisibilityMode !== 'show' &&
       hasHiddenBalanceAccount(
         null,
         accountSummaries.map((item) => item.account),
@@ -56,7 +56,7 @@
               </div>
             </th>
             <th class="text-right">
-              {#if $hideVisibleAnalyticsBalances || (balancesHidden && !$showHiddenAnalyticsBalances) || isGroupBalanceHidden(accountSummaries)}
+              {#if $analyticsBalancesVisibilityMode === 'hide' || (balancesHidden && $analyticsBalancesVisibilityMode !== 'show') || isGroupBalanceHidden(accountSummaries)}
                 <HiddenMoney currency={currencySymbols[mainCurrency] ?? mainCurrency} size="sm" />
               {:else}
                 {formatMoney(ratedBalance, {
@@ -87,7 +87,7 @@
             <td class="rated-balance">
               <div class="flex gap-0.25 items-baseline justify-end">
                 <span>
-                  {#if $hideVisibleAnalyticsBalances || (!$showHiddenAnalyticsBalances && isBalanceHidden($settingsStore, item.account))}
+                  {#if $analyticsBalancesVisibilityMode === 'hide' || ($analyticsBalancesVisibilityMode !== 'show' && isBalanceHidden($settingsStore, item.account))}
                     <HiddenMoney size="sm" />
                   {:else}
                     {formatMoney(item.ratedBalance, { maxPrecision: 0 })}

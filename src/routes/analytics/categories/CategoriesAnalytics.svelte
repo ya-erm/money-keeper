@@ -9,7 +9,7 @@
 
   import TransactionList from '../../transactions/TransactionList.svelte';
 
-  import { hideVisibleAnalyticsBalances, showHiddenAnalyticsBalances } from '../store';
+  import { analyticsBalancesVisibilityMode } from '../store';
   import MonthSelect from './MonthSelect.svelte';
   import { intervalEndStore, intervalStartStore, intervalTypeStore } from './store';
 
@@ -71,9 +71,19 @@
 
   let selectedCategoryId: string | null = null;
   $: selectedGroup = groups.find((group) => group.categoryId === selectedCategoryId);
+  $: incomingTotal = groups.filter((g) => g.category?.type === 'IN').reduce((sum, g) => sum + g.sum, 0);
+  $: outgoingTotal = Math.abs(groups.filter((g) => g.category?.type === 'OUT').reduce((sum, g) => sum + g.sum, 0));
   $: totalsHidden =
-    $hideVisibleAnalyticsBalances ||
-    (!$showHiddenAnalyticsBalances && (balancesHidden || groups.some((group) => group.hasHiddenBalanceAccount)));
+    $analyticsBalancesVisibilityMode === 'hide' ||
+    ($analyticsBalancesVisibilityMode !== 'show' &&
+      (balancesHidden || groups.some((group) => group.hasHiddenBalanceAccount)));
+
+  const getGroupPercentage = (group: (typeof groups)[number], incomingTotal: number, outgoingTotal: number) => {
+    const total = group.category?.type === 'IN' ? incomingTotal : outgoingTotal;
+    return total ? (100 * Math.abs(group.sum)) / total : 0;
+  };
+
+  const formatPercent = (value: number) => `${formatMoney(value, { maxPrecision: value > 10 ? 0 : 1 })}%`;
 </script>
 
 <div class="p-1">
@@ -90,13 +100,16 @@
               <Icon name={group.category?.icon ?? 'mdi:help'} />
               <span>{group.category?.name ?? group.categoryId}</span>
             </div>
-            <span>
-              {#if $hideVisibleAnalyticsBalances || (balancesHidden && !$showHiddenAnalyticsBalances)}
-                <HiddenMoney currency={mainCurrency} />
-              {:else}
-                {formatMoney(group.sum, { currency: mainCurrency })}
-              {/if}
-            </span>
+            <div class="category-values">
+              <span class="amount">
+                {#if $analyticsBalancesVisibilityMode === 'hide' || (balancesHidden && $analyticsBalancesVisibilityMode !== 'show')}
+                  <HiddenMoney currency={mainCurrency} />
+                {:else}
+                  {formatMoney(group.sum, { currency: mainCurrency })}
+                {/if}
+              </span>
+              <span class="percentage">{formatPercent(getGroupPercentage(group, incomingTotal, outgoingTotal))}</span>
+            </div>
           </button>
         </li>
       {/each}
@@ -109,10 +122,7 @@
           {#if totalsHidden}
             <HiddenMoney currency={mainCurrency} />
           {:else}
-            {formatMoney(
-              groups.filter((g) => g.category?.type === 'IN').reduce((sum, g) => sum + g.sum, 0),
-              { currency: mainCurrency },
-            )}
+            {formatMoney(incomingTotal, { currency: mainCurrency })}
           {/if}
         </div>
         <div>{$translate('categories.outgoings')}:</div>
@@ -120,10 +130,7 @@
           {#if totalsHidden}
             <HiddenMoney currency={mainCurrency} />
           {:else}
-            {formatMoney(
-              groups.filter((g) => g.category?.type === 'OUT').reduce((sum, g) => sum + g.sum, 0),
-              { currency: mainCurrency },
-            )}
+            {formatMoney(-outgoingTotal, { currency: mainCurrency })}
           {/if}
         </div>
       </div>
@@ -171,6 +178,25 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    min-width: 0;
+  }
+  .category > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .category-values {
+    display: grid;
+    grid-template-columns: minmax(6rem, auto) minmax(2.75rem, max-content);
+    align-items: center;
+    column-gap: 0.5rem;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .percentage {
+    color: var(--secondary-text-color);
+  }
+  .amount {
+    word-break: keep-all;
   }
   .total-container {
     display: flex;

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.14.0 - 2026-06-18
+
+### Added
+
+- Added income and expense percentages to category analytics.
+
 ## 2.13.0 - 2026-06-18
 
 ### Added

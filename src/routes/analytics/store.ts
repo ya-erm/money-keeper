@@ -1,9 +1,9 @@
 import { writable } from 'svelte/store';
 
-export const showHiddenAnalyticsBalances = writable(false);
-export const hideVisibleAnalyticsBalances = writable(false);
+export type AnalyticsBalancesVisibilityMode = 'auto' | 'show' | 'hide';
+
+export const analyticsBalancesVisibilityMode = writable<AnalyticsBalancesVisibilityMode>('auto');
 
 export function resetAnalyticsBalancesVisibility() {
-  showHiddenAnalyticsBalances.set(false);
-  hideVisibleAnalyticsBalances.set(false);
+  analyticsBalancesVisibilityMode.set('auto');
 }

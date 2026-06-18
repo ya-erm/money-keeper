@@ -3,57 +3,55 @@
   import HeaderButton from '$lib/ui/layout/HeaderButton.svelte';
   import { translate } from '$lib/translate';
   import { hasHiddenBalanceAccount } from '$lib/utils';
-  import { hideVisibleAnalyticsBalances, showHiddenAnalyticsBalances } from './store';
+  import { analyticsBalancesVisibilityMode } from './store';
 
   export let triState = false;
 
   $: hasHiddenBalances = hasHiddenBalanceAccount($settingsStore, $accountsStore);
   $: hasPartiallyHiddenBalances =
     triState && !$settingsStore.hideBalances && $accountsStore.some((account) => account.hideBalance);
-  $: if (hasHiddenBalances && !hasPartiallyHiddenBalances && $hideVisibleAnalyticsBalances) {
-    hideVisibleAnalyticsBalances.set(false);
+
+  $: if (!hasHiddenBalances && $analyticsBalancesVisibilityMode === 'show') {
+    analyticsBalancesVisibilityMode.set('auto');
   }
-  $: if (!hasHiddenBalances && $showHiddenAnalyticsBalances) {
-    showHiddenAnalyticsBalances.set(false);
+  $: if (hasHiddenBalances && !hasPartiallyHiddenBalances && $analyticsBalancesVisibilityMode === 'hide') {
+    analyticsBalancesVisibilityMode.set('auto');
   }
 
-  $: isPartiallyHidden = hasPartiallyHiddenBalances && !$showHiddenAnalyticsBalances && !$hideVisibleAnalyticsBalances;
+  $: isPartiallyHidden = hasPartiallyHiddenBalances && $analyticsBalancesVisibilityMode === 'auto';
 
   $: icon = isPartiallyHidden
     ? 'mdi:eye-lock-outline'
     : hasHiddenBalances
-      ? $showHiddenAnalyticsBalances
+      ? $analyticsBalancesVisibilityMode === 'show'
         ? 'mdi:eye-outline'
         : 'mdi:eye-off-outline'
-      : $hideVisibleAnalyticsBalances
+      : $analyticsBalancesVisibilityMode === 'hide'
         ? 'mdi:eye-off-outline'
         : 'mdi:eye-outline';
 
   $: label =
-    isPartiallyHidden || (hasHiddenBalances && !$showHiddenAnalyticsBalances)
+    isPartiallyHidden || (hasHiddenBalances && $analyticsBalancesVisibilityMode !== 'show')
       ? $translate('privacy.show_balances')
-      : $translate($hideVisibleAnalyticsBalances ? 'privacy.show_balances' : 'privacy.hide_balances');
+      : $translate($analyticsBalancesVisibilityMode === 'hide' ? 'privacy.show_balances' : 'privacy.hide_balances');
 
   const handleClick = () => {
     if (hasHiddenBalances) {
       if (hasPartiallyHiddenBalances) {
-        if (!$showHiddenAnalyticsBalances && !$hideVisibleAnalyticsBalances) {
-          hideVisibleAnalyticsBalances.set(true);
-        } else if ($hideVisibleAnalyticsBalances) {
-          hideVisibleAnalyticsBalances.set(false);
-          showHiddenAnalyticsBalances.set(true);
+        if ($analyticsBalancesVisibilityMode === 'auto') {
+          analyticsBalancesVisibilityMode.set('hide');
+        } else if ($analyticsBalancesVisibilityMode === 'hide') {
+          analyticsBalancesVisibilityMode.set('show');
         } else {
-          showHiddenAnalyticsBalances.set(false);
+          analyticsBalancesVisibilityMode.set('auto');
         }
       } else {
-        hideVisibleAnalyticsBalances.set(false);
-        showHiddenAnalyticsBalances.update((value) => !value);
+        analyticsBalancesVisibilityMode.update((value) => (value === 'show' ? 'auto' : 'show'));
       }
       return;
     }
 
-    showHiddenAnalyticsBalances.set(false);
-    hideVisibleAnalyticsBalances.update((value) => !value);
+    analyticsBalancesVisibilityMode.update((value) => (value === 'hide' ? 'auto' : 'hide'));
   };
 </script>
 
