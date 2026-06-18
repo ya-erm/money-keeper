@@ -2,7 +2,7 @@
 
 ## Development Server
 
-- If the user says a dev server is already running, use the existing server URL for verification. Do not try to start another dev server unless the existing one is unreachable and you have confirmed the expected URL or port.
+- If a dev server is already running, use the existing server URL for verification. Do not try to start another dev server unless the existing one is unreachable and you have confirmed the expected URL or port.
 
 ## Releases and Changelog
 

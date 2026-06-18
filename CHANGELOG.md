@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.12.2 - 2026-06-18
+
+### Changed
+
+- Replaced the account card edit button and long-press action with an options button that opens account actions.
+
 ## 2.12.1 - 2026-06-17
 
 ### Added

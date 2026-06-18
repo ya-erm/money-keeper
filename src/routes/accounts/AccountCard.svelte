@@ -5,7 +5,6 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import { formatMoney } from '$lib/utils/formatMoney';
-  import { longPress } from '$lib/utils';
   import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
 
   import AccountOptionsModal from './AccountOptionsModal.svelte';
@@ -23,16 +22,16 @@
     onEdit?.(account);
   };
 
+  const handleOpenOptions = () => {
+    showAdditionalOptions = true;
+  };
+
   $: balancesHidden = $settingsStore.hideBalances ?? false;
 
   let showAdditionalOptions = false;
 </script>
 
-<div
-  use:longPress={() => (showAdditionalOptions = true)}
-  class="w-full h-full p-1 flex-col items-center justify-between"
-  data-testId="AccountCard"
->
+<div class="w-full h-full p-1 flex-col items-center justify-between" data-testId="AccountCard">
   <div class="w-full flex items-center gap-0.5">
     <div class="account-icon flex items-center justify-center" style:background={account.color}>
       <Icon name={account.icon || 'mdi:briefcase-outline'} padding={0.5} />
@@ -48,8 +47,8 @@
       </div>
       <div class="account-tags">{account.tags.map((t) => `#${t.name}`).join(' ')}</div>
     </div>
-    <Button appearance="link" color="white" onClick={handleEdit} title={$translate('accounts.edit_account')}>
-      <Icon name="mdi:pencil" padding={0.5} />
+    <Button appearance="link" color="white" onClick={handleOpenOptions} title={$translate('common.additional_options')}>
+      <Icon name="mdi:dots-vertical" padding={0.5} />
     </Button>
   </div>
   <div class="flex-col items-center gap-0.25">
@@ -74,7 +73,7 @@
 </div>
 
 {#if showAdditionalOptions}
-  <AccountOptionsModal bind:opened={showAdditionalOptions} {account} {balance} />
+  <AccountOptionsModal bind:opened={showAdditionalOptions} {account} {balance} onEdit={handleEdit} />
 {/if}
 
 <style>

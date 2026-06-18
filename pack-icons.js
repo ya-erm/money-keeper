@@ -26,6 +26,7 @@ const iconsToBundle = [
   'mdi:close-circle-outline',
   'mdi:credit-card-plus-outline',
   'mdi:cog-outline',
+  'mdi:dots-vertical',
   'mdi:filter',
   'mdi:folder-outline',
   'mdi:format-list-bulleted',
