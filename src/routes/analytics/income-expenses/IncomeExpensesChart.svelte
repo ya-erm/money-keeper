@@ -11,7 +11,7 @@
   import { formatHiddenMoney } from '$lib/utils/formatHiddenMoney';
 
   import Chart from '../balance/Chart.svelte';
-  import { hideVisibleAnalyticsBalances, showHiddenAnalyticsBalances } from '../store';
+  import { analyticsBalancesVisibilityMode } from '../store';
 
   type GradientContext = {
     chart: {
@@ -93,8 +93,9 @@
 
   $: balanceDiff = monthStats.reduce((sum, item) => sum + item.income - item.expenses, 0);
   $: amountsHidden =
-    $hideVisibleAnalyticsBalances ||
-    (!$showHiddenAnalyticsBalances && (balancesHidden || monthStats.some((item) => item.hasHiddenBalanceAccount)));
+    $analyticsBalancesVisibilityMode === 'hide' ||
+    ($analyticsBalancesVisibilityMode !== 'show' &&
+      (balancesHidden || monthStats.some((item) => item.hasHiddenBalanceAccount)));
 
   $: isLineChart = chartType === 'line';
 </script>

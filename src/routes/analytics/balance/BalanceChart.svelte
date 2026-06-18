@@ -15,7 +15,7 @@
   import BalanceChartLegend from './BalanceChartLegend.svelte';
   import Chart from './Chart.svelte';
   import { getAccountBalanceChartData } from './chartData';
-  import { hideVisibleAnalyticsBalances, showHiddenAnalyticsBalances } from '../store';
+  import { analyticsBalancesVisibilityMode } from '../store';
 
   $: currencyRates = $currencyRatesStore ?? [];
   $: accounts = $accountsStore ?? [];
@@ -63,8 +63,8 @@
 
   $: filteredAccounts = sortedAccounts.filter((account) => selectedAccounts.includes(account.id));
   $: chartAmountsHidden =
-    $hideVisibleAnalyticsBalances ||
-    (!$showHiddenAnalyticsBalances && hasHiddenBalanceAccount($settingsStore, filteredAccounts));
+    $analyticsBalancesVisibilityMode === 'hide' ||
+    ($analyticsBalancesVisibilityMode !== 'show' && hasHiddenBalanceAccount($settingsStore, filteredAccounts));
 
   $: items = getAccountBalanceChartData({
     operations,
@@ -138,8 +138,9 @@
         tooltip: {
           callbacks: {
             label: (context) =>
-              $hideVisibleAnalyticsBalances ||
-              (!$showHiddenAnalyticsBalances && isBalanceHidden($settingsStore, filteredAccounts[context.datasetIndex]))
+              $analyticsBalancesVisibilityMode === 'hide' ||
+              ($analyticsBalancesVisibilityMode !== 'show' &&
+                isBalanceHidden($settingsStore, filteredAccounts[context.datasetIndex]))
                 ? `${context.dataset.label}: ${formatHiddenMoney(mainCurrency)}`
                 : `${context.dataset.label}: ${formatMoney(context.parsed.y ?? 0, { currency: mainCurrency })}`,
           },
