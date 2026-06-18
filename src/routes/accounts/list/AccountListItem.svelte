@@ -2,7 +2,7 @@
   import type { Account, AccountViewModel, CurrencyRate } from '$lib/data/interfaces';
   import { settingsStore } from '$lib/data';
   import Icon from '@ya-erm/svelte-ui/Icon';
-  import { formatMoney } from '$lib/utils/formatMoney';
+  import { formatMoney, isBalanceHidden } from '$lib/utils';
   import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
 
   export let account: AccountViewModel;
@@ -22,7 +22,7 @@
     onClick(account);
   };
 
-  $: balancesHidden = $settingsStore.hideBalances ?? false;
+  $: balancesHidden = isBalanceHidden($settingsStore, account);
 </script>
 
 <button

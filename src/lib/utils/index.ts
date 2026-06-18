@@ -27,6 +27,7 @@ export { deleteSearchParam, getNumberSearchParam, getSearchParam, setSearchParam
 export { getTimeZoneOffset, toShortTimezoneOffset } from './getTimeZoneOffset';
 export { groupByKey, groupByKeyToMap, groupBySelector, groupBySelectorToMap } from './groupBy';
 export { handleError } from './handleError';
+export { hasHiddenBalanceAccount, isBalanceHidden } from './isBalanceHidden';
 export { join } from './join';
 export { keyTransactions } from './keyTransactions';
 export { Logger } from './logger';

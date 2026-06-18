@@ -7,12 +7,13 @@
   export let onBack: VoidFunction | null = null;
   export let leftSlot: Component | null = null;
   export let rightSlot: Component | null = null;
+  export let rightSlotProps: Record<string, unknown> = {};
 
   export let hideMenu = false;
 </script>
 
 <main>
-  <Header {title} {onBack} {leftSlot} {rightSlot} />
+  <Header {title} {onBack} {leftSlot} {rightSlot} {rightSlotProps} />
   <div class="page">
     <slot />
   </div>

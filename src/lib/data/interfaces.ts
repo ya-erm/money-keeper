@@ -79,6 +79,7 @@ export type Account = {
   tagIds?: string[];
   deleted?: boolean;
   archived?: boolean;
+  hideBalance?: boolean;
 };
 
 export type AccountViewModel = Account & {

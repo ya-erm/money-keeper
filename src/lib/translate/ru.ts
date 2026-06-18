@@ -23,6 +23,7 @@ export const ruDict: Dictionary = {
   'common.no_items': 'Здесь пока ничего нет',
   'common.nothing_found': 'Ничего не найдено',
   'common.create': 'Создать',
+  'common.edit': 'Редактировать',
   'common.save': 'Сохранить',
   'common.add': 'Добавить',
   'common.save_changes_failure': 'Не удалось сохранить изменения',
@@ -98,6 +99,8 @@ export const ruDict: Dictionary = {
   'accounts.create_account_failure': 'Не удалось создать счёт',
   'accounts.create_account_success': 'Счёт создан',
   'accounts.edit_account': 'Редактировать счёт',
+  'accounts.hide_balance': 'Скрыть сумму',
+  'accounts.show_balance': 'Показать сумму',
   'accounts.delete_account': 'Удалить счёт',
   'accounts.delete_account_confirm': 'Вы уверены, что хотите удалить счёт?',
   'accounts.delete_account_confirm_description':

@@ -6,8 +6,9 @@
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
   import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
-  import { formatMoney } from '$lib/utils';
+  import { formatMoney, hasHiddenBalanceAccount, isBalanceHidden } from '$lib/utils';
 
+  import { hideVisibleAnalyticsBalances, showHiddenAnalyticsBalances } from '../store';
   import type { GroupSummary } from './interfaces';
   import { countPreviousItems } from './utils';
 
@@ -18,6 +19,22 @@
 
   const mainCurrency = settings?.currency ?? 'USD';
   $: balancesHidden = $settingsStore.hideBalances ?? false;
+  $: totalBalanceHidden =
+    $hideVisibleAnalyticsBalances ||
+    (!$showHiddenAnalyticsBalances &&
+      (balancesHidden ||
+        hasHiddenBalanceAccount(
+          null,
+          groups.flatMap((group) => group.accountSummaries.map((item) => item.account)),
+        )));
+
+  const isGroupBalanceHidden = (accountSummaries: GroupSummary['accountSummaries']) =>
+    $hideVisibleAnalyticsBalances ||
+    (!$showHiddenAnalyticsBalances &&
+      hasHiddenBalanceAccount(
+        null,
+        accountSummaries.map((item) => item.account),
+      ));
 
   const onClick = async (item: AccountViewModel) => {
     await goto(`${route('accounts')}?account-card=${item.id}`);
@@ -39,7 +56,7 @@
               </div>
             </th>
             <th class="text-right">
-              {#if balancesHidden}
+              {#if $hideVisibleAnalyticsBalances || (balancesHidden && !$showHiddenAnalyticsBalances) || isGroupBalanceHidden(accountSummaries)}
                 <HiddenMoney currency={currencySymbols[mainCurrency] ?? mainCurrency} size="sm" />
               {:else}
                 {formatMoney(ratedBalance, {
@@ -70,7 +87,7 @@
             <td class="rated-balance">
               <div class="flex gap-0.25 items-baseline justify-end">
                 <span>
-                  {#if balancesHidden}
+                  {#if $hideVisibleAnalyticsBalances || (!$showHiddenAnalyticsBalances && isBalanceHidden($settingsStore, item.account))}
                     <HiddenMoney size="sm" />
                   {:else}
                     {formatMoney(item.ratedBalance, { maxPrecision: 0 })}
@@ -96,7 +113,7 @@
         <td>
           <div class="flex gap-0.25 items-baseline justify-end">
             <span>
-              {#if balancesHidden}
+              {#if totalBalanceHidden}
                 <HiddenMoney size="sm" />
               {:else}
                 {formatMoney(totalBalance, { maxPrecision: 0 })}

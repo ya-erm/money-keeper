@@ -6,6 +6,7 @@
   import { showErrorToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import type { AccountViewModel, Transaction } from '$lib/data/interfaces';
 
   import { settingsStore } from '$lib/data';
@@ -14,7 +15,7 @@
   import { translate } from '$lib/translate';
   import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
   import Modal from '$lib/ui/Modal.svelte';
-  import { formatMoney } from '$lib/utils';
+  import { formatMoney, isBalanceHidden } from '$lib/utils';
   import { Logger } from '$lib/utils/logger';
 
   const logger = new Logger('CorrectBalanceModal');
@@ -24,8 +25,10 @@
   export let balance: number | null = null;
 
   let newBalance = '';
+  let balanceVisibleInModal = false;
   $: diff = parseFloat((Number(newBalance) - (balance ?? 0)).toFixed(10));
-  $: balancesHidden = $settingsStore.hideBalances ?? false;
+  $: balancesHidden = isBalanceHidden($settingsStore, account);
+  $: balanceHiddenInModal = balancesHidden && !balanceVisibleInModal;
 
   const onClose = () => (opened = false);
 
@@ -58,10 +61,20 @@
     <label class="flex-col gap-0.5">
       <InputLabel text={$translate('accounts.current_balance')} />
       <div class="current-balance">
-        {#if balancesHidden}
+        {#if balanceHiddenInModal}
           <HiddenMoney currency={account.currency} />
         {:else}
           {formatMoney(balance ?? 0, { currency: account.currency })}
+        {/if}
+        {#if balancesHidden}
+          <button
+            type="button"
+            class="visibility-toggle"
+            title={$translate(balanceVisibleInModal ? 'privacy.hide_balances' : 'privacy.show_balances')}
+            on:click={() => (balanceVisibleInModal = !balanceVisibleInModal)}
+          >
+            <Icon name={balanceVisibleInModal ? 'mdi:eye-off-outline' : 'mdi:eye-outline'} />
+          </button>
         {/if}
       </div>
     </label>
@@ -77,7 +90,11 @@
     <label class="flex-col gap-0.5">
       <InputLabel text={$translate('accounts.difference')} />
       <div class:positive={diff > 0} class:negative={diff < 0}>
-        {formatMoney(diff, { currency: account.currency })}
+        {#if balanceHiddenInModal}
+          <HiddenMoney currency={account.currency} />
+        {:else}
+          {formatMoney(diff, { currency: account.currency })}
+        {/if}
       </div>
     </label>
     <div class="grid-col-2 gap-1">
@@ -90,6 +107,18 @@
 <style>
   .current-balance {
     margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .visibility-toggle {
+    border: none;
+    padding: 0;
+    color: var(--active-color);
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
   }
   .positive {
     color: var(--green-color);

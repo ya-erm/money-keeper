@@ -8,6 +8,7 @@
   export let onBack: VoidFunction | null = null;
   export let leftSlot: Component | null = null;
   export let rightSlot: Component | null = null;
+  export let rightSlotProps: Record<string, unknown> = {};
 </script>
 
 <svelte:head>
@@ -33,7 +34,7 @@
 
   <div class="navigation-right-button">
     {#if rightSlot !== null}
-      <svelte:component this={rightSlot} />
+      <svelte:component this={rightSlot} {...rightSlotProps} />
     {/if}
   </div>
 </div>

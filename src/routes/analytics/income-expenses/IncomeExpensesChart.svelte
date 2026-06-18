@@ -7,10 +7,11 @@
   import { currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { translate } from '$lib/translate';
   import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
-  import { findRate, formatMoney } from '$lib/utils';
+  import { findRate, formatMoney, hasHiddenBalanceAccount } from '$lib/utils';
   import { formatHiddenMoney } from '$lib/utils/formatHiddenMoney';
 
   import Chart from '../balance/Chart.svelte';
+  import { hideVisibleAnalyticsBalances, showHiddenAnalyticsBalances } from '../store';
 
   type GradientContext = {
     chart: {
@@ -83,10 +84,17 @@
       month,
       income,
       expenses,
+      hasHiddenBalanceAccount: hasHiddenBalanceAccount(
+        null,
+        monthOperations.map((operation) => operation.account),
+      ),
     };
   });
 
   $: balanceDiff = monthStats.reduce((sum, item) => sum + item.income - item.expenses, 0);
+  $: amountsHidden =
+    $hideVisibleAnalyticsBalances ||
+    (!$showHiddenAnalyticsBalances && (balancesHidden || monthStats.some((item) => item.hasHiddenBalanceAccount)));
 
   $: isLineChart = chartType === 'line';
 </script>
@@ -149,7 +157,7 @@
           tooltip: {
             callbacks: {
               label: (context) =>
-                balancesHidden
+                amountsHidden
                   ? `${context.dataset.label}: ${formatHiddenMoney(mainCurrency)}`
                   : `${context.dataset.label}: ${formatMoney(context.parsed.y ?? 0, { currency: mainCurrency })}`,
             },
@@ -159,7 +167,7 @@
           y: {
             position: 'right',
             ticks: {
-              callback: (value) => (balancesHidden ? '' : value),
+              callback: (value) => (amountsHidden ? '' : value),
             },
           },
         },
@@ -170,8 +178,8 @@
 
 <div class="summary">
   <span>{$translate('analytics.income_expenses.total_diff')}:</span>
-  <strong class:negative={!balancesHidden && balanceDiff < 0}>
-    {#if balancesHidden}
+  <strong class:negative={!amountsHidden && balanceDiff < 0}>
+    {#if amountsHidden}
       <HiddenMoney currency={mainCurrency} />
     {:else}
       {formatMoney(balanceDiff, { currency: mainCurrency })}

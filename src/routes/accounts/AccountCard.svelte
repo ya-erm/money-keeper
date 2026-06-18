@@ -4,7 +4,7 @@
   import { translate } from '$lib/translate';
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
-  import { formatMoney } from '$lib/utils/formatMoney';
+  import { formatMoney, isBalanceHidden } from '$lib/utils';
   import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
 
   import AccountOptionsModal from './AccountOptionsModal.svelte';
@@ -26,7 +26,7 @@
     showAdditionalOptions = true;
   };
 
-  $: balancesHidden = $settingsStore.hideBalances ?? false;
+  $: balancesHidden = isBalanceHidden($settingsStore, account);
 
   let showAdditionalOptions = false;
 </script>

@@ -10,11 +10,12 @@
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/layout/Layout.svelte';
 
-  import { findRate, formatHiddenMoney, formatMoney } from '$lib/utils';
+  import { findRate, formatHiddenMoney, formatMoney, hasHiddenBalanceAccount, isBalanceHidden } from '$lib/utils';
 
   import BalanceChartLegend from './BalanceChartLegend.svelte';
   import Chart from './Chart.svelte';
   import { getAccountBalanceChartData } from './chartData';
+  import { hideVisibleAnalyticsBalances, showHiddenAnalyticsBalances } from '../store';
 
   $: currencyRates = $currencyRatesStore ?? [];
   $: accounts = $accountsStore ?? [];
@@ -34,7 +35,6 @@
     .reverse();
 
   $: mainCurrency = settings?.currency ?? 'USD';
-  $: balancesHidden = $settingsStore?.hideBalances ?? false;
 
   $: findRateFn = (currency: string) => findRate(currencyRates, mainCurrency, currency);
 
@@ -62,6 +62,9 @@
   };
 
   $: filteredAccounts = sortedAccounts.filter((account) => selectedAccounts.includes(account.id));
+  $: chartAmountsHidden =
+    $hideVisibleAnalyticsBalances ||
+    (!$showHiddenAnalyticsBalances && hasHiddenBalanceAccount($settingsStore, filteredAccounts));
 
   $: items = getAccountBalanceChartData({
     operations,
@@ -105,7 +108,7 @@
           position: 'right',
           grid: { z: 1 },
           ticks: {
-            callback: (value) => (balancesHidden ? '' : value),
+            callback: (value) => (chartAmountsHidden ? '' : value),
           },
         },
         x: {
@@ -135,7 +138,8 @@
         tooltip: {
           callbacks: {
             label: (context) =>
-              balancesHidden
+              $hideVisibleAnalyticsBalances ||
+              (!$showHiddenAnalyticsBalances && isBalanceHidden($settingsStore, filteredAccounts[context.datasetIndex]))
                 ? `${context.dataset.label}: ${formatHiddenMoney(mainCurrency)}`
                 : `${context.dataset.label}: ${formatMoney(context.parsed.y ?? 0, { currency: mainCurrency })}`,
           },

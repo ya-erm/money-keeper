@@ -5,10 +5,11 @@
   import { translate } from '$lib/translate';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
-  import { findRate, formatMoney, groupByKey } from '$lib/utils';
+  import { findRate, formatMoney, groupByKey, hasHiddenBalanceAccount } from '$lib/utils';
 
   import TransactionList from '../../transactions/TransactionList.svelte';
 
+  import { hideVisibleAnalyticsBalances, showHiddenAnalyticsBalances } from '../store';
   import MonthSelect from './MonthSelect.svelte';
   import { intervalEndStore, intervalStartStore, intervalTypeStore } from './store';
 
@@ -55,6 +56,10 @@
         category,
         categoryId,
         transactions: transactions ?? [],
+        hasHiddenBalanceAccount: hasHiddenBalanceAccount(
+          null,
+          transactions?.map((transaction) => transaction.account) ?? [],
+        ),
         sum:
           transactions?.reduce(
             (sum, t) => sum + (t.category.type === 'IN' ? 1 : -1) * t.amount * findRateFn(t.account.currency),
@@ -66,6 +71,9 @@
 
   let selectedCategoryId: string | null = null;
   $: selectedGroup = groups.find((group) => group.categoryId === selectedCategoryId);
+  $: totalsHidden =
+    $hideVisibleAnalyticsBalances ||
+    (!$showHiddenAnalyticsBalances && (balancesHidden || groups.some((group) => group.hasHiddenBalanceAccount)));
 </script>
 
 <div class="p-1">
@@ -83,7 +91,7 @@
               <span>{group.category?.name ?? group.categoryId}</span>
             </div>
             <span>
-              {#if balancesHidden}
+              {#if $hideVisibleAnalyticsBalances || (balancesHidden && !$showHiddenAnalyticsBalances)}
                 <HiddenMoney currency={mainCurrency} />
               {:else}
                 {formatMoney(group.sum, { currency: mainCurrency })}
@@ -98,7 +106,7 @@
       <div class="total">
         <div>{$translate('categories.incomings')}:</div>
         <div>
-          {#if balancesHidden}
+          {#if totalsHidden}
             <HiddenMoney currency={mainCurrency} />
           {:else}
             {formatMoney(
@@ -109,7 +117,7 @@
         </div>
         <div>{$translate('categories.outgoings')}:</div>
         <div>
-          {#if balancesHidden}
+          {#if totalsHidden}
             <HiddenMoney currency={mainCurrency} />
           {:else}
             {formatMoney(

@@ -23,6 +23,7 @@ export const enDict: Dictionary = {
   'common.no_items': 'No items yet',
   'common.nothing_found': 'Nothing found',
   'common.create': 'Create',
+  'common.edit': 'Edit',
   'common.save': 'Save',
   'common.add': 'Add',
   'common.save_changes_failure': 'Failed to save changes',
@@ -97,6 +98,8 @@ export const enDict: Dictionary = {
   'accounts.create_account_failure': 'Failed to create account',
   'accounts.create_account_success': 'Account was created',
   'accounts.edit_account': 'Update account',
+  'accounts.hide_balance': 'Hide amount',
+  'accounts.show_balance': 'Show amount',
   'accounts.delete_account': 'Delete account',
   'accounts.delete_account_confirm': 'Are you sure want to delete account?',
   'accounts.delete_account_confirm_description':

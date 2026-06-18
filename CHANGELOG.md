@@ -1,10 +1,11 @@
 # Changelog
 
-## 2.12.2 - 2026-06-18
+## 2.13.0 - 2026-06-18
 
-### Changed
+### Added
 
-- Replaced the account card edit button and long-press action with an options button that opens account actions.
+- Added the ability to hide balances for specific accounts.
+- Added a balance visibility toggle to analytics pages.
 
 ## 2.12.1 - 2026-06-17
 
