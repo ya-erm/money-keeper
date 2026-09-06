@@ -2,15 +2,7 @@
 // https://github.com/ya-erm/calculator-react/blob/dev/src/model/CalculationToken.ts
 
 type ICalculationTokenType =
-  | 'plus'
-  | 'minus'
-  | 'multiply'
-  | 'divide'
-  | 'mod'
-  | 'pow'
-  | 'leftBracket'
-  | 'rightBracket'
-  | 'number';
+  'plus' | 'minus' | 'multiply' | 'divide' | 'mod' | 'pow' | 'leftBracket' | 'rightBracket' | 'number';
 
 export class CalculationToken {
   type: ICalculationTokenType;
