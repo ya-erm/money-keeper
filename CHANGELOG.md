@@ -1,5 +1,28 @@
 # Changelog
 
+## 2.18.0 - 2026-09-06
+
+### Added
+
+- Added journal compaction: the "Compact journal" button on the import/export page replaces the whole change history on the server with a single snapshot of the current state. Sync numbers of devices stay valid, devices that are behind receive the snapshot on the next sync.
+- Added `GET /api/v2/journal/compact` (journal size) and `POST /api/v2/journal/compact` endpoints.
+
+### Changed
+
+- Local changes waiting for upload are re-applied after incoming updates, so they are not hidden by newer data from other devices.
+- Journal upload retries once after fetching updates when another device has already used the same order.
+
+## 2.17.0 - 2026-09-06
+
+### Added
+
+- Added an optional "Description from bank statement" field to operations. It is shown in the additional parameters of the form, included in the search and displayed in the list while searching.
+- Added a verification status to operations (`ok`, `mismatch`, `missing`) filled by the bank statement reconciliation. Problems are marked with a badge in the list and explained in the form.
+
+### Changed
+
+- Verification is dropped when the date, amount or account of a verified operation changes, and is not copied when an operation is copied.
+
 ## 2.16.0 - 2026-09-06
 
 ### Added

@@ -15,6 +15,7 @@ import type {
 } from './interfaces';
 import { journalService } from './journal';
 import { membersService } from './members';
+import { SNAPSHOT_KEY_BY_STORAGE } from './snapshot';
 import { useDB } from './useDB';
 
 type StorageName =
@@ -80,28 +81,58 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
     });
   }
 
-  /** Save one item to local DB */
-  private async saveToDB(item: T) {
+  /** Save items to local DB */
+  private async saveToDB(items: T[]) {
+    if (items.length === 0) return;
     const db = await useDB();
     const member = membersService.getSelectedMember();
-    await db.put(this._storageName, { ...item, owner: member.uuid });
+    const tx = db.transaction(this._storageName, 'readwrite');
+    await Promise.all([...items.map((item) => tx.store.put({ ...item, owner: member.uuid })), tx.done]);
   }
 
-  /** Apply journal updates and optional save to DB */
+  /** Replace all items of the member in local DB */
+  private async replaceInDB(items: T[]) {
+    const db = await useDB();
+    const member = membersService.getSelectedMember();
+    const tx = db.transaction(this._storageName, 'readwrite');
+    const keys = await tx.store.index('by-owner').getAllKeys(member.uuid);
+    await Promise.all([
+      ...keys.map((key) => tx.store.delete(key)),
+      ...items.map((item) => tx.store.put({ ...item, owner: member.uuid })),
+      tx.done,
+    ]);
+  }
+
+  /**
+   * Apply journal updates and optional save to DB.
+   * Changes are applied in order, a `snapshot` item replaces all items before it.
+   */
   async applyChanges(changes: Pick<JournalItem, 'data'>[], saveToDB = false) {
     const updates = new Map<string, T>();
+    let snapshotItems: T[] | null = null;
+
     changes.forEach((item) => {
+      const snapshot = item.data.snapshot;
+      if (snapshot) {
+        snapshotItems = (snapshot[SNAPSHOT_KEY_BY_STORAGE[this._storageName]] ?? []) as unknown as T[];
+        updates.clear();
+      }
       const update = item.data[this._journalKey] as unknown as T;
       if (update) {
         updates.set(update.id, update);
       }
     });
     const items = Array.from(updates.values());
+    const replaced = snapshotItems as T[] | null;
 
     this._items.update((prev) => {
       const dict = new Map<string, T>();
-      prev.active.forEach((item) => dict.set(item.id, item));
-      prev.deleted.forEach((item) => dict.set(item.id, item));
+      if (replaced) {
+        replaced.forEach((item) => dict.set(item.id, item));
+      } else {
+        prev.active.forEach((item) => dict.set(item.id, item));
+        prev.deleted.forEach((item) => dict.set(item.id, item));
+      }
       items.forEach((item) => dict.set(item.id, item));
       const allItems = Array.from(dict.values());
       return {
@@ -111,7 +142,11 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
     });
 
     if (saveToDB) {
-      await Promise.all(items.map((item) => this.saveToDB(item)));
+      if (replaced) {
+        await this.replaceInDB([...this._items.value.active, ...this._items.value.deleted]);
+      } else {
+        await this.saveToDB(items);
+      }
     }
   }
 

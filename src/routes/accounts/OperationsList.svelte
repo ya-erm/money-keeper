@@ -25,6 +25,7 @@
       (t) =>
         !search ||
         t.comment?.toLowerCase().includes(search.toLowerCase()) ||
+        t.description?.toLowerCase().includes(search.toLowerCase()) ||
         t.category?.name.toLowerCase().includes(search.toLowerCase()) ||
         t.date.substring(0, 10).includes(search) ||
         t.tags.some((tag) => tag.name.toLowerCase().includes(search.toLowerCase())) ||
@@ -72,11 +73,11 @@
             {$translate('common.count', { values: { count: futureOperations.length } })}
           </span>
         </SpoilerToggle>
-        <GroupedOperationsList {account} operations={futureOperations} />
+        <GroupedOperationsList {account} operations={futureOperations} showDescription={!!search} />
       </Spoiler>
       <hr class="line" />
     {/if}
-    <GroupedOperationsList {account} operations={pastOperations} />
+    <GroupedOperationsList {account} operations={pastOperations} showDescription={!!search} />
   </div>
 </ShowMoreContainer>
 

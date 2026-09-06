@@ -32,7 +32,7 @@ export type SnapshotEntityKey = Exclude<keyof Snapshot, 'accountsOrder' | 'categ
 type SnapshotEntity = Snapshot[SnapshotEntityKey][number];
 
 /** Map from journal operation key to snapshot collection */
-const ENTITY_KEYS: { [key in keyof JournalOperation]: SnapshotEntityKey | 'setting' } = {
+const ENTITY_KEYS: { [key in keyof JournalOperation]: SnapshotEntityKey | 'setting' | 'snapshot' } = {
   category: 'categories',
   accountTag: 'accountTags',
   account: 'accounts',
@@ -44,7 +44,20 @@ const ENTITY_KEYS: { [key in keyof JournalOperation]: SnapshotEntityKey | 'setti
   accountsOrder: 'setting',
   categoriesInOrder: 'setting',
   categoriesOutOrder: 'setting',
+  snapshot: 'snapshot',
 };
+
+/** Map from local storage name to snapshot collection */
+export const SNAPSHOT_KEY_BY_STORAGE = {
+  categories: 'categories',
+  accountTags: 'accountTags',
+  accounts: 'accounts',
+  tags: 'operationTags',
+  transactions: 'operations',
+  currencyRates: 'currencyRates',
+  groupings: 'groupings',
+  repeatings: 'repeatings',
+} as const satisfies Record<string, SnapshotEntityKey>;
 
 export const SNAPSHOT_ENTITY_KEYS: SnapshotEntityKey[] = [
   'categories',
@@ -117,6 +130,22 @@ export function reduceJournal(
       const target = ENTITY_KEYS[key as keyof JournalOperation];
       if (!target) {
         throw new UnknownJournalKeyError(key, item.order);
+      }
+      if (target === 'snapshot') {
+        // Snapshot replaces everything before it
+        const snapshot = value as Snapshot;
+        for (const entityKey of SNAPSHOT_ENTITY_KEYS) {
+          const map = new Map<string, SnapshotEntity>();
+          (snapshot[entityKey] ?? []).forEach((entity) => map.set(entity.id, entity));
+          maps.set(entityKey, map);
+        }
+        delete settings.accountsOrder;
+        delete settings.categoriesInOrder;
+        delete settings.categoriesOutOrder;
+        if (snapshot.accountsOrder) settings.accountsOrder = snapshot.accountsOrder;
+        if (snapshot.categoriesInOrder) settings.categoriesInOrder = snapshot.categoriesInOrder;
+        if (snapshot.categoriesOutOrder) settings.categoriesOutOrder = snapshot.categoriesOutOrder;
+        continue;
       }
       if (target === 'setting') {
         settings[key as keyof typeof settings] = value as string[];

@@ -4,6 +4,7 @@ import type {
   PostManyJournalResponseData,
 } from '$lib/server/api/v2/journal';
 import type { GetJournalRequest } from '$lib/server/api/v2/journal/getJournal';
+import { isApiError } from '$lib/api/ApiError';
 import { store } from '$lib/store';
 import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 import { unexpectedCase } from '$lib/utils';
@@ -104,6 +105,12 @@ export class JournalService implements Initialisable {
     if (this.updates.length > 0) {
       logger.log('Apply updates to subscribers');
       await this.applyChangesToSubscribers(this.updates, true);
+
+      if (this.queue.length > 0) {
+        // Local changes must win over the incoming ones (including snapshots), they will be uploaded next
+        logger.log('Re-apply queue to subscribers');
+        await this.applyChangesToSubscribers(this.queue, true);
+      }
     }
 
     if (this.queue.length > 0) {
@@ -292,9 +299,25 @@ export class JournalService implements Initialisable {
     }
   }
 
-  /** Try to upload queue to the server, don't throw error */
-  async tryUploadQueue() {
-    return await this.uploadQueue().catch();
+  /**
+   * Try to upload queue to the server, don't throw error.
+   * On order conflict (another device uploaded something) fetches updates, renumbers the queue and retries once.
+   */
+  async tryUploadQueue(retryOnConflict = true) {
+    try {
+      await this.uploadQueue();
+    } catch (e) {
+      const cause = e instanceof Error ? e.cause : undefined;
+      if (retryOnConflict && isApiError(cause) && cause.status === 409) {
+        logger.log('Journal order conflict, fetch updates and retry upload');
+        await this.tryFetchUpdates();
+        if (this.updates.length > 0) {
+          await this.applyChangesToSubscribers(this.updates, true);
+          await this.applyChangesToSubscribers(this.queue, true);
+        }
+        await this.tryUploadQueue(false);
+      }
+    }
   }
 }
 
