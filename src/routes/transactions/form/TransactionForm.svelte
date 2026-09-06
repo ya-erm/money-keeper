@@ -8,7 +8,6 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
-  import Portal from '@ya-erm/svelte-ui/Portal';
   import Spoiler from '@ya-erm/svelte-ui/Spoiler';
   import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
 
@@ -27,7 +26,7 @@
   import { repeatingsService, repeatingsStore } from '$lib/data/repeatings';
   import { translate } from '$lib/translate';
   import type { Messages } from '$lib/translate/messages';
-  import Layout from '$lib/ui/layout/Layout.svelte';
+  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
   import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
@@ -485,40 +484,40 @@
   }}
 />
 
-<Portal visible={repeatingListVisible}>
-  <Layout
-    title={$translate('transactions.repeatings.select_repeating')}
-    onBack={() => {
-      if (!repeating) repeatingChecked = false;
-      repeatingListVisible = false;
-    }}
-    hideMenu
-  >
-    <div class="p-1">
-      <RepeatingsList
-        repeatings={$repeatingsStore}
-        onClick={(item) => {
-          repeating = item;
-          repeatingListVisible = false;
-        }}
-      />
-    </div>
-  </Layout>
-</Portal>
-
-<Portal visible={timeZoneListVisible}>
-  <Layout title={$translate('timezones.select_time_zone')} onBack={() => (timeZoneListVisible = false)} hideMenu>
-    <TimeZoneList
-      onClick={(tz, shift) => {
-        timeZone = tz;
-        timeZoneShift = shift;
-        date = dayjs.utc(datetime).tz(timeZone).format('YYYY-MM-DD');
-        time = dayjs.utc(datetime).tz(timeZone).format('HH:mm');
-        timeZoneListVisible = false;
+<SubScreen
+  visible={repeatingListVisible}
+  title={$translate('transactions.repeatings.select_repeating')}
+  onBack={() => {
+    if (!repeating) repeatingChecked = false;
+    repeatingListVisible = false;
+  }}
+>
+  <div class="p-1">
+    <RepeatingsList
+      repeatings={$repeatingsStore}
+      onClick={(item) => {
+        repeating = item;
+        repeatingListVisible = false;
       }}
     />
-  </Layout>
-</Portal>
+  </div>
+</SubScreen>
+
+<SubScreen
+  visible={timeZoneListVisible}
+  title={$translate('timezones.select_time_zone')}
+  onBack={() => (timeZoneListVisible = false)}
+>
+  <TimeZoneList
+    onClick={(tz, shift) => {
+      timeZone = tz;
+      timeZoneShift = shift;
+      date = dayjs.utc(datetime).tz(timeZone).format('YYYY-MM-DD');
+      time = dayjs.utc(datetime).tz(timeZone).format('HH:mm');
+      timeZoneListVisible = false;
+    }}
+  />
+</SubScreen>
 
 <style>
   .currency-rate-info {

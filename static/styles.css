@@ -49,9 +49,9 @@ body.dark-mode {
   box-sizing: border-box;
 }
 
-/* Full-screen portal from svelte-ui: match theme background outside the centered column */
-dialog[data-testid='Portal'] {
-  background-color: var(--background-color);
+/* Full-screen portal from svelte-ui: content provides its own background */
+dialog[data-testid$='Portal'] {
+  background-color: transparent;
 }
 
 a {

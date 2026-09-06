@@ -10,11 +10,13 @@
   export let rightSlotProps: Record<string, unknown> = {};
 
   export let hideMenu = false;
+  /** Render as a floating panel on wide screens (used by SubScreen) */
+  export let panel = false;
 </script>
 
-<main>
+<main class:panel>
   <div class="content">
-    <Header {title} {onBack} {leftSlot} {rightSlot} {rightSlotProps} />
+    <Header {title} {onBack} {leftSlot} {rightSlot} {rightSlotProps} closable={panel} />
     <div class="page">
       <slot />
     </div>
@@ -61,6 +63,21 @@
       margin: 0 auto;
       border-left: 1px solid var(--border-color);
       border-right: 1px solid var(--border-color);
+    }
+
+    main.panel {
+      height: auto;
+      max-height: calc(100vh - 4rem);
+      width: 100%;
+      max-width: var(--panel-width, 40rem);
+      border: 1px solid var(--border-color);
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2);
+    }
+    main.panel .content {
+      max-width: none;
+      border: none;
     }
   }
 </style>

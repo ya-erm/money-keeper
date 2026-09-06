@@ -1,14 +1,19 @@
 <script lang="ts">
   import { type Component } from 'svelte';
 
+  import { translate } from '$lib/translate';
+
   import SyncState from './SyncState.svelte';
   import HeaderBackButton from './HeaderBackButton.svelte';
+  import HeaderButton from './HeaderButton.svelte';
 
   export let title: string;
   export let onBack: VoidFunction | null = null;
   export let leftSlot: Component | null = null;
   export let rightSlot: Component | null = null;
   export let rightSlotProps: Record<string, unknown> = {};
+  /** Show a close button instead of the back button on wide screens */
+  export let closable = false;
 </script>
 
 <svelte:head>
@@ -20,7 +25,14 @@
     {#if leftSlot !== null}
       <svelte:component this={leftSlot} />
     {:else if onBack !== null}
-      <HeaderBackButton onClick={onBack} />
+      <span class="back-button" class:closable>
+        <HeaderBackButton onClick={onBack} />
+      </span>
+      {#if closable}
+        <span class="close-button">
+          <HeaderButton icon="mdi:close" label={$translate('common.close')} onClick={onBack} />
+        </span>
+      {/if}
     {/if}
   </div>
   <div class="flex-grow flex-col flex-center">
@@ -68,5 +80,20 @@
   }
   .navigation-right-button {
     justify-self: flex-end;
+  }
+  .back-button {
+    display: flex;
+  }
+  .close-button {
+    display: none;
+    padding-left: 0.5rem;
+  }
+  @media (min-width: 768px) {
+    .back-button.closable {
+      display: none;
+    }
+    .close-button {
+      display: flex;
+    }
   }
 </style>

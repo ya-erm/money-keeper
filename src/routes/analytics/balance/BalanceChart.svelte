@@ -3,12 +3,11 @@
 
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
-  import Portal from '@ya-erm/svelte-ui/Portal';
 
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { type Account } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/layout/Layout.svelte';
+  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
 
   import { findRate, formatHiddenMoney, formatMoney, hasHiddenBalanceAccount, isBalanceHidden } from '$lib/utils';
 
@@ -150,15 +149,17 @@
   />
 </div>
 
-<Portal visible={legendVisible}>
-  <Layout title={$translate('analytics.balance.legend')} onBack={() => (legendVisible = false)}>
-    <BalanceChartLegend
-      accounts={sortedAccounts.slice().reverse()}
-      onApply={handleAccountCheckedApply}
-      {selectedAccounts}
-    />
-  </Layout>
-</Portal>
+<SubScreen
+  visible={legendVisible}
+  title={$translate('analytics.balance.legend')}
+  onBack={() => (legendVisible = false)}
+>
+  <BalanceChartLegend
+    accounts={sortedAccounts.slice().reverse()}
+    onApply={handleAccountCheckedApply}
+    {selectedAccounts}
+  />
+</SubScreen>
 
 <style>
   .chart-container {
