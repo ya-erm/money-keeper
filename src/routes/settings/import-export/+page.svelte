@@ -16,8 +16,9 @@
     operationTagsService,
     operationsService,
     operationsStore,
+    repeatingsService,
   } from '$lib/data';
-  import type { Account, Category, CurrencyRate, Grouping, Tag, Transaction } from '$lib/data/interfaces';
+  import type { Account, Category, CurrencyRate, Grouping, Repeating, Tag, Transaction } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
   import Layout from '$lib/ui/layout/Layout.svelte';
@@ -35,6 +36,7 @@
     operations: Transaction[];
     currencyRates: CurrencyRate[];
     groupings: Grouping[];
+    repeatings?: Repeating[];
   } = {
     categories: [],
     accountTags: [],
@@ -43,6 +45,7 @@
     operations: [],
     currencyRates: [],
     groupings: [],
+    repeatings: [],
   };
 
   let parsed = false;
@@ -60,6 +63,7 @@
     operations: operationsService.items,
     currencyRates: currencyRatesService.items,
     groupings: groupingsService.items,
+    repeatings: repeatingsService.items,
   };
 
   // eslint-disable-next-line svelte/no-immutable-reactive-statements
@@ -103,6 +107,11 @@
 
       v2.currencyRates?.filter(notExists(currencyRatesService.items)).forEach((currencyRate) => {
         void journalService.addOperationToQueue({ currencyRate }, { upload: false });
+        count += 1;
+      });
+
+      v2.repeatings?.filter(notExists(repeatingsService.items)).forEach((repeating) => {
+        void journalService.addOperationToQueue({ repeating }, { upload: false });
         count += 1;
       });
 
@@ -169,7 +178,8 @@
         <span>{$translate('import_export.operation_tags')}: <b>{v2.operationTags?.length ?? 0}</b>,</span>
         <span>{$translate('import_export.operations')}: <b>{v2.operations?.length ?? 0}</b>,</span>
         <span>{$translate('import_export.currency_rates')}: <b>{v2.currencyRates?.length ?? 0}</b></span>
-        <span>{$translate('import_export.groupings')}: <b>{v2.groupings?.length ?? 0}</b></span>
+        <span>{$translate('import_export.groupings')}: <b>{v2.groupings?.length ?? 0}</b>,</span>
+        <span>{$translate('import_export.repeatings')}: <b>{v2.repeatings?.length ?? 0}</b></span>
       </p>
 
       <Button data-testId="AddToJournalButton" disabled={uploading} class="w-full" onClick={addToJournal}>
@@ -195,7 +205,8 @@
       <span>{$translate('import_export.operation_tags')}: <b>{current.operationTags?.length ?? 0}</b>,</span>
       <span>{$translate('import_export.operations')}: <b>{current.operations?.length ?? 0}</b>,</span>
       <span>{$translate('import_export.currency_rates')}: <b>{current.currencyRates?.length ?? 0}</b></span>
-      <span>{$translate('import_export.groupings')}: <b>{current.groupings?.length ?? 0}</b></span>
+      <span>{$translate('import_export.groupings')}: <b>{current.groupings?.length ?? 0}</b>,</span>
+      <span>{$translate('import_export.repeatings')}: <b>{current.repeatings?.length ?? 0}</b></span>
     </p>
     <a href={URL.createObjectURL(currentJsonFile)} download={`export-${dayjs().format('YYYY-MM-DD')}.json`}>
       <Button class="w-full">{$translate('import_export.save')}</Button>

@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.16.0 - 2026-09-06
+
+### Added
+
+- Added `GET /api/v2/snapshot` endpoint that returns the current state of all data reduced from the journal on the server.
+- Added `Authorization: Bearer <token>` support for API requests, intended for scripts and external tools.
+- Added the API tokens page in settings to create and revoke tokens.
+- Added repeatings to the JSON import and export.
+
+### Changed
+
+- Journal upload now returns `409 CONFLICT` instead of a server error when the order is already used.
+
 ## 2.15.0 - 2026-09-06
 
 ### Added
