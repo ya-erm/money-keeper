@@ -2,7 +2,11 @@ import { sveltekit } from '@sveltejs/kit/vite';
 // import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 import type { UserConfig } from 'vite';
 
-const config: UserConfig = {
+type UserConfigWithTest = UserConfig & {
+  test: { include: string[] };
+};
+
+const config: UserConfigWithTest = {
   plugins: [
     sveltekit(),
     // SvelteKitPWA({
@@ -12,6 +16,9 @@ const config: UserConfig = {
     //   },
     // }),
   ],
+  test: {
+    include: ['src/**/*.test.ts'],
+  },
 };
 
 export default config;
