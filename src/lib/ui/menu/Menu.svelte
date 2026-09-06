@@ -18,14 +18,15 @@
   });
 </script>
 
-<div class="menu-bar" class:hidden={$hidden}>
+<nav class="menu-bar" class:hidden={$hidden}>
+  <div class="menu-title">{$translate('app.title')}</div>
   {#each $menu as item (item.path)}
     <a href={item.path} class="menu-item" data-testId="MenuItem" class:active={$isActive(item.path)}>
       <Icon name={item.icon} size={1.5} />
       <span class="text">{$translate(item.title)}</span>
     </a>
   {/each}
-</div>
+</nav>
 
 <style>
   .menu-bar {
@@ -36,6 +37,9 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
   .menu-bar.hidden {
+    display: none;
+  }
+  .menu-title {
     display: none;
   }
   .menu-item {
@@ -61,5 +65,53 @@
   }
   .menu-item .text {
     font-size: 0.7em;
+  }
+
+  /* Tablet: vertical rail with icons only */
+  @media (min-width: 768px) {
+    .menu-bar {
+      order: -1;
+      flex-direction: column;
+      align-items: stretch;
+      flex-shrink: 0;
+      gap: 0.25rem;
+      padding: 0.75rem 0.5rem;
+      border-top: none;
+      border-right: 1px solid var(--border-color);
+    }
+    .menu-item {
+      flex-grow: 0;
+      border-radius: 0.5rem;
+      padding: 0.6rem 0.75rem;
+    }
+    .menu-item.active {
+      background-color: var(--hover-background-color);
+    }
+    .menu-item .text {
+      display: none;
+    }
+  }
+
+  /* Desktop: full sidebar with labels */
+  @media (min-width: 1024px) {
+    .menu-bar {
+      width: 15rem;
+    }
+    .menu-title {
+      display: block;
+      font-size: 1.25rem;
+      font-weight: 600;
+      padding: 0.5rem 0.75rem 1rem;
+      color: var(--primary-text-color);
+    }
+    .menu-item {
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 0.75rem;
+    }
+    .menu-item .text {
+      display: inline;
+      font-size: 1rem;
+    }
   }
 </style>
