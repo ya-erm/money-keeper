@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.18.0 - 2026-09-06
+
+### Added
+
+- Added journal compaction: the "Compact journal" button on the import/export page replaces the whole change history on the server with a single snapshot of the current state. Sync numbers of devices stay valid, devices that are behind receive the snapshot on the next sync.
+- Added `GET /api/v2/journal/compact` (journal size) and `POST /api/v2/journal/compact` endpoints.
+
+### Changed
+
+- Local changes waiting for upload are re-applied after incoming updates, so they are not hidden by newer data from other devices.
+- Journal upload retries once after fetching updates when another device has already used the same order.
+
 ## 2.17.0 - 2026-09-06
 
 ### Added

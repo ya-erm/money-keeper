@@ -130,10 +130,18 @@ export class MembersService implements Initialisable, JournalSubscriber {
 
   /** Apply journal updates and optional save to DB */
   async applyChanges(changes: JournalItem[], saveToDB: boolean) {
-    const accountsOrder = changes.findLast((item) => item.data.accountsOrder);
-    const categoriesInOrder = changes.findLast((item) => item.data.categoriesInOrder);
-    const categoriesOutOrder = changes.findLast((item) => item.data.categoriesOutOrder);
-    const mergedSettings = { ...accountsOrder?.data, ...categoriesInOrder?.data, ...categoriesOutOrder?.data };
+    const mergedSettings: Pick<MemberSettings, 'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder'> = {};
+    for (const { data } of changes) {
+      if (data.snapshot) {
+        // Snapshot replaces all settings before it
+        mergedSettings.accountsOrder = data.snapshot.accountsOrder ?? [];
+        mergedSettings.categoriesInOrder = data.snapshot.categoriesInOrder ?? [];
+        mergedSettings.categoriesOutOrder = data.snapshot.categoriesOutOrder ?? [];
+      }
+      if (data.accountsOrder) mergedSettings.accountsOrder = data.accountsOrder;
+      if (data.categoriesInOrder) mergedSettings.categoriesInOrder = data.categoriesInOrder;
+      if (data.categoriesOutOrder) mergedSettings.categoriesOutOrder = data.categoriesOutOrder;
+    }
     if (Object.keys(mergedSettings).length > 0) {
       await this.updateSettings({ ...mergedSettings }, saveToDB);
     }

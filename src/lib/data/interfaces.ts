@@ -1,5 +1,7 @@
 import type { DBSchema } from 'idb';
 
+import type { Snapshot } from './snapshot';
+
 export type WithOwner<T> = T & { owner: string };
 
 export type Initialisable = {
@@ -52,6 +54,11 @@ export type JournalOperation = {
   categoriesOutOrder?: string[];
   grouping?: Grouping;
   repeating?: Repeating;
+  /**
+   * Full state written by journal compaction, replaces everything before it.
+   * Deleted accounts, categories and tags are kept (with `deleted: true`), deleted operations are dropped.
+   */
+  snapshot?: Snapshot;
 };
 
 export type JournalSubscriber = {
