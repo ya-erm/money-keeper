@@ -18,14 +18,7 @@ import { membersService } from './members';
 import { useDB } from './useDB';
 
 type StorageName =
-  | 'categories'
-  | 'accounts'
-  | 'transactions'
-  | 'tags'
-  | 'accountTags'
-  | 'currencyRates'
-  | 'groupings'
-  | 'repeatings';
+  'categories' | 'accounts' | 'transactions' | 'tags' | 'accountTags' | 'currencyRates' | 'groupings' | 'repeatings';
 
 type EntityType = Category | Account | Transaction | Tag | CurrencyRate | Repeating;
 
