@@ -13,9 +13,11 @@
 </script>
 
 <main>
-  <Header {title} {onBack} {leftSlot} {rightSlot} {rightSlotProps} />
-  <div class="page">
-    <slot />
+  <div class="content">
+    <Header {title} {onBack} {leftSlot} {rightSlot} {rightSlotProps} />
+    <div class="page">
+      <slot />
+    </div>
   </div>
   {#if !hideMenu}
     <Menu />
@@ -24,6 +26,8 @@
 
 <style>
   main {
+    --content-max-width: 48rem;
+
     display: flex;
     flex-direction: column;
     color: var(--primary-text-color);
@@ -33,14 +37,27 @@
     max-height: -webkit-fill-available;
   }
 
+  .content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-height: 0;
+    min-width: 0;
+  }
+
   .page {
     overflow-y: auto;
     flex-grow: 1;
   }
 
+  /* Desktop: menu becomes a sidebar on the left, content is a centered column */
   @media (min-width: 768px) {
     main {
-      max-width: 48rem;
+      flex-direction: row;
+    }
+    .content {
+      width: 100%;
+      max-width: var(--content-max-width);
       margin: 0 auto;
       border-left: 1px solid var(--border-color);
       border-right: 1px solid var(--border-color);
