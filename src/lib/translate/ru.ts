@@ -391,6 +391,18 @@ export const ruDict: Dictionary = {
   'import_export.import_failure': 'Не выполнить импорт',
   'import_export.operations_keys_logged': 'Ключи операций залогированы. Смотри логи или консоль',
   'import_export.show_textbox': 'Показать',
+  'import_export.journal': 'Журнал',
+  'import_export.journal_records': 'Записей журнала на сервере: {count}, номер синхронизации: {syncNumber}',
+  'import_export.journal_load_failure': 'Не удалось загрузить информацию о журнале',
+  'import_export.compact': 'Сжать журнал',
+  'import_export.compact_description':
+    'Сервер хранит каждое изменение как запись журнала. Сжатие заменяет всю историю одним снимком текущего состояния, другие устройства получат его при следующей синхронизации.',
+  'import_export.compact_confirm':
+    'История изменений на сервере будет заменена текущим состоянием, восстановить её будет нельзя. Продолжить?',
+  'import_export.compact_success': 'Журнал сжат: {before} → {after} записей',
+  'import_export.compact_failure': 'Не удалось сжать журнал',
+  'import_export.compact_conflict': 'Журнал изменился, синхронизируйтесь и попробуйте снова',
+  'import_export.compact_queue_not_empty': 'Не все изменения загружены на сервер, попробуйте позже',
   // Settings
   'settings.title': 'Настройки',
   'settings.language': 'Язык',

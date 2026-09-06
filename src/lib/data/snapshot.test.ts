@@ -123,6 +123,40 @@ describe('reduceJournal', () => {
     expect(reduceJournal(journal).operations).toEqual([transaction({ amount: 50 })]);
   });
 
+  it('snapshot item replaces everything before it and later items apply on top', () => {
+    const journal: JournalItem[] = [
+      { order: 1, data: { transaction: transaction({ id: 'old', amount: 1 }) } },
+      { order: 2, data: { category: { id: 'old-cat', name: 'Old', type: 'IN' } } },
+      { order: 3, data: { accountsOrder: ['old'] } },
+      {
+        order: 4,
+        data: {
+          snapshot: {
+            categories: [category, { id: 'deleted-cat', name: 'Deleted', type: 'OUT', deleted: true }],
+            accountTags: [],
+            accounts: [account],
+            operationTags: [],
+            operations: [transaction()],
+            currencyRates: [],
+            groupings: [],
+            repeatings: [],
+            categoriesOutOrder: ['cat-1'],
+          },
+        },
+      },
+      { order: 5, data: { transaction: transaction({ id: 'op-2', amount: 7 }) } },
+      { order: 6, data: { transaction: transaction({ deleted: true }) } },
+    ];
+
+    const snapshot = reduceJournal(journal, { deleted: 'referenced' });
+
+    expect(snapshot.operations).toEqual([transaction({ id: 'op-2', amount: 7 })]);
+    expect(snapshot.categories.map((c) => c.id)).toEqual(['cat-1', 'deleted-cat']);
+    expect(snapshot.accounts).toEqual([account]);
+    expect(snapshot.accountsOrder).toBeUndefined();
+    expect(snapshot.categoriesOutOrder).toEqual(['cat-1']);
+  });
+
   it('throws on unknown journal keys', () => {
     const journal = [{ order: 7, data: { somethingNew: { id: 'x' } } }] as unknown as JournalItem[];
 

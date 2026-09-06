@@ -58,6 +58,14 @@ curl -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
   https://<host>/api/v2/journal
 ```
 
+## Journal compaction
+
+The server stores every change as a journal item. `POST /api/v2/journal/compact` replaces all items up to the
+current max order N with a single `{ "snapshot": { ... } }` item at order N. Orders stay monotonic, so device sync
+numbers keep working: a device that has seen N gets nothing new, a device behind N receives the snapshot (which
+replaces its whole local state) followed by the items after N. Pass `syncNumber` in the body to make sure the
+caller has the latest state, otherwise `409` is returned. Works only for unencrypted journals.
+
 ## E2E tests
 
 E2E tests run with Playwright in guest mode and use local IndexedDB, so database startup is not required for the main test flow.
