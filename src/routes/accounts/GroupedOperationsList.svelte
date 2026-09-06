@@ -10,7 +10,7 @@
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/layout/Layout.svelte';
   import HeaderFormSubmitButton from '$lib/ui/layout/HeaderFormSubmitButton.svelte';
-  import { findCurrencyRate, getSearchParam, setSearchParam } from '$lib/utils';
+  import { findCurrencyRate, formatMoney, getSearchParam, setSearchParam } from '$lib/utils';
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
   import EditTransaction from '../transactions/edit/EditTransaction.svelte';
@@ -31,6 +31,17 @@
     return res;
   }, {});
 
+  /** Sum of expenses per currency (transfers and excluded from analysis operations are skipped) */
+  function formatDayExpenses(transactions: TransactionViewModel[]) {
+    const byCurrency: Record<string, number> = {};
+    for (const t of transactions) {
+      if (t.category.type !== 'OUT' || t.category.system || t.linkedTransaction || t.excludeFromAnalysis) continue;
+      const currency = t.account.currency;
+      byCurrency[currency] = (byCurrency[currency] ?? 0) + t.amount;
+    }
+    return Object.entries(byCurrency).map(([currency, amount]) => `-${formatMoney(amount, { currency })}`);
+  }
+
   $: operationId = getSearchParam($page, 'operation-id');
   const openOperationForm = (id: string) => setSearchParam($page, 'operation-id', id, { replace: false });
   const closeOperationForm = () => history.back();
@@ -41,7 +52,17 @@
 
 <ul class="operations-list flex-col gap-1">
   {#each Object.entries(groups) as [date, transactions] (date)}
-    <div>{dayjs(date).format('DD MMMM YYYY, dddd')}</div>
+    {@const dayExpenses = formatDayExpenses(transactions)}
+    <div class="day-header flex items-center justify-between gap-0.5">
+      <span>{dayjs(date).format('DD MMMM YYYY, dddd')}</span>
+      {#if dayExpenses.length}
+        <div class="day-expenses flex-col items-end" data-testId="DayExpenses">
+          {#each dayExpenses as dayExpense (dayExpense)}
+            <span>{dayExpense}</span>
+          {/each}
+        </div>
+      {/if}
+    </div>
     {#each transactions as transaction (transaction.id)}
       <TransactionListItem
         hideAccount={!!account}
@@ -78,5 +99,12 @@
     padding: 0;
     margin: 0;
     padding-top: 1rem;
+  }
+  .day-expenses {
+    flex-shrink: 0;
+    font-size: 0.8rem;
+    color: var(--secondary-text-color);
+    opacity: 0.6;
+    white-space: nowrap;
   }
 </style>

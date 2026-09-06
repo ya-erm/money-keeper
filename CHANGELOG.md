@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.15.0 - 2026-09-06
+
+### Added
+
+- Added daily expenses total to the date headers in the operations list.
+
 ## 2.14.0 - 2026-06-18
 
 ### Added
