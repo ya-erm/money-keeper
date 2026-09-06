@@ -3,12 +3,10 @@
 
   import { page } from '$app/stores';
 
-  import Portal from '@ya-erm/svelte-ui/Portal';
-
   import { currencyRatesStore, memberSettingsStore } from '$lib/data';
   import type { Account, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/layout/Layout.svelte';
+  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
   import HeaderFormSubmitButton from '$lib/ui/layout/HeaderFormSubmitButton.svelte';
   import { findCurrencyRate, formatMoney, getSearchParam, setSearchParam } from '$lib/utils';
 
@@ -81,16 +79,14 @@
   {/each}
 </ul>
 
-<Portal visible={operationId !== null}>
-  <Layout
-    title={$translate('transactions.edit_transaction')}
-    onBack={closeOperationForm}
-    rightSlot={HeaderFormSubmitButton}
-    hideMenu
-  >
-    <EditTransaction id={operationId} onBack={closeOperationForm} />
-  </Layout>
-</Portal>
+<SubScreen
+  visible={operationId !== null}
+  title={$translate('transactions.edit_transaction')}
+  onBack={closeOperationForm}
+  rightSlot={HeaderFormSubmitButton}
+>
+  <EditTransaction id={operationId} onBack={closeOperationForm} />
+</SubScreen>
 
 {#if optionsModalOperation}
   <OperationOptionsModal bind:opened={optionsModalOpened} operation={optionsModalOperation} />

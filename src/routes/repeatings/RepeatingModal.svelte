@@ -7,11 +7,10 @@
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Modal from '@ya-erm/svelte-ui/Modal';
-  import Portal from '@ya-erm/svelte-ui/Portal';
 
   import type { Repeating, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/layout/Layout.svelte';
+  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
   import Select from '$lib/ui/Select.svelte';
   import { checkNumberFormParameter } from '$lib/utils/checkFormParams';
 
@@ -117,13 +116,15 @@
   </Modal>
 </Modal>
 
-<Portal visible={operationsListVisible}>
-  <Layout title={$translate('repeatings.operations')} onBack={() => (operationsListVisible = false)} hideMenu>
-    <div class="p-1">
-      <GroupedOperationsList operations={operations ?? []} />
-    </div>
-  </Layout>
-</Portal>
+<SubScreen
+  visible={operationsListVisible}
+  title={$translate('repeatings.operations')}
+  onBack={() => (operationsListVisible = false)}
+>
+  <div class="p-1">
+    <GroupedOperationsList operations={operations ?? []} />
+  </div>
+</SubScreen>
 
 <style>
   .info {

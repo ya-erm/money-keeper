@@ -5,12 +5,11 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
   import MultiSwitch from '@ya-erm/svelte-ui/MultiSwitch';
-  import Portal from '@ya-erm/svelte-ui/Portal';
 
   import type { Category, CategoryType } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
-  import Layout from '$lib/ui/layout/Layout.svelte';
+  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
   import Modal from '$lib/ui/Modal.svelte';
   import { deleteSearchParam, getSearchParam, setSearchParam } from '$lib/utils';
 
@@ -111,15 +110,13 @@
     </div>
   </form>
 
-  <Portal visible={iconSelecting}>
-    <Layout title={$translate('icons.select_icon')} onBack={closeIconSelecting} hideMenu>
-      <CategoryIcons
-        icon={icon ?? null}
-        onSelect={(value) => {
-          void closeIconSelecting();
-          icon = value;
-        }}
-      />
-    </Layout>
-  </Portal>
+  <SubScreen visible={iconSelecting} title={$translate('icons.select_icon')} onBack={closeIconSelecting}>
+    <CategoryIcons
+      icon={icon ?? null}
+      onSelect={(value) => {
+        void closeIconSelecting();
+        icon = value;
+      }}
+    />
+  </SubScreen>
 </Modal>

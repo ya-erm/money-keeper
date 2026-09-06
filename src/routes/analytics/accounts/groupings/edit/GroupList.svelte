@@ -4,13 +4,12 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
-  import Portal from '@ya-erm/svelte-ui/Portal';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 
   import { accountsStore } from '$lib/data';
   import type { Group } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/layout/Layout.svelte';
+  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
 
   import AccountList from '../../../../accounts/list/AccountList.svelte';
   import GroupAccountList from './GroupAccountList.svelte';
@@ -70,11 +69,14 @@
   </ul>
 </div>
 
-<Portal visible={!!groupIdForAddAccount} testId="Grouping.AccountSelecting.Portal">
-  <Layout title={$translate('transactions.select_account')} onBack={() => (groupIdForAddAccount = null)} hideMenu>
-    <AccountList {accounts} onClick={handelSelectAccount} />
-  </Layout>
-</Portal>
+<SubScreen
+  visible={!!groupIdForAddAccount}
+  title={$translate('transactions.select_account')}
+  onBack={() => (groupIdForAddAccount = null)}
+  testId="Grouping.AccountSelecting.Portal"
+>
+  <AccountList {accounts} onClick={handelSelectAccount} />
+</SubScreen>
 
 <style>
   .groups > ul {
