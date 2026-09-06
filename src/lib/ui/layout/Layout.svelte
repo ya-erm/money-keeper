@@ -37,4 +37,13 @@
     overflow-y: auto;
     flex-grow: 1;
   }
+
+  @media (min-width: 768px) {
+    main {
+      max-width: 48rem;
+      margin: 0 auto;
+      border-left: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+    }
+  }
 </style>
