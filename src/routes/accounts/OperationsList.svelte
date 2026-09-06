@@ -4,17 +4,25 @@
   import Spoiler from '@ya-erm/svelte-ui/Spoiler';
   import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
 
+  import { page } from '$app/stores';
+
   import { operationsStore } from '$lib/data';
   import type { Account } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
-  import { futureOperationsPredicate, pastOperationsPredicate } from '$lib/utils';
+  import { futureOperationsPredicate, pastOperationsPredicate, withSearchParams } from '$lib/utils';
 
   import GroupedOperationsList from './GroupedOperationsList.svelte';
 
   export let account: Account | null = null;
+  /** Details are shown next to the list by the parent */
+  export let inlineDetails: boolean = false;
 
   $: operations = $operationsStore;
+
+  $: addOperationHref = inlineDetails
+    ? withSearchParams($page, { 'operation-id': 'new', accountId: account?.id ?? null })
+    : route('transactions.create') + (account?.id ? `?accountId=${account?.id}` : '');
 
   let search: string = '';
   let limit = 20;
@@ -48,10 +56,7 @@
           {$translate('common.count', { values: { count: allFilteredOperations.length } })}
         </span>
       </h3>
-      <a
-        href={route('transactions.create') + (account?.id ? `?accountId=${account?.id}` : '')}
-        data-testId="AddOperationButton"
-      >
+      <a href={addOperationHref} data-testId="AddOperationButton">
         {$translate('common.add')}
       </a>
     </div>
@@ -73,11 +78,11 @@
             {$translate('common.count', { values: { count: futureOperations.length } })}
           </span>
         </SpoilerToggle>
-        <GroupedOperationsList {account} operations={futureOperations} showDescription={!!search} />
+        <GroupedOperationsList {account} operations={futureOperations} showDescription={!!search} {inlineDetails} />
       </Spoiler>
       <hr class="line" />
     {/if}
-    <GroupedOperationsList {account} operations={pastOperations} showDescription={!!search} />
+    <GroupedOperationsList {account} operations={pastOperations} showDescription={!!search} {inlineDetails} />
   </div>
 </ShowMoreContainer>
 

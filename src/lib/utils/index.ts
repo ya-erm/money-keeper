@@ -23,7 +23,13 @@ export {
   operationBeforeDatePredicate,
   pastOperationsPredicate,
 } from './futureOperations';
-export { deleteSearchParam, getNumberSearchParam, getSearchParam, setSearchParam } from './getSearchParam';
+export {
+  deleteSearchParam,
+  getNumberSearchParam,
+  getSearchParam,
+  setSearchParam,
+  withSearchParams,
+} from './getSearchParam';
 export { getTimeZoneOffset, toShortTimezoneOffset } from './getTimeZoneOffset';
 export { groupByKey, groupByKeyToMap, groupBySelector, groupBySelectorToMap } from './groupBy';
 export { handleError } from './handleError';

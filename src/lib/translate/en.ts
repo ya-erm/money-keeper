@@ -277,6 +277,7 @@ export const enDict: Dictionary = {
   'transactions.comment': 'Comment',
   'transactions.tags': 'Tags',
   'transactions.edit_transaction': 'Edit operation',
+  'transactions.select_operation': 'Select an operation to see its details',
   'transactions.create_transaction_success': 'Operation was created',
   'transactions.create_transaction_failure': 'Failed to create operation',
   'transactions.delete_transaction': 'Delete operation',

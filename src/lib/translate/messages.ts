@@ -272,6 +272,7 @@ export type Messages =
   | 'transactions.create_transaction_success'
   | 'transactions.create_transaction_failure'
   | 'transactions.edit_transaction'
+  | 'transactions.select_operation'
   | 'transactions.delete_transaction'
   | 'transactions.delete_transaction_success'
   | 'transactions.delete_transaction_failure'

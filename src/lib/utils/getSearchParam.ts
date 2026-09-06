@@ -15,6 +15,16 @@ function getPathWithSearchParams(page: Page, searchParams: URLSearchParams) {
   return query ? `${page.url.pathname}?${query}` : page.url.pathname;
 }
 
+/** Path of the current page with some search params changed (`null` removes a param) */
+export function withSearchParams(page: Page, params: Record<string, string | null>) {
+  const searchParams = new URLSearchParams(page.url.searchParams);
+  for (const [name, value] of Object.entries(params)) {
+    if (value === null) searchParams.delete(name);
+    else searchParams.set(name, value);
+  }
+  return getPathWithSearchParams(page, searchParams);
+}
+
 export async function setSearchParam(
   page: Page,
   name: string,
@@ -26,8 +36,10 @@ export async function setSearchParam(
   await goto(resolve(getPathWithSearchParams(page, searchParams), {}), { replaceState: replace });
 }
 
-export async function deleteSearchParam(page: Page, name: string) {
+export async function deleteSearchParam(page: Page, name: string | string[]) {
   const searchParams = new URLSearchParams(page.url.searchParams);
-  searchParams.delete(name);
+  for (const item of Array.isArray(name) ? name : [name]) {
+    searchParams.delete(item);
+  }
   await goto(resolve(getPathWithSearchParams(page, searchParams), {}), { replaceState: true });
 }

@@ -12,9 +12,11 @@
   export let hideMenu = false;
   /** Render as a floating panel on wide screens (used by SubScreen) */
   export let panel = false;
+  /** Allow wider content column, e.g. for a list with a details pane */
+  export let wide = false;
 </script>
 
-<main class:panel>
+<main class:panel class:wide>
   <div class="content">
     <Header {title} {onBack} {leftSlot} {rightSlot} {rightSlotProps} closable={panel} />
     <div class="page">
@@ -29,7 +31,12 @@
 <style>
   main {
     --content-max-width: 48rem;
+  }
+  main.wide {
+    --content-max-width: 80rem;
+  }
 
+  main {
     display: flex;
     flex-direction: column;
     color: var(--primary-text-color);
@@ -54,13 +61,14 @@
 
   /* Desktop: menu becomes a sidebar on the left, content is a centered column */
   @media (min-width: 768px) {
+    /* Sidebar and content are centered together as one block */
     main {
       flex-direction: row;
+      justify-content: center;
     }
     .content {
       width: 100%;
       max-width: var(--content-max-width);
-      margin: 0 auto;
       border-left: 1px solid var(--border-color);
       border-right: 1px solid var(--border-color);
     }

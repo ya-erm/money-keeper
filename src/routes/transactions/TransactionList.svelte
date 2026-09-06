@@ -17,6 +17,8 @@
 
   export let transactions: TransactionViewModel[];
   export let hideAccount: boolean = false;
+  /** Details are shown next to the list by the parent, do not open them as a nested screen */
+  export let inlineDetails: boolean = false;
 
   $: currencyRates = $currencyRatesStore;
   $: settings = $memberSettingsStore;
@@ -34,7 +36,7 @@
     }, {});
 
   $: operationId = getSearchParam($page, 'operation-id');
-  const openOperationForm = (id: string) => setSearchParam($page, 'operation-id', id, { replace: false });
+  const openOperationForm = (id: string) => setSearchParam($page, 'operation-id', id, { replace: inlineDetails });
   const closeOperationForm = () => history.back();
 </script>
 
@@ -48,6 +50,7 @@
           {hideAccount}
           currencyRate={findCurrencyRate(currencyRates, settings?.currency, transaction.account.currency)}
           onClick={({ id }) => openOperationForm(id)}
+          selected={inlineDetails && transaction.id === operationId}
         />
       {/each}
     {/each}
@@ -55,7 +58,7 @@
 </ShowMoreContainer>
 
 <SubScreen
-  visible={operationId !== null}
+  visible={!inlineDetails && operationId !== null}
   title={$translate('transactions.edit_transaction')}
   onBack={closeOperationForm}
   rightSlot={HeaderFormSubmitButton}
