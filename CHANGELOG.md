@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.17.0 - 2026-09-06
+
+### Added
+
+- Added an optional "Description from bank statement" field to operations. It is shown in the additional parameters of the form, included in the search and displayed in the list while searching.
+- Added a verification status to operations (`ok`, `mismatch`, `missing`) filled by the bank statement reconciliation. Problems are marked with a badge in the list and explained in the form.
+
+### Changed
+
+- Verification is dropped when the date, amount or account of a verified operation changes, and is not copied when an operation is copied.
+
 ## 2.16.0 - 2026-09-06
 
 ### Added

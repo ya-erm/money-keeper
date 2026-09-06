@@ -11,6 +11,8 @@
   export let transaction: TransactionViewModel;
   export let currencyRate: CurrencyRate | null = null;
   export let hideAccount: boolean = false;
+  /** Show technical description (e.g. from bank statement) under the comment */
+  export let showDescription: boolean = false;
   export let onClick: ((transaction: TransactionViewModel) => void) | null = null;
   export let onLongPress: ((transaction: TransactionViewModel) => void) | null = null;
 
@@ -40,6 +42,8 @@
         deleted: transaction.category.deleted,
       };
 
+  $: verificationProblem = transaction.verification && transaction.verification.status !== 'ok';
+
   $: source = outgoing ? transactionAccount : linkedTransactionAccountOrCategory;
   $: destination = incoming ? transactionAccount : linkedTransactionAccountOrCategory;
 </script>
@@ -59,6 +63,11 @@
       {#if transaction.repeating}
         <div class="repeating-icon">
           <Icon name="mdi:repeat" size={1} />
+        </div>
+      {/if}
+      {#if verificationProblem}
+        <div class="verification-icon" data-testId="VerificationProblemIcon" title={transaction.verification?.status}>
+          <Icon name="mdi:alert-circle" size={1} />
         </div>
       {/if}
     </div>
@@ -84,6 +93,9 @@
         <div class="comment small-text">
           {replaceCalcExpressions(transaction.comment)}
         </div>
+      {/if}
+      {#if showDescription && transaction.description}
+        <div class="description small-text">{transaction.description}</div>
       {/if}
       {#if transaction.tags?.length}
         <div class="tags">
@@ -153,13 +165,23 @@
     background-color: var(--header-background-color);
     position: relative;
   }
-  .repeating-icon {
+  .repeating-icon,
+  .verification-icon {
     position: absolute;
     bottom: 0;
     right: 0;
     border-radius: 50%;
     background: var(--background-color);
     outline: 1px solid var(--background-color);
+  }
+  .verification-icon {
+    top: 0;
+    bottom: auto;
+    color: var(--orange-color);
+  }
+  .description {
+    font-size: 0.8rem;
+    color: var(--secondary-text-color);
   }
   .text {
     overflow: hidden;
@@ -177,6 +199,7 @@
   }
   .source,
   .comment,
+  .description,
   .destination {
     text-overflow: ellipsis;
     white-space: nowrap;
