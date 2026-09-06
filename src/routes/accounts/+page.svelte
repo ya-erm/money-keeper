@@ -5,6 +5,7 @@
   import type { AccountViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/layout/Layout.svelte';
+  import { isWideScreen } from '$lib/ui/layout/media';
   import ModalContainer from '$lib/ui/ModalContainer.svelte';
   import ReloadPageButton from '$lib/ui/ReloadPageButton.svelte';
   import { deleteSearchParam, getSearchParam } from '$lib/utils';
@@ -14,6 +15,7 @@
   import AccountModal from './AccountModal.svelte';
   import AddOperationButton from './AddOperationButton.svelte';
   import OperationsList from './OperationsList.svelte';
+  import OperationsSplitView from '../transactions/OperationsSplitView.svelte';
 
   $: accounts = $accountsStore;
 
@@ -21,6 +23,9 @@
   $: cardId = getSearchParam($page, 'account-card');
 
   $: account = accounts.find((x) => x.id.toString() === cardId) ?? null;
+
+  $: operationId = getSearchParam($page, 'operation-id');
+  const closeOperation = () => void deleteSearchParam($page, ['operation-id', 'accountId']);
 
   let opened = false;
 
@@ -58,13 +63,15 @@
   }
 </script>
 
-<Layout {title} {leftSlot} {rightSlot}>
-  <div class="container" on:scroll={handlePageScroll}>
-    <AccountCards onEdit={handleAccountEdit} />
-    <div bind:this={operationsContainer}>
-      <OperationsList {account} />
+<Layout {title} {leftSlot} {rightSlot} wide>
+  <OperationsSplitView {operationId} onClose={closeOperation}>
+    <div class="container" on:scroll={handlePageScroll}>
+      <AccountCards onEdit={handleAccountEdit} />
+      <div bind:this={operationsContainer}>
+        <OperationsList {account} inlineDetails={$isWideScreen} />
+      </div>
     </div>
-  </div>
+  </OperationsSplitView>
 </Layout>
 
 {#if opened}

@@ -15,6 +15,7 @@
   export let showDescription: boolean = false;
   export let onClick: ((transaction: TransactionViewModel) => void) | null = null;
   export let onLongPress: ((transaction: TransactionViewModel) => void) | null = null;
+  export let selected: boolean = false;
 
   $: incoming = transaction.category.type === 'IN';
   $: outgoing = transaction.category.type === 'OUT';
@@ -53,6 +54,7 @@
     data-testId="TransactionListItem"
     data-id={transaction.id}
     class:interactive={!!onClick}
+    class:selected
     tabindex={!onClick ? -1 : undefined}
     on:click={() => onClick?.(transaction)}
     use:longPress={() => onLongPress?.(transaction)}
@@ -137,6 +139,10 @@
     cursor: pointer;
     border: none;
     width: 100%;
+  }
+  button.selected {
+    background: var(--hover-background-color);
+    box-shadow: 0 0 0 0.5rem var(--hover-background-color);
   }
   @media (hover: hover) {
     button.interactive:hover {

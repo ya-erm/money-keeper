@@ -278,6 +278,7 @@ export const ruDict: Dictionary = {
   'transactions.comment': 'Комментарий',
   'transactions.tags': 'Теги',
   'transactions.edit_transaction': 'Редактировать операцию',
+  'transactions.select_operation': 'Выберите операцию, чтобы увидеть детали',
   'transactions.create_transaction_success': 'Операция создана',
   'transactions.create_transaction_failure': 'Не удалось создать операцию',
   'transactions.delete_transaction': 'Удалить операцию',

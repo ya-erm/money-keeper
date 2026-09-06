@@ -77,7 +77,7 @@
       gap: 0.25rem;
       padding: 0.75rem 0.5rem;
       border-top: none;
-      border-right: 1px solid var(--border-color);
+      border-left: 1px solid var(--border-color);
     }
     .menu-item {
       flex-grow: 0;
