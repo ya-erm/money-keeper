@@ -117,6 +117,8 @@ export type Transaction = {
   excludeFromAnalysis?: boolean;
   tagIds?: string[];
   repeatingId?: string;
+  locationLat?: number | null;
+  locationLng?: number | null;
   deleted?: boolean;
 };
 

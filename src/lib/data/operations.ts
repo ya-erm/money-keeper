@@ -196,6 +196,8 @@ export function cloneOperation(item: Transaction): Transaction {
     excludeFromAnalysis: item.excludeFromAnalysis,
     tagIds: item.tagIds ? [...item.tagIds] : undefined,
     repeatingId: item.repeatingId,
+    locationLat: item.locationLat,
+    locationLng: item.locationLng,
   };
 }
 
