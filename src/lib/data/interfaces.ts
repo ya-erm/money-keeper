@@ -1,5 +1,7 @@
 import type { DBSchema } from 'idb';
 
+import type { Snapshot } from './snapshot';
+
 export type WithOwner<T> = T & { owner: string };
 
 export type Initialisable = {
@@ -52,6 +54,11 @@ export type JournalOperation = {
   categoriesOutOrder?: string[];
   grouping?: Grouping;
   repeating?: Repeating;
+  /**
+   * Full state written by journal compaction, replaces everything before it.
+   * Deleted accounts, categories and tags are kept (with `deleted: true`), deleted operations are dropped.
+   */
+  snapshot?: Snapshot;
 };
 
 export type JournalSubscriber = {
@@ -100,8 +107,28 @@ export type CurrencyRate = {
   deleted?: boolean;
 };
 
+export type VerificationStatus =
+  /** Operation matches the bank statement */
+  | 'ok'
+  /** Similar operation found in the bank statement, but date or amount differs */
+  | 'mismatch'
+  /** Operation is not found in the bank statement of its period */
+  | 'missing';
+
+/** Result of the reconciliation with a bank statement */
+export type Verification = {
+  status: VerificationStatus;
+  /** Identifier of the bank statement, e.g. "2026-08" */
+  statement: string;
+  /** Values from the bank statement, filled for `mismatch` */
+  expected?: {
+    date?: string;
+    amount?: number;
+  } | null;
+};
+
 // TODO: rename to Operation
-// after adding new field don't forget to change function copyOperation
+// after adding new field don't forget to change function cloneOperation
 export type Transaction = {
   id: string;
   accountId: string;
@@ -110,7 +137,10 @@ export type Transaction = {
   timeZone?: string | null;
   amount: number;
   comment?: string | null;
+  /** Technical description, e.g. operation name as it is written in the bank statement */
   description?: string | null;
+  /** Result of the reconciliation with a bank statement, absent if the operation was not checked yet */
+  verification?: Verification | null;
   linkedTransactionId?: string | null;
   anotherCurrency?: string | null;
   anotherCurrencyAmount?: number | null;

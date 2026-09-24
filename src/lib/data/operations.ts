@@ -179,7 +179,10 @@ export function deleteOperation(id: string) {
   }
 }
 
-/** Create a copy of operation (note: don't forget to change id if needed) */
+/**
+ * Create a copy of operation (note: don't forget to change id if needed).
+ * Verification is not copied, because the copy is a new operation that was not checked yet.
+ */
 export function cloneOperation(item: Transaction): Transaction {
   return {
     id: item.id,

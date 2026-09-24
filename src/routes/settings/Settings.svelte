@@ -80,6 +80,9 @@
     />
   {/if}
   <ListLinkItem title={$translate('settings.import_export')} href={route('settings.import_export')} />
+  {#if userIsLoggedIn}
+    <ListLinkItem title={$translate('settings.api_tokens')} href={route('settings.api_tokens')} />
+  {/if}
   <ListLinkItem title={$translate('settings.repeatings')} href={route('repeatings')} />
 </ListGroup>
 

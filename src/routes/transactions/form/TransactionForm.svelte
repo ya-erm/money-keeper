@@ -5,6 +5,7 @@
 
   import Button from '@ya-erm/svelte-ui/Button';
   import Checkbox from '@ya-erm/svelte-ui/Checkbox';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Portal from '@ya-erm/svelte-ui/Portal';
@@ -13,10 +14,19 @@
 
   import { memberSettingsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
-  import type { AccountViewModel, Category, Tag, Transaction, TransactionViewModel } from '$lib/data/interfaces';
+  import type {
+    AccountViewModel,
+    Category,
+    Tag,
+    Transaction,
+    TransactionViewModel,
+    VerificationStatus,
+  } from '$lib/data/interfaces';
   import { operationsCommentsStore, operationsStore } from '$lib/data/operations';
+  import { withVerification } from '$lib/data/verification';
   import { repeatingsService, repeatingsStore } from '$lib/data/repeatings';
   import { translate } from '$lib/translate';
+  import type { Messages } from '$lib/translate/messages';
   import Layout from '$lib/ui/layout/Layout.svelte';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
   import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
@@ -117,7 +127,15 @@
     }
   };
 
-  let additionalParametersHidden = transaction?.excludeFromAnalysis || transaction?.repeating ? false : true;
+  let description = transaction?.description ?? '';
+  const verification = transaction?.verification ?? null;
+
+  const verificationMessage = (status: VerificationStatus): Messages => `transactions.verification.${status}`;
+
+  let additionalParametersHidden =
+    transaction?.excludeFromAnalysis || transaction?.repeating || transaction?.description || verification
+      ? false
+      : true;
 
   let excludeFromAnalysis = transaction?.excludeFromAnalysis ?? false;
 
@@ -181,6 +199,7 @@
         ...(timeZone ? { timeZone } : {}),
         amount: checkNumberFormParameter(formData, 'amount'),
         comment: checkStringOptionalFormParameter(formData, 'comment'),
+        ...(description.trim() ? { description: description.trim() } : {}),
         tagIds,
         ...(anotherCurrency
           ? {
@@ -201,6 +220,7 @@
           ...(timeZone ? { timeZone } : {}),
           amount: checkNumberFormParameter(formData, 'destinationAmount'),
           comment: checkStringOptionalFormParameter(formData, 'comment')?.trim(),
+          ...(destinationTransaction?.description ? { description: destinationTransaction.description } : {}),
           tagIds,
           linkedTransactionId: transactions[0].id,
           ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
@@ -213,7 +233,9 @@
         repeatingsService.save(repeating);
       }
 
-      onSubmit(transactions);
+      // Keep verification of edited operations if date, amount and account are the same
+      const originalTransactions = [isTransfer ? sourceTransaction : transaction, destinationTransaction];
+      onSubmit(transactions.map((item, i) => withVerification(originalTransactions[i], item)));
     } catch (e) {
       handleError(e);
     }
@@ -378,6 +400,35 @@
           {$translate('transactions.additional_parameters')}
         </SpoilerToggle>
         <div class="flex-col gap-1">
+          <Input
+            label={$translate('transactions.description')}
+            name="description"
+            bind:value={description}
+            translate={$translate}
+            testId="DescriptionInput"
+            optional
+          />
+          {#if verification}
+            <div class="verification" class:problem={verification.status !== 'ok'} data-testId="VerificationInfo">
+              <Icon
+                name={verification.status === 'ok' ? 'mdi:check-decagram-outline' : 'mdi:alert-circle-outline'}
+                size={1}
+              />
+              <span>
+                {$translate(verificationMessage(verification.status), {
+                  values: { statement: verification.statement },
+                })}
+                {#if verification.status === 'mismatch' && verification.expected}
+                  {$translate('transactions.verification.expected', {
+                    values: {
+                      date: verification.expected.date ?? '—',
+                      amount: verification.expected.amount ?? '—',
+                    },
+                  })}
+                {/if}
+              </span>
+            </div>
+          {/if}
           <Checkbox bind:checked={excludeFromAnalysis} label={$translate('transactions.exclude_from_analytics')} />
           <div class="flex gap-1">
             <div class="flex-grow">
@@ -474,6 +525,16 @@
     font-size: 0.9rem;
     text-align: right;
     color: var(--secondary-text-color);
+  }
+  .verification {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.9rem;
+    color: var(--secondary-text-color);
+  }
+  .verification.problem {
+    color: var(--orange-color);
   }
   .comment-preview {
     font-size: 0.9em;

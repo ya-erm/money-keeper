@@ -16,3 +16,7 @@ screenshots/raw
 .pnpm-store
 test-results
 playwright-report
+
+# Claude Code local files
+.claude/launch.json
+.claude/worktrees/

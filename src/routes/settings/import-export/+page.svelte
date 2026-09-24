@@ -1,8 +1,11 @@
 <script lang="ts">
   import dayjs from 'dayjs';
+  import { onMount } from 'svelte';
 
   import Button from '@ya-erm/svelte-ui/Button';
   import { showErrorToast, showInfoToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
+
+  import { isApiError } from '$lib/api/ApiError';
 
   import {
     accountTagsService,
@@ -16,12 +19,19 @@
     operationTagsService,
     operationsService,
     operationsStore,
+    repeatingsService,
   } from '$lib/data';
-  import type { Account, Category, CurrencyRate, Grouping, Tag, Transaction } from '$lib/data/interfaces';
+  import type { Account, Category, CurrencyRate, Grouping, Repeating, Tag, Transaction } from '$lib/data/interfaces';
+  import type {
+    CompactJournalRequestData,
+    CompactJournalResponseData,
+    JournalStatsResponseData,
+  } from '$lib/server/api/v2/journal';
   import { translate } from '$lib/translate';
   import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
   import Layout from '$lib/ui/layout/Layout.svelte';
-  import { Logger, deepEqual, groupByKey, keyTransactions } from '$lib/utils';
+  import Modal from '$lib/ui/Modal.svelte';
+  import { Logger, deepEqual, groupByKey, keyTransactions, useFetch } from '$lib/utils';
 
   const logger = new Logger('Import/Export');
 
@@ -35,6 +45,7 @@
     operations: Transaction[];
     currencyRates: CurrencyRate[];
     groupings: Grouping[];
+    repeatings?: Repeating[];
   } = {
     categories: [],
     accountTags: [],
@@ -43,6 +54,7 @@
     operations: [],
     currencyRates: [],
     groupings: [],
+    repeatings: [],
   };
 
   let parsed = false;
@@ -60,6 +72,7 @@
     operations: operationsService.items,
     currencyRates: currencyRatesService.items,
     groupings: groupingsService.items,
+    repeatings: repeatingsService.items,
   };
 
   // eslint-disable-next-line svelte/no-immutable-reactive-statements
@@ -106,6 +119,11 @@
         count += 1;
       });
 
+      v2.repeatings?.filter(notExists(repeatingsService.items)).forEach((repeating) => {
+        void journalService.addOperationToQueue({ repeating }, { upload: false });
+        count += 1;
+      });
+
       v2.operations?.filter(notExists(operationsService.items)).forEach((transaction) => {
         void journalService.addOperationToQueue({ transaction }, { upload: false });
         count += 1;
@@ -135,6 +153,57 @@
       uploading = false;
     }
   }
+
+  // Journal compaction
+
+  const isGuest = membersService.isGuest;
+
+  const statsFetcher = useFetch<undefined, JournalStatsResponseData>('GET', '/api/v2/journal/compact');
+  const compactFetcher = useFetch<CompactJournalRequestData, CompactJournalResponseData>(
+    'POST',
+    '/api/v2/journal/compact',
+  );
+  const compacting = compactFetcher.loading;
+
+  let journalStats: JournalStatsResponseData | null = null;
+  let compactModalOpened = false;
+
+  async function loadJournalStats() {
+    try {
+      journalStats = await statsFetcher.fetch();
+    } catch (e) {
+      logger.error('Failed to load journal stats', e);
+      showErrorToast($translate('import_export.journal_load_failure'));
+    }
+  }
+
+  async function compactJournal() {
+    try {
+      // Make sure the latest state is applied and nothing is waiting for upload
+      await journalService.syncWithServer();
+      if (journalService.queue.length > 0) {
+        showErrorToast($translate('import_export.compact_queue_not_empty'));
+        return;
+      }
+      const result = await compactFetcher.fetch({ syncNumber: journalService.syncNumber });
+      compactModalOpened = false;
+      showSuccessToast(
+        $translate('import_export.compact_success', { values: { before: result.before, after: result.after } }),
+      );
+      await loadJournalStats();
+    } catch (e) {
+      logger.error('Failed to compact journal', e);
+      if (isApiError(e) && e.status === 409) {
+        showErrorToast($translate('import_export.compact_conflict'));
+      } else {
+        showErrorToast(`${$translate('import_export.compact_failure')}\n${e}`);
+      }
+    }
+  }
+
+  onMount(() => {
+    if (!isGuest) void loadJournalStats();
+  });
 
   const logOperationsKeys = () => {
     const operationsByAccount = groupByKey($operationsStore, 'accountId');
@@ -169,7 +238,8 @@
         <span>{$translate('import_export.operation_tags')}: <b>{v2.operationTags?.length ?? 0}</b>,</span>
         <span>{$translate('import_export.operations')}: <b>{v2.operations?.length ?? 0}</b>,</span>
         <span>{$translate('import_export.currency_rates')}: <b>{v2.currencyRates?.length ?? 0}</b></span>
-        <span>{$translate('import_export.groupings')}: <b>{v2.groupings?.length ?? 0}</b></span>
+        <span>{$translate('import_export.groupings')}: <b>{v2.groupings?.length ?? 0}</b>,</span>
+        <span>{$translate('import_export.repeatings')}: <b>{v2.repeatings?.length ?? 0}</b></span>
       </p>
 
       <Button data-testId="AddToJournalButton" disabled={uploading} class="w-full" onClick={addToJournal}>
@@ -195,11 +265,36 @@
       <span>{$translate('import_export.operation_tags')}: <b>{current.operationTags?.length ?? 0}</b>,</span>
       <span>{$translate('import_export.operations')}: <b>{current.operations?.length ?? 0}</b>,</span>
       <span>{$translate('import_export.currency_rates')}: <b>{current.currencyRates?.length ?? 0}</b></span>
-      <span>{$translate('import_export.groupings')}: <b>{current.groupings?.length ?? 0}</b></span>
+      <span>{$translate('import_export.groupings')}: <b>{current.groupings?.length ?? 0}</b>,</span>
+      <span>{$translate('import_export.repeatings')}: <b>{current.repeatings?.length ?? 0}</b></span>
     </p>
     <a href={URL.createObjectURL(currentJsonFile)} download={`export-${dayjs().format('YYYY-MM-DD')}.json`}>
       <Button class="w-full">{$translate('import_export.save')}</Button>
     </a>
+
+    {#if !isGuest}
+      <h2>{$translate('import_export.journal')}</h2>
+      <p>
+        {#if journalStats}
+          {$translate('import_export.journal_records', {
+            values: { count: journalStats.itemsCount, syncNumber: journalStats.syncNumber ?? 0 },
+          })}
+        {:else}
+          {$translate('common.loading')}
+        {/if}
+      </p>
+      <p class="hint">{$translate('import_export.compact_description')}</p>
+      <Button
+        class="w-full"
+        color="white"
+        bordered
+        disabled={!journalStats || journalStats.itemsCount <= 1}
+        onClick={() => (compactModalOpened = true)}
+        testId="CompactJournalButton"
+      >
+        {$translate('import_export.compact')}
+      </Button>
+    {/if}
 
     <h3>{$translate('import_export.other_features')}</h3>
     <Button onClick={logOperationsKeys} color="white" bordered>
@@ -208,9 +303,23 @@
   </div>
 </Layout>
 
+<Modal bind:opened={compactModalOpened} header={$translate('import_export.compact')} width={25}>
+  <div class="flex-col gap-1">
+    <p class="m-0">{$translate('import_export.compact_confirm')}</p>
+    <Button onClick={compactJournal} disabled={$compacting} testId="CompactJournalConfirmButton">
+      {$translate($compacting ? 'common.loading' : 'import_export.compact')}
+    </Button>
+    <Button color="white" bordered onClick={() => (compactModalOpened = false)}>{$translate('common.cancel')}</Button>
+  </div>
+</Modal>
+
 <style>
   .container {
     height: 100%;
+  }
+  .hint {
+    font-size: 0.9rem;
+    color: var(--secondary-text-color);
   }
   textarea {
     border-radius: 0.75rem;

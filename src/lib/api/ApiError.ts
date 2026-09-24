@@ -26,6 +26,8 @@ export type ApiErrorCode =
   | 'BAD_REQUEST'
   | 'FORBIDDEN'
   | 'NOT_FOUND'
+  | 'CONFLICT'
+  | 'JOURNAL_ENCRYPTED'
   | 'INTERNAL_ERROR'
   | 'NOT_IMPLEMENTED'
   | 'USER_NOT_FOUND'

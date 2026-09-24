@@ -21,6 +21,8 @@
 
   export let account: Account | null = null;
   export let operations: TransactionViewModel[];
+  /** Show technical descriptions of operations, e.g. while searching */
+  export let showDescription: boolean = false;
 
   $: currencyRate = findCurrencyRate(currencyRates, settings?.currency, account?.currency ?? '');
 
@@ -66,6 +68,7 @@
     {#each transactions as transaction (transaction.id)}
       <TransactionListItem
         hideAccount={!!account}
+        {showDescription}
         currencyRate={currencyRate ?? findCurrencyRate(currencyRates, settings?.currency, transaction.account.currency)}
         onClick={() => openOperationForm(transaction.id)}
         onLongPress={() => {

@@ -92,7 +92,7 @@
   }
   .accounts-list {
     padding: 1rem;
-    min-width: 100vw;
+    min-width: 100%;
     display: flex;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
@@ -144,6 +144,6 @@
     pointer-events: none;
     top: -1rem;
     bottom: -1rem;
-    width: 100vw;
+    width: 100%;
   }
 </style>

@@ -35,6 +35,7 @@ type RouteKey =
   | 'settings.language'
   | 'settings.currency_rates'
   | 'settings.encryption'
+  | 'settings.api_tokens'
   | 'settings.import_export'
   | 'settings.changelog'
   | 'settings.logs'
@@ -160,6 +161,10 @@ export const routes: { [key in RouteKey]: Route } = {
   'settings.import_export': {
     path: '/settings/import-export',
     title: 'settings.import_export',
+  },
+  'settings.api_tokens': {
+    path: '/settings/api-tokens',
+    title: 'settings.api_tokens',
   },
   'settings.changelog': {
     path: '/settings/changelog',
