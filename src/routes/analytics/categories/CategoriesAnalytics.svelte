@@ -11,6 +11,7 @@
 
   import { analyticsBalancesVisibilityMode } from '../store';
   import MonthSelect from './MonthSelect.svelte';
+  import { groupTransactionsByComment } from './groupTransactionsByComment';
   import { intervalEndStore, intervalStartStore, intervalTypeStore } from './store';
 
   $: categories = $categoriesStore;
@@ -71,6 +72,19 @@
 
   let selectedCategoryId: string | null = null;
   $: selectedGroup = groups.find((group) => group.categoryId === selectedCategoryId);
+  $: commentGroups = selectedGroup
+    ? groupTransactionsByComment(
+        selectedGroup.transactions,
+        (transaction) =>
+          (transaction.category.type === 'IN' ? 1 : -1) * transaction.amount * findRateFn(transaction.account.currency),
+      ).map((group) => ({
+        ...group,
+        hasHiddenBalanceAccount: hasHiddenBalanceAccount(
+          null,
+          group.transactions.map((transaction) => transaction.account),
+        ),
+      }))
+    : [];
   $: incomingTotal = groups.filter((g) => g.category?.type === 'IN').reduce((sum, g) => sum + g.sum, 0);
   $: outgoingTotal = Math.abs(groups.filter((g) => g.category?.type === 'OUT').reduce((sum, g) => sum + g.sum, 0));
   $: totalsHidden =
@@ -95,6 +109,7 @@
         <li class="item" class:selected={selectedCategoryId === group.categoryId} data-id={group.categoryId}>
           <button
             on:click={() => (selectedCategoryId = selectedCategoryId !== group.categoryId ? group.categoryId : null)}
+            aria-expanded={selectedCategoryId === group.categoryId}
           >
             <div class="category">
               <Icon name={group.category?.icon ?? 'mdi:help'} />
@@ -102,7 +117,7 @@
             </div>
             <div class="category-values">
               <span class="amount">
-                {#if $analyticsBalancesVisibilityMode === 'hide' || (balancesHidden && $analyticsBalancesVisibilityMode !== 'show')}
+                {#if $analyticsBalancesVisibilityMode === 'hide' || ((balancesHidden || group.hasHiddenBalanceAccount) && $analyticsBalancesVisibilityMode !== 'show')}
                   <HiddenMoney currency={mainCurrency} />
                 {:else}
                   {formatMoney(group.sum, { currency: mainCurrency })}
@@ -139,6 +154,25 @@
 </div>
 
 {#if selectedGroup}
+  <section class="comments-summary p-1" aria-labelledby="comments-summary-title">
+    <h2 id="comments-summary-title">{$translate('analytics.categories.comments')}</h2>
+    <ul class="comment-list">
+      {#each commentGroups as group (group.comment)}
+        <li>
+          <span class:no-comment={!group.comment}>
+            {group.comment ?? $translate('analytics.categories.no_comment')}
+          </span>
+          <span class="comment-amount">
+            {#if $analyticsBalancesVisibilityMode === 'hide' || ((balancesHidden || group.hasHiddenBalanceAccount) && $analyticsBalancesVisibilityMode !== 'show')}
+              <HiddenMoney currency={mainCurrency} />
+            {:else}
+              {formatMoney(group.sum, { currency: mainCurrency })}
+            {/if}
+          </span>
+        </li>
+      {/each}
+    </ul>
+  </section>
   <div class="transactions-preview">
     <TransactionList transactions={selectedGroup.transactions} />
   </div>
@@ -209,5 +243,41 @@
     grid-template-columns: auto auto;
     column-gap: 0.5rem;
     row-gap: 0.25rem;
+  }
+  .comments-summary {
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--border-color);
+  }
+  .comments-summary h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+  }
+  .comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .comment-list li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .comment-list li > span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .no-comment {
+    color: var(--secondary-text-color);
+    font-style: italic;
+  }
+  .comment-amount {
+    flex-shrink: 0;
+    text-align: right;
   }
 </style>

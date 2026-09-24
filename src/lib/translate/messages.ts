@@ -128,6 +128,8 @@ export type Messages =
   | 'analytics.categories.end_date'
   | 'analytics.categories.monthly_interval'
   | 'analytics.categories.custom_interval'
+  | 'analytics.categories.comments'
+  | 'analytics.categories.no_comment'
   | 'analytics.accounts.total'
   | 'analytics.accounts.grouping'
   | 'analytics.accounts.grouping.not_selected'

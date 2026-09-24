@@ -134,6 +134,8 @@ export const ruDict: Dictionary = {
   'analytics.categories.end_date': 'Конец интервала',
   'analytics.categories.monthly_interval': 'По месяцам',
   'analytics.categories.custom_interval': 'Произвольный',
+  'analytics.categories.comments': 'По комментариям',
+  'analytics.categories.no_comment': 'Без комментария',
   'analytics.accounts.total': 'Всего',
   'analytics.accounts.grouping': 'Группировка',
   'analytics.accounts.grouping.not_selected': 'Без группировки',
