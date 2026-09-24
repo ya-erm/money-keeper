@@ -264,6 +264,7 @@
   .comments-summary {
     margin-top: 0.5rem;
     border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
   }
   .comments-summary-header {
     margin-bottom: 0.75rem;
