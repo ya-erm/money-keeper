@@ -161,32 +161,34 @@
 
 {#if selectedGroup}
   <section class="comments-summary p-1" aria-label={$translate('analytics.categories.comments')}>
-    <Spoiler hidden={commentsHidden}>
-      <div slot="spoiler-header" class="comments-summary-header">
-        <SpoilerToggle bind:hidden={commentsHidden} translate={$translate}>
-          {$translate('analytics.categories.comments')}
-        </SpoilerToggle>
-      </div>
-      <ul class="comment-list">
-        {#each commentGroups as group (group.comment)}
-          <li>
-            <span class:no-comment={!group.comment}>
-              {group.comment ?? $translate('analytics.categories.no_comment')}
-            </span>
-            <div class="comment-values">
-              <span class="comment-amount">
-                {#if $analyticsBalancesVisibilityMode === 'hide' || ((balancesHidden || group.hasHiddenBalanceAccount) && $analyticsBalancesVisibilityMode !== 'show')}
-                  <HiddenMoney currency={mainCurrency} />
-                {:else}
-                  {formatMoney(group.sum, { currency: mainCurrency })}
-                {/if}
+    {#key selectedGroup.categoryId}
+      <Spoiler hidden={commentsHidden}>
+        <div slot="spoiler-header" class="comments-summary-header">
+          <SpoilerToggle bind:hidden={commentsHidden} translate={$translate}>
+            {$translate('analytics.categories.comments')}
+          </SpoilerToggle>
+        </div>
+        <ul class="comment-list">
+          {#each commentGroups as group (group.comment)}
+            <li>
+              <span class:no-comment={!group.comment}>
+                {group.comment ?? $translate('analytics.categories.no_comment')}
               </span>
-              <span class="percentage">{formatPercent(getCommentGroupPercentage(group.sum, selectedGroup.sum))}</span>
-            </div>
-          </li>
-        {/each}
-      </ul>
-    </Spoiler>
+              <div class="comment-values">
+                <span class="comment-amount">
+                  {#if $analyticsBalancesVisibilityMode === 'hide' || ((balancesHidden || group.hasHiddenBalanceAccount) && $analyticsBalancesVisibilityMode !== 'show')}
+                    <HiddenMoney currency={mainCurrency} />
+                  {:else}
+                    {formatMoney(group.sum, { currency: mainCurrency })}
+                  {/if}
+                </span>
+                <span class="percentage">{formatPercent(getCommentGroupPercentage(group.sum, selectedGroup.sum))}</span>
+              </div>
+            </li>
+          {/each}
+        </ul>
+      </Spoiler>
+    {/key}
   </section>
   <div class="transactions-preview">
     <TransactionList transactions={selectedGroup.transactions} />
