@@ -34,6 +34,12 @@ test('shows the total for transactions with the same comment when a category is 
   await page.getByRole('button', { name: /T_Pets/ }).click();
 
   const comments = page.getByRole('region', { name: 'By comment' });
-  await expect(comments.getByRole('listitem').filter({ hasText: 'Food for pets' })).toContainText(/-75\.50\sUSD/);
-  await expect(comments.getByRole('listitem').filter({ hasText: 'No comment' })).toContainText(/-10\sUSD/);
+  await expect(comments.getByRole('listitem').filter({ hasText: 'Food for pets' })).toContainText(/-75\.50\sUSD 88%/);
+  await expect(comments.getByRole('listitem').filter({ hasText: 'No comment' })).toContainText(/-10\sUSD 12%/);
+
+  const toggle = comments.getByRole('button', { name: /By comment/ });
+  await toggle.click();
+  await expect(comments.locator('.spoiler')).toHaveClass(/spoiler-hidden/);
+  await toggle.click();
+  await expect(comments.locator('.spoiler')).not.toHaveClass(/spoiler-hidden/);
 });

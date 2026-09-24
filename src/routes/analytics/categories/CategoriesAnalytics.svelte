@@ -4,6 +4,8 @@
   import { categoriesStore, currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { translate } from '$lib/translate';
   import Icon from '@ya-erm/svelte-ui/Icon';
+  import Spoiler from '@ya-erm/svelte-ui/Spoiler';
+  import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
   import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
   import { findRate, formatMoney, groupByKey, hasHiddenBalanceAccount } from '$lib/utils';
 
@@ -71,6 +73,7 @@
     .sort((a, b) => a.sum - b.sum);
 
   let selectedCategoryId: string | null = null;
+  let commentsHidden = false;
   $: selectedGroup = groups.find((group) => group.categoryId === selectedCategoryId);
   $: commentGroups = selectedGroup
     ? groupTransactionsByComment(
@@ -96,6 +99,9 @@
     const total = group.category?.type === 'IN' ? incomingTotal : outgoingTotal;
     return total ? (100 * Math.abs(group.sum)) / total : 0;
   };
+
+  const getCommentGroupPercentage = (sum: number, categorySum: number) =>
+    categorySum ? (100 * Math.abs(sum)) / Math.abs(categorySum) : 0;
 
   const formatPercent = (value: number) => `${formatMoney(value, { maxPrecision: value > 10 ? 0 : 1 })}%`;
 </script>
@@ -154,24 +160,33 @@
 </div>
 
 {#if selectedGroup}
-  <section class="comments-summary p-1" aria-labelledby="comments-summary-title">
-    <h2 id="comments-summary-title">{$translate('analytics.categories.comments')}</h2>
-    <ul class="comment-list">
-      {#each commentGroups as group (group.comment)}
-        <li>
-          <span class:no-comment={!group.comment}>
-            {group.comment ?? $translate('analytics.categories.no_comment')}
-          </span>
-          <span class="comment-amount">
-            {#if $analyticsBalancesVisibilityMode === 'hide' || ((balancesHidden || group.hasHiddenBalanceAccount) && $analyticsBalancesVisibilityMode !== 'show')}
-              <HiddenMoney currency={mainCurrency} />
-            {:else}
-              {formatMoney(group.sum, { currency: mainCurrency })}
-            {/if}
-          </span>
-        </li>
-      {/each}
-    </ul>
+  <section class="comments-summary p-1" aria-label={$translate('analytics.categories.comments')}>
+    <Spoiler hidden={commentsHidden}>
+      <div slot="spoiler-header" class="comments-summary-header">
+        <SpoilerToggle bind:hidden={commentsHidden} translate={$translate}>
+          {$translate('analytics.categories.comments')}
+        </SpoilerToggle>
+      </div>
+      <ul class="comment-list">
+        {#each commentGroups as group (group.comment)}
+          <li>
+            <span class:no-comment={!group.comment}>
+              {group.comment ?? $translate('analytics.categories.no_comment')}
+            </span>
+            <div class="comment-values">
+              <span class="comment-amount">
+                {#if $analyticsBalancesVisibilityMode === 'hide' || ((balancesHidden || group.hasHiddenBalanceAccount) && $analyticsBalancesVisibilityMode !== 'show')}
+                  <HiddenMoney currency={mainCurrency} />
+                {:else}
+                  {formatMoney(group.sum, { currency: mainCurrency })}
+                {/if}
+              </span>
+              <span class="percentage">{formatPercent(getCommentGroupPercentage(group.sum, selectedGroup.sum))}</span>
+            </div>
+          </li>
+        {/each}
+      </ul>
+    </Spoiler>
   </section>
   <div class="transactions-preview">
     <TransactionList transactions={selectedGroup.transactions} />
@@ -248,9 +263,8 @@
     margin-top: 0.5rem;
     border-top: 1px solid var(--border-color);
   }
-  .comments-summary h2 {
-    margin: 0 0 0.75rem;
-    font-size: 1rem;
+  .comments-summary-header {
+    margin-bottom: 0.75rem;
   }
   .comment-list {
     display: flex;
@@ -277,6 +291,13 @@
     font-style: italic;
   }
   .comment-amount {
+    text-align: right;
+  }
+  .comment-values {
+    display: grid;
+    grid-template-columns: minmax(6rem, auto) minmax(2.75rem, max-content);
+    align-items: center;
+    column-gap: 0.5rem;
     flex-shrink: 0;
     text-align: right;
   }
