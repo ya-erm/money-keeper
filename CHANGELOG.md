@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.19.0 - 2026-09-24
+
+### Added
+
+- Added a collapsible summary with totals and percentages grouped by transaction comment when a category is opened in category analytics.
+
 ## 2.18.0 - 2026-09-06
 
 ### Added

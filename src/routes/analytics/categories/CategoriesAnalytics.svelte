@@ -4,6 +4,8 @@
   import { categoriesStore, currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { translate } from '$lib/translate';
   import Icon from '@ya-erm/svelte-ui/Icon';
+  import Spoiler from '@ya-erm/svelte-ui/Spoiler';
+  import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
   import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
   import { findRate, formatMoney, groupByKey, hasHiddenBalanceAccount } from '$lib/utils';
 
@@ -11,6 +13,7 @@
 
   import { analyticsBalancesVisibilityMode } from '../store';
   import MonthSelect from './MonthSelect.svelte';
+  import { groupTransactionsByComment } from './groupTransactionsByComment';
   import { intervalEndStore, intervalStartStore, intervalTypeStore } from './store';
 
   $: categories = $categoriesStore;
@@ -70,7 +73,21 @@
     .sort((a, b) => a.sum - b.sum);
 
   let selectedCategoryId: string | null = null;
+  let commentsHidden = false;
   $: selectedGroup = groups.find((group) => group.categoryId === selectedCategoryId);
+  $: commentGroups = selectedGroup
+    ? groupTransactionsByComment(
+        selectedGroup.transactions,
+        (transaction) =>
+          (transaction.category.type === 'IN' ? 1 : -1) * transaction.amount * findRateFn(transaction.account.currency),
+      ).map((group) => ({
+        ...group,
+        hasHiddenBalanceAccount: hasHiddenBalanceAccount(
+          null,
+          group.transactions.map((transaction) => transaction.account),
+        ),
+      }))
+    : [];
   $: incomingTotal = groups.filter((g) => g.category?.type === 'IN').reduce((sum, g) => sum + g.sum, 0);
   $: outgoingTotal = Math.abs(groups.filter((g) => g.category?.type === 'OUT').reduce((sum, g) => sum + g.sum, 0));
   $: totalsHidden =
@@ -82,6 +99,9 @@
     const total = group.category?.type === 'IN' ? incomingTotal : outgoingTotal;
     return total ? (100 * Math.abs(group.sum)) / total : 0;
   };
+
+  const getCommentGroupPercentage = (sum: number, categorySum: number) =>
+    categorySum ? (100 * Math.abs(sum)) / Math.abs(categorySum) : 0;
 
   const formatPercent = (value: number) => `${formatMoney(value, { maxPrecision: value > 10 ? 0 : 1 })}%`;
 </script>
@@ -95,6 +115,7 @@
         <li class="item" class:selected={selectedCategoryId === group.categoryId} data-id={group.categoryId}>
           <button
             on:click={() => (selectedCategoryId = selectedCategoryId !== group.categoryId ? group.categoryId : null)}
+            aria-expanded={selectedCategoryId === group.categoryId}
           >
             <div class="category">
               <Icon name={group.category?.icon ?? 'mdi:help'} />
@@ -102,7 +123,7 @@
             </div>
             <div class="category-values">
               <span class="amount">
-                {#if $analyticsBalancesVisibilityMode === 'hide' || (balancesHidden && $analyticsBalancesVisibilityMode !== 'show')}
+                {#if $analyticsBalancesVisibilityMode === 'hide' || ((balancesHidden || group.hasHiddenBalanceAccount) && $analyticsBalancesVisibilityMode !== 'show')}
                   <HiddenMoney currency={mainCurrency} />
                 {:else}
                   {formatMoney(group.sum, { currency: mainCurrency })}
@@ -139,6 +160,36 @@
 </div>
 
 {#if selectedGroup}
+  <section class="comments-summary p-1" aria-label={$translate('analytics.categories.comments')}>
+    {#key selectedGroup.categoryId}
+      <Spoiler hidden={commentsHidden}>
+        <div slot="spoiler-header" class="comments-summary-header">
+          <SpoilerToggle bind:hidden={commentsHidden} translate={$translate}>
+            {$translate('analytics.categories.comments')}
+          </SpoilerToggle>
+        </div>
+        <ul class="comment-list">
+          {#each commentGroups as group (group.comment)}
+            <li>
+              <span class:no-comment={!group.comment}>
+                {group.comment ?? $translate('analytics.categories.no_comment')}
+              </span>
+              <div class="comment-values">
+                <span class="comment-amount">
+                  {#if $analyticsBalancesVisibilityMode === 'hide' || ((balancesHidden || group.hasHiddenBalanceAccount) && $analyticsBalancesVisibilityMode !== 'show')}
+                    <HiddenMoney currency={mainCurrency} />
+                  {:else}
+                    {formatMoney(group.sum, { currency: mainCurrency })}
+                  {/if}
+                </span>
+                <span class="percentage">{formatPercent(getCommentGroupPercentage(group.sum, selectedGroup.sum))}</span>
+              </div>
+            </li>
+          {/each}
+        </ul>
+      </Spoiler>
+    {/key}
+  </section>
   <div class="transactions-preview">
     <TransactionList transactions={selectedGroup.transactions} />
   </div>
@@ -209,5 +260,48 @@
     grid-template-columns: auto auto;
     column-gap: 0.5rem;
     row-gap: 0.25rem;
+  }
+  .comments-summary {
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+  }
+  .comments-summary-header {
+    margin-bottom: 0.75rem;
+  }
+  .comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .comment-list li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .comment-list li > span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .no-comment {
+    color: var(--secondary-text-color);
+    font-style: italic;
+  }
+  .comment-amount {
+    text-align: right;
+  }
+  .comment-values {
+    display: grid;
+    grid-template-columns: minmax(6rem, auto) minmax(2.75rem, max-content);
+    align-items: center;
+    column-gap: 0.5rem;
+    flex-shrink: 0;
+    text-align: right;
   }
 </style>
