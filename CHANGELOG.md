@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.20.0 - 2026-09-27
+
+### Added
+
+- The category card on the analytics overview now shows the top five expense categories for the current month, their share of total spending, and combines the remaining categories into an “Other” donut segment.
+
 ## 2.19.0 - 2026-09-24
 
 ### Added
