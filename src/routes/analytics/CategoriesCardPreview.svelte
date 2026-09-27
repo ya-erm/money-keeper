@@ -56,7 +56,7 @@
             <span class="name">{item.name}</span>
           </span>
           {#if !balancesHidden}
-            <span class="amount">{formatMoney(-item.amount, { currency: mainCurrency })}</span>
+            <span class="amount">{formatMoney(-item.amount, { currency: mainCurrency, maxPrecision: 0 })}</span>
           {/if}
           <span class="percentage">{formatPercent(item.percentage)}</span>
         </li>
@@ -70,7 +70,7 @@
 <style>
   .categories-preview {
     display: grid;
-    grid-template-columns: 25% minmax(0, 1fr);
+    grid-template-columns: 23% minmax(0, 1fr);
     align-items: center;
     min-height: 6rem;
   }
@@ -110,7 +110,7 @@
 
   .category-legend li {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 8rem 2.625rem;
+    grid-template-columns: minmax(0, 1fr) 6.75rem 2.4rem;
     align-items: center;
     min-width: 0;
     font-size: 0.75rem;
@@ -123,7 +123,7 @@
   }
 
   .category-legend.amounts-hidden li {
-    grid-template-columns: minmax(0, 1fr) 2.625rem;
+    grid-template-columns: minmax(0, 1fr) 2.4rem;
   }
 
   .category-name {
@@ -164,12 +164,12 @@
 
   @media (max-width: 22rem) {
     .category-legend li {
-      grid-template-columns: minmax(0, 1fr) 6rem 2.35rem;
+      grid-template-columns: minmax(0, 1fr) 5.25rem 2.2rem;
       font-size: 0.68rem;
     }
 
     .category-legend.amounts-hidden li {
-      grid-template-columns: minmax(0, 1fr) 2.35rem;
+      grid-template-columns: minmax(0, 1fr) 2.2rem;
     }
 
     .donut::after {
