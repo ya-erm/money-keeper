@@ -6,6 +6,8 @@
   import type { Messages } from '$lib/translate/types';
   import Layout from '$lib/ui/layout/Layout.svelte';
 
+  import CategoriesCardPreview from './CategoriesCardPreview.svelte';
+
   type AnalyticsCard = {
     title: Messages;
     href: string;
@@ -53,12 +55,9 @@
           <Icon name="mdi:chevron-right" />
         </div>
 
-        <div class="preview">
+        <div class="preview" class:categories-preview-container={card.preview === 'donut'}>
           {#if card.preview === 'donut'}
-            <span class="donut"></span>
-            <span class="legend legend-a"></span>
-            <span class="legend legend-b"></span>
-            <span class="legend legend-c"></span>
+            <CategoriesCardPreview />
           {:else if card.preview === 'accounts'}
             <span class="account-rows">
               <span class="account-row account-row-a"></span>
@@ -213,46 +212,9 @@
       25% 100%;
   }
 
-  .donut {
-    position: absolute;
-    top: 0.7rem;
-    left: 0.9rem;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 50%;
-    background: conic-gradient(var(--active-color) 0 42%, var(--green-color) 42% 70%, var(--orange-color) 70% 100%);
-  }
-
-  .donut::after {
-    position: absolute;
-    inset: 0.75rem;
-    content: '';
-    background: var(--header-background-color);
-    border-radius: inherit;
-  }
-
-  .legend {
-    position: absolute;
-    height: 0.5rem;
-    right: 1rem;
-    display: block;
-    background: var(--border-color);
-    border-radius: 0.25rem;
-  }
-
-  .legend-a {
-    top: 1.25rem;
-    width: 48%;
-  }
-
-  .legend-b {
-    top: 2.05rem;
-    width: 37%;
-  }
-
-  .legend-c {
-    top: 2.85rem;
-    width: 25%;
+  .preview.categories-preview-container {
+    height: 6rem;
+    background: var(--background-color);
   }
 
   .account-rows {
