@@ -110,7 +110,7 @@
 
   .category-legend li {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(4.75rem, auto) 3rem;
+    grid-template-columns: minmax(0, 1fr) 8rem 2.625rem;
     align-items: center;
     min-width: 0;
     font-size: 0.75rem;
@@ -123,7 +123,7 @@
   }
 
   .category-legend.amounts-hidden li {
-    grid-template-columns: minmax(0, 1fr) 3rem;
+    grid-template-columns: minmax(0, 1fr) 2.625rem;
   }
 
   .category-name {
@@ -164,12 +164,12 @@
 
   @media (max-width: 22rem) {
     .category-legend li {
-      grid-template-columns: minmax(0, 1fr) minmax(4rem, auto) 2.65rem;
+      grid-template-columns: minmax(0, 1fr) 6rem 2.35rem;
       font-size: 0.68rem;
     }
 
     .category-legend.amounts-hidden li {
-      grid-template-columns: minmax(0, 1fr) 2.65rem;
+      grid-template-columns: minmax(0, 1fr) 2.35rem;
     }
 
     .donut::after {
