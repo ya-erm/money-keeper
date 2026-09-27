@@ -217,7 +217,7 @@
   }
 
   .preview.accounts-preview-container {
-    height: 6.5rem;
+    height: 7.5rem;
   }
 
   .balance-preview {

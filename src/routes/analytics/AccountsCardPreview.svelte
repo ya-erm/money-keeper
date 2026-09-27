@@ -100,7 +100,7 @@
 
   .account-list {
     display: grid;
-    grid-auto-rows: 1.25rem;
+    grid-auto-rows: 1.5rem;
     border-top: 1px solid var(--border-color);
     margin: 0;
     padding: 0;
