@@ -56,7 +56,11 @@
           <Icon name="mdi:chevron-right" />
         </div>
 
-        <div class="preview" class:data-preview-container={card.preview === 'donut' || card.preview === 'accounts'}>
+        <div
+          class="preview"
+          class:data-preview-container={card.preview === 'donut' || card.preview === 'accounts'}
+          class:accounts-preview-container={card.preview === 'accounts'}
+        >
           {#if card.preview === 'donut'}
             <CategoriesCardPreview />
           {:else if card.preview === 'accounts'}
@@ -210,6 +214,10 @@
   .preview.data-preview-container {
     height: 6rem;
     background: var(--background-color);
+  }
+
+  .preview.accounts-preview-container {
+    height: 6.5rem;
   }
 
   .balance-preview {

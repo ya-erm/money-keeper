@@ -37,10 +37,12 @@
 
 <div class="accounts-preview" class:empty={!preview.totalAbsoluteBalance}>
   {#if preview.totalAbsoluteBalance}
-    <div class="balance-bar" aria-hidden="true">
-      {#each items as item (item.id)}
-        <span style:width={`${item.percentage}%`} style:background={item.color}></span>
-      {/each}
+    <div class="balance-bar-container" aria-hidden="true">
+      <div class="balance-bar">
+        {#each items as item (item.id)}
+          <span style:width={`${item.percentage}%`} style:background={item.color}></span>
+        {/each}
+      </div>
     </div>
     <ol class="account-list" aria-label={$translate('analytics.cards.accounts.current')}>
       {#each items as item (item.id)}
@@ -66,7 +68,7 @@
 <style>
   .accounts-preview {
     display: grid;
-    grid-template-rows: 1rem minmax(0, 1fr);
+    grid-template-rows: 1.5rem minmax(0, 1fr);
     height: 100%;
   }
 
@@ -76,19 +78,30 @@
     justify-content: center;
   }
 
+  .balance-bar-container {
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+  }
+
   .balance-bar {
     display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    height: 0.5rem;
     overflow: hidden;
-    border-bottom: 1px solid var(--border-color);
+    border-radius: 0.25rem;
   }
 
   .balance-bar span {
     min-width: 1px;
+    border-radius: inherit;
   }
 
   .account-list {
     display: grid;
     grid-auto-rows: 1.25rem;
+    border-top: 1px solid var(--border-color);
     margin: 0;
     padding: 0;
     list-style: none;
