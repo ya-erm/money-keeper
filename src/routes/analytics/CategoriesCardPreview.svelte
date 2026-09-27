@@ -1,17 +1,18 @@
 <script lang="ts">
-  import { currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
+  import { currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { translate } from '$lib/translate';
   import { findRate, formatMoney } from '$lib/utils';
 
   import { getExpenseCategoriesPreview } from './categoryPreview';
 
-  const colors = ['#2997d6', '#23a455', '#f3aa18', '#dc3f4f', '#8b5cf6'];
+  const colors = ['#2997d6', '#23a455', '#f3aa18'];
   const otherColor = '#a8adb4';
 
   $: mainCurrency = $memberSettingsStore?.currency ?? 'USD';
   $: preview = getExpenseCategoriesPreview($operationsStore, (currency) =>
     findRate($currencyRatesStore, mainCurrency, currency),
   );
+  $: balancesHidden = ($settingsStore.hideBalances ?? false) || preview.hasHiddenBalanceAccount;
   $: legendItems = [
     ...preview.categories.map((category, index) => ({ ...category, color: colors[index] })),
     ...(preview.otherAmount > 0
@@ -43,11 +44,20 @@
 <div class="categories-preview" class:empty={!preview.total}>
   {#if preview.total}
     <span class="donut" style:background={donutGradient} aria-hidden="true"></span>
-    <ol class="category-legend" aria-label={$translate('analytics.cards.categories.month')}>
+    <ol
+      class="category-legend"
+      class:amounts-hidden={balancesHidden}
+      aria-label={$translate('analytics.cards.categories.month')}
+    >
       {#each legendItems as item (item.id)}
         <li>
-          <span class="color" style:background-color={item.color}></span>
-          <span class="name">{item.name}</span>
+          <span class="category-name">
+            <span class="color" style:background-color={item.color}></span>
+            <span class="name">{item.name}</span>
+          </span>
+          {#if !balancesHidden}
+            <span class="amount">{formatMoney(-item.amount, { currency: mainCurrency })}</span>
+          {/if}
           <span class="percentage">{formatPercent(item.percentage)}</span>
         </li>
       {/each}
@@ -60,11 +70,9 @@
 <style>
   .categories-preview {
     display: grid;
-    grid-template-columns: 4.5rem minmax(0, 1fr);
+    grid-template-columns: 25% minmax(0, 1fr);
     align-items: center;
-    gap: 1rem;
     min-height: 6rem;
-    padding: 0.625rem 0.75rem;
   }
 
   .categories-preview.empty {
@@ -75,8 +83,9 @@
   .donut {
     position: relative;
     display: block;
-    width: 4.5rem;
-    height: 4.5rem;
+    width: min(4.5rem, calc(100% - 0.75rem));
+    aspect-ratio: 1;
+    justify-self: center;
     border-radius: 50%;
   }
 
@@ -89,23 +98,40 @@
   }
 
   .category-legend {
-    display: flex;
-    flex-direction: column;
-    gap: 0.22rem;
+    display: grid;
+    grid-auto-rows: 1.5rem;
+    align-self: stretch;
     min-width: 0;
     margin: 0;
     padding: 0;
+    border-left: 1px solid var(--border-color);
     list-style: none;
   }
 
   .category-legend li {
     display: grid;
-    grid-template-columns: 0.55rem minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) minmax(4.75rem, auto) 3rem;
     align-items: center;
-    gap: 0.4rem;
     min-width: 0;
     font-size: 0.75rem;
     line-height: 1.15;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .category-legend li:last-child {
+    border-bottom: 0;
+  }
+
+  .category-legend.amounts-hidden li {
+    grid-template-columns: minmax(0, 1fr) 3rem;
+  }
+
+  .category-name {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+    padding: 0 0.5rem;
   }
 
   .color {
@@ -120,25 +146,44 @@
     white-space: nowrap;
   }
 
+  .amount,
+  .percentage {
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 0.4rem;
+    white-space: nowrap;
+    border-left: 1px solid var(--border-color);
+  }
+
   .percentage,
   .empty-message {
     color: var(--secondary-text-color);
   }
 
   @media (max-width: 22rem) {
-    .categories-preview {
-      grid-template-columns: 3.75rem minmax(0, 1fr);
-      gap: 0.625rem;
-      padding-inline: 0.5rem;
+    .category-legend li {
+      grid-template-columns: minmax(0, 1fr) minmax(4rem, auto) 2.65rem;
+      font-size: 0.68rem;
     }
 
-    .donut {
-      width: 3.75rem;
-      height: 3.75rem;
+    .category-legend.amounts-hidden li {
+      grid-template-columns: minmax(0, 1fr) 2.65rem;
     }
 
     .donut::after {
       inset: 0.9rem;
+    }
+
+    .category-name {
+      gap: 0.3rem;
+      padding-inline: 0.35rem;
+    }
+
+    .amount,
+    .percentage {
+      padding-inline: 0.25rem;
     }
   }
 </style>

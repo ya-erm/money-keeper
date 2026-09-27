@@ -14,17 +14,19 @@ export type ExpenseCategoriesPreview = {
   otherAmount: number;
   otherPercentage: number;
   total: number;
+  hasHiddenBalanceAccount: boolean;
 };
 
 export function getExpenseCategoriesPreview(
   transactions: TransactionViewModel[],
   getRate: (currency: string) => number,
   date: string | number | Date | Dayjs = dayjs(),
-  limit = 5,
+  limit = 3,
 ): ExpenseCategoriesPreview {
   const start = dayjs(date).startOf('month');
   const end = start.add(1, 'month');
   const amounts = new Map<string, { name: string; amount: number }>();
+  let hasHiddenBalanceAccount = false;
 
   for (const transaction of transactions) {
     const transactionDate = dayjs(transaction.date);
@@ -40,6 +42,7 @@ export function getExpenseCategoriesPreview(
 
     const current = amounts.get(transaction.categoryId);
     const amount = transaction.amount * getRate(transaction.account.currency);
+    hasHiddenBalanceAccount ||= transaction.account.hideBalance ?? false;
     amounts.set(transaction.categoryId, {
       name: transaction.category.name,
       amount: (current?.amount ?? 0) + amount,
@@ -61,5 +64,6 @@ export function getExpenseCategoriesPreview(
     otherAmount,
     otherPercentage: total ? (otherAmount / total) * 100 : 0,
     total,
+    hasHiddenBalanceAccount,
   };
 }

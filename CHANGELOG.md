@@ -4,7 +4,7 @@
 
 ### Added
 
-- The category card on the analytics overview now shows the top five expense categories for the current month, their share of total spending, and combines the remaining categories into an “Other” donut segment.
+- The category card on the analytics overview now shows the top three expense categories for the current month, their amounts and share of total spending, and combines the remaining categories into an “Other” donut segment. Amounts respect balance privacy settings.
 
 ## 2.19.0 - 2026-09-24
 

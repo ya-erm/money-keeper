@@ -213,8 +213,8 @@
   }
 
   .preview.categories-preview-container {
-    height: auto;
-    min-height: 6rem;
+    height: 6rem;
+    background: var(--background-color);
   }
 
   .account-rows {

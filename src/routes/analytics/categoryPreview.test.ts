@@ -22,7 +22,7 @@ const transaction = (
 });
 
 describe('getExpenseCategoriesPreview', () => {
-  it('returns the top five monthly expense categories and combines the rest', () => {
+  it('returns the top three monthly expense categories and combines the rest', () => {
     const transactions = [
       transaction('1', 'Food', 60),
       transaction('2', 'Food', 40),
@@ -41,11 +41,10 @@ describe('getExpenseCategoriesPreview', () => {
       { id: 'Food', amount: 100 },
       { id: 'Home', amount: 80 },
       { id: 'Car', amount: 60 },
-      { id: 'Health', amount: 40 },
-      { id: 'Fun', amount: 20 },
     ]);
-    expect(result.otherAmount).toBe(20);
-    expect(result.otherPercentage).toBe(6.25);
+    expect(result.otherAmount).toBe(80);
+    expect(result.otherPercentage).toBe(25);
+    expect(result.hasHiddenBalanceAccount).toBe(false);
   });
 
   it('uses currency rates and ignores non-expenses, excluded, system and out-of-month operations', () => {
@@ -72,5 +71,20 @@ describe('getExpenseCategoriesPreview', () => {
     expect(result.total).toBe(20);
     expect(result.categories).toEqual([{ id: 'Food', name: 'Food', amount: 20, percentage: 100 }]);
     expect(result.otherAmount).toBe(0);
+    expect(result.hasHiddenBalanceAccount).toBe(false);
+  });
+
+  it('reports when a monthly expense belongs to a hidden-balance account', () => {
+    const result = getExpenseCategoriesPreview(
+      [
+        transaction('1', 'Food', 10, {
+          account: { id: 'account', name: 'Account', currency: 'USD', hideBalance: true },
+        }),
+      ],
+      () => 1,
+      new Date('2026-09-15'),
+    );
+
+    expect(result.hasHiddenBalanceAccount).toBe(true);
   });
 });
