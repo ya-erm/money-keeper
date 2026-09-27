@@ -180,8 +180,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 2rem;
+    height: 2rem;
     color: var(--active-color);
     background: var(--hover-background-color);
     border-radius: 0.5rem;
@@ -199,7 +199,7 @@
   .preview {
     position: relative;
     height: 4.5rem;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     overflow: hidden;
     border-radius: 0.375rem;
     background:
