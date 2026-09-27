@@ -81,7 +81,7 @@
   .balance-bar-container {
     display: flex;
     align-items: center;
-    padding: 0 1rem;
+    padding: 0 0.5rem;
   }
 
   .balance-bar {
