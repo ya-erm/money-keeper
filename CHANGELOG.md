@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.22.0 - 2026-09-28
+
+### Added
+
+- The income and expenses card on the analytics overview now shows actual daily data and totals for the current month. Amounts respect balance privacy settings.
+
 ## 2.21.0 - 2026-09-27
 
 ### Added

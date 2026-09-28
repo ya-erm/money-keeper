@@ -8,6 +8,7 @@
 
   import AccountsCardPreview from './AccountsCardPreview.svelte';
   import CategoriesCardPreview from './CategoriesCardPreview.svelte';
+  import IncomeExpensesCardPreview from './IncomeExpensesCardPreview.svelte';
 
   type AnalyticsCard = {
     title: Messages;
@@ -58,8 +59,11 @@
 
         <div
           class="preview"
-          class:data-preview-container={card.preview === 'donut' || card.preview === 'accounts'}
+          class:data-preview-container={card.preview === 'donut' ||
+            card.preview === 'accounts' ||
+            card.preview === 'bars'}
           class:accounts-preview-container={card.preview === 'accounts'}
+          class:income-expenses-preview-container={card.preview === 'bars'}
         >
           {#if card.preview === 'donut'}
             <CategoriesCardPreview />
@@ -99,30 +103,7 @@
               />
             </svg>
           {:else}
-            <svg
-              class="income-expenses-preview"
-              viewBox="0 0 260 72"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path
-                class="income-expenses-area"
-                d="M0 41 C16 24 32 13 50 27 C70 42 93 46 118 38 C140 32 154 31 171 20 C190 9 207 22 224 29 C238 34 249 36 260 37 L260 72 L0 72 Z"
-              />
-              <path
-                class="expense-area"
-                d="M0 51 C22 57 48 58 72 55 C99 52 112 45 124 33 C136 21 148 45 164 51 C181 57 195 46 211 40 C228 34 242 50 260 54 L260 72 L0 72 Z"
-              />
-              <path
-                class="income-line"
-                d="M0 41 C16 24 32 13 50 27 C70 42 93 46 118 38 C140 32 154 31 171 20 C190 9 207 22 224 29 C238 34 249 36 260 37"
-              />
-              <path
-                class="expense-line"
-                d="M0 51 C22 57 48 58 72 55 C99 52 112 45 124 33 C136 21 148 45 164 51 C181 57 195 46 211 40 C228 34 242 50 260 54"
-              />
-            </svg>
+            <IncomeExpensesCardPreview />
           {/if}
         </div>
       </a>
@@ -220,6 +201,10 @@
     height: 7.5rem;
   }
 
+  .preview.income-expenses-preview-container {
+    height: 7.5rem;
+  }
+
   .balance-preview {
     position: absolute;
     top: 0.55rem;
@@ -258,41 +243,6 @@
     fill: none;
     stroke-width: 2;
     stroke-linejoin: round;
-  }
-
-  .income-expenses-preview {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.75rem;
-    bottom: 0.45rem;
-    left: 0.75rem;
-    width: calc(100% - 1.5rem);
-    height: calc(100% - 0.95rem);
-  }
-
-  .income-expenses-area {
-    fill: color-mix(in srgb, var(--green-color) 18%, transparent);
-  }
-
-  .expense-area {
-    fill: color-mix(in srgb, var(--red-color) 14%, transparent);
-  }
-
-  .income-line,
-  .expense-line {
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    vector-effect: non-scaling-stroke;
-  }
-
-  .income-line {
-    stroke: var(--green-color);
-  }
-
-  .expense-line {
-    stroke: var(--red-color);
   }
 
   @media (min-width: 30rem) {
