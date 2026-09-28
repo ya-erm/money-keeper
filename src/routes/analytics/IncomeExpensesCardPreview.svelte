@@ -2,7 +2,7 @@
   import dayjs from 'dayjs';
 
   import { currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
-  import { translate } from '$lib/translate';
+  import { activeLocale, translate } from '$lib/translate';
   import { findRate, formatMoney } from '$lib/utils';
 
   import { getIncomeExpensesPreview, getNiceChartGrid } from './incomeExpensesPreview';
@@ -23,6 +23,15 @@
   $: amountsHidden = ($settingsStore.hideBalances ?? false) || preview.hasHiddenBalanceAccount;
   $: maxAmount = Math.max(...preview.incomeByMonth, ...preview.expensesByMonth, 0);
   $: chartGrid = getNiceChartGrid(maxAmount);
+  $: monthLabels = Array.from({ length: 12 }, (_, index) =>
+    dayjs()
+      .subtract(1, 'month')
+      .subtract(11 - index, 'month')
+      .locale($activeLocale === 'ru-RU' ? 'ru' : 'en')
+      .format('MMM')
+      .replace('.', '')
+      .slice(0, 3),
+  );
 
   const getPoints = (values: number[], max: number): Point[] =>
     values.map((value, index) => {
@@ -73,76 +82,83 @@
 
 <div class="income-expenses-card-preview">
   {#if preview.incomeTotal || preview.expensesTotal}
-    <svg
-      class="chart"
-      viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-      preserveAspectRatio="none"
-      role="img"
-      aria-label={$translate('analytics.cards.income_expenses.month')}
-    >
-      <defs>
-        <linearGradient
-          id="income-preview-gradient"
-          x1="0"
-          y1="0"
-          x2="0"
-          y2={chartHeight}
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop offset="0" stop-color="#16a34a" stop-opacity="0.24" />
-          <stop offset="1" stop-color="#16a34a" stop-opacity="0.02" />
-        </linearGradient>
-        <linearGradient
-          id="expenses-preview-gradient"
-          x1="0"
-          y1="0"
-          x2="0"
-          y2={chartHeight}
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop offset="0" stop-color="#dc2626" stop-opacity="0.22" />
-          <stop offset="1" stop-color="#dc2626" stop-opacity="0.02" />
-        </linearGradient>
-      </defs>
-      <path class="area income-area" d={incomeAreaPath} />
-      <path class="area expenses-area" d={expensesAreaPath} />
-      <g class="month-grid" aria-hidden="true">
-        {#each incomePoints as point}
-          <line x1={point.x} y1="0" x2={point.x} y2={chartHeight} />
-        {/each}
-      </g>
-      <g class="amount-grid" aria-hidden="true">
-        <line
-          class="zero-line"
-          x1="0"
-          y1={chartHeight - verticalPadding}
-          x2={chartWidth}
-          y2={chartHeight - verticalPadding}
-        >
-          <title>{formatMoney(0, { currency: mainCurrency, maxPrecision: 0 })}</title>
-        </line>
-        {#each chartGrid.values as value (value)}
-          <line
+    <div class="chart-panel">
+      <svg
+        class="chart"
+        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={$translate('analytics.cards.income_expenses.month')}
+      >
+        <defs>
+          <linearGradient
+            id="income-preview-gradient"
             x1="0"
-            y1={chartHeight - verticalPadding - (value / chartGrid.max) * (chartHeight - verticalPadding * 2)}
-            x2={chartWidth}
-            y2={chartHeight - verticalPadding - (value / chartGrid.max) * (chartHeight - verticalPadding * 2)}
+            y1="0"
+            x2="0"
+            y2={chartHeight}
+            gradientUnits="userSpaceOnUse"
           >
-            <title>{formatMoney(value, { currency: mainCurrency, maxPrecision: 0 })}</title>
+            <stop offset="0" stop-color="#16a34a" stop-opacity="0.24" />
+            <stop offset="1" stop-color="#16a34a" stop-opacity="0.02" />
+          </linearGradient>
+          <linearGradient
+            id="expenses-preview-gradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2={chartHeight}
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0" stop-color="#dc2626" stop-opacity="0.22" />
+            <stop offset="1" stop-color="#dc2626" stop-opacity="0.02" />
+          </linearGradient>
+        </defs>
+        <path class="area income-area" d={incomeAreaPath} />
+        <path class="area expenses-area" d={expensesAreaPath} />
+        <g class="month-grid" aria-hidden="true">
+          {#each incomePoints as point}
+            <line x1={point.x} y1="0" x2={point.x} y2={chartHeight} />
+          {/each}
+        </g>
+        <g class="amount-grid" aria-hidden="true">
+          <line
+            class="zero-line"
+            x1="0"
+            y1={chartHeight - verticalPadding}
+            x2={chartWidth}
+            y2={chartHeight - verticalPadding}
+          >
+            <title>{formatMoney(0, { currency: mainCurrency, maxPrecision: 0 })}</title>
           </line>
+          {#each chartGrid.values as value (value)}
+            <line
+              x1="0"
+              y1={chartHeight - verticalPadding - (value / chartGrid.max) * (chartHeight - verticalPadding * 2)}
+              x2={chartWidth}
+              y2={chartHeight - verticalPadding - (value / chartGrid.max) * (chartHeight - verticalPadding * 2)}
+            >
+              <title>{formatMoney(value, { currency: mainCurrency, maxPrecision: 0 })}</title>
+            </line>
+          {/each}
+        </g>
+        <path class="line income-line" d={incomePath} />
+        <path class="line expenses-line" d={expensesPath} />
+        <g aria-hidden="true">
+          {#each incomePoints as point}
+            <ellipse class="point income-point" cx={point.x} cy={point.y} rx="0.45" ry="0.8" />
+          {/each}
+          {#each expensesPoints as point}
+            <ellipse class="point expenses-point" cx={point.x} cy={point.y} rx="0.45" ry="0.8" />
+          {/each}
+        </g>
+      </svg>
+      <div class="month-labels" aria-hidden="true">
+        {#each monthLabels as month}
+          <span>{month}</span>
         {/each}
-      </g>
-      <path class="line income-line" d={incomePath} />
-      <path class="line expenses-line" d={expensesPath} />
-      <g aria-hidden="true">
-        {#each incomePoints as point}
-          <ellipse class="point income-point" cx={point.x} cy={point.y} rx="0.45" ry="0.8" />
-        {/each}
-        {#each expensesPoints as point}
-          <ellipse class="point expenses-point" cx={point.x} cy={point.y} rx="0.45" ry="0.8" />
-        {/each}
-      </g>
-    </svg>
+      </div>
+    </div>
     <dl class="summary">
       <div>
         <dt><span class="color income-color"></span>{$translate('categories.incomings')}</dt>
@@ -177,6 +193,23 @@
     width: calc(100% - 1rem);
     height: calc(100% - 0.5rem);
     margin: 0.25rem 0.5rem;
+  }
+
+  .chart-panel {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) 1rem;
+    min-height: 0;
+  }
+
+  .month-labels {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: center;
+    padding: 0 0.5rem;
+    color: var(--secondary-text-color);
+    font-size: 0.5rem;
+    line-height: 1;
+    text-align: center;
   }
 
   .line {
