@@ -32,8 +32,7 @@
       return { x, y };
     });
 
-  const getSmoothPath = (values: number[], max: number) => {
-    const points = getPoints(values, max);
+  const getSmoothPath = (points: Point[]) => {
     if (!points.length) return '';
     if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
 
@@ -56,8 +55,10 @@
     return path;
   };
 
-  $: incomePath = getSmoothPath(preview.incomeByMonth, maxAmount);
-  $: expensesPath = getSmoothPath(preview.expensesByMonth, maxAmount);
+  $: incomePoints = getPoints(preview.incomeByMonth, maxAmount);
+  $: expensesPoints = getPoints(preview.expensesByMonth, maxAmount);
+  $: incomePath = getSmoothPath(incomePoints);
+  $: expensesPath = getSmoothPath(expensesPoints);
 </script>
 
 <div class="income-expenses-card-preview">
@@ -69,8 +70,21 @@
       role="img"
       aria-label={$translate('analytics.cards.income_expenses.month')}
     >
+      <g class="month-grid" aria-hidden="true">
+        {#each incomePoints as point}
+          <line x1={point.x} y1="0" x2={point.x} y2={chartHeight} />
+        {/each}
+      </g>
       <path class="line income-line" d={incomePath} />
       <path class="line expenses-line" d={expensesPath} />
+      <g aria-hidden="true">
+        {#each incomePoints as point}
+          <ellipse class="point income-point" cx={point.x} cy={point.y} rx="0.45" ry="0.8" />
+        {/each}
+        {#each expensesPoints as point}
+          <ellipse class="point expenses-point" cx={point.x} cy={point.y} rx="0.45" ry="0.8" />
+        {/each}
+      </g>
     </svg>
     <dl class="summary">
       <div>
@@ -114,6 +128,26 @@
     stroke-linecap: round;
     stroke-linejoin: round;
     vector-effect: non-scaling-stroke;
+  }
+
+  .month-grid line {
+    stroke: var(--border-color);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .point {
+    fill: var(--background-color);
+    stroke-width: 1.25;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .income-point {
+    stroke: var(--green-color);
+  }
+
+  .expenses-point {
+    stroke: var(--red-color);
   }
 
   .income-line {
