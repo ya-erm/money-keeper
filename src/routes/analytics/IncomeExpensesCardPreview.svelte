@@ -104,12 +104,23 @@
           <stop offset="1" stop-color="#dc2626" stop-opacity="0.02" />
         </linearGradient>
       </defs>
+      <path class="area income-area" d={incomeAreaPath} />
+      <path class="area expenses-area" d={expensesAreaPath} />
       <g class="month-grid" aria-hidden="true">
         {#each incomePoints as point}
           <line x1={point.x} y1="0" x2={point.x} y2={chartHeight} />
         {/each}
       </g>
       <g class="amount-grid" aria-hidden="true">
+        <line
+          class="zero-line"
+          x1="0"
+          y1={chartHeight - verticalPadding}
+          x2={chartWidth}
+          y2={chartHeight - verticalPadding}
+        >
+          <title>{formatMoney(0, { currency: mainCurrency, maxPrecision: 0 })}</title>
+        </line>
         {#each chartGrid.values as value (value)}
           <line
             x1="0"
@@ -121,8 +132,6 @@
           </line>
         {/each}
       </g>
-      <path class="area income-area" d={incomeAreaPath} />
-      <path class="area expenses-area" d={expensesAreaPath} />
       <path class="line income-line" d={incomePath} />
       <path class="line expenses-line" d={expensesPath} />
       <g aria-hidden="true">
@@ -200,6 +209,10 @@
     stroke: color-mix(in srgb, var(--border-color) 78%, transparent);
     stroke-width: 1;
     vector-effect: non-scaling-stroke;
+  }
+
+  .amount-grid .zero-line {
+    stroke: var(--border-color);
   }
 
   .point {
