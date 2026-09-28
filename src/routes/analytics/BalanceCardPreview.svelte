@@ -12,7 +12,6 @@
   const chartHeight = 40;
   const verticalPadding = 3;
   const curveTension = 0.9;
-  const fallbackColors = ['#2997d6', '#23a455', '#f3aa18'];
   const otherColor = '#a8adb4';
 
   type Point = { x: number; y: number };
@@ -34,7 +33,7 @@
     $memberSettingsStore?.accountsOrder ?? [],
   );
   $: rawSeries = [
-    ...preview.series.map((series, index) => ({ ...series, color: series.color ?? fallbackColors[index] })),
+    ...preview.series.map((series) => ({ ...series, color: series.color ?? 'gray' })),
     ...(preview.hasOther
       ? [
           {
