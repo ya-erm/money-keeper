@@ -33,7 +33,6 @@
     $memberSettingsStore?.accountsOrder ?? [],
   );
   $: rawSeries = [
-    ...preview.series.map((series) => ({ ...series, color: series.color ?? 'gray' })),
     ...(preview.hasOther
       ? [
           {
@@ -44,6 +43,7 @@
           },
         ]
       : []),
+    ...preview.series.map((series) => ({ ...series, color: series.color ?? 'gray' })),
   ];
   $: cumulativeSeries = rawSeries.reduce<((BalancePreviewSeries & { color: string }) & { lowerValues: number[] })[]>(
     (result, series) => {
