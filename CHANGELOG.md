@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.25.0 - 2026-09-28
+
+### Fixed
+
+- Analytics cards no longer retain a hover outline after touch scrolling on mobile devices, while keyboard focus remains visible.
+
 ## 2.24.0 - 2026-09-28
 
 ### Added

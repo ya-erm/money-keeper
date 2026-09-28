@@ -109,7 +109,6 @@
       background-color 0.2s;
   }
 
-  .analytics-card:hover,
   .analytics-card:focus-visible {
     border-color: var(--active-color);
     background: var(--hover-background-color);
@@ -119,6 +118,14 @@
   .analytics-card:focus-visible {
     outline: 2px solid var(--active-color);
     outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .analytics-card:hover {
+      border-color: var(--active-color);
+      background: var(--hover-background-color);
+      transform: translateY(-1px);
+    }
   }
 
   .card-header {
