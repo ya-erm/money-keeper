@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.21.0 - 2026-09-27
+
+### Added
+
+- The account card on the analytics overview now shows the three largest current account balances, their share of total absolute balance, and a combined “Other” row. Amounts respect global and per-account balance privacy settings.
+
 ## 2.20.0 - 2026-09-27
 
 ### Added

@@ -6,6 +6,7 @@
   import type { Messages } from '$lib/translate/types';
   import Layout from '$lib/ui/layout/Layout.svelte';
 
+  import AccountsCardPreview from './AccountsCardPreview.svelte';
   import CategoriesCardPreview from './CategoriesCardPreview.svelte';
 
   type AnalyticsCard = {
@@ -55,17 +56,15 @@
           <Icon name="mdi:chevron-right" />
         </div>
 
-        <div class="preview" class:categories-preview-container={card.preview === 'donut'}>
+        <div
+          class="preview"
+          class:data-preview-container={card.preview === 'donut' || card.preview === 'accounts'}
+          class:accounts-preview-container={card.preview === 'accounts'}
+        >
           {#if card.preview === 'donut'}
             <CategoriesCardPreview />
           {:else if card.preview === 'accounts'}
-            <span class="account-rows">
-              <span class="account-row account-row-a"></span>
-              <span class="account-row account-row-b"></span>
-              <span class="account-row account-row-c"></span>
-            </span>
-            <span class="account-row account-row-preview"></span>
-            <span class="account-row account-row-preview"></span>
+            <AccountsCardPreview />
           {:else if card.preview === 'line'}
             <svg
               class="balance-preview"
@@ -181,8 +180,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 2rem;
+    height: 2rem;
     color: var(--active-color);
     background: var(--hover-background-color);
     border-radius: 0.5rem;
@@ -200,7 +199,7 @@
   .preview {
     position: relative;
     height: 4.5rem;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     overflow: hidden;
     border-radius: 0.375rem;
     background:
@@ -212,43 +211,13 @@
       25% 100%;
   }
 
-  .preview.categories-preview-container {
+  .preview.data-preview-container {
     height: 6rem;
     background: var(--background-color);
   }
 
-  .account-rows {
-    display: flex;
-    height: 0.5rem;
-    gap: 0.5rem;
-    margin: 0.5rem 1rem;
-  }
-
-  .account-row {
-    display: block;
-    height: 0.5rem;
-    border-radius: 0.25rem;
-    background: var(--border-color);
-  }
-
-  .account-row-a {
-    width: 60%;
-    background: var(--active-color);
-  }
-
-  .account-row-b {
-    width: 30%;
-    background: var(--green-color);
-  }
-
-  .account-row-c {
-    width: 10%;
-    background: var(--red-color);
-  }
-
-  .account-row-preview {
-    margin: 1rem;
-    margin-bottom: 0;
+  .preview.accounts-preview-container {
+    height: 7.5rem;
   }
 
   .balance-preview {
