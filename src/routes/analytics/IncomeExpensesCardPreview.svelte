@@ -55,10 +55,19 @@
     return path;
   };
 
+  const getAreaPath = (points: Point[], linePath: string) => {
+    if (!points.length || !linePath) return '';
+    const first = points[0];
+    const last = points.at(-1) ?? first;
+    return `${linePath} L ${last.x.toFixed(2)} ${chartHeight} L ${first.x.toFixed(2)} ${chartHeight} Z`;
+  };
+
   $: incomePoints = getPoints(preview.incomeByMonth, maxAmount);
   $: expensesPoints = getPoints(preview.expensesByMonth, maxAmount);
   $: incomePath = getSmoothPath(incomePoints);
   $: expensesPath = getSmoothPath(expensesPoints);
+  $: incomeAreaPath = getAreaPath(incomePoints, incomePath);
+  $: expensesAreaPath = getAreaPath(expensesPoints, expensesPath);
 </script>
 
 <div class="income-expenses-card-preview">
@@ -70,11 +79,37 @@
       role="img"
       aria-label={$translate('analytics.cards.income_expenses.month')}
     >
+      <defs>
+        <linearGradient
+          id="income-preview-gradient"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2={chartHeight}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" stop-color="#16a34a" stop-opacity="0.24" />
+          <stop offset="1" stop-color="#16a34a" stop-opacity="0.02" />
+        </linearGradient>
+        <linearGradient
+          id="expenses-preview-gradient"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2={chartHeight}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" stop-color="#dc2626" stop-opacity="0.22" />
+          <stop offset="1" stop-color="#dc2626" stop-opacity="0.02" />
+        </linearGradient>
+      </defs>
       <g class="month-grid" aria-hidden="true">
         {#each incomePoints as point}
           <line x1={point.x} y1="0" x2={point.x} y2={chartHeight} />
         {/each}
       </g>
+      <path class="area income-area" d={incomeAreaPath} />
+      <path class="area expenses-area" d={expensesAreaPath} />
       <path class="line income-line" d={incomePath} />
       <path class="line expenses-line" d={expensesPath} />
       <g aria-hidden="true">
@@ -128,6 +163,18 @@
     stroke-linecap: round;
     stroke-linejoin: round;
     vector-effect: non-scaling-stroke;
+  }
+
+  .area {
+    stroke: none;
+  }
+
+  .income-area {
+    fill: url('#income-preview-gradient');
+  }
+
+  .expenses-area {
+    fill: url('#expenses-preview-gradient');
   }
 
   .month-grid line {
