@@ -191,20 +191,20 @@
 
   .chart {
     width: calc(100% - 1rem);
-    height: calc(100% - 0.5rem);
-    margin: 0.25rem 0.5rem;
+    height: 100%;
+    margin: 0 0.5rem;
   }
 
   .chart-panel {
     display: grid;
-    grid-template-rows: minmax(0, 1fr) 1rem;
+    grid-template-rows: minmax(0, 1fr) 0.75rem;
     min-height: 0;
   }
 
   .month-labels {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    align-items: center;
+    align-items: start;
     padding: 0 0.5rem;
     color: var(--secondary-text-color);
     font-size: 0.5rem;
