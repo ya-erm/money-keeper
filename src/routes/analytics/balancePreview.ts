@@ -16,6 +16,23 @@ export type BalancePreview = {
   hasOther: boolean;
 };
 
+export function getTotalBalanceAt(
+  accounts: AccountViewModel[],
+  transactions: TransactionViewModel[],
+  getRate: (currency: string) => number,
+  date: string | number | Date | Dayjs,
+): number {
+  const boundary = dayjs(date);
+  return accounts.reduce((total, account) => {
+    const balance = calculateBalance(
+      transactions.filter(
+        (transaction) => transaction.accountId === account.id && dayjs(transaction.date).isBefore(boundary),
+      ),
+    );
+    return total + Math.max(0, balance * getRate(account.currency));
+  }, 0);
+}
+
 export function getBalancePreview(
   accounts: AccountViewModel[],
   transactions: TransactionViewModel[],

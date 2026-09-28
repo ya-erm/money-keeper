@@ -1,11 +1,11 @@
 <script lang="ts">
   import dayjs from 'dayjs';
 
-  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
+  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { activeLocale, translate } from '$lib/translate';
-  import { findRate } from '$lib/utils';
+  import { findRate, formatHiddenMoney, formatMoney } from '$lib/utils';
 
-  import { getBalancePreview, type BalancePreviewSeries } from './balancePreview';
+  import { getBalancePreview, getTotalBalanceAt, type BalancePreviewSeries } from './balancePreview';
   import { getNiceChartGrid } from './incomeExpensesPreview';
 
   const chartWidth = 100;
@@ -16,15 +16,16 @@
   const otherColor = '#a8adb4';
 
   type Point = { x: number; y: number };
-  type ChartSeries = BalancePreviewSeries & { color: string; points: Point[]; path: string; areaPath: string };
+  type ChartSeries = BalancePreviewSeries & {
+    color: string;
+    points: Point[];
+    path: string;
+    areaPath: string;
+  };
 
   $: mainCurrency = $memberSettingsStore?.currency ?? 'USD';
-  $: preview = getBalancePreview(
-    $accountsStore,
-    $operationsStore,
-    (currency) => findRate($currencyRatesStore, mainCurrency, currency),
-    dayjs().subtract(1, 'month'),
-  );
+  $: getRate = (currency: string) => findRate($currencyRatesStore, mainCurrency, currency);
+  $: preview = getBalancePreview($accountsStore, $operationsStore, getRate, dayjs().subtract(1, 'month'));
   $: rawSeries = [
     ...preview.series.map((series, index) => ({ ...series, color: series.color ?? fallbackColors[index] })),
     ...(preview.hasOther
@@ -38,9 +39,26 @@
         ]
       : []),
   ];
-  $: maxAmount = Math.max(0, ...rawSeries.flatMap(({ values }) => values));
+  $: cumulativeSeries = rawSeries.reduce<((BalancePreviewSeries & { color: string }) & { lowerValues: number[] })[]>(
+    (result, series) => {
+      const lowerValues = result.at(-1)?.values ?? series.values.map(() => 0);
+      result.push({
+        ...series,
+        lowerValues,
+        values: series.values.map((value, index) => value + lowerValues[index]),
+      });
+      return result;
+    },
+    [],
+  );
+  $: maxAmount = Math.max(0, ...(cumulativeSeries.at(-1)?.values ?? []));
   $: chartGrid = getNiceChartGrid(maxAmount);
-  $: chartSeries = rawSeries.map((series) => makeChartSeries(series, chartGrid.max));
+  $: chartSeries = cumulativeSeries.map((series) => makeChartSeries(series, series.lowerValues, chartGrid.max));
+  $: now = dayjs();
+  $: balanceYearAgo = getTotalBalanceAt($accountsStore, $operationsStore, getRate, now.subtract(1, 'year'));
+  $: balanceNow = getTotalBalanceAt($accountsStore, $operationsStore, getRate, now.add(1, 'millisecond'));
+  $: balanceDifference = balanceNow - balanceYearAgo;
+  $: balancesHidden = ($settingsStore.hideBalances ?? false) || $accountsStore.some((account) => account.hideBalance);
   $: monthLabels = Array.from({ length: 12 }, (_, index) =>
     dayjs()
       .subtract(1, 'month')
@@ -77,42 +95,37 @@
     return path;
   }
 
-  function makeChartSeries(series: BalancePreviewSeries & { color: string }, max: number): ChartSeries {
+  function makeChartSeries(
+    series: BalancePreviewSeries & { color: string },
+    lowerValues: number[],
+    max: number,
+  ): ChartSeries {
     const points = getPoints(series.values, max);
     const path = getSmoothPath(points);
-    const first = points[0];
-    const last = points.at(-1) ?? first;
+    const lowerPath = getSmoothPath(getPoints(lowerValues, max).reverse()).replace(/^M/, 'L');
     return {
       ...series,
       points,
       path,
-      areaPath:
-        first && last ? `${path} L ${last.x.toFixed(2)} ${chartHeight} L ${first.x.toFixed(2)} ${chartHeight} Z` : '',
+      areaPath: path && lowerPath ? `${path} ${lowerPath} Z` : '',
     };
   }
+
+  const formatBalance = (value: number) =>
+    balancesHidden ? formatHiddenMoney(mainCurrency) : formatMoney(value, { currency: mainCurrency, maxPrecision: 0 });
+
+  const formatDifference = (value: number) => {
+    const formatted = formatBalance(value);
+    return !balancesHidden && value > 0 ? `+${formatted}` : formatted;
+  };
 </script>
 
 <div class="balance-card-preview" class:empty={!chartSeries.length}>
   {#if chartSeries.length}
     <div class="chart-panel">
       <svg class="chart" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="none" aria-hidden="true">
-        <defs>
-          {#each chartSeries as series (series.id)}
-            <linearGradient
-              id={`balance-preview-gradient-${series.id}`}
-              x1="0"
-              y1="0"
-              x2="0"
-              y2={chartHeight}
-              gradientUnits="userSpaceOnUse"
-            >
-              <stop offset="0" stop-color={series.color} stop-opacity="0.16" />
-              <stop offset="1" stop-color={series.color} stop-opacity="0.01" />
-            </linearGradient>
-          {/each}
-        </defs>
-        {#each chartSeries.slice().reverse() as series (series.id)}
-          <path class="area" d={series.areaPath} fill={`url('#balance-preview-gradient-${series.id}')`} />
+        {#each chartSeries as series (series.id)}
+          <path class="area" d={series.areaPath} fill={series.color} />
         {/each}
         <g class="month-grid">
           {#each chartSeries[0].points as point}
@@ -141,11 +154,13 @@
         {#each monthLabels.slice(0, -1) as month}<span>{month}</span>{/each}
       </div>
     </div>
-    <ul class="legend" aria-label={$translate('analytics.cards.balance')}>
-      {#each chartSeries as series (series.id)}
-        <li><span class="color" style:background={series.color}></span><span>{series.name}</span></li>
-      {/each}
-    </ul>
+    <div class="balance-summary" aria-label={$translate('analytics.cards.balance')}>
+      <span>{formatBalance(balanceYearAgo)}</span>
+      <span class:positive={balanceDifference > 0} class:negative={balanceDifference < 0}>
+        {formatDifference(balanceDifference)}
+      </span>
+      <span>{formatBalance(balanceNow)}</span>
+    </div>
   {:else}
     <span class="empty-message">{$translate('analytics.cards.balance.no_balances')}</span>
   {/if}
@@ -194,38 +209,35 @@
     stroke-linejoin: round;
     vector-effect: non-scaling-stroke;
   }
+  .area {
+    opacity: 0.32;
+  }
   .point {
     fill: var(--background-color);
     stroke-width: 1.25;
     vector-effect: non-scaling-stroke;
   }
-  .legend {
+  .balance-summary {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.5rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: center;
-    margin: 0;
     padding: 0 0.5rem;
     border-top: 1px solid var(--border-color);
-    list-style: none;
-  }
-  .legend li {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    min-width: 0;
-    font-size: 0.65rem;
-  }
-  .legend li span:last-child {
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0.7rem;
     white-space: nowrap;
   }
-  .color {
-    flex-shrink: 0;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
+  .balance-summary span:nth-child(2) {
+    color: var(--secondary-text-color);
+    text-align: center;
+  }
+  .balance-summary span:last-child {
+    text-align: right;
+  }
+  .balance-summary .positive {
+    color: var(--green-color);
+  }
+  .balance-summary .negative {
+    color: var(--red-color);
   }
   .empty-message {
     color: var(--secondary-text-color);

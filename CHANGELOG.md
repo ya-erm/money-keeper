@@ -4,7 +4,7 @@
 
 ### Added
 
-- The total balance card on the analytics overview now shows monthly balances for the last 12 completed months, highlighting the three largest accounts and combining the remaining accounts into a gray “Other” series.
+- The total balance card on the analytics overview now shows a stacked monthly balance chart for the last 12 completed months, highlighting the three largest accounts and combining the remaining accounts into a gray “Other” area. The summary compares the total balance one year ago with its current value and shows the change.
 
 ## 2.22.0 - 2026-09-28
 

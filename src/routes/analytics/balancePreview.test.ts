@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { AccountViewModel, Category, TransactionViewModel } from '$lib/data/interfaces';
 
-import { getBalancePreview } from './balancePreview';
+import { getBalancePreview, getTotalBalanceAt } from './balancePreview';
 
 const income: Category = { id: 'income', name: 'Income', type: 'IN' };
 const expense: Category = { id: 'expense', name: 'Expense', type: 'OUT' };
@@ -12,6 +12,25 @@ const account = (id: string, currency = 'USD'): AccountViewModel => ({
   name: id,
   currency,
   tags: [],
+});
+
+describe('getTotalBalanceAt', () => {
+  it('returns the converted total at the requested point in time', () => {
+    const usd = account('USD');
+    const eur = account('EUR', 'EUR');
+    expect(
+      getTotalBalanceAt(
+        [usd, eur],
+        [
+          transaction('usd', usd, 20, '2026-09-01'),
+          transaction('eur', eur, 10, '2026-09-01'),
+          transaction('future', usd, 100, '2026-09-16'),
+        ],
+        (currency) => (currency === 'EUR' ? 2 : 1),
+        new Date('2026-09-15'),
+      ),
+    ).toBe(40);
+  });
 });
 
 const transaction = (
