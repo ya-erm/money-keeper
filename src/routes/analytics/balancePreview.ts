@@ -1,0 +1,59 @@
+import dayjs, { type Dayjs } from 'dayjs';
+
+import type { AccountViewModel, TransactionViewModel } from '$lib/data/interfaces';
+import { calculateBalance } from '$lib/utils';
+
+export type BalancePreviewSeries = {
+  id: string;
+  name: string;
+  color?: string;
+  values: number[];
+};
+
+export type BalancePreview = {
+  series: BalancePreviewSeries[];
+  otherValues: number[];
+  hasOther: boolean;
+};
+
+export function getBalancePreview(
+  accounts: AccountViewModel[],
+  transactions: TransactionViewModel[],
+  getRate: (currency: string) => number,
+  date: string | number | Date | Dayjs = dayjs(),
+  limit = 3,
+): BalancePreview {
+  const selectedMonth = dayjs(date).startOf('month');
+  const monthEnds = Array.from({ length: 12 }, (_, index) =>
+    selectedMonth.subtract(11 - index, 'month').add(1, 'month'),
+  );
+
+  const accountSeries = accounts.map((account) => {
+    const accountTransactions = transactions.filter((transaction) => transaction.accountId === account.id);
+    const values = monthEnds.map((monthEnd) => {
+      const balance = calculateBalance(
+        accountTransactions.filter((transaction) => dayjs(transaction.date).isBefore(monthEnd)),
+      );
+      return Math.max(0, balance * getRate(account.currency));
+    });
+
+    return {
+      id: account.id,
+      name: account.name,
+      color: account.color,
+      values,
+    };
+  });
+
+  const rankedSeries = accountSeries
+    .filter((series) => series.values.some((value) => value > 0))
+    .sort((a, b) => (b.values.at(-1) ?? 0) - (a.values.at(-1) ?? 0));
+  const series = rankedSeries.slice(0, limit);
+  const otherSeries = rankedSeries.slice(limit);
+
+  return {
+    series,
+    otherValues: monthEnds.map((_, index) => otherSeries.reduce((sum, account) => sum + account.values[index], 0)),
+    hasOther: otherSeries.length > 0,
+  };
+}

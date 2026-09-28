@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.23.0 - 2026-09-28
+
+### Added
+
+- The total balance card on the analytics overview now shows monthly balances for the last 12 completed months, highlighting the three largest accounts and combining the remaining accounts into a gray “Other” series.
+
 ## 2.22.0 - 2026-09-28
 
 ### Added
