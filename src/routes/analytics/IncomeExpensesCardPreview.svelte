@@ -35,7 +35,7 @@
 
   const getPoints = (values: number[], max: number): Point[] =>
     values.map((value, index) => {
-      const x = values.length > 1 ? (index / values.length) * chartWidth : 0;
+      const x = values.length > 1 ? (index / (values.length - 1)) * chartWidth : 0;
       const y = max
         ? chartHeight - verticalPadding - (value / max) * (chartHeight - verticalPadding * 2)
         : chartHeight / 2;
@@ -154,7 +154,7 @@
         </g>
       </svg>
       <div class="month-labels" aria-hidden="true">
-        {#each monthLabels as month}
+        {#each monthLabels.slice(0, -1) as month}
           <span>{month}</span>
         {/each}
       </div>
@@ -203,7 +203,7 @@
 
   .month-labels {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-columns: repeat(11, minmax(0, 1fr));
     align-items: start;
     padding: 0 0.5rem;
     color: var(--secondary-text-color);
