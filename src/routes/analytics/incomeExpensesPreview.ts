@@ -10,6 +10,30 @@ export type IncomeExpensesPreview = {
   hasHiddenBalanceAccount: boolean;
 };
 
+export type ChartGrid = {
+  max: number;
+  step: number;
+  values: number[];
+};
+
+export function getNiceChartGrid(maxValue: number, targetLines = 6): ChartGrid {
+  if (maxValue <= 0) return { max: 0, step: 0, values: [] };
+
+  const roughStep = maxValue / targetLines;
+  const magnitude = 10 ** Math.floor(Math.log10(roughStep));
+  const fraction = roughStep / magnitude;
+  const niceFraction = fraction < 1.5 ? 1 : fraction < 3 ? 2 : fraction < 7 ? 5 : 10;
+  const step = niceFraction * magnitude;
+  const linesCount = Math.ceil(maxValue / step);
+  const max = linesCount * step;
+
+  return {
+    max,
+    step,
+    values: Array.from({ length: linesCount }, (_, index) => (index + 1) * step),
+  };
+}
+
 export function getIncomeExpensesPreview(
   transactions: TransactionViewModel[],
   getRate: (currency: string) => number,

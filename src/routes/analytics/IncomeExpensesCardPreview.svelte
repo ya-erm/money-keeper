@@ -5,12 +5,12 @@
   import { translate } from '$lib/translate';
   import { findRate, formatMoney } from '$lib/utils';
 
-  import { getIncomeExpensesPreview } from './incomeExpensesPreview';
+  import { getIncomeExpensesPreview, getNiceChartGrid } from './incomeExpensesPreview';
 
   const chartWidth = 100;
   const chartHeight = 40;
   const verticalPadding = 3;
-  const curveTension = 0.75;
+  const curveTension = 0.9;
 
   type Point = { x: number; y: number };
 
@@ -22,6 +22,7 @@
   );
   $: amountsHidden = ($settingsStore.hideBalances ?? false) || preview.hasHiddenBalanceAccount;
   $: maxAmount = Math.max(...preview.incomeByMonth, ...preview.expensesByMonth, 0);
+  $: chartGrid = getNiceChartGrid(maxAmount);
 
   const getPoints = (values: number[], max: number): Point[] =>
     values.map((value, index) => {
@@ -62,8 +63,8 @@
     return `${linePath} L ${last.x.toFixed(2)} ${chartHeight} L ${first.x.toFixed(2)} ${chartHeight} Z`;
   };
 
-  $: incomePoints = getPoints(preview.incomeByMonth, maxAmount);
-  $: expensesPoints = getPoints(preview.expensesByMonth, maxAmount);
+  $: incomePoints = getPoints(preview.incomeByMonth, chartGrid.max);
+  $: expensesPoints = getPoints(preview.expensesByMonth, chartGrid.max);
   $: incomePath = getSmoothPath(incomePoints);
   $: expensesPath = getSmoothPath(expensesPoints);
   $: incomeAreaPath = getAreaPath(incomePoints, incomePath);
@@ -106,6 +107,18 @@
       <g class="month-grid" aria-hidden="true">
         {#each incomePoints as point}
           <line x1={point.x} y1="0" x2={point.x} y2={chartHeight} />
+        {/each}
+      </g>
+      <g class="amount-grid" aria-hidden="true">
+        {#each chartGrid.values as value (value)}
+          <line
+            x1="0"
+            y1={chartHeight - verticalPadding - (value / chartGrid.max) * (chartHeight - verticalPadding * 2)}
+            x2={chartWidth}
+            y2={chartHeight - verticalPadding - (value / chartGrid.max) * (chartHeight - verticalPadding * 2)}
+          >
+            <title>{formatMoney(value, { currency: mainCurrency, maxPrecision: 0 })}</title>
+          </line>
         {/each}
       </g>
       <path class="area income-area" d={incomeAreaPath} />
@@ -179,6 +192,12 @@
 
   .month-grid line {
     stroke: var(--border-color);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .amount-grid line {
+    stroke: color-mix(in srgb, var(--border-color) 78%, transparent);
     stroke-width: 1;
     vector-effect: non-scaling-stroke;
   }

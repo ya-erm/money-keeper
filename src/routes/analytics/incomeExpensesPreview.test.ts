@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { Account, Category, TransactionViewModel } from '$lib/data/interfaces';
 
-import { getIncomeExpensesPreview } from './incomeExpensesPreview';
+import { getIncomeExpensesPreview, getNiceChartGrid } from './incomeExpensesPreview';
 
 const account: Account = { id: 'account', name: 'Account', currency: 'EUR' };
 const income: Category = { id: 'income', name: 'Income', type: 'IN' };
@@ -73,5 +73,19 @@ describe('getIncomeExpensesPreview', () => {
     );
 
     expect(result.hasHiddenBalanceAccount).toBe(true);
+  });
+});
+
+describe('getNiceChartGrid', () => {
+  it.each([
+    [4_334, 1_000, 5_000],
+    [13_000, 2_000, 14_000],
+    [600_000, 100_000, 600_000],
+  ])('selects a round step for a maximum of %s', (value, step, max) => {
+    expect(getNiceChartGrid(value)).toMatchObject({ step, max });
+  });
+
+  it('returns an empty grid when there are no values', () => {
+    expect(getNiceChartGrid(0)).toEqual({ max: 0, step: 0, values: [] });
   });
 });
