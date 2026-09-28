@@ -35,7 +35,7 @@
 
   const getPoints = (values: number[], max: number): Point[] =>
     values.map((value, index) => {
-      const x = values.length > 1 ? (index / (values.length - 1)) * chartWidth : chartWidth / 2;
+      const x = values.length > 1 ? (index / values.length) * chartWidth : 0;
       const y = max
         ? chartHeight - verticalPadding - (value / max) * (chartHeight - verticalPadding * 2)
         : chartHeight / 2;
@@ -209,7 +209,7 @@
     color: var(--secondary-text-color);
     font-size: 0.5rem;
     line-height: 1;
-    text-align: center;
+    text-align: left;
   }
 
   .line {
