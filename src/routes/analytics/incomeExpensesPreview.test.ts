@@ -27,7 +27,7 @@ const transaction = (
 });
 
 describe('getIncomeExpensesPreview', () => {
-  it('groups current-month income and expenses by day and converts currencies', () => {
+  it('groups the selected month income and expenses by day and converts currencies', () => {
     const result = getIncomeExpensesPreview(
       [
         transaction('1', '2026-09-01', 10, income),
@@ -38,19 +38,20 @@ describe('getIncomeExpensesPreview', () => {
       new Date('2026-09-03T12:00:00'),
     );
 
-    expect(result.incomeByDay).toEqual([20, 0, 40]);
-    expect(result.expensesByDay).toEqual([10, 0, 0]);
+    expect(result.incomeByDay.slice(0, 3)).toEqual([20, 0, 40]);
+    expect(result.expensesByDay.slice(0, 3)).toEqual([10, 0, 0]);
+    expect(result.incomeByDay).toHaveLength(30);
     expect(result.incomeTotal).toBe(60);
     expect(result.expensesTotal).toBe(10);
   });
 
-  it('ignores excluded, system, future and out-of-month operations', () => {
+  it('ignores excluded, system and out-of-month operations', () => {
     const result = getIncomeExpensesPreview(
       [
         transaction('excluded', '2026-09-01', 10, income, { excludeFromAnalysis: true }),
         transaction('system', '2026-09-01', 10, { ...income, system: true }),
-        transaction('future', '2026-09-04', 10, income),
         transaction('old', '2026-08-31', 10, income),
+        transaction('next', '2026-10-01', 10, income),
       ],
       () => 1,
       new Date('2026-09-03T12:00:00'),

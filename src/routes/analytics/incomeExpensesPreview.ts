@@ -18,7 +18,7 @@ export function getIncomeExpensesPreview(
   const currentDate = dayjs(date);
   const start = currentDate.startOf('month');
   const end = start.add(1, 'month');
-  const daysCount = currentDate.date();
+  const daysCount = currentDate.daysInMonth();
   const incomeByDay = Array.from({ length: daysCount }, () => 0);
   const expensesByDay = Array.from({ length: daysCount }, () => 0);
   let hasHiddenBalanceAccount = false;
@@ -29,8 +29,7 @@ export function getIncomeExpensesPreview(
       transaction.excludeFromAnalysis ||
       transaction.category.system ||
       transactionDate.isBefore(start) ||
-      !transactionDate.isBefore(end) ||
-      transactionDate.isAfter(currentDate.endOf('day'))
+      !transactionDate.isBefore(end)
     ) {
       continue;
     }
