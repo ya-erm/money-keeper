@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.23.0 - 2026-09-28
+
+### Added
+
+- The main currency modal now suggests currencies used by existing accounts for quick selection.
+
 ## 2.22.0 - 2026-09-28
 
 ### Added
