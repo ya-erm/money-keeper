@@ -129,6 +129,8 @@ export type Messages =
   | 'analytics.cards.categories.no_expenses'
   | 'analytics.cards.accounts.current'
   | 'analytics.cards.accounts.other'
+  | 'analytics.cards.balance.other'
+  | 'analytics.cards.balance.no_balances'
   | 'analytics.cards.accounts.no_balances'
   | 'analytics.cards.income_expenses.month'
   | 'analytics.cards.income_expenses.no_operations'

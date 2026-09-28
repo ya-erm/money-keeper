@@ -134,6 +134,8 @@ export const enDict: Dictionary = {
   'analytics.cards.categories.no_expenses': 'No expenses this month',
   'analytics.cards.accounts.current': 'Largest account balances',
   'analytics.cards.accounts.other': 'Other',
+  'analytics.cards.balance.other': 'Other',
+  'analytics.cards.balance.no_balances': 'No balances',
   'analytics.cards.accounts.no_balances': 'No account balances',
   'analytics.cards.income_expenses.month': 'Income and expenses for the last 12 completed months',
   'analytics.cards.income_expenses.no_operations': 'No income or expenses last month',

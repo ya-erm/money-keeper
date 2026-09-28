@@ -7,6 +7,7 @@
   import Layout from '$lib/ui/layout/Layout.svelte';
 
   import AccountsCardPreview from './AccountsCardPreview.svelte';
+  import BalanceCardPreview from './BalanceCardPreview.svelte';
   import CategoriesCardPreview from './CategoriesCardPreview.svelte';
   import IncomeExpensesCardPreview from './IncomeExpensesCardPreview.svelte';
 
@@ -61,47 +62,17 @@
           class="preview"
           class:data-preview-container={card.preview === 'donut' ||
             card.preview === 'accounts' ||
+            card.preview === 'line' ||
             card.preview === 'bars'}
           class:accounts-preview-container={card.preview === 'accounts'}
-          class:income-expenses-preview-container={card.preview === 'bars'}
+          class:chart-preview-container={card.preview === 'line' || card.preview === 'bars'}
         >
           {#if card.preview === 'donut'}
             <CategoriesCardPreview />
           {:else if card.preview === 'accounts'}
             <AccountsCardPreview />
           {:else if card.preview === 'line'}
-            <svg
-              class="balance-preview"
-              viewBox="0 0 100 60"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <polygon
-                class="balance-area balance-area-total"
-                points="0,54 9,50 18,47 29,40 43,38 56,32 68,27 80,17 91,12 100,15 100,60 0,60"
-              />
-              <polyline
-                class="balance-line balance-line-total"
-                points="0,54 9,50 18,47 29,40 43,38 56,32 68,27 80,17 91,12 100,15"
-              />
-              <polygon
-                class="balance-area balance-area-middle"
-                points="0,48 12,45 25,41 38,43 52,40 66,38 80,32 92,31 100,34 100,60 0,60"
-              />
-              <polyline
-                class="balance-line balance-line-middle"
-                points="0,48 12,45 25,41 38,43 52,40 66,38 80,32 92,31 100,34"
-              />
-              <polygon
-                class="balance-area balance-area-bottom"
-                points="0,56 16,54 31,51 45,53 60,51 75,48 89,46 100,48 100,60 0,60"
-              />
-              <polyline
-                class="balance-line balance-line-bottom"
-                points="0,56 16,54 31,51 45,53 60,51 75,48 89,46 100,48"
-              />
-            </svg>
+            <BalanceCardPreview />
           {:else}
             <IncomeExpensesCardPreview />
           {/if}
@@ -201,48 +172,8 @@
     height: 7.5rem;
   }
 
-  .preview.income-expenses-preview-container {
+  .preview.chart-preview-container {
     height: 7.5rem;
-  }
-
-  .balance-preview {
-    position: absolute;
-    top: 0.55rem;
-    right: 0.75rem;
-    bottom: 0.45rem;
-    left: 0.75rem;
-    width: calc(100% - 1.5rem);
-    height: calc(100% - 1rem);
-  }
-
-  .balance-area-total {
-    fill: color-mix(in srgb, var(--active-color) 42%, transparent);
-  }
-
-  .balance-line-total {
-    stroke: color-mix(in srgb, var(--active-color) 65%, transparent);
-  }
-
-  .balance-area-middle {
-    fill: color-mix(in srgb, var(--green-color) 48%, transparent);
-  }
-
-  .balance-line-middle {
-    stroke: color-mix(in srgb, var(--green-color) 70%, transparent);
-  }
-
-  .balance-area-bottom {
-    fill: color-mix(in srgb, var(--orange-color) 58%, transparent);
-  }
-
-  .balance-line-bottom {
-    stroke: color-mix(in srgb, var(--orange-color) 80%, transparent);
-  }
-
-  .balance-line {
-    fill: none;
-    stroke-width: 2;
-    stroke-linejoin: round;
   }
 
   @media (min-width: 30rem) {
