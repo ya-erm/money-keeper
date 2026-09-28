@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.22.0 - 2026-09-28
+
+### Added
+
+- The income and expenses card on the analytics overview now shows the trend for the last 12 completed months and totals for the previous month. Smooth lines use a shared scale with localized month labels, monthly and automatically rounded amount grid lines including a visible zero baseline, value markers, and gradient area fills; amounts respect balance privacy settings.
+
 ## 2.21.0 - 2026-09-27
 
 ### Added

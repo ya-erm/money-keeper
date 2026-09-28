@@ -130,6 +130,8 @@ export type Messages =
   | 'analytics.cards.accounts.current'
   | 'analytics.cards.accounts.other'
   | 'analytics.cards.accounts.no_balances'
+  | 'analytics.cards.income_expenses.month'
+  | 'analytics.cards.income_expenses.no_operations'
   | 'analytics.categories.start_date'
   | 'analytics.categories.end_date'
   | 'analytics.categories.monthly_interval'
