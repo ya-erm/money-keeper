@@ -25,7 +25,14 @@
 
   $: mainCurrency = $memberSettingsStore?.currency ?? 'USD';
   $: getRate = (currency: string) => findRate($currencyRatesStore, mainCurrency, currency);
-  $: preview = getBalancePreview($accountsStore, $operationsStore, getRate, dayjs().subtract(1, 'month'));
+  $: preview = getBalancePreview(
+    $accountsStore,
+    $operationsStore,
+    getRate,
+    dayjs().subtract(1, 'month'),
+    3,
+    $memberSettingsStore?.accountsOrder ?? [],
+  );
   $: rawSeries = [
     ...preview.series.map((series, index) => ({ ...series, color: series.color ?? fallbackColors[index] })),
     ...(preview.hasOther

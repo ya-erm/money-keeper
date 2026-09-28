@@ -39,6 +39,7 @@ export function getBalancePreview(
   getRate: (currency: string) => number,
   date: string | number | Date | Dayjs = dayjs(),
   limit = 3,
+  accountOrder: string[] = [],
 ): BalancePreview {
   const selectedMonth = dayjs(date).startOf('month');
   const monthEnds = Array.from({ length: 12 }, (_, index) =>
@@ -65,7 +66,16 @@ export function getBalancePreview(
   const rankedSeries = accountSeries
     .filter((series) => series.values.some((value) => value > 0))
     .sort((a, b) => (b.values.at(-1) ?? 0) - (a.values.at(-1) ?? 0));
-  const series = rankedSeries.slice(0, limit);
+  const getAccountOrder = (account: AccountViewModel) => {
+    const index = accountOrder.indexOf(account.id);
+    return index < 0 ? accounts.length : index;
+  };
+  const chartOrder = accounts
+    .slice()
+    .sort((a, b) => getAccountOrder(a) - getAccountOrder(b))
+    .reverse()
+    .map((account) => account.id);
+  const series = rankedSeries.slice(0, limit).sort((a, b) => chartOrder.indexOf(a.id) - chartOrder.indexOf(b.id));
   const otherSeries = rankedSeries.slice(limit);
 
   return {

@@ -77,6 +77,16 @@ describe('getBalancePreview', () => {
     expect(result.hasOther).toBe(true);
   });
 
+  it('orders selected accounts like the main balance chart', () => {
+    const accounts = ['A', 'B', 'C', 'D'].map((id) => account(id));
+    const transactions = accounts.map((currentAccount, index) =>
+      transaction(`${currentAccount.id}-balance`, currentAccount, (index + 1) * 10, '2026-09-10'),
+    );
+    const result = getBalancePreview(accounts, transactions, () => 1, new Date('2026-09-15'), 3, ['A', 'B', 'C', 'D']);
+
+    expect(result.series.map(({ id }) => id)).toEqual(['D', 'C', 'B']);
+  });
+
   it('ignores future operations, converts currencies and hides negative balances from the chart', () => {
     const eur = account('EUR', 'EUR');
     const debt = account('Debt');
