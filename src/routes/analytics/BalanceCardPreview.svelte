@@ -233,10 +233,10 @@
   .balance-summary span:last-child {
     text-align: right;
   }
-  .balance-summary .positive {
+  .balance-summary span.positive {
     color: var(--green-color);
   }
-  .balance-summary .negative {
+  .balance-summary span.negative {
     color: var(--red-color);
   }
   .empty-message {
