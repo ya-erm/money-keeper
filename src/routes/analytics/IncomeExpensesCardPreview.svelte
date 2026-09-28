@@ -21,7 +21,7 @@
     dayjs().subtract(1, 'month'),
   );
   $: amountsHidden = ($settingsStore.hideBalances ?? false) || preview.hasHiddenBalanceAccount;
-  $: maxAmount = Math.max(...preview.incomeByDay, ...preview.expensesByDay, 0);
+  $: maxAmount = Math.max(...preview.incomeByMonth, ...preview.expensesByMonth, 0);
 
   const getPoints = (values: number[], max: number): Point[] =>
     values.map((value, index) => {
@@ -56,8 +56,8 @@
     return path;
   };
 
-  $: incomePath = getSmoothPath(preview.incomeByDay, maxAmount);
-  $: expensesPath = getSmoothPath(preview.expensesByDay, maxAmount);
+  $: incomePath = getSmoothPath(preview.incomeByMonth, maxAmount);
+  $: expensesPath = getSmoothPath(preview.expensesByMonth, maxAmount);
 </script>
 
 <div class="income-expenses-card-preview">

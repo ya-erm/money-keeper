@@ -3,8 +3,8 @@ import dayjs, { type Dayjs } from 'dayjs';
 import type { TransactionViewModel } from '$lib/data/interfaces';
 
 export type IncomeExpensesPreview = {
-  incomeByDay: number[];
-  expensesByDay: number[];
+  incomeByMonth: number[];
+  expensesByMonth: number[];
   incomeTotal: number;
   expensesTotal: number;
   hasHiddenBalanceAccount: boolean;
@@ -15,12 +15,11 @@ export function getIncomeExpensesPreview(
   getRate: (currency: string) => number,
   date: string | number | Date | Dayjs = dayjs(),
 ): IncomeExpensesPreview {
-  const currentDate = dayjs(date);
-  const start = currentDate.startOf('month');
-  const end = start.add(1, 'month');
-  const daysCount = currentDate.daysInMonth();
-  const incomeByDay = Array.from({ length: daysCount }, () => 0);
-  const expensesByDay = Array.from({ length: daysCount }, () => 0);
+  const selectedMonth = dayjs(date).startOf('month');
+  const start = selectedMonth.subtract(11, 'month');
+  const end = selectedMonth.add(1, 'month');
+  const incomeByMonth = Array.from({ length: 12 }, () => 0);
+  const expensesByMonth = Array.from({ length: 12 }, () => 0);
   let hasHiddenBalanceAccount = false;
 
   for (const transaction of transactions) {
@@ -35,17 +34,17 @@ export function getIncomeExpensesPreview(
     }
 
     const amount = transaction.amount * getRate(transaction.account.currency);
-    const dayIndex = transactionDate.date() - 1;
-    if (transaction.category.type === 'IN') incomeByDay[dayIndex] += amount;
-    else expensesByDay[dayIndex] += amount;
+    const monthIndex = transactionDate.startOf('month').diff(start, 'month');
+    if (transaction.category.type === 'IN') incomeByMonth[monthIndex] += amount;
+    else expensesByMonth[monthIndex] += amount;
     hasHiddenBalanceAccount ||= transaction.account.hideBalance ?? false;
   }
 
   return {
-    incomeByDay,
-    expensesByDay,
-    incomeTotal: incomeByDay.reduce((sum, amount) => sum + amount, 0),
-    expensesTotal: expensesByDay.reduce((sum, amount) => sum + amount, 0),
+    incomeByMonth,
+    expensesByMonth,
+    incomeTotal: incomeByMonth.at(-1) ?? 0,
+    expensesTotal: expensesByMonth.at(-1) ?? 0,
     hasHiddenBalanceAccount,
   };
 }

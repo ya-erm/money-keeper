@@ -27,10 +27,10 @@ const transaction = (
 });
 
 describe('getIncomeExpensesPreview', () => {
-  it('groups the selected month income and expenses by day and converts currencies', () => {
+  it('groups the last twelve completed months and returns totals for the selected month', () => {
     const result = getIncomeExpensesPreview(
       [
-        transaction('1', '2026-09-01', 10, income),
+        transaction('1', '2026-08-01', 10, income),
         transaction('2', '2026-09-01', 5, expense),
         transaction('3', '2026-09-03', 20, income),
       ],
@@ -38,10 +38,10 @@ describe('getIncomeExpensesPreview', () => {
       new Date('2026-09-03T12:00:00'),
     );
 
-    expect(result.incomeByDay.slice(0, 3)).toEqual([20, 0, 40]);
-    expect(result.expensesByDay.slice(0, 3)).toEqual([10, 0, 0]);
-    expect(result.incomeByDay).toHaveLength(30);
-    expect(result.incomeTotal).toBe(60);
+    expect(result.incomeByMonth).toHaveLength(12);
+    expect(result.incomeByMonth.slice(-2)).toEqual([20, 40]);
+    expect(result.expensesByMonth.slice(-2)).toEqual([0, 10]);
+    expect(result.incomeTotal).toBe(40);
     expect(result.expensesTotal).toBe(10);
   });
 
@@ -50,7 +50,7 @@ describe('getIncomeExpensesPreview', () => {
       [
         transaction('excluded', '2026-09-01', 10, income, { excludeFromAnalysis: true }),
         transaction('system', '2026-09-01', 10, { ...income, system: true }),
-        transaction('old', '2026-08-31', 10, income),
+        transaction('old', '2025-09-30', 10, income),
         transaction('next', '2026-10-01', 10, income),
       ],
       () => 1,

@@ -4,7 +4,7 @@
 
 ### Added
 
-- The income and expenses card on the analytics overview now shows actual daily data and totals for the previous completed month. Smooth lines use a shared scale, and amounts respect balance privacy settings.
+- The income and expenses card on the analytics overview now shows the trend for the last 12 completed months and totals for the previous month. Smooth lines use a shared scale, and amounts respect balance privacy settings.
 
 ## 2.21.0 - 2026-09-27
 

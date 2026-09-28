@@ -136,7 +136,7 @@ export const ruDict: Dictionary = {
   'analytics.cards.accounts.current': 'Крупнейшие остатки на счетах',
   'analytics.cards.accounts.other': 'Остальное',
   'analytics.cards.accounts.no_balances': 'На счетах пока нет средств',
-  'analytics.cards.income_expenses.month': 'Доходы и расходы по дням прошлого месяца',
+  'analytics.cards.income_expenses.month': 'Доходы и расходы за последние 12 завершённых месяцев',
   'analytics.cards.income_expenses.no_operations': 'В прошлом месяце доходов и расходов не было',
   'analytics.categories.start_date': 'Начало интервала',
   'analytics.categories.end_date': 'Конец интервала',
