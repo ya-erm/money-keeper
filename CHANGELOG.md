@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.25.1 - 2026-09-30
+
+### Changed
+
+- Updated compatible dependencies, including Svelte, Vite, ESLint, Vitest, Prisma 6, and dotenv.
+
 ## 2.25.0 - 2026-09-28
 
 ### Fixed
