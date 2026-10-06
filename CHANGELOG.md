@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.25.2 - 2026-10-06
+
+### Fixed
+
+- Removed the next occurrence date from recurring operation entries.
+
 ## 2.25.1 - 2026-09-30
 
 ### Changed
