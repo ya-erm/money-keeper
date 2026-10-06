@@ -134,12 +134,6 @@
               <span> - in future</span>
             {/if}
           </div>
-          <div>
-            Next: {repeating.nextDate.format('D MMMM YYYY')}
-            {#if repeating.nextDate.isBefore(dayjs())}
-              <span> - ⚠️ in past</span>
-            {/if}
-          </div>
         </div>
         {#if repeating.lastDate.isBefore(dayjs()) && (repeating.endDate ? repeating.nextDate.isBefore(dayjs(repeating.endDate)) : true)}
           <Button onClick={() => createNextOperation(repeating)}>{$translate('common.create')}</Button>
