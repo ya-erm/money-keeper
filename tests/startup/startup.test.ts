@@ -49,7 +49,7 @@ test('offers recovery when local data initialization fails', async ({ page }) =>
   });
   await page.goto('/');
   await expect(page.locator('#app-startup')).toHaveAttribute('data-startup-error', '');
-  await expect(page.getByRole('alert')).toContainText('Could not open the app');
+  await expect(page.locator('#app-startup').getByRole('alert')).toContainText('Could not open the app');
   await expect(page.getByRole('button', { name: 'Try again', exact: true })).toBeVisible();
   await expect(page.locator('#app-content')).toHaveAttribute('inert', '');
 });

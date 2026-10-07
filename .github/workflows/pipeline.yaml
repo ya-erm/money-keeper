@@ -46,6 +46,9 @@ jobs:
       - name: Run e2e tests in Linux container
         run: pnpm test
 
+      - name: Run production PWA startup tests in Linux container
+        run: pnpm test --config=playwright.pwa.config.ts
+
       - name: Upload Playwright report
         id: upload-playwright-report
         if: ${{ !cancelled() }}
@@ -55,6 +58,7 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            test-results-pwa/
           if-no-files-found: ignore
           retention-days: 7
 

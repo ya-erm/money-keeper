@@ -5,6 +5,8 @@ import base from './playwright.config';
 export default defineConfig({
   ...base,
   testMatch: '**/startup/*.test.ts',
+  outputDir: 'test-results-pwa',
+  reporter: [['list'], ['html', { outputFolder: 'playwright-report/pwa', open: 'never' }]],
   use: { ...base.use, baseURL: 'http://127.0.0.1:4174' },
   projects: [{ name: 'pwa-chromium', metadata: { pwa: true } }],
   webServer: {
