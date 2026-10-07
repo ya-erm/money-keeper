@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.26.0 - 2026-10-07
+
+### Added
+
+- Added an immediate, theme-aware startup screen with a loading indicator and retry help, before application scripts and local data are ready.
+
+### Improved
+
+- Precached the public PWA entry page so repeat launches do not wait for a slow network response.
+
 ## 2.25.2 - 2026-10-06
 
 ### Fixed

@@ -3,7 +3,11 @@
   import { darkMode } from './theme';
 
   onMount(() => {
-    darkMode.subscribe((value) => {
+    return darkMode.subscribe((value) => {
+      const themeColor = document.getElementById('app-theme-color');
+      themeColor?.setAttribute('content', value ? '#121212' : '#ffffff');
+      document.documentElement.dataset.startupTheme = value ? 'dark' : 'light';
+
       if (value) {
         window.document.body.classList.add('dark-mode');
       } else {
@@ -12,7 +16,3 @@
     });
   });
 </script>
-
-<svelte:head>
-  <meta name="theme-color" content={$darkMode ? '#121212' : 'white'} />
-</svelte:head>

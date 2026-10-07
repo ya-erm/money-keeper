@@ -17,7 +17,12 @@ export const load: LayoutLoad = async () => {
     return;
   }
 
-  await mainService.init().catch(handleError);
+  try {
+    await mainService.init();
+  } catch (error) {
+    handleError(error);
+    return { startupFailed: true };
+  }
 
   // sync for authorized users only
   if (!membersService.isGuest) {
