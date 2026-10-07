@@ -2,16 +2,243 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="%sveltekit.assets%/styles.css" />
+    <meta id="app-theme-color" name="theme-color" content="#f2f2f2" />
+    <script>
+      // Runs before CSS or application code. Storage can be unavailable in private browsing.
+      try {
+        if (localStorage.getItem('mk_dark_mode') === 'true') {
+          document.documentElement.dataset.startupTheme = 'dark';
+          document.getElementById('app-theme-color').content = '#000000';
+        }
+      } catch (_) {}
+      try {
+        const localeCookie = document.cookie.match(/(?:^|;\s*)locale=([^;]*)/);
+        const locale = localeCookie ? decodeURIComponent(localeCookie[1]) : navigator.language;
+        document.documentElement.dataset.startupLocale = /^ru(?:-|$)/i.test(locale) ? 'ru' : 'en';
+      } catch (_) {}
+    </script>
+    <style>
+      html {
+        background: #f2f2f2;
+      }
+      html[data-startup-theme='dark'] {
+        background: #000;
+      }
+      #app-startup {
+        --startup-background: #f2f2f2;
+        --startup-text: #171b22;
+        --startup-muted: #656e7b;
+        --startup-card: #fff;
+        --startup-line: #dce8f0;
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+        box-sizing: border-box;
+        background: var(--startup-background);
+        color: var(--startup-text);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        text-align: center;
+      }
+      [data-startup-theme='dark'] #app-startup {
+        --startup-background: #000;
+        --startup-text: #f6f8fc;
+        --startup-muted: #9aa5b4;
+        --startup-card: #151a21;
+        --startup-line: #1d3344;
+      }
+      #app-startup .startup-mark {
+        display: grid;
+        place-items: center;
+        width: 88px;
+        height: 88px;
+        margin-bottom: 28px;
+        border: 1px solid rgb(127 150 174 / 12%);
+        border-radius: 26px;
+        background: var(--startup-card);
+        box-shadow: 0 12px 40px rgb(47 149 220 / 9%);
+      }
+      #app-startup svg {
+        width: 52px;
+        height: 52px;
+        color: var(--startup-text);
+      }
+      #app-startup h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 650;
+        letter-spacing: -1px;
+        line-height: 1.2;
+      }
+      #app-startup .startup-caption {
+        margin: 12px 0 34px;
+        color: var(--startup-muted);
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      #app-startup .startup-progress {
+        width: 112px;
+        height: 3px;
+        overflow: hidden;
+        border-radius: 3px;
+        background: var(--startup-line);
+      }
+      #app-startup .startup-progress::after {
+        content: '';
+        display: block;
+        width: 44px;
+        height: 100%;
+        border-radius: inherit;
+        background: #2f95dc;
+        animation: startup-progress 1.6s ease-in-out infinite;
+      }
+      #app-startup .startup-help {
+        position: absolute;
+        right: 24px;
+        bottom: max(48px, env(safe-area-inset-bottom));
+        left: 24px;
+        color: var(--startup-muted);
+        font-size: 13px;
+        line-height: 1.6;
+        visibility: hidden;
+        animation: startup-help 0s 12s forwards;
+      }
+      #app-startup .startup-error {
+        display: none;
+      }
+      #app-startup[data-startup-error] .startup-loading,
+      #app-startup[data-startup-error] .startup-progress {
+        display: none;
+      }
+      #app-startup[data-startup-error] .startup-error {
+        display: block;
+      }
+      #app-startup[data-startup-error] .startup-help {
+        visibility: visible;
+        animation: none;
+      }
+      #app-startup .startup-help p {
+        margin: 0 0 12px;
+      }
+      #app-startup button {
+        min-height: 44px;
+        padding: 8px 20px;
+        border: 1px solid var(--startup-line);
+        border-radius: 12px;
+        background: var(--startup-card);
+        color: #2f95dc;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      #app-startup button:focus-visible {
+        outline: 2px solid #2f95dc;
+        outline-offset: 4px;
+      }
+      #app-startup [lang='ru'],
+      [data-startup-locale='ru'] #app-startup [lang='en'] {
+        display: none;
+      }
+      [data-startup-locale='ru'] #app-startup [lang='ru'] {
+        display: inline;
+      }
+      @keyframes startup-progress {
+        0% {
+          transform: translateX(-44px);
+        }
+        100% {
+          transform: translateX(112px);
+        }
+      }
+      @keyframes startup-help {
+        to {
+          visibility: visible;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #app-startup .startup-progress::after {
+          animation: none;
+          transform: translateX(34px);
+        }
+      }
+      @media (max-height: 480px) {
+        #app-startup .startup-mark {
+          width: 64px;
+          height: 64px;
+          margin-bottom: 16px;
+          border-radius: 20px;
+        }
+        #app-startup .startup-caption {
+          margin: 8px 0 20px;
+        }
+        #app-startup .startup-help {
+          position: static;
+          margin-top: 20px;
+        }
+      }
+    </style>
     <link rel="icon" href="%sveltekit.assets%/favicon.png" />
     <meta name="viewport" content="width=device-width, viewport-fit=cover" />
     <meta name="description" content="Money Keeper App" />
     <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Money Keeper" />
     <link rel="apple-touch-icon" href="%sveltekit.assets%/logo192.png" />
     <link rel="manifest" href="%sveltekit.assets%/manifest.json" />
     %sveltekit.head%
   </head>
   <body>
-    <div>%sveltekit.body%</div>
+    <!-- Outside Svelte's hydration target; no image, font, CSS or JS request needed. -->
+    <div id="app-startup">
+      <div class="startup-mark" aria-hidden="true">
+        <svg viewBox="0 0 512 512" fill="currentColor">
+          <path d="M44 181h38v192h309v38H44z" />
+          <path
+            fill-rule="evenodd"
+            d="M121 104h347v230H121zm38 77v77a39 39 0 0 1 39 38h193a39 39 0 0 1 39-38v-77a39 39 0 0 1-39-38H198a39 39 0 0 1-39 38z"
+          />
+          <circle cx="294" cy="219" r="58" />
+        </svg>
+      </div>
+      <h1>Money Keeper</h1>
+      <p class="startup-caption startup-loading" role="status">
+        <span lang="en">Getting things ready</span>
+        <span lang="ru">Всё готовим для вас</span>
+      </p>
+      <p class="startup-caption startup-error" role="alert">
+        <span lang="en">Could not open the app</span>
+        <span lang="ru">Не удалось открыть приложение</span>
+      </p>
+      <div class="startup-progress" aria-hidden="true"></div>
+      <div class="startup-help">
+        <p class="startup-loading">
+          <span lang="en">Taking longer than usual.<br />Check your connection or try again.</span>
+          <span lang="ru">Загрузка дольше обычного.<br />Проверьте интернет или попробуйте ещё раз.</span>
+        </p>
+        <p class="startup-error">
+          <span lang="en">Try opening the app again.</span>
+          <span lang="ru">Попробуйте открыть приложение ещё раз.</span>
+        </p>
+        <button type="button" onclick="location.reload()">
+          <span lang="en">Try again</span>
+          <span lang="ru">Попробовать снова</span>
+        </button>
+      </div>
+      <noscript>
+        <p>Please enable JavaScript to open Money Keeper.</p>
+        <style>
+          #app-startup .startup-caption,
+          #app-startup .startup-progress,
+          #app-startup .startup-help {
+            display: none;
+          }
+        </style>
+      </noscript>
+    </div>
+    <div id="app-content" inert>%sveltekit.body%</div>
   </body>
 </html>

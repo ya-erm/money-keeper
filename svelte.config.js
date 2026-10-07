@@ -21,6 +21,8 @@ const config = {
 
   kit: {
     adapter: adapter(),
+    // Inline small route styles so the HTML startup screen can paint before downloads.
+    inlineStyleThreshold: 16384,
     version: {
       name: pkg.version,
     },

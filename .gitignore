@@ -15,6 +15,7 @@ screenshots/raw
 .vercel
 .pnpm-store
 test-results
+test-results-pwa
 playwright-report
 
 # Claude Code local files

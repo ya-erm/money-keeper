@@ -107,3 +107,26 @@ pnpm test -- --update-snapshots
 - Published reports keep the latest 5 runs per PR and the latest 200 runs overall.
 - Screenshot baselines for visual checks are stored рядом с тестами в папках `tests/**/*.test.ts-snapshots/`.
 - The Playwright dev server is started automatically by the test runner.
+
+## PWA startup
+
+The public `/` redirect page is prerendered and precached with its matching build assets.
+Financial data and authenticated APIs are not part of this launch cache. Other routes retain
+network-first document loading, so a cold deep link can still wait for its HTML response.
+The inline startup screen stays visible until local data and the first real route are ready.
+
+Run the startup checks against a production build (including the offline service-worker case):
+
+```sh
+pnpm exec playwright test --config=playwright.pwa.config.ts
+```
+
+Also check an installed iPhone PWA after deployment: first launch, repeat launch with a slow
+connection, airplane-mode launch, light/dark theme, and closing/reopening after an update.
+The web screen cannot render before HTML arrives on a first visit, and does not replace iOS's
+native launch image. Browser emulation does not verify that OS-owned interval.
+
+Updates wait for existing tabs/PWA windows to close so cached HTML and hashed assets remain
+on the same release. Close all Money Keeper windows and reopen to activate a waiting update;
+a normal reload alone may keep the old release active. Do not reuse a released application
+version, since `package.json` supplies the service-worker cache version.
