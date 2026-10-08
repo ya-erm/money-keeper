@@ -60,6 +60,7 @@
         const savedPosition = places.find((place) => isValidCoordinates(place.latitude, place.longitude));
         const center = selectedPosition ?? currentPosition ?? savedPosition ?? { latitude: 0, longitude: 0 };
         map = leaflet.map(container, { worldCopyJump: true, maxZoom: 19 });
+        map.attributionControl.setPrefix(false);
         map.setView([center.latitude, center.longitude], selectedPosition || currentPosition || savedPosition ? 16 : 2);
         leaflet
           .tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
