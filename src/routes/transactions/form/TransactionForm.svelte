@@ -270,6 +270,17 @@
     locationPickerOpened = false;
   };
 
+  const removeKnownPlace = async () => {
+    if (!editorPlace) return;
+    const placeId = editorPlace.id;
+    const places = membersService.selectedMemberSettings?.knownPlaces ?? [];
+    await membersService.updateKnownPlaces(places.filter((place) => place.id !== placeId));
+    locationRevision++;
+    if (selectedKnownPlaceId === placeId) selectedKnownPlaceId = '';
+    editorPlace = null;
+    locationPickerOpened = false;
+  };
+
   const handleSubmit = async (e: Event) => {
     try {
       const formData = new FormData(e.target as HTMLFormElement);
@@ -578,7 +589,7 @@
               color="danger"
               underlined={false}
               onClick={removeLocation}
-              testId="RemoveLocationButton">{$translate('common.delete')}</Button
+              testId="RemoveLocationButton">{$translate('common.clear')}</Button
             >
           {:else}<Button
               appearance="link"
@@ -628,9 +639,11 @@
       : null}
     {currentPosition}
     initialName={editorPlace?.name ?? ''}
+    confirmLabel="common.save"
     places={knownPlaces}
     onLocated={(position) => (currentPosition = position)}
     onSelect={onLocationSelected}
+    onRemove={editorPlace ? removeKnownPlace : null}
     onClose={() => (locationPickerOpened = false)}
   />
 {/if}
