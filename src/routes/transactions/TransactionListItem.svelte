@@ -7,6 +7,7 @@
   import { longPress } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
   import { formatMoney } from '$lib/utils/formatMoney';
+  import { isValidCoordinates } from '$lib/utils/geolocation';
 
   export let transaction: TransactionViewModel;
   export let currencyRate: CurrencyRate | null = null;
@@ -20,6 +21,10 @@
   $: incoming = transaction.category.type === 'IN';
   $: outgoing = transaction.category.type === 'OUT';
   $: isTransfer = !!transaction.linkedTransaction;
+  $: hasLocation =
+    transaction.locationLat != null &&
+    transaction.locationLng != null &&
+    isValidCoordinates(transaction.locationLat, transaction.locationLng);
 
   $: categoryName = transaction.category.name.startsWith('system.category')
     ? $translate(transaction.category.name as Messages)
@@ -63,8 +68,18 @@
     <div class="icon flex-center" class:deleted={transaction.category.deleted}>
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />
       {#if transaction.repeating}
-        <div class="repeating-icon">
+        <div class="repeating-icon" data-testId="RepeatingOperationIcon">
           <Icon name="mdi:repeat" size={1} />
+        </div>
+      {:else if hasLocation}
+        <div
+          class="location-icon"
+          role="img"
+          aria-label={$translate('transactions.geolocation')}
+          title={$translate('transactions.geolocation')}
+          data-testId="OperationLocationIcon"
+        >
+          <Icon name="mdi:map-marker" size={1} />
         </div>
       {/if}
       {#if verificationProblem}
@@ -172,6 +187,7 @@
     position: relative;
   }
   .repeating-icon,
+  .location-icon,
   .verification-icon {
     position: absolute;
     bottom: 0;
