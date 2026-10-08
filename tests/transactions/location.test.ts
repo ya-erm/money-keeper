@@ -11,17 +11,27 @@ const places = [
   { id: 'nearest', name: 'Nearest cafe', latitude: 44.8177, longitude: 20.4633 },
 ];
 
-async function readLocation(page: Page) {
-  await page.locator('.location-actions').getByRole('button', { name: 'Save', exact: true }).click();
-  const modal = page.locator('.modal').filter({ visible: true });
-  const coordinates = modal.locator('input[type="number"]');
-  const position = {
-    latitude: Number(await coordinates.first().inputValue()),
-    longitude: Number(await coordinates.last().inputValue()),
-  };
-  await modal.getByRole('button', { name: 'Cancel', exact: true, includeHidden: true }).click();
-  await expect(modal).toHaveCount(0);
-  return position;
+async function readStoredLocation(page: Page) {
+  return page.evaluate(
+    () =>
+      new Promise<{ latitude: number; longitude: number } | null>((resolve, reject) => {
+        const request = indexedDB.open('mk-2');
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          const db = request.result;
+          const rows = db.transaction('transactions', 'readonly').objectStore('transactions').getAll();
+          rows.onerror = () => {
+            db.close();
+            reject(rows.error);
+          };
+          rows.onsuccess = () => {
+            db.close();
+            const operation = rows.result.find((item) => item.comment === 'Map location operation');
+            resolve(operation ? { latitude: operation.locationLat, longitude: operation.locationLng } : null);
+          };
+        };
+      }),
+  );
 }
 
 test.describe('Operation locations', () => {
@@ -78,9 +88,6 @@ test.describe('Operation locations', () => {
     await map.click({ position: { x: 70, y: 150 } });
     await page.getByTestId('ConfirmLocationButton').click();
     await expect(picker).toHaveCount(0);
-    const selected = await readLocation(page);
-    expect(selected.latitude).not.toBe(currentPosition.latitude);
-    expect(selected.longitude).not.toBe(currentPosition.longitude);
 
     const { typeSwitchInButton, categorySelect, amountInput, commentInput, createButton } =
       getTransactionFormLocators(page);
@@ -92,21 +99,60 @@ test.describe('Operation locations', () => {
     await createButton.click();
     await page.waitForURL(/accounts\?account-card=/);
     await page.goto('/accounts?account-card=f6ddb1f2-d708-4ff4-bc0c-5d7df732aee6', { waitUntil: 'networkidle' });
+    await expect
+      .poll(() => readStoredLocation(page))
+      .toMatchObject({ latitude: expect.any(Number), longitude: expect.any(Number) });
+    const selected = await readStoredLocation(page);
+    expect(selected?.latitude).not.toBe(currentPosition.latitude);
+    expect(selected?.longitude).not.toBe(currentPosition.longitude);
     const operation = page.getByTestId('TransactionListItem').filter({ hasText: 'Map location operation' });
     await operation.click();
     await expect(page.getByTestId('SaveTransactionButton')).toBeVisible();
-    expect(await readLocation(page)).toEqual(selected);
+    await expect(page.locator('.location-value')).toContainText('Unnamed');
 
     await page.locator('.location-actions').getByRole('button', { name: 'On map', exact: true }).click();
     await expect(map).toHaveClass(/leaflet-container/);
     await map.click({ position: { x: 70, y: 150 } });
     await page.getByTestId('ConfirmLocationButton').click();
-    const edited = await readLocation(page);
-    expect(edited).not.toEqual(selected);
     await page.getByTestId('SaveTransactionButton').click();
     await expect(page.getByTestId('SaveTransactionButton')).toHaveCount(0);
+    await expect.poll(() => readStoredLocation(page)).not.toEqual(selected);
+    const edited = await readStoredLocation(page);
     await page.reload({ waitUntil: 'networkidle' });
     await page.getByTestId('TransactionListItem').filter({ hasText: 'Map location operation' }).click();
-    expect(await readLocation(page)).toEqual(edited);
+    expect(await readStoredLocation(page)).toEqual(edited);
+    await expect(page.locator('.location-value')).toContainText('Unnamed');
+  });
+
+  test('edits a saved place on the map and preserves changes only after saving', async ({ page }) => {
+    await page.goto('/settings/known-places', { waitUntil: 'networkidle' });
+    const card = page.locator('.place-card').filter({ hasText: 'Far away' });
+    await card.click();
+    const modal = page.locator('.modal').filter({ visible: true });
+    await expect(modal.locator('input[type="number"]')).toHaveCount(0);
+    await expect(modal.getByRole('button', { name: 'Detect via GPS', exact: true, includeHidden: true })).toHaveClass(
+      /white/,
+    );
+    const openMap = modal.getByRole('button', { name: 'On map', exact: true, includeHidden: true });
+    await expect(openMap).toHaveClass(/white/);
+    await openMap.click();
+    const picker = page.getByTestId('LocationPicker');
+    const map = page.getByTestId('LocationMap');
+    await expect(map).toHaveClass(/leaflet-container/);
+    await expect(map.locator('.location-pin')).toBeVisible();
+    await map.click({ position: { x: 70, y: 150 } });
+    await picker.getByRole('button', { name: 'Back', exact: true }).click();
+    await expect(card).toContainText('48.856600, 2.352200');
+    await openMap.click();
+    await expect(map).toHaveClass(/leaflet-container/);
+    await map.click({ position: { x: 70, y: 150 } });
+    await page.getByTestId('ConfirmLocationButton').click();
+    await expect(modal.getByRole('status', { includeHidden: true })).toHaveText('Location selected');
+    await expect(card).toContainText('48.856600, 2.352200');
+    await modal.getByRole('button', { name: 'Save', exact: true, includeHidden: true }).click();
+    await expect(card).not.toContainText('48.856600, 2.352200');
+    const savedText = await card.innerText();
+    await page.reload({ waitUntil: 'networkidle' });
+    await expect(card).toHaveText(savedText);
   });
 });

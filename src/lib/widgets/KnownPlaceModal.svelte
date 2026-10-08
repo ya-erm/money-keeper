@@ -10,6 +10,8 @@
   import type { KnownPlace } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import Modal from '$lib/ui/Modal.svelte';
+  import { isValidCoordinates, type Coordinates } from '$lib/utils/geolocation';
+  import LocationPicker from './LocationPicker.svelte';
 
   export let opened: boolean;
   export let item: KnownPlace | null = null;
@@ -18,27 +20,16 @@
   export let onSaved: ((place: KnownPlace) => void) | null = null;
 
   let name = item?.name ?? '';
-  let latitude = `${item?.latitude ?? initialLatitude ?? ''}`;
-  let longitude = `${item?.longitude ?? initialLongitude ?? ''}`;
+  const latitude = item?.latitude ?? initialLatitude;
+  const longitude = item?.longitude ?? initialLongitude;
+  let position: Coordinates | null =
+    latitude !== null && longitude !== null && isValidCoordinates(latitude, longitude) ? { latitude, longitude } : null;
+  let locationPickerOpened = false;
+  let locating = false;
 
-  $: latitudeNumber = Number(latitude);
-  $: longitudeNumber = Number(longitude);
-  $: locationUrl =
-    latitude != null &&
-    longitude != null &&
-    latitude !== '' &&
-    longitude !== '' &&
-    Number.isFinite(latitudeNumber) &&
-    Number.isFinite(longitudeNumber) &&
-    latitudeNumber >= -90 &&
-    latitudeNumber <= 90 &&
-    longitudeNumber >= -180 &&
-    longitudeNumber <= 180
-      ? `https://maps.google.com/?q=${latitudeNumber},${longitudeNumber}`
-      : null;
-
-  const openLocation = () => {
-    if (locationUrl) window.open(locationUrl, '_blank', 'noopener,noreferrer');
+  const selectLocation = (value: Coordinates) => {
+    position = value;
+    locationPickerOpened = false;
   };
 
   const detectLocation = () => {
@@ -46,36 +37,29 @@
       showErrorToast($translate('transactions.geolocation_not_supported'));
       return;
     }
+    locating = true;
     window.navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
-        latitude = `${coords.latitude}`;
-        longitude = `${coords.longitude}`;
+        position = { latitude: coords.latitude, longitude: coords.longitude };
+        locating = false;
       },
-      () => showErrorToast($translate('transactions.geolocation_failed')),
+      () => {
+        locating = false;
+        showErrorToast($translate('transactions.geolocation_failed'));
+      },
       { enableHighAccuracy: true, timeout: 10000 },
     );
   };
 
   const save = async () => {
-    const latitudeNumber = Number(latitude);
-    const longitudeNumber = Number(longitude);
-    if (
-      !name.trim() ||
-      !Number.isFinite(latitudeNumber) ||
-      !Number.isFinite(longitudeNumber) ||
-      latitudeNumber < -90 ||
-      latitudeNumber > 90 ||
-      longitudeNumber < -180 ||
-      longitudeNumber > 180
-    ) {
+    if (!name.trim() || !position || !isValidCoordinates(position.latitude, position.longitude)) {
       return;
     }
 
     const place: KnownPlace = {
       id: item?.id ?? uuid(),
       name: name.trim(),
-      latitude: latitudeNumber,
-      longitude: longitudeNumber,
+      ...position,
     };
     const places = membersService.selectedMemberSettings?.knownPlaces ?? [];
     const nextPlaces = item
@@ -95,48 +79,48 @@
   };
 </script>
 
-<Modal header={$translate(item ? 'known_places.edit' : 'known_places.new')} bind:opened width={22}>
-  <form class="flex-col gap-1" on:submit|preventDefault={save}>
-    <Input label={$translate('known_places.name')} bind:value={name} required />
-    <Input
-      label={$translate('known_places.latitude')}
-      bind:value={latitude}
-      type="number"
-      inputmode="decimal"
-      min="-90"
-      max="90"
-      step="any"
-      required
-    />
-    <Input
-      label={$translate('known_places.longitude')}
-      bind:value={longitude}
-      type="number"
-      inputmode="decimal"
-      min="-180"
-      max="180"
-      step="any"
-      required
-    />
-    <Button color="white" bordered onClick={detectLocation}>
-      <span class="flex items-center gap-0.5">
-        <Icon name="mdi:crosshairs-gps" />
-        {$translate('transactions.detect_geolocation')}
-      </span>
-    </Button>
-    <Button color="white" bordered onClick={openLocation} disabled={!locationUrl}>
-      <span class="flex items-center gap-0.5">
-        <Icon name="mdi:map-outline" />
-        {$translate('transactions.open_geolocation')}
-      </span>
-    </Button>
-    <div class="grid-col-2 gap-1">
-      {#if item}
-        <Button onClick={remove} text={$translate('common.delete')} color="danger" />
-      {:else}
-        <Button onClick={() => (opened = false)} text={$translate('common.cancel')} color="secondary" />
-      {/if}
-      <Button text={$translate('common.save')} color="primary" type="submit" />
-    </div>
-  </form>
-</Modal>
+{#if locationPickerOpened}
+  <LocationPicker
+    initialPosition={position}
+    places={membersService.selectedMemberSettings?.knownPlaces ?? []}
+    onSelect={selectLocation}
+    onClose={() => (locationPickerOpened = false)}
+  />
+{:else}
+  <Modal header={$translate(item ? 'known_places.edit' : 'known_places.new')} bind:opened width={22}>
+    <form class="flex-col gap-1" on:submit|preventDefault={save}>
+      <Input label={$translate('known_places.name')} bind:value={name} required />
+      <p class="location-status" role="status">
+        {$translate(position ? 'known_places.location_selected' : 'known_places.location_required')}
+      </p>
+      <Button color="white" bordered onClick={detectLocation} disabled={locating}>
+        <span class="flex items-center gap-0.5">
+          <Icon name="mdi:crosshairs-gps" />
+          {locating ? $translate('common.loading') : $translate('transactions.detect_geolocation')}
+        </span>
+      </Button>
+      <Button color="white" bordered onClick={() => (locationPickerOpened = true)} disabled={locating}>
+        <span class="flex items-center gap-0.5">
+          <Icon name="mdi:map-outline" />
+          {$translate('transactions.open_geolocation')}
+        </span>
+      </Button>
+      <div class="grid-col-2 gap-1">
+        {#if item}
+          <Button onClick={remove} text={$translate('common.delete')} color="danger" />
+        {:else}
+          <Button onClick={() => (opened = false)} text={$translate('common.cancel')} color="secondary" />
+        {/if}
+        <Button text={$translate('common.save')} color="primary" type="submit" disabled={!position || locating} />
+      </div>
+    </form>
+  </Modal>
+{/if}
+
+<style>
+  .location-status {
+    margin: 0;
+    color: var(--secondary-text-color);
+    font-size: 0.9rem;
+  }
+</style>

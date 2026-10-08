@@ -10,7 +10,7 @@
 ### Improved
 
 - Made operation location actions compact square icon buttons with accessible labels for mobile screens.
-- Added white GPS and map buttons to the place editor. The map opens the coordinates currently entered in the form.
+- Added white GPS and map buttons to the place editor. Locations are selected on the map instead of entering coordinates manually.
 
 ## 2.26.1 - 2026-10-08
 
