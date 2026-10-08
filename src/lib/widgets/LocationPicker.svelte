@@ -5,17 +5,24 @@
 
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
-  import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import { showErrorToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
   import type { KnownPlace } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
+  import type { Messages } from '$lib/translate/messages';
+  import { handleError } from '$lib/utils';
   import SubScreen from '$lib/ui/layout/SubScreen.svelte';
   import { isValidCoordinates, type Coordinates } from '$lib/utils/geolocation';
 
   export let initialPosition: Coordinates | null = null;
   export let currentPosition: Coordinates | null = null;
   export let places: KnownPlace[] = [];
-  export let onSelect: (position: Coordinates) => void;
+  export let initialName = '';
+  export let nameRequired = false;
+  export let confirmLabel: Messages = 'common.done';
+  export let onSelect: (position: Coordinates, name: string) => void | Promise<void>;
   export let onLocated: ((position: Coordinates) => void) | null = null;
+  export let onRemove: (() => void | Promise<void>) | null = null;
   export let onClose: () => void;
 
   let container: HTMLDivElement;
@@ -26,32 +33,72 @@
   let ready = false;
   let failed = false;
   let locating = false;
+  let name = initialName;
+  let submitting = false;
+  let disposed = false;
+  let selectionRevision = 0;
   let selectPosition: ((position: Coordinates) => void) | null = null;
 
-  const locate = () => {
+  const locate = (automatic = false) => {
     if (!navigator.geolocation) {
-      showErrorToast($translate('transactions.geolocation_not_supported'));
+      if (!automatic) showErrorToast($translate('transactions.geolocation_not_supported'));
       return;
     }
+    const revision = selectionRevision;
     locating = true;
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
+        if (disposed) return;
         const position = { latitude: coords.latitude, longitude: coords.longitude };
         onLocated?.(position);
-        selectPosition?.(position);
-        map?.setView([position.latitude, position.longitude], 17);
+        if (revision === selectionRevision) {
+          selectPosition?.(position);
+          map?.setView([position.latitude, position.longitude], 17);
+        }
         locating = false;
       },
       () => {
+        if (disposed) return;
         locating = false;
-        showErrorToast($translate('transactions.geolocation_failed'));
+        if (!automatic) showErrorToast($translate('transactions.geolocation_failed'));
       },
       { enableHighAccuracy: true, timeout: 10000 },
     );
   };
 
+  const save = async () => {
+    if (!selectedPosition || submitting || (nameRequired && !name.trim())) return;
+    submitting = true;
+    try {
+      await onSelect(selectedPosition, name.trim());
+    } catch (error) {
+      handleError(error);
+    } finally {
+      submitting = false;
+    }
+  };
+  const remove = async () => {
+    if (!onRemove || submitting) return;
+    submitting = true;
+    try {
+      await onRemove();
+    } catch (error) {
+      handleError(error);
+    } finally {
+      submitting = false;
+    }
+  };
+  const copyCoordinates = async () => {
+    if (!selectedPosition) return;
+    try {
+      await navigator.clipboard.writeText(`${selectedPosition.latitude}, ${selectedPosition.longitude}`);
+      showSuccessToast($translate('transactions.coordinates_copied'));
+    } catch {
+      showErrorToast($translate('transactions.coordinates_copy_failed'));
+    }
+  };
+
   onMount(() => {
-    let disposed = false;
     let resizeObserver: ResizeObserver | null = null;
     const initialize = async () => {
       try {
@@ -77,6 +124,7 @@
         });
         selectPosition = (position) => {
           if (!map || !isValidCoordinates(position.latitude, position.longitude)) return;
+          selectionRevision++;
           selectedPosition = position;
           if (marker) {
             marker.setLatLng([position.latitude, position.longitude]);
@@ -122,6 +170,9 @@
             .addTo(map);
         }
         if (selectedPosition) selectPosition(selectedPosition);
+        else if (currentPosition && isValidCoordinates(currentPosition.latitude, currentPosition.longitude))
+          selectPosition(currentPosition);
+        else locate(true);
         resizeObserver = new ResizeObserver(() => map?.invalidateSize());
         resizeObserver.observe(container);
         ready = true;
@@ -140,35 +191,65 @@
   });
 </script>
 
-<SubScreen visible={true} title={$translate('transactions.choose_on_map')} onBack={onClose} testId="LocationPicker">
-  <div class="picker">
-    <p class="hint">{$translate('transactions.map_hint')}</p>
-    <div
-      class="map"
-      role="region"
-      bind:this={container}
-      data-testId="LocationMap"
-      aria-label={$translate('transactions.choose_on_map')}
-    ></div>
+<SubScreen visible={true} title={$translate('transactions.location_editor')} onBack={onClose} testId="LocationPicker">
+  <form class="picker" on:submit|preventDefault={save}>
+    <div class="map-frame">
+      <div
+        class="map"
+        role="region"
+        bind:this={container}
+        data-testId="LocationMap"
+        aria-label={$translate('transactions.choose_on_map')}
+      ></div>
+      <button
+        type="button"
+        class="gps"
+        on:click={() => locate()}
+        disabled={!ready || locating || submitting}
+        aria-busy={locating}
+        aria-label={$translate('transactions.current_location')}
+        title={$translate('transactions.current_location')}
+        data-testId="LocateOnMapButton"><Icon name="mdi:crosshairs-gps" size={1.25} /></button
+      >
+    </div>
     {#if failed}
       <p role="alert">{$translate('transactions.map_failed')}</p>
     {:else if !ready}
       <p>{$translate('common.loading')}</p>
     {/if}
+    {#if selectedPosition}
+      <button
+        type="button"
+        class="coordinates"
+        on:click={copyCoordinates}
+        title={$translate('transactions.copy_coordinates')}
+        aria-label={$translate('transactions.copy_coordinates')}
+        data-testId="LocationCoordinates"
+      >
+        {$translate('transactions.coordinates')}: ({selectedPosition.latitude.toFixed(4)}, {selectedPosition.longitude.toFixed(
+          4,
+        )})
+      </button>
+    {/if}
+    <Input
+      label={$translate('known_places.name')}
+      bind:value={name}
+      required={nameRequired}
+      testId="LocationNameInput"
+    />
     <div class="picker-actions">
-      <Button color="white" bordered onClick={locate} disabled={!ready || locating}>
-        <Icon name="mdi:crosshairs-gps" size={1.25} />
-        {locating ? $translate('common.loading') : $translate('transactions.detect_geolocation')}
-      </Button>
+      {#if onRemove}<Button color="danger" appearance="link" onClick={remove} disabled={submitting}
+          >{$translate('common.delete')}</Button
+        >{/if}
       <Button
-        onClick={() => selectedPosition && onSelect(selectedPosition)}
-        disabled={!ready || !selectedPosition}
+        type="submit"
+        disabled={!ready || !selectedPosition || submitting || (nameRequired && !name.trim())}
         testId="ConfirmLocationButton"
       >
-        {$translate('common.select')}
+        {$translate(confirmLabel)}
       </Button>
     </div>
-  </div>
+  </form>
 </SubScreen>
 
 <style>
@@ -178,13 +259,44 @@
     gap: 1rem;
     padding: 1rem;
   }
-  .hint {
-    margin: 0;
+  .map-frame {
+    position: relative;
+  }
+  .gps {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 2rem;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--header-background-color);
+    color: var(--active-color);
+    cursor: pointer;
+  }
+  .gps:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .coordinates {
+    text-align: left;
+    margin: -0.5rem 0;
+    padding: 0;
+    min-height: 2.75rem;
+    border: 0;
+    background: transparent;
     color: var(--secondary-text-color);
-    font-size: 0.9rem;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
   }
   .map {
-    height: clamp(16rem, 55vh, 30rem);
+    height: clamp(14rem, 42vh, 26rem);
     border-radius: 0.75rem;
     background: #e5e5e5;
     z-index: 0;

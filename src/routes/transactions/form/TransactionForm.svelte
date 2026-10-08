@@ -12,7 +12,7 @@
   import Spoiler from '@ya-erm/svelte-ui/Spoiler';
   import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
 
-  import { memberSettingsStore, operationTagsService } from '$lib/data';
+  import { membersService, memberSettingsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type {
     AccountViewModel,
@@ -39,7 +39,7 @@
   } from '$lib/utils/checkFormParams';
   import TagsList from '$lib/widgets/TagsList.svelte';
   import TimeZoneList from '$lib/widgets/TimeZoneList.svelte';
-  import KnownPlaceModal from '$lib/widgets/KnownPlaceModal.svelte';
+  import PlaceSelector from '$lib/widgets/PlaceSelector.svelte';
   import LocationPicker from '$lib/widgets/LocationPicker.svelte';
   import { findNearbyPlaces, type Coordinates } from '$lib/utils/geolocation';
 
@@ -110,15 +110,14 @@
 
   let locationLat = transaction?.locationLat ?? null;
   let locationLng = transaction?.locationLng ?? null;
-  let locationLoading = false;
-  let knownPlaceModalOpened = false;
+  let editorPlace: KnownPlace | null = null;
   let locationPickerOpened = false;
   let selectedKnownPlaceId = '';
   let currentPosition: Coordinates | null = null;
 
   $: knownPlaces = settings?.knownPlaces ?? [];
+  $: hasLocation = locationLat !== null && locationLng !== null;
   $: nearbyPlaces = findNearbyPlaces(currentPosition, knownPlaces);
-  $: otherPlaces = knownPlaces.filter((place) => !nearbyPlaces.some((nearby) => nearby.id === place.id));
   $: selectedKnownPlace = knownPlaces.find((place) => place.id === selectedKnownPlaceId) ?? null;
   $: if (!selectedKnownPlaceId && locationLat !== null && locationLng !== null) {
     selectedKnownPlaceId =
@@ -196,46 +195,17 @@
     }
   };
 
-  const requestLocation = () => {
-    if (typeof window === 'undefined' || !window.navigator.geolocation) {
-      showErrorToast($translate('transactions.geolocation_not_supported'));
-      return;
-    }
-    locationLoading = true;
-    window.navigator.geolocation.getCurrentPosition(
-      (position) => {
-        locationLat = position.coords.latitude;
-        locationLng = position.coords.longitude;
-        currentPosition = { latitude: locationLat, longitude: locationLng };
-        const knownPlace = findNearbyPlaces(currentPosition, knownPlaces)[0];
-        if (knownPlace) {
-          selectedKnownPlaceId = knownPlace.id;
-          locationLat = knownPlace.latitude;
-          locationLng = knownPlace.longitude;
-        } else {
-          selectedKnownPlaceId = '';
-        }
-        locationLoading = false;
-      },
-      () => {
-        showErrorToast($translate('transactions.geolocation_failed'));
-        locationLoading = false;
-      },
-      { enableHighAccuracy: true, timeout: 10000 },
-    );
+  const openLocationPicker = (adding = false) => {
+    editorPlace = adding ? null : selectedKnownPlace;
+    locationPickerOpened = true;
   };
 
-  const selectKnownPlace = (event: Event) => {
-    chooseKnownPlace((event.currentTarget as HTMLSelectElement).value);
-  };
-
-  const chooseKnownPlace = (id: string) => {
-    selectedKnownPlaceId = id;
-    const place = knownPlaces.find((knownPlace) => knownPlace.id === selectedKnownPlaceId);
+  const chooseKnownPlace = (place: KnownPlace | null) => {
     if (place) {
       locationLat = place.latitude;
       locationLng = place.longitude;
-    }
+      selectedKnownPlaceId = place.id;
+    } else removeLocation();
   };
 
   const removeLocation = () => {
@@ -244,16 +214,19 @@
     selectedKnownPlaceId = '';
   };
 
-  const onKnownPlaceSaved = (place: KnownPlace) => {
-    selectedKnownPlaceId = place.id;
-    locationLat = place.latitude;
-    locationLng = place.longitude;
-  };
-
-  const onLocationSelected = (position: Coordinates) => {
+  const onLocationSelected = async (position: Coordinates, name: string) => {
+    let savedPlace: KnownPlace | null = null;
+    if (name) {
+      const saved: KnownPlace = { id: editorPlace?.id ?? uuid(), name, ...position };
+      savedPlace = saved;
+      const places = membersService.selectedMemberSettings?.knownPlaces ?? [];
+      await membersService.updateKnownPlaces(
+        editorPlace ? places.map((place) => (place.id === editorPlace?.id ? saved : place)) : [...places, saved],
+      );
+    }
     locationLat = position.latitude;
     locationLng = position.longitude;
-    selectedKnownPlaceId = findNearbyPlaces(position, knownPlaces)[0]?.id ?? '';
+    selectedKnownPlaceId = savedPlace?.id ?? findNearbyPlaces(position, knownPlaces)[0]?.id ?? '';
     locationPickerOpened = false;
   };
 
@@ -556,83 +529,37 @@
       </Spoiler>
     </div>
 
-    <div class="flex-col gap-0.5">
-      <InputLabel text={$translate('transactions.geolocation')} optional translate={$translate} />
+    <div class="flex-col gap-0.25">
+      <div class="location-header">
+        <InputLabel text={$translate('transactions.geolocation')} />
+        {#if hasLocation}<Button
+            appearance="link"
+            color="danger"
+            underlined={false}
+            onClick={removeLocation}
+            testId="RemoveLocationButton">{$translate('common.delete')}</Button
+          >{/if}
+      </div>
       <div class="location-value">
-        {#if knownPlaces.length > 0}
-          <select
-            class="known-place-select"
-            aria-label={$translate('transactions.known_place')}
-            value={selectedKnownPlaceId}
-            on:change={selectKnownPlace}
-          >
-            <option value="">
-              {locationLat !== null && locationLng !== null
-                ? $translate('transactions.unnamed_place')
-                : $translate('common.select')}
-            </option>
-            {#if nearbyPlaces.length > 0}
-              <optgroup label={$translate('transactions.nearby_places')}>
-                {#each nearbyPlaces as place (place.id)}
-                  <option value={place.id}>{place.name}</option>
-                {/each}
-              </optgroup>
-            {/if}
-            <optgroup label={$translate('settings.known_places')}>
-              {#each otherPlaces as place (place.id)}
-                <option value={place.id}>{place.name}</option>
-              {/each}
-            </optgroup>
-          </select>
-        {:else}
-          <span>
-            {locationLat !== null && locationLng !== null ? $translate('transactions.unnamed_place') : ''}
-          </span>
-        {/if}
+        <PlaceSelector
+          places={knownPlaces}
+          nearby={nearbyPlaces}
+          selected={selectedKnownPlace}
+          position={locationLat !== null && locationLng !== null
+            ? { latitude: locationLat, longitude: locationLng }
+            : null}
+          onSelect={chooseKnownPlace}
+          onAdd={() => openLocationPicker(true)}
+        />
         <div class="location-actions">
           <Button
             appearance="transparent"
-            aria-label={$translate('transactions.detect_geolocation')}
-            title={locationLoading ? $translate('common.loading') : $translate('transactions.detect_geolocation')}
-            aria-busy={locationLoading}
-            onClick={requestLocation}
-            disabled={locationLoading}
+            aria-label={$translate(hasLocation ? 'transactions.edit_location' : 'transactions.choose_on_map')}
+            title={$translate(hasLocation ? 'transactions.edit_location' : 'transactions.choose_on_map')}
+            onClick={() => openLocationPicker()}
           >
-            <span aria-hidden="true"><Icon name="mdi:crosshairs-gps" size={1.25} /></span>
+            <span aria-hidden="true"><Icon name={hasLocation ? 'mdi:pencil' : 'mdi:map-outline'} size={1.25} /></span>
           </Button>
-          <Button
-            appearance="transparent"
-            aria-label={$translate(
-              locationLat !== null && locationLng !== null
-                ? 'transactions.open_geolocation'
-                : 'transactions.choose_on_map',
-            )}
-            title={$translate('transactions.choose_on_map')}
-            onClick={() => (locationPickerOpened = true)}
-          >
-            <span aria-hidden="true"><Icon name="mdi:map-outline" size={1.25} /></span>
-          </Button>
-          {#if locationLat !== null && locationLng !== null}
-            <Button
-              appearance="transparent"
-              aria-label={$translate(selectedKnownPlace ? 'common.edit' : 'transactions.save_known_place')}
-              title={$translate(selectedKnownPlace ? 'common.edit' : 'transactions.save_known_place')}
-              onClick={() => (knownPlaceModalOpened = true)}
-            >
-              <span aria-hidden="true">
-                <Icon name={selectedKnownPlace ? 'mdi:pencil' : 'mdi:content-save-outline'} size={1.25} />
-              </span>
-            </Button>
-            <Button
-              appearance="transparent"
-              color="danger"
-              aria-label={$translate('transactions.remove_location')}
-              title={$translate('transactions.remove_location')}
-              onClick={removeLocation}
-            >
-              <span aria-hidden="true"><Icon name="mdi:delete-outline" size={1.25} /></span>
-            </Button>
-          {/if}
         </div>
       </div>
     </div>
@@ -651,20 +578,11 @@
       ? { latitude: locationLat, longitude: locationLng }
       : null}
     {currentPosition}
+    initialName={editorPlace?.name ?? ''}
     places={knownPlaces}
     onLocated={(position) => (currentPosition = position)}
     onSelect={onLocationSelected}
     onClose={() => (locationPickerOpened = false)}
-  />
-{/if}
-
-{#if knownPlaceModalOpened}
-  <KnownPlaceModal
-    bind:opened={knownPlaceModalOpened}
-    item={selectedKnownPlace}
-    initialLatitude={locationLat}
-    initialLongitude={locationLng}
-    onSaved={onKnownPlaceSaved}
   />
 {/if}
 
@@ -762,18 +680,19 @@
     flex-shrink: 0;
     font-size: 0.9rem;
   }
+  .location-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 1.5rem;
+    gap: 0.5rem;
+  }
   .location-value {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-    font-size: 0.9rem;
+    gap: 0.5rem;
     color: var(--secondary-text-color);
     overflow-wrap: anywhere;
-  }
-  .location-value > span,
-  .known-place-select {
-    flex: 1;
-    min-width: 0;
   }
   .location-actions {
     display: flex;
@@ -793,13 +712,5 @@
   }
   .location-actions :global(.icon-container) {
     display: flex;
-  }
-  .known-place-select {
-    height: 2.75rem;
-    padding: 0.5rem;
-    color: var(--primary-text-color);
-    background: var(--header-background-color);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
   }
 </style>
