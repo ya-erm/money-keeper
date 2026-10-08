@@ -560,15 +560,35 @@
           <span>{selectedKnownPlace?.name ?? $translate('transactions.unnamed_place')}</span>
           <div class="location-actions">
             {#if locationUrl}
-              <a class="location-link" href={locationUrl} target="_blank" rel="noreferrer">
-                {$translate('transactions.open_geolocation')}
+              <a
+                class="location-link"
+                href={locationUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={$translate('transactions.open_geolocation')}
+                title={$translate('transactions.open_geolocation')}
+              >
+                <span aria-hidden="true"><Icon name="mdi:map-outline" size={1.25} /></span>
               </a>
             {/if}
-            <Button appearance="link" underlined={false} onClick={() => (knownPlaceModalOpened = true)}>
-              {$translate(selectedKnownPlace ? 'common.edit' : 'transactions.save_known_place')}
+            <Button
+              appearance="transparent"
+              aria-label={$translate(selectedKnownPlace ? 'common.edit' : 'transactions.save_known_place')}
+              title={$translate(selectedKnownPlace ? 'common.edit' : 'transactions.save_known_place')}
+              onClick={() => (knownPlaceModalOpened = true)}
+            >
+              <span aria-hidden="true">
+                <Icon name={selectedKnownPlace ? 'mdi:pencil' : 'mdi:content-save-outline'} size={1.25} />
+              </span>
             </Button>
-            <Button appearance="link" underlined={false} color="danger" onClick={removeLocation}>
-              {$translate('transactions.remove_location')}
+            <Button
+              appearance="transparent"
+              color="danger"
+              aria-label={$translate('transactions.remove_location')}
+              title={$translate('transactions.remove_location')}
+              onClick={removeLocation}
+            >
+              <span aria-hidden="true"><Icon name="mdi:delete-outline" size={1.25} /></span>
             </Button>
           </div>
         </div>
@@ -692,25 +712,45 @@
   }
   .location-value {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    align-items: center;
+    gap: 0.75rem;
     font-size: 0.9rem;
     color: var(--secondary-text-color);
     overflow-wrap: anywhere;
   }
+  .location-value > span {
+    flex: 1;
+    min-width: 0;
+  }
   .location-actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    flex-shrink: 0;
+    gap: 0.25rem;
     align-items: center;
   }
   .location-actions > :global(*) {
-    flex-shrink: 0;
-    font-size: inherit;
-    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+  }
+  .location-actions :global(.icon-container) {
+    display: flex;
   }
   .location-link {
     color: var(--link-color);
+    text-decoration: none;
+  }
+  .location-link:hover {
+    opacity: 0.7;
+  }
+  .location-link:focus-visible {
+    outline: 2px solid var(--active-color);
+    outline-offset: 2px;
   }
   .known-place-select {
     min-height: 2.5rem;

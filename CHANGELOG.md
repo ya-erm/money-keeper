@@ -6,6 +6,10 @@
 
 - Added a synchronized list of named places that can be selected, edited, and removed when assigning a location to an operation. Operation data continues to store coordinates.
 
+### Improved
+
+- Made operation location actions compact square icon buttons with accessible labels for mobile screens.
+
 ## 2.26.1 - 2026-10-08
 
 ### Fixed
