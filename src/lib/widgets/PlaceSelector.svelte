@@ -116,7 +116,7 @@
       {#each [{ label: 'transactions.nearby_places' as const, places: nearby }, { label: 'settings.known_places' as const, places: others }] as group (group.label)}
         {#if group.places.length}
           <div class="place-group" role="group" aria-label={$translate(group.label)}>
-            <div class="group-label" aria-hidden="true">{$translate(group.label)}</div>
+            <div class="group-label" aria-hidden="true">{$translate(group.label)}:</div>
             {#each group.places as place (place.id)}
               <button type="button" role="menuitem" on:click={() => choose(place)}>{place.name}</button>
             {/each}
@@ -226,7 +226,7 @@
     font-size: 1em;
     font-weight: 600;
     color: var(--primary-text-color);
-    padding: 0.5rem 0;
+    padding: 0.5rem;
   }
   .place-group button {
     padding-left: 1rem;

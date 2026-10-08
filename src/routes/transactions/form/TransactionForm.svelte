@@ -573,19 +573,19 @@
       <div class="location-header">
         <InputLabel text={$translate('transactions.geolocation')} />
         <div class="location-header-actions">
-          <Button
-            appearance="link"
-            underlined={false}
-            disabled={locating}
-            onClick={detectLocation}
-            testId="DetectLocationButton">{$translate('transactions.detect_geolocation')}</Button
-          >
           {#if hasLocation}<Button
               appearance="link"
               color="danger"
               underlined={false}
               onClick={removeLocation}
               testId="RemoveLocationButton">{$translate('common.delete')}</Button
+            >
+          {:else}<Button
+              appearance="link"
+              underlined={false}
+              disabled={locating}
+              onClick={detectLocation}
+              testId="DetectLocationButton">{$translate('transactions.detect_geolocation')}</Button
             >{/if}
         </div>
       </div>
@@ -762,7 +762,7 @@
     height: 2.75rem;
     padding: 0;
     border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     color: var(--active-color);
   }
   .location-actions :global(.icon-container) {
