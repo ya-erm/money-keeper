@@ -202,11 +202,10 @@
   rightSlot={Button}
   rightSlotProps={{
     text: $translate('common.done'),
-    appearance: 'link',
+    appearance: 'transparent',
     underlined: false,
     onClick: save,
     disabled: !canSave,
-    class: 'p-1',
     testId: 'LocationDoneButton',
   }}
   testId="LocationPicker"
