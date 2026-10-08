@@ -34,6 +34,7 @@ type RouteKey =
   | 'settings'
   | 'settings.language'
   | 'settings.currency_rates'
+  | 'settings.known_places'
   | 'settings.encryption'
   | 'settings.api_tokens'
   | 'settings.import_export'
@@ -153,6 +154,10 @@ export const routes: { [key in RouteKey]: Route } = {
   'settings.currency_rates': {
     path: '/settings/currency-rates',
     title: 'currency_rates.title',
+  },
+  'settings.known_places': {
+    path: '/settings/known-places',
+    title: 'settings.known_places',
   },
   'settings.encryption': {
     path: '/settings/encryption',

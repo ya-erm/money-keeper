@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.27.0 - 2026-10-08
+
+### Added
+
+- Added a synchronized list of named places that can be selected, edited, and removed when assigning a location to an operation. Operation data continues to store coordinates.
+
 ## 2.26.1 - 2026-10-08
 
 ### Fixed

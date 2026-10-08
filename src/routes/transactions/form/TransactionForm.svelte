@@ -16,6 +16,7 @@
   import type {
     AccountViewModel,
     Category,
+    KnownPlace,
     Tag,
     Transaction,
     TransactionViewModel,
@@ -37,6 +38,7 @@
   } from '$lib/utils/checkFormParams';
   import TagsList from '$lib/widgets/TagsList.svelte';
   import TimeZoneList from '$lib/widgets/TimeZoneList.svelte';
+  import KnownPlaceModal from '$lib/widgets/KnownPlaceModal.svelte';
 
   import RepeatingModal from '../../repeatings/RepeatingModal.svelte';
   import RepeatingsList from '../../repeatings/RepeatingsList.svelte';
@@ -106,6 +108,30 @@
   let locationLat = transaction?.locationLat ?? null;
   let locationLng = transaction?.locationLng ?? null;
   let locationLoading = false;
+  let knownPlaceModalOpened = false;
+  let selectedKnownPlaceId = '';
+
+  const findNearbyPlace = (latitude: number, longitude: number, places: KnownPlace[]) => {
+    const distance = (place: KnownPlace) => {
+      const radians = (degrees: number) => (degrees * Math.PI) / 180;
+      const latitudeDelta = radians(place.latitude - latitude);
+      const longitudeDelta = radians(place.longitude - longitude);
+      const value =
+        Math.sin(latitudeDelta / 2) ** 2 +
+        Math.cos(radians(latitude)) * Math.cos(radians(place.latitude)) * Math.sin(longitudeDelta / 2) ** 2;
+      return 6371000 * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
+    };
+    return places
+      .map((place) => ({ place, distance: distance(place) }))
+      .filter(({ distance: distanceInMeters }) => distanceInMeters <= 100)
+      .sort((a, b) => a.distance - b.distance)[0]?.place;
+  };
+
+  $: knownPlaces = settings?.knownPlaces ?? [];
+  $: selectedKnownPlace = knownPlaces.find((place) => place.id === selectedKnownPlaceId) ?? null;
+  $: if (!selectedKnownPlaceId && locationLat !== null && locationLng !== null) {
+    selectedKnownPlaceId = findNearbyPlace(locationLat, locationLng, knownPlaces)?.id ?? '';
+  }
 
   let anotherCurrencyModalOpened = false;
   let anotherCurrency: string | null = transaction?.anotherCurrency ?? null;
@@ -154,7 +180,6 @@
     }
   };
 
-
   const requestLocation = () => {
     if (typeof window === 'undefined' || !window.navigator.geolocation) {
       showErrorToast($translate('transactions.geolocation_not_supported'));
@@ -165,6 +190,14 @@
       (position) => {
         locationLat = position.coords.latitude;
         locationLng = position.coords.longitude;
+        const knownPlace = findNearbyPlace(locationLat, locationLng, knownPlaces);
+        if (knownPlace) {
+          selectedKnownPlaceId = knownPlace.id;
+          locationLat = knownPlace.latitude;
+          locationLng = knownPlace.longitude;
+        } else {
+          selectedKnownPlaceId = '';
+        }
         locationLoading = false;
       },
       () => {
@@ -173,6 +206,27 @@
       },
       { enableHighAccuracy: true, timeout: 10000 },
     );
+  };
+
+  const selectKnownPlace = (event: Event) => {
+    selectedKnownPlaceId = (event.currentTarget as HTMLSelectElement).value;
+    const place = knownPlaces.find((knownPlace) => knownPlace.id === selectedKnownPlaceId);
+    if (place) {
+      locationLat = place.latitude;
+      locationLng = place.longitude;
+    }
+  };
+
+  const removeLocation = () => {
+    locationLat = null;
+    locationLng = null;
+    selectedKnownPlaceId = '';
+  };
+
+  const onKnownPlaceSaved = (place: KnownPlace) => {
+    selectedKnownPlaceId = place.id;
+    locationLat = place.latitude;
+    locationLng = place.longitude;
   };
 
   $: locationUrl =
@@ -484,14 +538,37 @@
           {locationLoading ? $translate('common.loading') : $translate('transactions.detect_geolocation')}
         </Button>
       </div>
+      {#if knownPlaces.length > 0}
+        <select
+          class="known-place-select"
+          aria-label={$translate('transactions.known_place')}
+          value={selectedKnownPlaceId}
+          on:change={selectKnownPlace}
+        >
+          <option value="">
+            {locationLat !== null && locationLng !== null
+              ? $translate('transactions.unnamed_place')
+              : $translate('common.select')}
+          </option>
+          {#each knownPlaces as place (place.id)}
+            <option value={place.id}>{place.name}</option>
+          {/each}
+        </select>
+      {/if}
       {#if locationLat !== null && locationLng !== null}
         <div class="location-value">
-          <span>{locationLat.toFixed(6)}, {locationLng.toFixed(6)}</span>
+          <span>{selectedKnownPlace?.name ?? $translate('transactions.unnamed_place')}</span>
           {#if locationUrl}
             <a class="location-link" href={locationUrl} target="_blank" rel="noreferrer">
               {$translate('transactions.open_geolocation')}
             </a>
           {/if}
+          <Button appearance="link" underlined={false} onClick={() => (knownPlaceModalOpened = true)}>
+            {$translate(selectedKnownPlace ? 'common.edit' : 'transactions.save_known_place')}
+          </Button>
+          <Button appearance="link" underlined={false} color="danger" onClick={removeLocation}>
+            {$translate('transactions.remove_location')}
+          </Button>
         </div>
       {/if}
     </div>
@@ -503,6 +580,16 @@
 </form>
 
 <AnotherCurrencyModal bind:opened={anotherCurrencyModalOpened} bind:anotherCurrency />
+
+{#if knownPlaceModalOpened}
+  <KnownPlaceModal
+    bind:opened={knownPlaceModalOpened}
+    item={selectedKnownPlace}
+    initialLatitude={locationLat}
+    initialLongitude={locationLng}
+    onSaved={onKnownPlaceSaved}
+  />
+{/if}
 
 <RepeatingTypeModal
   bind:opened={repeatingTypeModalOpened}
@@ -607,5 +694,13 @@
   }
   .location-link {
     color: var(--link-color);
+  }
+  .known-place-select {
+    min-height: 2.5rem;
+    padding: 0.5rem;
+    color: var(--primary-text-color);
+    background: var(--header-background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
   }
 </style>
