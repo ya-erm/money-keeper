@@ -532,7 +532,7 @@
     </div>
 
     <div class="flex-col gap-0.5">
-      <div class="flex justify-between items-center gap-1">
+      <div class="location-header flex justify-between items-center gap-1">
         <InputLabel text={$translate('transactions.geolocation')} optional translate={$translate} />
         <Button appearance="link" underlined={false} onClick={requestLocation} disabled={locationLoading}>
           {locationLoading ? $translate('common.loading') : $translate('transactions.detect_geolocation')}
@@ -558,17 +558,19 @@
       {#if locationLat !== null && locationLng !== null}
         <div class="location-value">
           <span>{selectedKnownPlace?.name ?? $translate('transactions.unnamed_place')}</span>
-          {#if locationUrl}
-            <a class="location-link" href={locationUrl} target="_blank" rel="noreferrer">
-              {$translate('transactions.open_geolocation')}
-            </a>
-          {/if}
-          <Button appearance="link" underlined={false} onClick={() => (knownPlaceModalOpened = true)}>
-            {$translate(selectedKnownPlace ? 'common.edit' : 'transactions.save_known_place')}
-          </Button>
-          <Button appearance="link" underlined={false} color="danger" onClick={removeLocation}>
-            {$translate('transactions.remove_location')}
-          </Button>
+          <div class="location-actions">
+            {#if locationUrl}
+              <a class="location-link" href={locationUrl} target="_blank" rel="noreferrer">
+                {$translate('transactions.open_geolocation')}
+              </a>
+            {/if}
+            <Button appearance="link" underlined={false} onClick={() => (knownPlaceModalOpened = true)}>
+              {$translate(selectedKnownPlace ? 'common.edit' : 'transactions.save_known_place')}
+            </Button>
+            <Button appearance="link" underlined={false} color="danger" onClick={removeLocation}>
+              {$translate('transactions.remove_location')}
+            </Button>
+          </div>
         </div>
       {/if}
     </div>
@@ -685,12 +687,27 @@
     flex-shrink: 0;
     font-size: 0.9rem;
   }
+  .location-header {
+    flex-wrap: wrap;
+  }
   .location-value {
     display: flex;
-    gap: 0.75rem;
-    align-items: center;
+    flex-direction: column;
+    gap: 0.25rem;
     font-size: 0.9rem;
     color: var(--secondary-text-color);
+    overflow-wrap: anywhere;
+  }
+  .location-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .location-actions > :global(*) {
+    flex-shrink: 0;
+    font-size: inherit;
+    white-space: nowrap;
   }
   .location-link {
     color: var(--link-color);
