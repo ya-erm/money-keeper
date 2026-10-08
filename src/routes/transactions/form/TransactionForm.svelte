@@ -41,7 +41,7 @@
   import TimeZoneList from '$lib/widgets/TimeZoneList.svelte';
   import PlaceSelector from '$lib/widgets/PlaceSelector.svelte';
   import LocationPicker from '$lib/widgets/LocationPicker.svelte';
-  import { findNearbyPlaces, type Coordinates } from '$lib/utils/geolocation';
+  import { findNearbyPlaces, isValidCoordinates, type Coordinates } from '$lib/utils/geolocation';
 
   import RepeatingModal from '../../repeatings/RepeatingModal.svelte';
   import RepeatingsList from '../../repeatings/RepeatingsList.svelte';
@@ -114,6 +114,9 @@
   let locationPickerOpened = false;
   let selectedKnownPlaceId = '';
   let currentPosition: Coordinates | null = null;
+  let locating = false;
+  let disposed = false;
+  let locationRevision = 0;
 
   $: knownPlaces = settings?.knownPlaces ?? [];
   $: hasLocation = locationLat !== null && locationLng !== null;
@@ -125,7 +128,6 @@
   }
 
   onMount(() => {
-    let disposed = false;
     const suggestNearbyPlaces = async () => {
       try {
         if (!navigator.geolocation || !navigator.permissions) return;
@@ -196,11 +198,13 @@
   };
 
   const openLocationPicker = (adding = false) => {
+    locationRevision++;
     editorPlace = adding ? null : selectedKnownPlace;
     locationPickerOpened = true;
   };
 
   const chooseKnownPlace = (place: KnownPlace | null) => {
+    locationRevision++;
     if (place) {
       locationLat = place.latitude;
       locationLng = place.longitude;
@@ -209,12 +213,48 @@
   };
 
   const removeLocation = () => {
+    locationRevision++;
     locationLat = null;
     locationLng = null;
     selectedKnownPlaceId = '';
   };
 
+  const detectLocation = () => {
+    if (locating) return;
+    if (!navigator.geolocation) {
+      showErrorToast($translate('transactions.geolocation_not_supported'));
+      return;
+    }
+    const revision = locationRevision;
+    locating = true;
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        if (disposed) return;
+        locating = false;
+        if (!isValidCoordinates(coords.latitude, coords.longitude)) {
+          showErrorToast($translate('transactions.geolocation_failed'));
+          return;
+        }
+        const position = { latitude: coords.latitude, longitude: coords.longitude };
+        currentPosition = position;
+        if (revision !== locationRevision) return;
+        const nearest = findNearbyPlaces(position, knownPlaces)[0];
+        locationRevision++;
+        locationLat = nearest?.latitude ?? position.latitude;
+        locationLng = nearest?.longitude ?? position.longitude;
+        selectedKnownPlaceId = nearest?.id ?? '';
+      },
+      () => {
+        if (disposed) return;
+        locating = false;
+        if (revision === locationRevision) showErrorToast($translate('transactions.geolocation_failed'));
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
+
   const onLocationSelected = async (position: Coordinates, name: string) => {
+    locationRevision++;
     let savedPlace: KnownPlace | null = null;
     if (name) {
       const saved: KnownPlace = { id: editorPlace?.id ?? uuid(), name, ...position };
@@ -532,13 +572,22 @@
     <div class="flex-col gap-0.25">
       <div class="location-header">
         <InputLabel text={$translate('transactions.geolocation')} />
-        {#if hasLocation}<Button
+        <div class="location-header-actions">
+          <Button
             appearance="link"
-            color="danger"
             underlined={false}
-            onClick={removeLocation}
-            testId="RemoveLocationButton">{$translate('common.delete')}</Button
-          >{/if}
+            disabled={locating}
+            onClick={detectLocation}
+            testId="DetectLocationButton">{$translate('transactions.detect_geolocation')}</Button
+          >
+          {#if hasLocation}<Button
+              appearance="link"
+              color="danger"
+              underlined={false}
+              onClick={removeLocation}
+              testId="RemoveLocationButton">{$translate('common.delete')}</Button
+            >{/if}
+        </div>
       </div>
       <div class="location-value">
         <PlaceSelector
@@ -553,7 +602,7 @@
         />
         <div class="location-actions">
           <Button
-            appearance="transparent"
+            color="white"
             aria-label={$translate(hasLocation ? 'transactions.edit_location' : 'transactions.choose_on_map')}
             title={$translate(hasLocation ? 'transactions.edit_location' : 'transactions.choose_on_map')}
             onClick={() => openLocationPicker()}
@@ -694,6 +743,11 @@
     color: var(--secondary-text-color);
     overflow-wrap: anywhere;
   }
+  .location-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
   .location-actions {
     display: flex;
     flex-shrink: 0;
@@ -709,6 +763,7 @@
     padding: 0;
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
+    color: var(--active-color);
   }
   .location-actions :global(.icon-container) {
     display: flex;

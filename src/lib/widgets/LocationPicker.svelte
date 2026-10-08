@@ -6,6 +6,7 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
+  import Modal from '@ya-erm/svelte-ui/Modal';
   import { showErrorToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
   import type { KnownPlace } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
@@ -35,9 +36,11 @@
   let locating = false;
   let name = initialName;
   let submitting = false;
+  let deleteConfirmationOpened = false;
   let disposed = false;
   let selectionRevision = 0;
   let selectPosition: ((position: Coordinates) => void) | null = null;
+  $: canSave = ready && !!selectedPosition && !submitting && (!nameRequired || !!name.trim());
 
   const locate = (automatic = false) => {
     if (!navigator.geolocation) {
@@ -82,6 +85,7 @@
     submitting = true;
     try {
       await onRemove();
+      deleteConfirmationOpened = false;
     } catch (error) {
       handleError(error);
     } finally {
@@ -191,7 +195,22 @@
   });
 </script>
 
-<SubScreen visible={true} title={$translate('transactions.location_editor')} onBack={onClose} testId="LocationPicker">
+<SubScreen
+  visible={true}
+  title={$translate('transactions.location_editor')}
+  onBack={onClose}
+  rightSlot={Button}
+  rightSlotProps={{
+    text: $translate('common.done'),
+    appearance: 'link',
+    underlined: false,
+    onClick: save,
+    disabled: !canSave,
+    class: 'p-1',
+    testId: 'LocationDoneButton',
+  }}
+  testId="LocationPicker"
+>
   <form class="picker" on:submit|preventDefault={save}>
     <div class="map-frame">
       <div
@@ -218,18 +237,31 @@
       <p>{$translate('common.loading')}</p>
     {/if}
     {#if selectedPosition}
-      <button
-        type="button"
-        class="coordinates"
-        on:click={copyCoordinates}
-        title={$translate('transactions.copy_coordinates')}
-        aria-label={$translate('transactions.copy_coordinates')}
-        data-testId="LocationCoordinates"
-      >
-        {$translate('transactions.coordinates')}: ({selectedPosition.latitude.toFixed(4)}, {selectedPosition.longitude.toFixed(
-          4,
-        )})
-      </button>
+      <div class="coordinate-row">
+        <button
+          type="button"
+          class="coordinates"
+          on:click={copyCoordinates}
+          title={$translate('transactions.copy_coordinates')}
+          aria-label={$translate('transactions.copy_coordinates')}
+          data-testId="LocationCoordinates"
+        >
+          {$translate('transactions.coordinates')}: ({selectedPosition.latitude.toFixed(4)}, {selectedPosition.longitude.toFixed(
+            4,
+          )})
+        </button>
+        <a
+          class="external-map"
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${selectedPosition.latitude},${selectedPosition.longitude}`)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={$translate('transactions.open_in_google_maps')}
+          aria-label={$translate('transactions.open_in_google_maps')}
+          data-testId="OpenExternalMapLink"
+        >
+          {$translate('common.open')} <span aria-hidden="true"><Icon name="mdi:open-in-new" size={1} /></span>
+        </a>
+      </div>
     {/if}
     <Input
       label={$translate('known_places.name')}
@@ -238,19 +270,31 @@
       testId="LocationNameInput"
     />
     <div class="picker-actions">
-      {#if onRemove}<Button color="danger" appearance="link" onClick={remove} disabled={submitting}
-          >{$translate('common.delete')}</Button
-        >{/if}
-      <Button
-        type="submit"
-        disabled={!ready || !selectedPosition || submitting || (nameRequired && !name.trim())}
-        testId="ConfirmLocationButton"
-      >
+      <Button type="submit" disabled={!canSave} testId="ConfirmLocationButton">
         {$translate(confirmLabel)}
       </Button>
+      {#if onRemove}<Button
+          color="danger"
+          appearance="link"
+          onClick={() => (deleteConfirmationOpened = true)}
+          disabled={submitting}
+          testId="DeleteKnownPlaceButton">{$translate('common.delete')}</Button
+        >{/if}
     </div>
   </form>
 </SubScreen>
+
+<Modal bind:opened={deleteConfirmationOpened} header={$translate('known_places.delete')} width={25}>
+  <div class="flex-col gap-1">
+    <p class="m-0">{$translate('known_places.delete_confirm', { values: { name: initialName } })}</p>
+    <Button color="danger" onClick={remove} disabled={submitting} testId="ConfirmDeleteKnownPlaceButton"
+      >{$translate('common.delete')}</Button
+    >
+    <Button color="white" bordered onClick={() => (deleteConfirmationOpened = false)} disabled={submitting}
+      >{$translate('common.cancel')}</Button
+    >
+  </div>
+</Modal>
 
 <style>
   .picker {
@@ -283,9 +327,16 @@
     opacity: 0.5;
     cursor: default;
   }
-  .coordinates {
-    text-align: left;
+  .coordinate-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     margin: -0.5rem 0;
+  }
+  .coordinates {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
     padding: 0;
     min-height: 2.75rem;
     border: 0;
@@ -295,6 +346,18 @@
     font-size: 0.85rem;
     cursor: pointer;
   }
+  .external-map {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+    min-height: 2.75rem;
+    color: var(--active-color);
+    text-decoration: none;
+  }
+  .external-map span {
+    display: flex;
+  }
   .map {
     height: clamp(14rem, 42vh, 26rem);
     border-radius: 0.75rem;
@@ -303,11 +366,11 @@
   }
   .picker-actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    flex-direction: column;
+    gap: 1rem;
   }
   .picker-actions > :global(button) {
-    flex: 1;
+    width: 100%;
   }
   .map :global(.location-pin) {
     background: var(--active-color);
