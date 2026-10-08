@@ -54,12 +54,12 @@ test.describe('Operation locations', () => {
 
   test('suggests nearby saved places on opening without assigning a location', async ({ page }) => {
     await page.goto('/transactions/create', { waitUntil: 'networkidle' });
-    await expect(page.locator('.nearby-places')).toContainText('Nearest cafe');
-    await expect(page.locator('.location-value')).toHaveCount(0);
+    await expect(page.locator('.known-place-select')).toHaveValue('');
+    await expect(page.getByRole('button', { name: 'Remove', exact: true })).toHaveCount(0);
     const options = page.locator('.known-place-select optgroup').first().locator('option');
     await expect(options).toHaveText(['Nearest cafe', 'Near cafe']);
-    await page.locator('.nearby-places').getByRole('button', { name: 'Nearest cafe', exact: true }).click();
-    await expect(page.locator('.location-value')).toContainText('Nearest cafe');
+    await page.locator('.known-place-select').selectOption('nearest');
+    await expect(page.locator('.known-place-select')).toHaveValue('nearest');
   });
 
   test('preserves an existing operation location when suggesting nearby places', async ({ page }) => {
@@ -71,15 +71,14 @@ test.describe('Operation locations', () => {
     await page.goto(`/accounts?account-card=${operation.accountId}&operation-id=${operation.id}`, {
       waitUntil: 'networkidle',
     });
-    await expect(page.locator('.nearby-places')).toContainText('Nearest cafe');
-    await expect(page.locator('.location-value')).toContainText('Far away');
+    await expect(page.locator('.known-place-select optgroup').first()).toContainText('Nearest cafe');
     await expect(page.locator('.known-place-select')).toHaveValue('far');
   });
 
   test('saves a point selected on the map and can change it while editing', async ({ page }) => {
     await page.goto('/accounts', { waitUntil: 'networkidle' });
     await page.getByTestId('AddOperationButton').click();
-    await expect(page.locator('.nearby-places')).toContainText('Nearest cafe');
+    await expect(page.locator('.known-place-select optgroup').first()).toContainText('Nearest cafe');
     await page.getByRole('button', { name: 'Choose on map', exact: true }).click();
     const picker = page.getByTestId('LocationPicker');
     const map = page.getByTestId('LocationMap');
@@ -108,7 +107,7 @@ test.describe('Operation locations', () => {
     const operation = page.getByTestId('TransactionListItem').filter({ hasText: 'Map location operation' });
     await operation.click();
     await expect(page.getByTestId('SaveTransactionButton')).toBeVisible();
-    await expect(page.locator('.location-value')).toContainText('Unnamed');
+    await expect(page.locator('.known-place-select option:checked')).toHaveText('Unnamed');
 
     await page.locator('.location-actions').getByRole('button', { name: 'On map', exact: true }).click();
     await expect(map).toHaveClass(/leaflet-container/);
@@ -121,7 +120,7 @@ test.describe('Operation locations', () => {
     await page.reload({ waitUntil: 'networkidle' });
     await page.getByTestId('TransactionListItem').filter({ hasText: 'Map location operation' }).click();
     expect(await readStoredLocation(page)).toEqual(edited);
-    await expect(page.locator('.location-value')).toContainText('Unnamed');
+    await expect(page.locator('.known-place-select option:checked')).toHaveText('Unnamed');
   });
 
   test('edits a saved place on the map and preserves changes only after saving', async ({ page }) => {

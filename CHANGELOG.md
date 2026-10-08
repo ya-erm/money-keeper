@@ -11,7 +11,7 @@
 
 - Made operation location actions compact square icon buttons with accessible labels for mobile screens.
 - Added white GPS and map buttons to the place editor. Locations are selected on the map instead of entering coordinates manually.
-- Removed the Leaflet branding from the map while retaining OpenStreetMap attribution.
+- Combined the place selector and location icon buttons into one row, without repeating the selected place name. Nearby places appear first in the selector.
 
 ## 2.26.1 - 2026-10-08
 

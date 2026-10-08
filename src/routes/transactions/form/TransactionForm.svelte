@@ -557,60 +557,62 @@
     </div>
 
     <div class="flex-col gap-0.5">
-      <div class="location-header flex justify-between items-center gap-1">
-        <InputLabel text={$translate('transactions.geolocation')} optional translate={$translate} />
-        <Button appearance="link" underlined={false} onClick={requestLocation} disabled={locationLoading}>
-          {locationLoading ? $translate('common.loading') : $translate('transactions.detect_geolocation')}
-        </Button>
-      </div>
-      {#if knownPlaces.length > 0}
-        {#if nearbyPlaces.length > 0}
-          <div class="nearby-places">
-            <span>{$translate('transactions.nearby_places')}:</span>
-            {#each nearbyPlaces as place (place.id)}
-              <Button appearance="link" underlined={false} onClick={() => chooseKnownPlace(place.id)}>
-                {place.name}
-              </Button>
-            {/each}
-          </div>
-        {/if}
-        <select
-          class="known-place-select"
-          aria-label={$translate('transactions.known_place')}
-          value={selectedKnownPlaceId}
-          on:change={selectKnownPlace}
-        >
-          <option value="">
-            {locationLat !== null && locationLng !== null
-              ? $translate('transactions.unnamed_place')
-              : $translate('common.select')}
-          </option>
-          {#if nearbyPlaces.length > 0}
-            <optgroup label={$translate('transactions.nearby_places')}>
-              {#each nearbyPlaces as place (place.id)}
+      <InputLabel text={$translate('transactions.geolocation')} optional translate={$translate} />
+      <div class="location-value">
+        {#if knownPlaces.length > 0}
+          <select
+            class="known-place-select"
+            aria-label={$translate('transactions.known_place')}
+            value={selectedKnownPlaceId}
+            on:change={selectKnownPlace}
+          >
+            <option value="">
+              {locationLat !== null && locationLng !== null
+                ? $translate('transactions.unnamed_place')
+                : $translate('common.select')}
+            </option>
+            {#if nearbyPlaces.length > 0}
+              <optgroup label={$translate('transactions.nearby_places')}>
+                {#each nearbyPlaces as place (place.id)}
+                  <option value={place.id}>{place.name}</option>
+                {/each}
+              </optgroup>
+            {/if}
+            <optgroup label={$translate('settings.known_places')}>
+              {#each otherPlaces as place (place.id)}
                 <option value={place.id}>{place.name}</option>
               {/each}
             </optgroup>
-          {/if}
-          <optgroup label={$translate('settings.known_places')}>
-            {#each otherPlaces as place (place.id)}
-              <option value={place.id}>{place.name}</option>
-            {/each}
-          </optgroup>
-        </select>
-      {/if}
-      {#if locationLat !== null && locationLng !== null}
-        <div class="location-value">
-          <span>{selectedKnownPlace?.name ?? $translate('transactions.unnamed_place')}</span>
-          <div class="location-actions">
-            <Button
-              appearance="transparent"
-              aria-label={$translate('transactions.open_geolocation')}
-              title={$translate('transactions.choose_on_map')}
-              onClick={() => (locationPickerOpened = true)}
-            >
-              <span aria-hidden="true"><Icon name="mdi:map-outline" size={1.25} /></span>
-            </Button>
+          </select>
+        {:else}
+          <span>
+            {locationLat !== null && locationLng !== null ? $translate('transactions.unnamed_place') : ''}
+          </span>
+        {/if}
+        <div class="location-actions">
+          <Button
+            appearance="transparent"
+            aria-label={$translate('transactions.detect_geolocation')}
+            title={locationLoading ? $translate('common.loading') : $translate('transactions.detect_geolocation')}
+            aria-busy={locationLoading}
+            onClick={requestLocation}
+            disabled={locationLoading}
+          >
+            <span aria-hidden="true"><Icon name="mdi:crosshairs-gps" size={1.25} /></span>
+          </Button>
+          <Button
+            appearance="transparent"
+            aria-label={$translate(
+              locationLat !== null && locationLng !== null
+                ? 'transactions.open_geolocation'
+                : 'transactions.choose_on_map',
+            )}
+            title={$translate('transactions.choose_on_map')}
+            onClick={() => (locationPickerOpened = true)}
+          >
+            <span aria-hidden="true"><Icon name="mdi:map-outline" size={1.25} /></span>
+          </Button>
+          {#if locationLat !== null && locationLng !== null}
             <Button
               appearance="transparent"
               aria-label={$translate(selectedKnownPlace ? 'common.edit' : 'transactions.save_known_place')}
@@ -630,14 +632,9 @@
             >
               <span aria-hidden="true"><Icon name="mdi:delete-outline" size={1.25} /></span>
             </Button>
-          </div>
+          {/if}
         </div>
-      {:else}
-        <Button color="white" bordered onClick={() => (locationPickerOpened = true)}>
-          <Icon name="mdi:map-outline" size={1.25} />
-          {$translate('transactions.choose_on_map')}
-        </Button>
-      {/if}
+      </div>
     </div>
 
     <slot />
@@ -765,18 +762,16 @@
     flex-shrink: 0;
     font-size: 0.9rem;
   }
-  .location-header {
-    flex-wrap: wrap;
-  }
   .location-value {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.25rem;
     font-size: 0.9rem;
     color: var(--secondary-text-color);
     overflow-wrap: anywhere;
   }
-  .location-value > span {
+  .location-value > span,
+  .known-place-select {
     flex: 1;
     min-width: 0;
   }
@@ -799,16 +794,8 @@
   .location-actions :global(.icon-container) {
     display: flex;
   }
-  .nearby-places {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-    color: var(--secondary-text-color);
-  }
   .known-place-select {
-    min-height: 2.5rem;
+    height: 2.75rem;
     padding: 0.5rem;
     color: var(--primary-text-color);
     background: var(--header-background-color);
