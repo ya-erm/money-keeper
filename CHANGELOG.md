@@ -5,10 +5,12 @@
 ### Added
 
 - Added a synchronized list of named places that can be selected, edited, and removed when assigning a location to an operation. Operation data continues to store coordinates.
+- Added map selection for operation locations and suggestions for saved places within 100 meters of the current position.
 
 ### Improved
 
 - Made operation location actions compact square icon buttons with accessible labels for mobile screens.
+- Added white GPS and map buttons to the place editor. The map opens the coordinates currently entered in the form.
 
 ## 2.26.1 - 2026-10-08
 

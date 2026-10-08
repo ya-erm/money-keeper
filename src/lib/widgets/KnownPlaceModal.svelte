@@ -21,6 +21,26 @@
   let latitude = `${item?.latitude ?? initialLatitude ?? ''}`;
   let longitude = `${item?.longitude ?? initialLongitude ?? ''}`;
 
+  $: latitudeNumber = Number(latitude);
+  $: longitudeNumber = Number(longitude);
+  $: locationUrl =
+    latitude != null &&
+    longitude != null &&
+    latitude !== '' &&
+    longitude !== '' &&
+    Number.isFinite(latitudeNumber) &&
+    Number.isFinite(longitudeNumber) &&
+    latitudeNumber >= -90 &&
+    latitudeNumber <= 90 &&
+    longitudeNumber >= -180 &&
+    longitudeNumber <= 180
+      ? `https://maps.google.com/?q=${latitudeNumber},${longitudeNumber}`
+      : null;
+
+  const openLocation = () => {
+    if (locationUrl) window.open(locationUrl, '_blank', 'noopener,noreferrer');
+  };
+
   const detectLocation = () => {
     if (typeof window === 'undefined' || !window.navigator.geolocation) {
       showErrorToast($translate('transactions.geolocation_not_supported'));
@@ -98,10 +118,16 @@
       step="any"
       required
     />
-    <Button appearance="link" underlined={false} onClick={detectLocation}>
+    <Button color="white" bordered onClick={detectLocation}>
       <span class="flex items-center gap-0.5">
         <Icon name="mdi:crosshairs-gps" />
         {$translate('transactions.detect_geolocation')}
+      </span>
+    </Button>
+    <Button color="white" bordered onClick={openLocation} disabled={!locationUrl}>
+      <span class="flex items-center gap-0.5">
+        <Icon name="mdi:map-outline" />
+        {$translate('transactions.open_geolocation')}
       </span>
     </Button>
     <div class="grid-col-2 gap-1">

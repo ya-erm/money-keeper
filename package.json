@@ -33,6 +33,7 @@
     "@sveltejs/kit": "^2.70.3",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@types/bcrypt": "^6.0.0",
+    "@types/leaflet": "1.9.22",
     "@types/node": "26.6.3",
     "@typescript-eslint/eslint-plugin": "^8.71.0",
     "@typescript-eslint/parser": "^8.71.0",
@@ -63,6 +64,7 @@
     "bcrypt": "^6.0.0",
     "dayjs": "^1.11.23",
     "idb": "^8.0.3",
+    "leaflet": "1.9.4",
     "svelte-dnd-action": "^0.9.79",
     "timezones-list": "^3.1.0",
     "uuid": "^14.0.2"
