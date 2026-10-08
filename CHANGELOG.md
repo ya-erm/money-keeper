@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.26.1 - 2026-10-08
+
+### Fixed
+
+- Updated transitive esbuild and deepmerge-ts dependencies to patched versions for GHSA-67mh-4wv8-2f99 and CVE-2026-40345.
+- Updated transitive source-map-js to fix GHSA-68fv-2mgg-jv7q.
+
 ## 2.26.0 - 2026-10-07
 
 ### Added
