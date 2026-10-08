@@ -1,6 +1,6 @@
 import { store } from '$lib/store';
 import { Logger } from '$lib/utils/logger';
-import type { Initialisable, JournalItem, JournalSubscriber, Member, MemberSettings } from './interfaces';
+import type { Initialisable, JournalItem, JournalSubscriber, KnownPlace, Member, MemberSettings } from './interfaces';
 import { journalService } from './journal';
 import { settingsService } from './settings';
 import { useDB } from './useDB';
@@ -110,6 +110,11 @@ export class MembersService implements Initialisable, JournalSubscriber {
     }
   }
 
+  async updateKnownPlaces(knownPlaces: KnownPlace[], options?: { saveToDB?: boolean; upload?: boolean }) {
+    await this.updateSettings({ knownPlaces }, options?.saveToDB ?? true);
+    await journalService.addOperationToQueue({ knownPlaces }, { upload: options?.upload ?? true });
+  }
+
   /** Delete member */
   async deleteMember(member: Member) {
     const db = await useDB();
@@ -130,17 +135,22 @@ export class MembersService implements Initialisable, JournalSubscriber {
 
   /** Apply journal updates and optional save to DB */
   async applyChanges(changes: JournalItem[], saveToDB: boolean) {
-    const mergedSettings: Pick<MemberSettings, 'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder'> = {};
+    const mergedSettings: Pick<
+      MemberSettings,
+      'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder' | 'knownPlaces'
+    > = {};
     for (const { data } of changes) {
       if (data.snapshot) {
         // Snapshot replaces all settings before it
         mergedSettings.accountsOrder = data.snapshot.accountsOrder ?? [];
         mergedSettings.categoriesInOrder = data.snapshot.categoriesInOrder ?? [];
         mergedSettings.categoriesOutOrder = data.snapshot.categoriesOutOrder ?? [];
+        mergedSettings.knownPlaces = data.snapshot.knownPlaces ?? [];
       }
       if (data.accountsOrder) mergedSettings.accountsOrder = data.accountsOrder;
       if (data.categoriesInOrder) mergedSettings.categoriesInOrder = data.categoriesInOrder;
       if (data.categoriesOutOrder) mergedSettings.categoriesOutOrder = data.categoriesOutOrder;
+      if (data.knownPlaces) mergedSettings.knownPlaces = data.knownPlaces;
     }
     if (Object.keys(mergedSettings).length > 0) {
       await this.updateSettings({ ...mergedSettings }, saveToDB);

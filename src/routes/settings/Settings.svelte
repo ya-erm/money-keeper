@@ -62,6 +62,7 @@
     onChange={handleHideBalancesChange}
   />
   <ListLinkItem title={$translate('currency_rates.title')} href={route('settings.currency_rates')} />
+  <ListLinkItem title={$translate('settings.known_places')} href={route('settings.known_places')} />
   <ListSelectItem
     title={$translate('currency_rates.default_currency')}
     value={memberSettings?.currency ?? ''}

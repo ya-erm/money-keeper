@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.27.0 - 2026-10-08
+
+### Added
+
+- Added location selection for operations.
+- Added a list of saved places.
+
 ## 2.26.1 - 2026-10-08
 
 ### Fixed

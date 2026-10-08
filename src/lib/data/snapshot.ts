@@ -3,6 +3,7 @@ import type {
   Category,
   CurrencyRate,
   Grouping,
+  KnownPlace,
   JournalOperation,
   Repeating,
   Tag,
@@ -25,9 +26,13 @@ export type Snapshot = {
   accountsOrder?: string[];
   categoriesInOrder?: string[];
   categoriesOutOrder?: string[];
+  knownPlaces?: KnownPlace[];
 };
 
-export type SnapshotEntityKey = Exclude<keyof Snapshot, 'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder'>;
+export type SnapshotEntityKey = Exclude<
+  keyof Snapshot,
+  'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder' | 'knownPlaces'
+>;
 
 type SnapshotEntity = Snapshot[SnapshotEntityKey][number];
 
@@ -44,6 +49,7 @@ const ENTITY_KEYS: { [key in keyof JournalOperation]: SnapshotEntityKey | 'setti
   accountsOrder: 'setting',
   categoriesInOrder: 'setting',
   categoriesOutOrder: 'setting',
+  knownPlaces: 'setting',
   snapshot: 'snapshot',
 };
 
@@ -102,6 +108,7 @@ export function createEmptySnapshot(): Snapshot {
     currencyRates: [],
     groupings: [],
     repeatings: [],
+    knownPlaces: [],
   };
 }
 
@@ -120,7 +127,7 @@ export function reduceJournal(
   const maps = new Map<SnapshotEntityKey, Map<string, SnapshotEntity>>();
   SNAPSHOT_ENTITY_KEYS.forEach((key) => maps.set(key, new Map()));
 
-  const settings: Pick<Snapshot, 'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder'> = {};
+  const settings: Pick<Snapshot, 'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder' | 'knownPlaces'> = {};
 
   const sorted = [...items].sort((a, b) => a.order - b.order);
 
@@ -142,13 +149,15 @@ export function reduceJournal(
         delete settings.accountsOrder;
         delete settings.categoriesInOrder;
         delete settings.categoriesOutOrder;
+        delete settings.knownPlaces;
         if (snapshot.accountsOrder) settings.accountsOrder = snapshot.accountsOrder;
         if (snapshot.categoriesInOrder) settings.categoriesInOrder = snapshot.categoriesInOrder;
         if (snapshot.categoriesOutOrder) settings.categoriesOutOrder = snapshot.categoriesOutOrder;
+        if (snapshot.knownPlaces) settings.knownPlaces = snapshot.knownPlaces;
         continue;
       }
       if (target === 'setting') {
-        settings[key as keyof typeof settings] = value as string[];
+        (settings as Record<string, unknown>)[key] = value;
         continue;
       }
       const entity = value as SnapshotEntity;
@@ -167,6 +176,7 @@ export function reduceJournal(
   if (settings.accountsOrder) snapshot.accountsOrder = settings.accountsOrder;
   if (settings.categoriesInOrder) snapshot.categoriesInOrder = settings.categoriesInOrder;
   if (settings.categoriesOutOrder) snapshot.categoriesOutOrder = settings.categoriesOutOrder;
+  if (settings.knownPlaces) snapshot.knownPlaces = settings.knownPlaces;
 
   return snapshot;
 }
