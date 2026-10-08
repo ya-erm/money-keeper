@@ -1,6 +1,6 @@
 {
   "name": "money-keeper",
-  "version": "2.26.0",
+  "version": "2.26.1",
   "private": true,
   "scripts": {
     "dev": "vite dev",
@@ -69,15 +69,23 @@
   },
   "type": "module",
   "overrides": {
+    "@prisma/config": {
+      "deepmerge-ts": "8.0.2"
+    },
     "@sveltejs/kit": {
       "cookie": ">=0.7.0 <2"
+    },
+    "svelte-i18n": {
+      "esbuild": "0.28.2"
     },
     "serialize-javascript": ">=7.0.3"
   },
   "pnpm": {
     "overrides": {
+      "@prisma/config>deepmerge-ts": "8.0.2",
       "cookie": ">=0.7.0 <2",
-      "serialize-javascript": ">=7.0.3"
+      "serialize-javascript": ">=7.0.3",
+      "svelte-i18n>esbuild": "0.28.2"
     }
   },
   "packageManager": "pnpm@9.7.0+sha256.b35018fbfa8f583668b2649e407922a721355cd81f61beeb4ac1d4258e585559"
