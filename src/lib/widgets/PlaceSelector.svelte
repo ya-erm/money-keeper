@@ -115,7 +115,7 @@
       {/if}
       {#each [{ label: 'transactions.nearby_places' as const, places: nearby }, { label: 'settings.known_places' as const, places: others }] as group (group.label)}
         {#if group.places.length}
-          <div role="group" aria-label={$translate(group.label)}>
+          <div class="place-group" role="group" aria-label={$translate(group.label)}>
             <div class="group-label" aria-hidden="true">{$translate(group.label)}</div>
             {#each group.places as place (place.id)}
               <button type="button" role="menuitem" on:click={() => choose(place)}>{place.name}</button>
@@ -156,7 +156,7 @@
     color: var(--primary-text-color);
     background: var(--header-background-color);
     border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     cursor: pointer;
   }
   .value {
@@ -198,7 +198,7 @@
     background: var(--header-background-color);
     color: var(--primary-text-color);
     border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     box-shadow: 0 0.25rem 0.75rem #0002;
   }
   .options button {
@@ -226,7 +226,10 @@
     font-size: 1em;
     font-weight: 600;
     color: var(--primary-text-color);
-    padding: 0.5rem;
+    padding: 0.5rem 0;
+  }
+  .place-group button {
+    padding-left: 1rem;
   }
   .options .add {
     display: flex;
