@@ -223,8 +223,9 @@
     background: var(--hover-background-color);
   }
   .group-label {
-    font-size: 0.85em;
-    color: var(--secondary-text-color);
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--primary-text-color);
     padding: 0.5rem;
   }
   .options .add {
