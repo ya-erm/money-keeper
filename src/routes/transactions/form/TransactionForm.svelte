@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import dayjs from 'dayjs';
   import { v4 as uuid } from 'uuid';
   import { page } from '$app/stores';
@@ -11,11 +12,12 @@
   import Spoiler from '@ya-erm/svelte-ui/Spoiler';
   import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
 
-  import { memberSettingsStore, operationTagsService } from '$lib/data';
+  import { membersService, memberSettingsStore, operationTagsService } from '$lib/data';
   import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
   import type {
     AccountViewModel,
     Category,
+    KnownPlace,
     Tag,
     Transaction,
     TransactionViewModel,
@@ -37,6 +39,9 @@
   } from '$lib/utils/checkFormParams';
   import TagsList from '$lib/widgets/TagsList.svelte';
   import TimeZoneList from '$lib/widgets/TimeZoneList.svelte';
+  import PlaceSelector from '$lib/widgets/PlaceSelector.svelte';
+  import LocationPicker from '$lib/widgets/LocationPicker.svelte';
+  import { findNearbyPlaces, isValidCoordinates, type Coordinates } from '$lib/utils/geolocation';
 
   import RepeatingModal from '../../repeatings/RepeatingModal.svelte';
   import RepeatingsList from '../../repeatings/RepeatingsList.svelte';
@@ -103,6 +108,48 @@
 
   let comment = transaction?.comment ?? '';
 
+  let locationLat = transaction?.locationLat ?? null;
+  let locationLng = transaction?.locationLng ?? null;
+  let editorPlace: KnownPlace | null = null;
+  let locationPickerOpened = false;
+  let selectedKnownPlaceId = '';
+  let currentPosition: Coordinates | null = null;
+  let locating = false;
+  let disposed = false;
+  let locationRevision = 0;
+
+  $: knownPlaces = settings?.knownPlaces ?? [];
+  $: hasLocation = locationLat !== null && locationLng !== null;
+  $: nearbyPlaces = findNearbyPlaces(currentPosition, knownPlaces);
+  $: selectedKnownPlace = knownPlaces.find((place) => place.id === selectedKnownPlaceId) ?? null;
+  $: if (!selectedKnownPlaceId && locationLat !== null && locationLng !== null) {
+    selectedKnownPlaceId =
+      findNearbyPlaces({ latitude: locationLat, longitude: locationLng }, knownPlaces)[0]?.id ?? '';
+  }
+
+  onMount(() => {
+    const suggestNearbyPlaces = async () => {
+      try {
+        if (!navigator.geolocation || !navigator.permissions) return;
+        const permission = await navigator.permissions.query({ name: 'geolocation' });
+        if (disposed || permission.state !== 'granted') return;
+        navigator.geolocation.getCurrentPosition(
+          ({ coords }) => {
+            if (!disposed) currentPosition = { latitude: coords.latitude, longitude: coords.longitude };
+          },
+          () => {},
+          { timeout: 10000, maximumAge: 60000 },
+        );
+      } catch {
+        // Browsers without a geolocation Permissions API can still use the GPS button.
+      }
+    };
+    void suggestNearbyPlaces();
+    return () => {
+      disposed = true;
+    };
+  });
+
   let anotherCurrencyModalOpened = false;
   let anotherCurrency: string | null = transaction?.anotherCurrency ?? null;
 
@@ -148,6 +195,90 @@
     if (checked && !repeating) {
       repeatingTypeModalOpened = true;
     }
+  };
+
+  const openLocationPicker = (adding = false) => {
+    locationRevision++;
+    editorPlace = adding ? null : selectedKnownPlace;
+    locationPickerOpened = true;
+  };
+
+  const chooseKnownPlace = (place: KnownPlace | null) => {
+    locationRevision++;
+    if (place) {
+      locationLat = place.latitude;
+      locationLng = place.longitude;
+      selectedKnownPlaceId = place.id;
+    } else removeLocation();
+  };
+
+  const removeLocation = () => {
+    locationRevision++;
+    locationLat = null;
+    locationLng = null;
+    selectedKnownPlaceId = '';
+  };
+
+  const detectLocation = () => {
+    if (locating) return;
+    if (!navigator.geolocation) {
+      showErrorToast($translate('transactions.geolocation_not_supported'));
+      return;
+    }
+    const revision = locationRevision;
+    locating = true;
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        if (disposed) return;
+        locating = false;
+        if (!isValidCoordinates(coords.latitude, coords.longitude)) {
+          showErrorToast($translate('transactions.geolocation_failed'));
+          return;
+        }
+        const position = { latitude: coords.latitude, longitude: coords.longitude };
+        currentPosition = position;
+        if (revision !== locationRevision) return;
+        const nearest = findNearbyPlaces(position, knownPlaces)[0];
+        locationRevision++;
+        locationLat = nearest?.latitude ?? position.latitude;
+        locationLng = nearest?.longitude ?? position.longitude;
+        selectedKnownPlaceId = nearest?.id ?? '';
+      },
+      () => {
+        if (disposed) return;
+        locating = false;
+        if (revision === locationRevision) showErrorToast($translate('transactions.geolocation_failed'));
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
+
+  const onLocationSelected = async (position: Coordinates, name: string) => {
+    locationRevision++;
+    let savedPlace: KnownPlace | null = null;
+    if (name) {
+      const saved: KnownPlace = { id: editorPlace?.id ?? uuid(), name, ...position };
+      savedPlace = saved;
+      const places = membersService.selectedMemberSettings?.knownPlaces ?? [];
+      await membersService.updateKnownPlaces(
+        editorPlace ? places.map((place) => (place.id === editorPlace?.id ? saved : place)) : [...places, saved],
+      );
+    }
+    locationLat = position.latitude;
+    locationLng = position.longitude;
+    selectedKnownPlaceId = savedPlace?.id ?? findNearbyPlaces(position, knownPlaces)[0]?.id ?? '';
+    locationPickerOpened = false;
+  };
+
+  const removeKnownPlace = async () => {
+    if (!editorPlace) return;
+    const placeId = editorPlace.id;
+    const places = membersService.selectedMemberSettings?.knownPlaces ?? [];
+    await membersService.updateKnownPlaces(places.filter((place) => place.id !== placeId));
+    locationRevision++;
+    if (selectedKnownPlaceId === placeId) selectedKnownPlaceId = '';
+    editorPlace = null;
+    locationPickerOpened = false;
   };
 
   const handleSubmit = async (e: Event) => {
@@ -208,6 +339,7 @@
           : {}),
         ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
         ...(repeatingChecked ? { repeatingId: repeating?.id } : {}),
+        ...(locationLat !== null && locationLng !== null ? { locationLat, locationLng } : {}),
       });
 
       if (type === 'TRANSFER') {
@@ -224,6 +356,7 @@
           linkedTransactionId: transactions[0].id,
           ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
           ...(repeatingChecked ? { repeatingId: repeating?.id } : {}),
+          ...(locationLat !== null && locationLng !== null ? { locationLat, locationLng } : {}),
         });
         transactions[0].linkedTransactionId = transactions[1].id;
       }
@@ -446,6 +579,51 @@
         </div>
       </Spoiler>
     </div>
+
+    <div class="flex-col gap-0.25">
+      <div class="location-header">
+        <InputLabel text={$translate('transactions.geolocation')} />
+        <div class="location-header-actions">
+          {#if hasLocation}<Button
+              appearance="link"
+              color="danger"
+              underlined={false}
+              onClick={removeLocation}
+              testId="RemoveLocationButton">{$translate('common.clear')}</Button
+            >
+          {:else}<Button
+              appearance="link"
+              underlined={false}
+              disabled={locating}
+              onClick={detectLocation}
+              testId="DetectLocationButton">{$translate('transactions.detect_geolocation')}</Button
+            >{/if}
+        </div>
+      </div>
+      <div class="location-value">
+        <PlaceSelector
+          places={knownPlaces}
+          nearby={nearbyPlaces}
+          selected={selectedKnownPlace}
+          position={locationLat !== null && locationLng !== null
+            ? { latitude: locationLat, longitude: locationLng }
+            : null}
+          onSelect={chooseKnownPlace}
+          onAdd={() => openLocationPicker(true)}
+        />
+        <div class="location-actions">
+          <Button
+            color="white"
+            aria-label={$translate(hasLocation ? 'transactions.edit_location' : 'transactions.choose_on_map')}
+            title={$translate(hasLocation ? 'transactions.edit_location' : 'transactions.choose_on_map')}
+            onClick={() => openLocationPicker()}
+          >
+            <span aria-hidden="true"><Icon name={hasLocation ? 'mdi:pencil' : 'mdi:map-outline'} size={1.25} /></span>
+          </Button>
+        </div>
+      </div>
+    </div>
+
     <slot />
     <slot name="button" />
     <slot name="footer" />
@@ -453,6 +631,22 @@
 </form>
 
 <AnotherCurrencyModal bind:opened={anotherCurrencyModalOpened} bind:anotherCurrency />
+
+{#if locationPickerOpened}
+  <LocationPicker
+    initialPosition={locationLat !== null && locationLng !== null
+      ? { latitude: locationLat, longitude: locationLng }
+      : null}
+    {currentPosition}
+    initialName={editorPlace?.name ?? ''}
+    confirmLabel="common.save"
+    places={knownPlaces}
+    onLocated={(position) => (currentPosition = position)}
+    onSelect={onLocationSelected}
+    onRemove={editorPlace ? removeKnownPlace : null}
+    onClose={() => (locationPickerOpened = false)}
+  />
+{/if}
 
 <RepeatingTypeModal
   bind:opened={repeatingTypeModalOpened}
@@ -547,5 +741,44 @@
   .time-shift {
     flex-shrink: 0;
     font-size: 0.9rem;
+  }
+  .location-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 1.5rem;
+    gap: 0.5rem;
+  }
+  .location-value {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--secondary-text-color);
+    overflow-wrap: anywhere;
+  }
+  .location-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .location-actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.25rem;
+    align-items: center;
+  }
+  .location-actions > :global(*) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    color: var(--active-color);
+  }
+  .location-actions :global(.icon-container) {
+    display: flex;
   }
 </style>

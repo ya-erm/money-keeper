@@ -20,8 +20,18 @@
     operationsService,
     operationsStore,
     repeatingsService,
+    memberSettingsStore,
   } from '$lib/data';
-  import type { Account, Category, CurrencyRate, Grouping, Repeating, Tag, Transaction } from '$lib/data/interfaces';
+  import type {
+    Account,
+    Category,
+    CurrencyRate,
+    Grouping,
+    KnownPlace,
+    Repeating,
+    Tag,
+    Transaction,
+  } from '$lib/data/interfaces';
   import type {
     CompactJournalRequestData,
     CompactJournalResponseData,
@@ -46,6 +56,7 @@
     currencyRates: CurrencyRate[];
     groupings: Grouping[];
     repeatings?: Repeating[];
+    knownPlaces?: KnownPlace[];
   } = {
     categories: [],
     accountTags: [],
@@ -55,6 +66,7 @@
     currencyRates: [],
     groupings: [],
     repeatings: [],
+    knownPlaces: [],
   };
 
   let parsed = false;
@@ -73,6 +85,7 @@
     currencyRates: currencyRatesService.items,
     groupings: groupingsService.items,
     repeatings: repeatingsService.items,
+    knownPlaces: $memberSettingsStore?.knownPlaces ?? [],
   };
 
   // eslint-disable-next-line svelte/no-immutable-reactive-statements
@@ -133,6 +146,11 @@
         void journalService.addOperationToQueue({ grouping }, { upload: false });
         count += 1;
       });
+
+      if (v2.knownPlaces && !deepEqual(v2.knownPlaces, membersService.selectedMemberSettings?.knownPlaces ?? [])) {
+        await membersService.updateKnownPlaces(v2.knownPlaces, { upload: false });
+        count += Math.max(1, v2.knownPlaces.length);
+      }
 
       await journalService.applyChangesToSubscribers(journalService.queue, true);
 
@@ -240,6 +258,7 @@
         <span>{$translate('import_export.currency_rates')}: <b>{v2.currencyRates?.length ?? 0}</b></span>
         <span>{$translate('import_export.groupings')}: <b>{v2.groupings?.length ?? 0}</b>,</span>
         <span>{$translate('import_export.repeatings')}: <b>{v2.repeatings?.length ?? 0}</b></span>
+        <span>{$translate('settings.known_places')}: <b>{v2.knownPlaces?.length ?? 0}</b></span>
       </p>
 
       <Button data-testId="AddToJournalButton" disabled={uploading} class="w-full" onClick={addToJournal}>
@@ -267,6 +286,7 @@
       <span>{$translate('import_export.currency_rates')}: <b>{current.currencyRates?.length ?? 0}</b></span>
       <span>{$translate('import_export.groupings')}: <b>{current.groupings?.length ?? 0}</b>,</span>
       <span>{$translate('import_export.repeatings')}: <b>{current.repeatings?.length ?? 0}</b></span>
+      <span>{$translate('settings.known_places')}: <b>{current.knownPlaces?.length ?? 0}</b></span>
     </p>
     <a href={URL.createObjectURL(currentJsonFile)} download={`export-${dayjs().format('YYYY-MM-DD')}.json`}>
       <Button class="w-full">{$translate('import_export.save')}</Button>

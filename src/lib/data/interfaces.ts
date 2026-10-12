@@ -35,6 +35,14 @@ export type MemberSettings = {
   lastAnotherCurrency?: string | null;
   favoriteTimeZones?: string[];
   groupingId?: string | null;
+  knownPlaces?: KnownPlace[];
+};
+
+export type KnownPlace = {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
 };
 
 export type JournalItem = {
@@ -52,6 +60,7 @@ export type JournalOperation = {
   accountsOrder?: string[];
   categoriesInOrder?: string[];
   categoriesOutOrder?: string[];
+  knownPlaces?: KnownPlace[];
   grouping?: Grouping;
   repeating?: Repeating;
   /**
@@ -147,6 +156,8 @@ export type Transaction = {
   excludeFromAnalysis?: boolean;
   tagIds?: string[];
   repeatingId?: string;
+  locationLat?: number | null;
+  locationLng?: number | null;
   deleted?: boolean;
 };
 
