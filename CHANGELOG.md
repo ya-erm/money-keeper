@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.29.0 - 2026-10-15
+
+### Added
+
+- Click an account card balance to hide or show it, with the choice saved only on the current device.
+
 ## 2.27.0 - 2026-10-08
 
 ### Added
