@@ -399,6 +399,7 @@ export const ruDict: Dictionary = {
   'known_places.add': 'Добавить место',
   'known_places.empty': 'Пока нет известных мест',
   'known_places.description': 'Сохранённые места можно выбирать для указания геопозиции операции.',
+  'known_places.auto_detect_location': 'Автоматически определять геопозицию новых операций',
   'known_places.name': 'Название места',
   'known_places.location_selected': 'Местоположение выбрано',
   'known_places.location_required': 'Укажите точку на карте или определите её по GPS.',

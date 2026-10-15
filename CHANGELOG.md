@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.28.0 - 2026-10-15
+
+### Added
+
+- Added an option to automatically detect location for new operations.
+- Click an account card balance to hide or show it, with the choice saved only on the current device.
+
 ## 2.27.0 - 2026-10-08
 
 ### Added
