@@ -393,6 +393,7 @@ export const enDict: Dictionary = {
   'known_places.add': 'Add place',
   'known_places.empty': 'No known places yet',
   'known_places.description': 'Saved places are available when assigning a location to an operation.',
+  'known_places.auto_detect_location': 'Automatically detect location for new operations',
   'known_places.name': 'Place name',
   'known_places.location_selected': 'Location selected',
   'known_places.location_required': 'Choose a point on the map or use GPS.',
