@@ -214,6 +214,7 @@
     display: flex;
     align-items: center;
     gap: 0.125rem;
+    color: var(--secondary-text-color);
   }
   .repeating-icon,
   .location-icon,
