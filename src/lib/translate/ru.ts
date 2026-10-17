@@ -99,6 +99,8 @@ export const ruDict: Dictionary = {
   'auth.login.title': 'Вход',
   'auth.login': 'Логин',
   'auth.password': 'Пароль',
+  'auth.show_password': 'Показать пароль',
+  'auth.hide_password': 'Скрыть пароль',
   'auth.sign_in': 'Войти',
   'auth.incorrect_login_or_password': 'Неверный логин или пароль',
   'auth.incorrect_old_password': 'Неверный старый пароль',

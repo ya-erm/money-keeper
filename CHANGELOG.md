@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.31.0 - 2026-10-17
+
+### Added
+
+- Added a button to show or hide the password on the login screen.
+
 ## 2.30.1 - 2026-10-17
 
 ### Fixed

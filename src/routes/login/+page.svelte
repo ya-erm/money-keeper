@@ -3,6 +3,7 @@
   import { derived } from 'svelte/store';
 
   import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 
@@ -23,6 +24,7 @@
 
   let login = '';
   let password = '';
+  let passwordVisible = false;
 
   const loginFetcher = useFetch<LoginRequestData, LoginResponseData>('POST', '/api/v2/auth/login');
   const loginConfirmFetcher = useFetch<LoginConfirmRequestData, LoginConfirmResponseData>(
@@ -118,10 +120,23 @@
         bind:value={password}
         testId="PasswordInput"
         name="password"
-        type="password"
+        type={passwordVisible ? 'text' : 'password'}
         autocomplete
         required
-      />
+      >
+        <Button
+          slot="end"
+          type="button"
+          appearance="link"
+          color="secondary"
+          aria-label={$translate(passwordVisible ? 'auth.hide_password' : 'auth.show_password')}
+          title={$translate(passwordVisible ? 'auth.hide_password' : 'auth.show_password')}
+          testId="PasswordVisibilityToggle"
+          onClick={() => (passwordVisible = !passwordVisible)}
+        >
+          <Icon name={passwordVisible ? 'mdi:eye-off-outline' : 'mdi:eye-outline'} size={1.25} padding={0.5} />
+        </Button>
+      </Input>
       <Button text={$translate('auth.sign_in')} type="submit" testId="SignInButton" />
       <a class="flex-center" href="/register">{$translate('auth.register')}</a>
       <a class="flex-center" href="/">{$translate('auth.continue_as_guest')}</a>
