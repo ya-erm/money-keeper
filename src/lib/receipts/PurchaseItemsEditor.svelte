@@ -1,6 +1,7 @@
 <script lang="ts">
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import { translate } from '$lib/translate';
   import { calculateItemTotal, type PurchaseItemDraft } from './purchaseItems';
 
@@ -21,7 +22,7 @@
 </script>
 
 <div class="flex-col gap-0.5" data-testId="PurchaseItemsEditor">
-  <div>{$translate('receipts.items_list')}</div>
+  <InputLabel text={$translate('receipts.items_list')} />
   {#each items as item, i (i)}
     <div class="purchase-item flex-col gap-0.5" data-testId="PurchaseItem">
       <div class="item-heading">
