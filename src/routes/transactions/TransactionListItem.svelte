@@ -260,6 +260,7 @@
     color: var(--secondary-text-color);
   }
   .text {
+    gap: 0.125rem;
     overflow: hidden;
     text-align: left;
   }
