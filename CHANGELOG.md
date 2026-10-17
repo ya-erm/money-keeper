@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.30.1 - 2026-10-17
+
+### Fixed
+
+- Pinned the mobile Safari header to reduce iOS status-bar blur bleeding into its controls.
+
 ## 2.30.0 - 2026-10-17
 
 ### Added

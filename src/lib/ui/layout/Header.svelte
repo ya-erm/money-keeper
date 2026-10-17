@@ -20,38 +20,44 @@
   <title>{title}</title>
 </svelte:head>
 
-<div class="navigation-bar">
-  <div class="navigation-back-button h-full">
-    {#if leftSlot !== null}
-      <svelte:component this={leftSlot} />
-    {:else if onBack !== null}
-      <span class="back-button" class:closable>
-        <HeaderBackButton onClick={onBack} />
-      </span>
-      {#if closable}
-        <span class="close-button">
-          <HeaderButton icon="mdi:close" label={$translate('common.close')} onClick={onBack} />
+<div class="navigation-bar-placeholder">
+  <div class="navigation-bar">
+    <div class="navigation-back-button h-full">
+      {#if leftSlot !== null}
+        <svelte:component this={leftSlot} />
+      {:else if onBack !== null}
+        <span class="back-button" class:closable>
+          <HeaderBackButton onClick={onBack} />
         </span>
+        {#if closable}
+          <span class="close-button">
+            <HeaderButton icon="mdi:close" label={$translate('common.close')} onClick={onBack} />
+          </span>
+        {/if}
       {/if}
-    {/if}
-  </div>
-  <div class="flex-grow flex-col flex-center">
-    <h1 class="navigation-title my-0">
-      <span class="relative">
-        {title}
-      </span>
-    </h1>
-    <SyncState />
-  </div>
+    </div>
+    <div class="flex-grow flex-col flex-center">
+      <h1 class="navigation-title my-0">
+        <span class="relative">
+          {title}
+        </span>
+      </h1>
+      <SyncState />
+    </div>
 
-  <div class="navigation-right-button">
-    {#if rightSlot !== null}
-      <svelte:component this={rightSlot} {...rightSlotProps} />
-    {/if}
+    <div class="navigation-right-button">
+      {#if rightSlot !== null}
+        <svelte:component this={rightSlot} {...rightSlotProps} />
+      {/if}
+    </div>
   </div>
 </div>
 
 <style>
+  .navigation-bar-placeholder {
+    height: 60px;
+    flex-shrink: 0;
+  }
   .navigation-back-button {
     display: flex;
   }
@@ -87,6 +93,18 @@
   .close-button {
     display: none;
     padding-left: 0.5rem;
+  }
+  @supports (-webkit-touch-callout: none) {
+    @media (max-width: 767px) {
+      /* Let iOS sample an opaque pinned bar rather than blur the in-flow controls. */
+      .navigation-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+      }
+    }
   }
   @media (min-width: 768px) {
     .back-button.closable {
