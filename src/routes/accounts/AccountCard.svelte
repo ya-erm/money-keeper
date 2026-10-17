@@ -8,6 +8,7 @@
   import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
 
   import AccountOptionsModal from './AccountOptionsModal.svelte';
+  import { cardBalancesHidden } from './cardBalanceVisibility';
 
   export let account: AccountViewModel;
   export let balance: number | null = null;
@@ -26,7 +27,11 @@
     showAdditionalOptions = true;
   };
 
-  $: balancesHidden = isBalanceHidden($settingsStore, account);
+  $: balancesHidden = $cardBalancesHidden[account.id] ?? isBalanceHidden($settingsStore, account);
+
+  const handleToggleBalanceVisibility = () => {
+    cardBalancesHidden.update((value) => ({ ...value, [account.id]: !balancesHidden }));
+  };
 
   let showAdditionalOptions = false;
 </script>
@@ -51,24 +56,31 @@
       <Icon name="mdi:dots-vertical" padding={0.5} />
     </Button>
   </div>
-  <div class="flex-col items-center gap-0.25">
-    <div class="money-value">
+  <button
+    type="button"
+    class="balance-toggle flex-col items-center gap-0.25"
+    data-testId="AccountBalanceToggle"
+    aria-label={$translate(balancesHidden ? 'accounts.show_balance' : 'accounts.hide_balance')}
+    title={$translate(balancesHidden ? 'accounts.show_balance' : 'accounts.hide_balance')}
+    on:click={handleToggleBalanceVisibility}
+  >
+    <span class="money-value">
       {#if balancesHidden}
         <HiddenMoney currency={account.currency} size="lg" />
       {:else}
         {formatMoney(balance ?? 0, { currency: account.currency })}
       {/if}
-    </div>
+    </span>
     {#if currencyRate && balance !== null}
-      <div class="other-money-value">
+      <span class="other-money-value">
         {#if balancesHidden}
           <HiddenMoney currency={otherCurrency} size="sm" />
         {:else}
           {formatMoney(balance * rate, { currency: otherCurrency })}
         {/if}
-      </div>
+      </span>
     {/if}
-  </div>
+  </button>
   <div class="flex footer"></div>
 </div>
 
@@ -77,6 +89,19 @@
 {/if}
 
 <style>
+  .balance-toggle {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    border-radius: 0.25rem;
+  }
+  .balance-toggle:focus-visible {
+    outline: 2px solid var(--active-color);
+    outline-offset: 0.25rem;
+  }
   .archived {
     font-size: 0.9rem;
     opacity: 0.5;
