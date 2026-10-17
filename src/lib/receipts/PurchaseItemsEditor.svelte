@@ -5,6 +5,7 @@
   import { calculateItemTotal, type PurchaseItemDraft } from './purchaseItems';
 
   export let items: PurchaseItemDraft[];
+  export let currency: string | undefined = undefined;
 
   const recalculate = (index: number) => {
     items[index].total = calculateItemTotal(items[index].quantity, items[index].unitPrice);
@@ -20,7 +21,6 @@
 </script>
 
 <div class="flex-col gap-0.5" data-testId="PurchaseItemsEditor">
-  {#if items.length}<div class="currency">RSD</div>{/if}
   {#each items as item, i (i)}
     <div class="purchase-item flex-col gap-0.5" data-testId="PurchaseItem">
       <div class="item-heading">
@@ -37,6 +37,7 @@
         <Button
           color="danger"
           appearance="transparent"
+          bordered
           style="height: var(--item-control-height); width: var(--item-control-height); padding: 0; flex-shrink: 0"
           aria-label={$translate('receipts.remove_item')}
           onClick={() => (items = items.filter((_, index) => index !== i))}
@@ -83,8 +84,8 @@
       </div>
     </div>
   {/each}
-  {#if items.length && total !== null}<div class="total">
-      {$translate('receipts.item_total')}: {total.toFixed(2)}
+  {#if items.length && total !== null}<div class="total" data-testId="PurchaseItemsTotal">
+      {$translate('receipts.item_total')}: {total.toFixed(2)}{currency ? ` ${currency}` : ''}
     </div>{/if}
   <Button
     color="white"
@@ -102,11 +103,6 @@
     margin-top: 0.25rem;
     padding-top: 0.75rem;
     border-top: 1px solid var(--border-color);
-  }
-  .currency {
-    color: var(--secondary-text-color);
-    font-size: 0.85rem;
-    text-align: right;
   }
   .item-heading {
     display: flex;

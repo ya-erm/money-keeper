@@ -649,7 +649,7 @@
             translate={$translate}
           />
         </div>
-        <PurchaseItemsEditor bind:items={purchaseItems} />
+        <PurchaseItemsEditor bind:items={purchaseItems} currency={anotherCurrency || accountCurrency} />
       </div>
     </div>
     <div class="flex-col gap-0.5">

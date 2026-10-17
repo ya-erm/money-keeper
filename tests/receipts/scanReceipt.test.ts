@@ -190,6 +190,16 @@ test('loads store and items into separate receipt fields and preserves them afte
   await expect(page.getByTestId('PurchaseItemQuantity')).toHaveValue('1');
   await expect(page.getByTestId('PurchaseItemUnitPrice')).toHaveValue('525.7');
   await expect(page.getByTestId('PurchaseItemTotal')).toHaveValue('525.7');
+  const purchaseTotal = page.getByTestId('PurchaseItemsTotal');
+  await expect(purchaseTotal).toHaveText('Total: 525.70 RSD');
+  await selectAccountAsync(page, 'SourceAccountSelect', 'T_USD');
+  await expect(purchaseTotal).toHaveText('Total: 525.70 USD');
+  await page.getByRole('button', { name: 'Another currency', exact: true }).click();
+  await page.locator('input[name="another-currency"]').fill('EUR');
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(purchaseTotal).toHaveText('Total: 525.70 EUR');
+  await page.getByRole('button', { name: 'Same currency', exact: true }).click();
+  await expect(purchaseTotal).toHaveText('Total: 525.70 USD');
   await expect(page.getByTestId('DescriptionInput')).toHaveValue('');
   await selectAccountAsync(page, 'SourceAccountSelect', 'T_RSD');
   await page.getByTestId('CategorySelect').getByRole('button', { name: 'T_Shop' }).click();
