@@ -1,5 +1,6 @@
 <script lang="ts">
   import dayjs from 'dayjs';
+  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
 
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
@@ -63,7 +64,8 @@
   $: filteredAccounts = sortedAccounts.filter((account) => selectedAccounts.includes(account.id));
   $: chartAmountsHidden =
     $analyticsBalancesVisibilityMode === 'hide' ||
-    ($analyticsBalancesVisibilityMode !== 'show' && hasHiddenBalanceAccount($settingsStore, filteredAccounts));
+    ($analyticsBalancesVisibilityMode !== 'show' &&
+      hasHiddenBalanceAccount($settingsStore, filteredAccounts, $localAccountBalancesHidden));
 
   $: items = getAccountBalanceChartData({
     operations,
@@ -139,7 +141,7 @@
             label: (context) =>
               $analyticsBalancesVisibilityMode === 'hide' ||
               ($analyticsBalancesVisibilityMode !== 'show' &&
-                isBalanceHidden($settingsStore, filteredAccounts[context.datasetIndex]))
+                isBalanceHidden($settingsStore, filteredAccounts[context.datasetIndex], $localAccountBalancesHidden))
                 ? `${context.dataset.label}: ${formatHiddenMoney(mainCurrency)}`
                 : `${context.dataset.label}: ${formatMoney(context.parsed.y ?? 0, { currency: mainCurrency })}`,
           },
