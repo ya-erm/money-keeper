@@ -37,8 +37,7 @@
         <Button
           color="danger"
           appearance="transparent"
-          bordered
-          style="background: var(--header-background-color); height: var(--item-control-height); width: var(--item-control-height); padding: 0; flex-shrink: 0"
+          style="height: var(--item-control-height); width: var(--item-control-height); padding: 0; flex-shrink: 0"
           aria-label={$translate('receipts.remove_item')}
           onClick={() => (items = items.filter((_, index) => index !== i))}
         >
@@ -46,45 +45,41 @@
         </Button>
       </div>
       <div class="numbers">
-        <label>
-          <span>{$translate('receipts.quantity')}</span>
-          <!-- Keep a fractional step base for weighed goods while the arrows move by one. -->
-          <input
-            type="number"
-            min={item.quantity !== undefined && item.quantity % 1 > 0 ? item.quantity % 1 : 1}
-            step="1"
-            inputmode="decimal"
-            required
-            bind:value={item.quantity}
-            on:input={(event) => updateNumber(i, 'quantity', event.currentTarget.valueAsNumber)}
-            data-testId="PurchaseItemQuantity"
-          />
-        </label>
-        <label>
-          <span>{$translate('receipts.unit_price')}</span>
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            inputmode="decimal"
-            required
-            bind:value={item.unitPrice}
-            on:input={(event) => updateNumber(i, 'unitPrice', event.currentTarget.valueAsNumber)}
-            data-testId="PurchaseItemUnitPrice"
-          />
-        </label>
-        <label>
-          <span>{$translate('receipts.item_total')}</span>
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            inputmode="decimal"
-            required
-            bind:value={item.total}
-            data-testId="PurchaseItemTotal"
-          />
-        </label>
+        <!-- Keep a fractional step base for weighed goods while the arrows move by one. -->
+        <input
+          type="number"
+          aria-label={$translate('receipts.quantity')}
+          min={item.quantity !== undefined && item.quantity % 1 > 0 ? item.quantity % 1 : 1}
+          step="1"
+          inputmode="decimal"
+          required
+          bind:value={item.quantity}
+          on:input={(event) => updateNumber(i, 'quantity', event.currentTarget.valueAsNumber)}
+          data-testId="PurchaseItemQuantity"
+        />
+        <span aria-hidden="true">×</span>
+        <input
+          type="number"
+          aria-label={$translate('receipts.unit_price')}
+          min="0"
+          step="0.01"
+          inputmode="decimal"
+          required
+          bind:value={item.unitPrice}
+          on:input={(event) => updateNumber(i, 'unitPrice', event.currentTarget.valueAsNumber)}
+          data-testId="PurchaseItemUnitPrice"
+        />
+        <span aria-hidden="true">=</span>
+        <input
+          type="number"
+          aria-label={$translate('receipts.item_total')}
+          min="0"
+          step="0.01"
+          inputmode="decimal"
+          required
+          bind:value={item.total}
+          data-testId="PurchaseItemTotal"
+        />
       </div>
     </div>
   {/each}
@@ -128,9 +123,6 @@
     gap: 0.25rem;
     min-width: 0;
   }
-  label span {
-    font-size: 0.85rem;
-  }
   input {
     box-sizing: border-box;
     width: 100%;
@@ -148,8 +140,9 @@
   }
   .numbers {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.5rem;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.375rem;
   }
   .total {
     text-align: right;
