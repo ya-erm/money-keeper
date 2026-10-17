@@ -280,7 +280,6 @@ export type Messages =
   | 'receipts.loading_details'
   | 'receipts.retry_details'
   | 'receipts.details_failed'
-  | 'receipts.items_unavailable'
   | 'receipts.journal'
   | 'receipts.url'
   | 'receipts.contents'

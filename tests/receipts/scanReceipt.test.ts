@@ -226,7 +226,8 @@ test('automatically loads details and allows retry after a network failure', asy
   });
   const scanner = page.getByTestId('ReceiptScanner');
   await scanner.locator('input[name="receipt-link"]').fill(sample);
-  await expect(scanner.getByRole('status')).toHaveText('Could not load receipt details.');
+  await expect(scanner.getByRole('status')).toHaveText('Could not load the item list');
+  await expect(scanner.getByRole('status')).toHaveCSS('text-align', 'center');
   await expect(scanner.getByRole('button', { name: 'Fill operation', exact: true })).toBeEnabled();
   expect(attempts).toBe(1);
   await scanner.getByRole('button', { name: 'Retry loading', exact: true }).click();
@@ -263,7 +264,8 @@ test('can retry when the store loaded but the items are unavailable', async ({ p
   const scanner = page.getByTestId('ReceiptScanner');
   await scanner.locator('input[name="receipt-link"]').fill(sample);
   await expect(page.getByTestId('ReceiptPreview')).toContainText('LIDL SRBIJA KD');
-  await expect(scanner.getByRole('status')).toHaveText('Items are not available yet.');
+  await expect(scanner.getByRole('status')).toHaveText('Could not load the item list');
+  await expect(scanner.getByRole('status')).toHaveCSS('text-align', 'center');
   await expect(scanner.getByRole('button', { name: 'Fill operation', exact: true })).toBeEnabled();
   await scanner.getByRole('button', { name: 'Retry loading', exact: true }).click();
   await expect(scanner.getByRole('button', { name: 'Retry loading', exact: true })).toHaveCount(0);

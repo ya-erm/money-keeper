@@ -274,10 +274,10 @@
         {/if}
         {#if loadingDetails}
           <p class="hint" role="status">{$translate('receipts.loading_details')}</p>
-        {:else if detailsError || !receipt.details?.itemsAvailable}
+        {:else if (detailsError || !receipt.details?.itemsAvailable) && !receipt.details?.items.length}
           <div class="flex-col gap-0.25">
-            <p class="hint" role="status">
-              {$translate(detailsError ? 'receipts.details_failed' : 'receipts.items_unavailable')}
+            <p class="hint items-error" role="status">
+              {$translate('receipts.details_failed')}
             </p>
             <Button
               appearance="link"
@@ -307,6 +307,9 @@
   .hint {
     color: var(--secondary-text-color);
     font-size: 0.9rem;
+  }
+  .items-error {
+    text-align: center;
   }
   video {
     display: none;

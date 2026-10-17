@@ -107,6 +107,42 @@ export function parseReceiptItems(data: unknown, expectedAmount: number): Receip
   return [...grouped.values()];
 }
 
+export function parseReceiptJournal(journal: string, expectedAmount: number): ReceiptItem[] {
+  const lines = journal.split(/\r?\n/).map((line) => line.trim());
+  const header = lines.findIndex((line) =>
+    /^(?:Назив\s+Цена\s+Кол\.?\s+Укупно|Naziv\s+Cena\s+Kol\.?\s+Ukupno)$/u.test(line),
+  );
+  if (header < 0) throw new Error('Unsupported receipt journal');
+  const end = lines.findIndex((line, index) => index > header && /^-{5,}$/.test(line));
+  if (end < 0) throw new Error('Incomplete receipt journal');
+  const number = '(\\d+(?:\\.\\d{3})*(?:,\\d+)?)';
+  const values = new RegExp(`^${number}\\s+${number}\\s+${number}$`);
+  const decimal = (value: string) => Number(value.replace(/\./g, '').replace(',', '.'));
+  const items: ReceiptItem[] = [];
+  let nameLines: string[] = [];
+  for (const line of lines.slice(header + 1, end)) {
+    if (!line) continue;
+    const match = line.match(values);
+    if (!match) {
+      nameLines.push(line);
+      continue;
+    }
+    const label = nameLines.join(' ');
+    const taxLabel = /\s+\([\p{L}](?:,\s*[\p{L}])*\)$/u;
+    if (!taxLabel.test(label)) throw new Error('Invalid journal item label');
+    const unitPrice = decimal(match[1]);
+    const quantity = decimal(match[2]);
+    const total = decimal(match[3]);
+    if (Math.abs(Math.round(unitPrice * quantity * 100) / 100 - total) > 0.01) {
+      throw new Error('Inconsistent journal item');
+    }
+    items.push({ name: label.replace(taxLabel, ''), quantity, unitPrice, total });
+    nameLines = [];
+  }
+  if (nameLines.length) throw new Error('Incomplete journal item');
+  return parseReceiptItems({ success: true, items }, expectedAmount);
+}
+
 export async function loadSerbianReceiptDetails(value: string, request: typeof fetch = fetch): Promise<ReceiptDetails> {
   const receipt = parseSerbianReceipt(value);
   const source = new URL(receipt.url);
@@ -128,6 +164,14 @@ export async function loadSerbianReceiptDetails(value: string, request: typeof f
       details.itemsAvailable = true;
     } catch {
       // Merchant and the textual journal are still useful when specifications are unavailable.
+    }
+  }
+  if (!details.itemsAvailable) {
+    try {
+      details.items = parseReceiptJournal(details.journal, receipt.amount);
+      details.itemsAvailable = true;
+    } catch {
+      // Keep the original journal when its item layout cannot be parsed reliably.
     }
   }
   return details;
