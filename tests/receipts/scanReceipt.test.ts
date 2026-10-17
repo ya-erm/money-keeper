@@ -24,6 +24,14 @@ const receiptDetails = {
   items: [{ name: 'Cheese', quantity: 1, unitPrice: 525.7, total: 525.7 }],
 };
 
+async function expandPurchaseContents(page: Page) {
+  const contents = page.getByTestId('PurchaseContentsSection');
+  if (!(await page.getByTestId('ReceiptUrlInput').isVisible())) {
+    await contents.getByRole('button', { name: /Purchase contents/ }).click();
+  }
+  await expect(page.getByTestId('ReceiptUrlInput')).toBeVisible();
+}
+
 async function waitForStoredReceipt(page: Page, comment: string) {
   await expect
     .poll(() =>
@@ -76,6 +84,7 @@ test('previews a link, fills an RSD operation and saves only after confirmation'
   const scanner = page.getByTestId('ReceiptScanner');
   await scanner.getByRole('button', { name: 'Close', exact: true }).click();
   await selectAccountAsync(page, 'SourceAccountSelect', 'T_RSD');
+  await expandPurchaseContents(page);
   await page.getByTestId('ScanReceiptQrButton').click();
   await expect(scanner.getByRole('button', { name: 'Read receipt', exact: true })).toHaveCount(0);
   await expect(scanner.getByRole('button', { name: 'Close', exact: true })).toHaveClass(/white/);
@@ -160,6 +169,7 @@ test('loads store and items into separate receipt fields and preserves them afte
   const scanner = page.getByTestId('ReceiptScanner');
   await scanner.getByRole('button', { name: 'Close', exact: true }).click();
   await selectAccountAsync(page, 'SourceAccountSelect', 'T_RSD');
+  await expandPurchaseContents(page);
   await page.getByTestId('ScanReceiptQrButton').click();
   await scanner.locator('input[name="receipt-link"]').fill(sample);
   await expect(page.getByTestId('ReceiptPreview')).toContainText('LIDL SRBIJA KD');
@@ -171,9 +181,10 @@ test('loads store and items into separate receipt fields and preserves them afte
   await expect(page.getByTestId('ReceiptScanner')).toHaveCount(0);
   await expect(page.locator('input[name="comment"]')).toHaveValue('LIDL SRBIJA KD');
   const contents = page.getByTestId('PurchaseContentsSection');
-  await contents.getByRole('button', { name: 'Purchase contents Hide' }).click();
+  await expect(contents.getByRole('button', { name: /Purchase contents 1 item/ })).toBeVisible();
+  await contents.getByRole('button', { name: /Purchase contents/ }).click();
   await expect(page.getByTestId('ReceiptUrlInput')).not.toBeVisible();
-  await contents.getByRole('button', { name: 'Purchase contents Show' }).click();
+  await contents.getByRole('button', { name: /Purchase contents/ }).click();
   await expect(page.getByTestId('ReceiptUrlInput')).toBeVisible();
   await expect(page.getByTestId('OpenReceiptButton')).toBeVisible();
   await page.getByTestId('ReceiptUrlInput.ClearButton').click();
