@@ -2,13 +2,14 @@
   import Iconify from '@iconify/svelte';
   import Icon from '@ya-erm/svelte-ui/Icon';
 
+  import { memberSettingsStore } from '$lib/data';
   import type { CurrencyRate, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import type { Messages } from '$lib/translate/messages';
   import { longPress } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
   import { formatMoney } from '$lib/utils/formatMoney';
-  import { isValidCoordinates } from '$lib/utils/geolocation';
+  import { findNearbyPlaces, isValidCoordinates } from '$lib/utils/geolocation';
 
   export let transaction: TransactionViewModel;
   export let currencyRate: CurrencyRate | null = null;
@@ -27,6 +28,12 @@
     transaction.locationLng != null &&
     isValidCoordinates(transaction.locationLat, transaction.locationLng);
   $: combinedLocationAndItems = hasLocation && !transaction.repeating && !!transaction.purchaseItems?.length;
+  $: knownPlace = findNearbyPlaces(
+    transaction.locationLat != null && transaction.locationLng != null
+      ? { latitude: transaction.locationLat, longitude: transaction.locationLng }
+      : null,
+    $memberSettingsStore?.knownPlaces ?? [],
+  )[0];
 
   $: categoryName = transaction.category.name.startsWith('system.category')
     ? $translate(transaction.category.name as Messages)
@@ -135,11 +142,18 @@
       {#if showDescription && transaction.description}
         <div class="description small-text">{transaction.description}</div>
       {/if}
-      {#if transaction.tags?.length}
-        <div class="tags">
-          {#each transaction.tags as tag (tag.id)}
-            <span class="tag" class:deleted={tag.deleted}>#{tag.name}</span>
-          {/each}
+      {#if knownPlace?.name || transaction.tags?.length}
+        <div class="metadata">
+          {#if knownPlace?.name}
+            <span class="place-name" data-testId="OperationPlaceName">{knownPlace.name}</span>
+          {/if}
+          {#if transaction.tags?.length}
+            <div class="tags">
+              {#each transaction.tags as tag (tag.id)}
+                <span class="tag" class:deleted={tag.deleted}>#{tag.name}</span>
+              {/each}
+            </div>
+          {/if}
         </div>
       {/if}
     </div>
@@ -267,9 +281,19 @@
   .small-text {
     font-size: 0.9rem;
   }
-  .tags {
+  .metadata {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    max-width: 100%;
     font-size: 0.85rem;
     color: var(--secondary-text-color);
+  }
+  .tags {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .tag:not(:last-child)::after {
     content: ' ';
@@ -277,6 +301,7 @@
   .source,
   .comment,
   .description,
+  .place-name,
   .destination {
     text-overflow: ellipsis;
     white-space: nowrap;
