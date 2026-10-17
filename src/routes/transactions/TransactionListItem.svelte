@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Iconify from '@iconify/svelte';
   import Icon from '@ya-erm/svelte-ui/Icon';
 
   import type { CurrencyRate, TransactionViewModel } from '$lib/data/interfaces';
@@ -83,7 +84,7 @@
             title={$translate('transactions.geolocation')}
             data-testId="OperationLocationIcon"
           >
-            <Icon name="mdi:map-marker-outline" size={1} />
+            <Iconify icon="mdi:map-marker-outline" width="1rem" height="1rem" />
           </div>
         {/if}
         {#if transaction.purchaseItems?.length}
@@ -240,7 +241,7 @@
     outline: none;
   }
   .combined .location-icon {
-    margin-right: -0.125rem;
+    margin-right: -0.25rem;
   }
   .description {
     font-size: 0.8rem;
