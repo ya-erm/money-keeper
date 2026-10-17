@@ -218,7 +218,12 @@
     {#if !receipt}
       <p class="hint">{$translate('receipts.hint')}</p>
       <div class="grid-col-2 gap-1">
-        <Button disabled={busy || startingCamera} onClick={camera ? stopCamera : startCamera}>
+        <Button
+          color={camera ? 'white' : 'primary'}
+          bordered={camera}
+          disabled={busy || startingCamera}
+          onClick={camera ? stopCamera : startCamera}
+        >
           <span class="button-content"
             ><Icon name={camera ? 'mdi:stop' : 'mdi:camera-outline'} size={1.25} />
             {$translate(camera ? 'receipts.stop_camera' : 'receipts.camera')}</span
@@ -306,7 +311,8 @@
   video {
     display: none;
     width: 100%;
-    max-height: 16rem;
+    aspect-ratio: 1;
+    object-fit: cover;
     border-radius: 0.75rem;
     background: #000;
   }

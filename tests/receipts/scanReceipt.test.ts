@@ -294,6 +294,37 @@ test('scans a QR video frame and stops the camera after reading it', async ({ pa
   ).toBe('ended');
 });
 
+test('fills a square camera preview and stops the portrait stream manually', async ({ page }) => {
+  await page.evaluate(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 600;
+    canvas.height = 1000;
+    const context = canvas.getContext('2d')!;
+    const stream = canvas.captureStream(5);
+    const timer = setInterval(() => context.fillRect(0, 0, 600, 1000), 100);
+    Object.assign(window, { receiptTestStream: stream, receiptTestTimer: timer });
+    navigator.mediaDevices.getUserMedia = async () => stream;
+  });
+  await page.getByTestId('ReceiptScanner').getByRole('button', { name: 'Camera', exact: true }).click();
+  await expect(page.getByTestId('ReceiptScanner').getByRole('button', { name: 'Stop', exact: true })).toHaveClass(
+    /white/,
+  );
+  const video = page.getByTestId('ReceiptScanner').locator('video');
+  await expect(video).toBeVisible();
+  const bounds = await video.boundingBox();
+  expect(bounds).not.toBeNull();
+  expect(Math.abs(bounds!.width - bounds!.height)).toBeLessThan(1);
+  await expect(video).toHaveCSS('object-fit', 'cover');
+  await page.getByTestId('ReceiptScanner').getByRole('button', { name: 'Stop', exact: true }).click();
+  await expect(video).not.toBeVisible();
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { receiptTestStream: MediaStream }).receiptTestStream.getTracks()[0].readyState,
+    ),
+  ).toBe('ended');
+  await page.evaluate(() => clearInterval((window as unknown as { receiptTestTimer: number }).receiptTestTimer));
+});
+
 test('reads a real QR image and resolves RSD when the account is selected afterwards', async ({ page }) => {
   await page.goto('/transactions/create?scan-receipt=1', { waitUntil: 'networkidle' });
   await page.getByTestId('ReceiptPhotoInput').setInputFiles(photo);
