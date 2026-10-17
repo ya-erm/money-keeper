@@ -1,13 +1,15 @@
 <script lang="ts">
+  import Iconify from '@iconify/svelte';
   import Icon from '@ya-erm/svelte-ui/Icon';
 
+  import { memberSettingsStore } from '$lib/data';
   import type { CurrencyRate, TransactionViewModel } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
   import type { Messages } from '$lib/translate/messages';
   import { longPress } from '$lib/utils';
   import { replaceCalcExpressions } from '$lib/utils/calc';
   import { formatMoney } from '$lib/utils/formatMoney';
-  import { isValidCoordinates } from '$lib/utils/geolocation';
+  import { findNearbyPlaces, isValidCoordinates } from '$lib/utils/geolocation';
 
   export let transaction: TransactionViewModel;
   export let currencyRate: CurrencyRate | null = null;
@@ -25,6 +27,13 @@
     transaction.locationLat != null &&
     transaction.locationLng != null &&
     isValidCoordinates(transaction.locationLat, transaction.locationLng);
+  $: combinedLocationAndItems = hasLocation && !transaction.repeating && !!transaction.purchaseItems?.length;
+  $: knownPlace = findNearbyPlaces(
+    transaction.locationLat != null && transaction.locationLng != null
+      ? { latitude: transaction.locationLat, longitude: transaction.locationLng }
+      : null,
+    $memberSettingsStore?.knownPlaces ?? [],
+  )[0];
 
   $: categoryName = transaction.category.name.startsWith('system.category')
     ? $translate(transaction.category.name as Messages)
@@ -67,21 +76,40 @@
   >
     <div class="icon flex-center" class:deleted={transaction.category.deleted}>
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />
-      {#if transaction.repeating}
-        <div class="repeating-icon" data-testId="RepeatingOperationIcon">
-          <Icon name="mdi:repeat" size={1} />
-        </div>
-      {:else if hasLocation}
-        <div
-          class="location-icon"
-          role="img"
-          aria-label={$translate('transactions.geolocation')}
-          title={$translate('transactions.geolocation')}
-          data-testId="OperationLocationIcon"
-        >
-          <Icon name="mdi:map-marker" size={1} />
-        </div>
-      {/if}
+      <div class="operation-icons" class:combined={combinedLocationAndItems}>
+        {#if transaction.repeating}
+          <div class="repeating-icon" data-testId="RepeatingOperationIcon">
+            <Icon name="mdi:repeat" size={1} />
+          </div>
+        {:else if hasLocation}
+          <div
+            class="location-icon"
+            role="img"
+            aria-label={$translate('transactions.geolocation')}
+            title={$translate('transactions.geolocation')}
+            data-testId="OperationLocationIcon"
+          >
+            <Iconify icon="mdi:map-marker-outline" width="1rem" height="1rem" />
+          </div>
+        {/if}
+        {#if transaction.purchaseItems?.length}
+          <div
+            class="purchase-items-icon"
+            role="img"
+            aria-label={$translate('receipts.contents')}
+            title={$translate('receipts.contents')}
+            data-testId="OperationPurchaseItemsIcon"
+          >
+            <svg width="0.875rem" height="0.875rem" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d={combinedLocationAndItems ? 'M3 6h14M3 12h14M3 18h14' : 'M3 6h18M3 12h18M3 18h18'}
+                stroke="currentColor"
+                stroke-width="2.5"
+              />
+            </svg>
+          </div>
+        {/if}
+      </div>
       {#if verificationProblem}
         <div class="verification-icon" data-testId="VerificationProblemIcon" title={transaction.verification?.status}>
           <Icon name="mdi:alert-circle" size={1} />
@@ -114,11 +142,18 @@
       {#if showDescription && transaction.description}
         <div class="description small-text">{transaction.description}</div>
       {/if}
-      {#if transaction.tags?.length}
-        <div class="tags">
-          {#each transaction.tags as tag (tag.id)}
-            <span class="tag" class:deleted={tag.deleted}>#{tag.name}</span>
-          {/each}
+      {#if knownPlace?.name || transaction.tags?.length}
+        <div class="metadata">
+          {#if knownPlace?.name}
+            <span class="place-name" data-testId="OperationPlaceName">{knownPlace.name}</span>
+          {/if}
+          {#if transaction.tags?.length}
+            <div class="tags">
+              {#each transaction.tags as tag (tag.id)}
+                <span class="tag" class:deleted={tag.deleted}>#{tag.name}</span>
+              {/each}
+            </div>
+          {/if}
         </div>
       {/if}
     </div>
@@ -186,35 +221,79 @@
     background-color: var(--header-background-color);
     position: relative;
   }
+  .operation-icons {
+    position: absolute;
+    bottom: -0.125rem;
+    right: -0.125rem;
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    color: var(--secondary-text-color);
+  }
   .repeating-icon,
   .location-icon,
+  .purchase-items-icon,
   .verification-icon {
-    position: absolute;
-    bottom: 0;
-    right: 0;
+    display: flex;
     border-radius: 50%;
     background: var(--background-color);
     outline: 1px solid var(--background-color);
   }
   .verification-icon {
+    position: absolute;
     top: 0;
-    bottom: auto;
+    right: 0;
     color: var(--orange-color);
+  }
+  .operation-icons.combined {
+    gap: 0;
+    border-radius: 1rem;
+    background: var(--background-color);
+    outline: 1px solid var(--background-color);
+  }
+  .combined .location-icon,
+  .combined .purchase-items-icon {
+    border-radius: 0;
+    background: transparent;
+    outline: none;
+  }
+  .combined .location-icon {
+    position: relative;
+    z-index: 1;
+    margin-right: -0.4375rem;
+  }
+  .combined .location-icon :global(svg) {
+    overflow: visible;
+    stroke: var(--background-color);
+    stroke-width: 4;
+    stroke-linejoin: round;
+    paint-order: stroke fill;
   }
   .description {
     font-size: 0.8rem;
     color: var(--secondary-text-color);
   }
   .text {
+    gap: 0.125rem;
     overflow: hidden;
     text-align: left;
   }
   .small-text {
     font-size: 0.9rem;
   }
-  .tags {
+  .metadata {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    max-width: 100%;
     font-size: 0.85rem;
     color: var(--secondary-text-color);
+  }
+  .tags {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .tag:not(:last-child)::after {
     content: ' ';
@@ -222,6 +301,7 @@
   .source,
   .comment,
   .description,
+  .place-name,
   .destination {
     text-overflow: ellipsis;
     white-space: nowrap;

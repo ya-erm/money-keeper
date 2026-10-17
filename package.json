@@ -1,6 +1,6 @@
 {
   "name": "money-keeper",
-  "version": "2.29.1",
+  "version": "2.30.1",
   "private": true,
   "scripts": {
     "dev": "vite dev",
@@ -62,8 +62,10 @@
     "@prisma/client": "^6.19.3",
     "@vercel/analytics": "^2.0.1",
     "bcrypt": "^6.0.0",
+    "cheerio": "1.1.2",
     "dayjs": "^1.11.23",
     "idb": "^8.0.3",
+    "jsqr": "1.4.0",
     "leaflet": "1.9.4",
     "svelte-dnd-action": "^0.9.79",
     "timezones-list": "^3.1.0",

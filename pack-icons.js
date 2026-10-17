@@ -12,6 +12,9 @@ const target = 'src/lib/icons.ts';
 
 // Icons to bundle, array
 const iconsToBundle = [
+  'mdi:camera-outline',
+  'mdi:image-outline',
+  'mdi:stop',
   'mdi:account',
   'mdi:account-group',
   'mdi:analytics',
@@ -42,6 +45,7 @@ const iconsToBundle = [
   'mdi:logout',
   'mdi:map-outline',
   'mdi:map-marker',
+  'mdi:map-marker-outline',
   'mdi:open-in-new',
   'mdi:pencil',
   'mdi:plus',

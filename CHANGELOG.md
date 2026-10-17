@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.30.1 - 2026-10-17
+
+### Fixed
+
+- Pinned the mobile Safari header to reduce iOS status-bar blur bleeding into its controls.
+
+## 2.30.0 - 2026-10-17
+
+### Added
+
+- Added Serbian fiscal receipt scanning in the operation form's Purchase contents section. Read QR codes with the camera, from a photo, or from a pasted link. Store and items load automatically, with retry available if loading fails; the operation can still be filled from QR data. Receipt links are stored separately; purchase items have editable names, quantities, prices and totals.
+- Operations with purchase items are marked with a list icon.
+- Operation lists show saved place names before tags.
+
 ## 2.29.1 - 2026-10-17
 
 ### Fixed
