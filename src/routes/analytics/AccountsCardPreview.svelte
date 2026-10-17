@@ -1,4 +1,6 @@
 <script lang="ts">
+  import dayjs from 'dayjs';
+  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { translate } from '$lib/translate';
   import { findRate, formatMoney } from '$lib/utils';
@@ -9,8 +11,13 @@
   const otherColor = '#a8adb4';
 
   $: mainCurrency = $memberSettingsStore?.currency ?? 'USD';
-  $: preview = getAccountsPreview($accountsStore, $operationsStore, (currency) =>
-    findRate($currencyRatesStore, mainCurrency, currency),
+  $: preview = getAccountsPreview(
+    $accountsStore,
+    $operationsStore,
+    (currency) => findRate($currencyRatesStore, mainCurrency, currency),
+    dayjs(),
+    3,
+    $localAccountBalancesHidden,
   );
   $: items = [
     ...preview.accounts.map((account, index) => ({

@@ -1,6 +1,7 @@
 import dayjs, { type Dayjs } from 'dayjs';
 
 import type { TransactionViewModel } from '$lib/data/interfaces';
+import { isBalanceHidden, type LocalBalanceVisibility } from '$lib/utils/isBalanceHidden';
 
 export type IncomeExpensesPreview = {
   incomeByMonth: number[];
@@ -38,6 +39,7 @@ export function getIncomeExpensesPreview(
   transactions: TransactionViewModel[],
   getRate: (currency: string) => number,
   date: string | number | Date | Dayjs = dayjs(),
+  localVisibility: LocalBalanceVisibility = {},
 ): IncomeExpensesPreview {
   const selectedMonth = dayjs(date).startOf('month');
   const start = selectedMonth.subtract(11, 'month');
@@ -61,7 +63,7 @@ export function getIncomeExpensesPreview(
     const monthIndex = transactionDate.startOf('month').diff(start, 'month');
     if (transaction.category.type === 'IN') incomeByMonth[monthIndex] += amount;
     else expensesByMonth[monthIndex] += amount;
-    hasHiddenBalanceAccount ||= transaction.account.hideBalance ?? false;
+    hasHiddenBalanceAccount ||= isBalanceHidden(null, transaction.account, localVisibility);
   }
 
   return {

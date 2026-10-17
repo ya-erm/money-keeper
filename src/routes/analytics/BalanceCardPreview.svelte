@@ -1,9 +1,10 @@
 <script lang="ts">
   import dayjs from 'dayjs';
+  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
 
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { activeLocale, translate } from '$lib/translate';
-  import { findRate, formatHiddenMoney, formatMoney } from '$lib/utils';
+  import { findRate, formatHiddenMoney, formatMoney, hasHiddenBalanceAccount } from '$lib/utils';
 
   import { getBalancePreview, getTotalBalanceAt, type BalancePreviewSeries } from './balancePreview';
   import { getNiceChartGrid } from './incomeExpensesPreview';
@@ -64,7 +65,7 @@
   $: balanceYearAgo = getTotalBalanceAt($accountsStore, $operationsStore, getRate, now.subtract(1, 'year'));
   $: balanceNow = getTotalBalanceAt($accountsStore, $operationsStore, getRate, now.add(1, 'millisecond'));
   $: balanceDifference = balanceNow - balanceYearAgo;
-  $: balancesHidden = ($settingsStore.hideBalances ?? false) || $accountsStore.some((account) => account.hideBalance);
+  $: balancesHidden = hasHiddenBalanceAccount($settingsStore, $accountsStore, $localAccountBalancesHidden);
   $: monthLabels = Array.from({ length: 12 }, (_, index) =>
     dayjs()
       .subtract(1, 'month')

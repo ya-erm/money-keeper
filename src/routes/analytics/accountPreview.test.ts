@@ -33,6 +33,22 @@ const transaction = (
 });
 
 describe('getAccountsPreview', () => {
+  it('applies local privacy to both a top account and the combined remainder without changing saved accounts', () => {
+    const accounts = [account('Top'), account('Other')];
+    const result = getAccountsPreview(
+      accounts,
+      [transaction('1', accounts[0], 20), transaction('2', accounts[1], 10)],
+      () => 1,
+      new Date('2026-09-15'),
+      1,
+      { Top: true, Other: true },
+    );
+
+    expect(result.accounts[0]).toMatchObject({ balance: 20, hidden: true });
+    expect(result.otherHidden).toBe(true);
+    expect(accounts.every((account) => account.hideBalance === undefined)).toBe(true);
+  });
+
   it('returns the three largest absolute balances and combines the rest', () => {
     const accounts = [account('Cash'), account('Savings'), account('Card'), account('Loan'), account('Reserve')];
     const transactions = [

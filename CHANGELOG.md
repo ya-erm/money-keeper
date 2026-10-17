@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.29.1 - 2026-10-17
+
+### Fixed
+
+- Hiding an account balance by clicking its card now applies across account lists and analytics, including totals and chart previews. The choice stays on the current device and is not synchronized.
+
 ## 2.29.0 - 2026-10-17
 
 ### Added

@@ -1,12 +1,14 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { memberSettingsStore, settingsStore } from '$lib/data';
+  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
   import { currencySymbols } from '$lib/data/currencySymbols';
   import type { AccountViewModel } from '$lib/data/interfaces';
   import { route } from '$lib/routes';
   import { translate } from '$lib/translate';
   import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
   import { formatMoney, hasHiddenBalanceAccount, isBalanceHidden } from '$lib/utils';
+  import type { LocalBalanceVisibility } from '$lib/utils/isBalanceHidden';
 
   import { analyticsBalancesVisibilityMode } from '../store';
   import type { GroupSummary } from './interfaces';
@@ -26,14 +28,19 @@
         hasHiddenBalanceAccount(
           null,
           groups.flatMap((group) => group.accountSummaries.map((item) => item.account)),
+          $localAccountBalancesHidden,
         )));
 
-  const isGroupBalanceHidden = (accountSummaries: GroupSummary['accountSummaries']) =>
+  const isGroupBalanceHidden = (
+    accountSummaries: GroupSummary['accountSummaries'],
+    localVisibility: LocalBalanceVisibility,
+  ) =>
     $analyticsBalancesVisibilityMode === 'hide' ||
     ($analyticsBalancesVisibilityMode !== 'show' &&
       hasHiddenBalanceAccount(
         null,
         accountSummaries.map((item) => item.account),
+        localVisibility,
       ));
 
   const onClick = async (item: AccountViewModel) => {
@@ -56,7 +63,7 @@
               </div>
             </th>
             <th class="text-right">
-              {#if $analyticsBalancesVisibilityMode === 'hide' || (balancesHidden && $analyticsBalancesVisibilityMode !== 'show') || isGroupBalanceHidden(accountSummaries)}
+              {#if $analyticsBalancesVisibilityMode === 'hide' || (balancesHidden && $analyticsBalancesVisibilityMode !== 'show') || isGroupBalanceHidden(accountSummaries, $localAccountBalancesHidden)}
                 <HiddenMoney currency={currencySymbols[mainCurrency] ?? mainCurrency} size="sm" />
               {:else}
                 {formatMoney(ratedBalance, {
@@ -87,7 +94,7 @@
             <td class="rated-balance">
               <div class="flex gap-0.25 items-baseline justify-end">
                 <span>
-                  {#if $analyticsBalancesVisibilityMode === 'hide' || ($analyticsBalancesVisibilityMode !== 'show' && isBalanceHidden($settingsStore, item.account))}
+                  {#if $analyticsBalancesVisibilityMode === 'hide' || ($analyticsBalancesVisibilityMode !== 'show' && isBalanceHidden($settingsStore, item.account, $localAccountBalancesHidden))}
                     <HiddenMoney size="sm" />
                   {:else}
                     {formatMoney(item.ratedBalance, { maxPrecision: 0 })}

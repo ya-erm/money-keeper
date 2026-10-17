@@ -1,5 +1,6 @@
 <script lang="ts">
   import { accountsStore, settingsStore } from '$lib/data';
+  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
   import HeaderButton from '$lib/ui/layout/HeaderButton.svelte';
   import { translate } from '$lib/translate';
   import { hasHiddenBalanceAccount } from '$lib/utils';
@@ -7,9 +8,11 @@
 
   export let triState = false;
 
-  $: hasHiddenBalances = hasHiddenBalanceAccount($settingsStore, $accountsStore);
+  $: hasHiddenBalances = hasHiddenBalanceAccount($settingsStore, $accountsStore, $localAccountBalancesHidden);
   $: hasPartiallyHiddenBalances =
-    triState && !$settingsStore.hideBalances && $accountsStore.some((account) => account.hideBalance);
+    triState &&
+    !$settingsStore.hideBalances &&
+    hasHiddenBalanceAccount(null, $accountsStore, $localAccountBalancesHidden);
 
   $: if (!hasHiddenBalances && $analyticsBalancesVisibilityMode === 'show') {
     analyticsBalancesVisibilityMode.set('auto');

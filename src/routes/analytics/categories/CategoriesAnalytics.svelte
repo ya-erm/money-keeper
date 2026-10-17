@@ -1,5 +1,6 @@
 <script lang="ts">
   import dayjs, { type Dayjs } from 'dayjs';
+  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
 
   import { categoriesStore, currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { translate } from '$lib/translate';
@@ -62,6 +63,7 @@
         hasHiddenBalanceAccount: hasHiddenBalanceAccount(
           null,
           transactions?.map((transaction) => transaction.account) ?? [],
+          $localAccountBalancesHidden,
         ),
         sum:
           transactions?.reduce(
@@ -85,6 +87,7 @@
         hasHiddenBalanceAccount: hasHiddenBalanceAccount(
           null,
           group.transactions.map((transaction) => transaction.account),
+          $localAccountBalancesHidden,
         ),
       }))
     : [];

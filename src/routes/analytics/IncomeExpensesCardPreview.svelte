@@ -1,5 +1,6 @@
 <script lang="ts">
   import dayjs from 'dayjs';
+  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
 
   import { currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
   import { activeLocale, translate } from '$lib/translate';
@@ -19,6 +20,7 @@
     $operationsStore,
     (currency) => findRate($currencyRatesStore, mainCurrency, currency),
     dayjs().subtract(1, 'month'),
+    $localAccountBalancesHidden,
   );
   $: amountsHidden = ($settingsStore.hideBalances ?? false) || preview.hasHiddenBalanceAccount;
   $: maxAmount = Math.max(...preview.incomeByMonth, ...preview.expensesByMonth, 0);
