@@ -67,7 +67,10 @@
   >
     <div class="icon flex-center" class:deleted={transaction.category.deleted}>
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />
-      <div class="operation-icons">
+      <div
+        class="operation-icons"
+        class:combined={hasLocation && !transaction.repeating && !!transaction.purchaseItems?.length}
+      >
         {#if transaction.repeating}
           <div class="repeating-icon" data-testId="RepeatingOperationIcon">
             <Icon name="mdi:repeat" size={1} />
@@ -223,6 +226,21 @@
     top: 0;
     right: 0;
     color: var(--orange-color);
+  }
+  .operation-icons.combined {
+    gap: 0;
+    border-radius: 1rem;
+    background: var(--background-color);
+    outline: 1px solid var(--background-color);
+  }
+  .combined .location-icon,
+  .combined .purchase-items-icon {
+    border-radius: 0;
+    background: transparent;
+    outline: none;
+  }
+  .combined .location-icon {
+    margin-right: -0.125rem;
   }
   .description {
     font-size: 0.8rem;
