@@ -79,7 +79,7 @@
           title={$translate('transactions.geolocation')}
           data-testId="OperationLocationIcon"
         >
-          <Icon name="mdi:map-marker" size={1} />
+          <Icon name="mdi:map-marker-outline" size={1} />
         </div>
       {/if}
       {#if transaction.purchaseItems?.length}

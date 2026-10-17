@@ -45,6 +45,7 @@ const iconsToBundle = [
   'mdi:logout',
   'mdi:map-outline',
   'mdi:map-marker',
+  'mdi:map-marker-outline',
   'mdi:open-in-new',
   'mdi:pencil',
   'mdi:plus',
