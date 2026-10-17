@@ -193,6 +193,8 @@ export function cloneOperation(item: Transaction): Transaction {
     amount: item.amount,
     comment: item.comment,
     description: item.description,
+    receiptUrl: item.receiptUrl,
+    purchaseItems: item.purchaseItems?.map((purchaseItem) => ({ ...purchaseItem })),
     linkedTransactionId: item.linkedTransactionId,
     anotherCurrency: item.anotherCurrency,
     anotherCurrencyAmount: item.anotherCurrencyAmount,

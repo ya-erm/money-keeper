@@ -18,6 +18,17 @@ function transaction(overrides: Partial<Transaction> = {}): Transaction {
 }
 
 describe('reduceJournal', () => {
+  it('retains receipt fields independently of bank descriptions through compaction and JSON export', () => {
+    const operation = transaction({
+      description: 'Bank statement description',
+      receiptUrl: 'https://suf.purs.gov.rs/v/?vl=example',
+      purchaseItems: [{ name: 'Cheese', quantity: 1, unitPrice: 100, total: 100 }],
+    });
+    const snapshot = reduceJournal([{ order: 1, data: { transaction: operation } }]);
+    const compacted = reduceJournal([{ order: 1, data: { snapshot: JSON.parse(JSON.stringify(snapshot)) } }]);
+    expect(compacted.operations).toEqual([operation]);
+  });
+
   it('returns empty snapshot for empty journal', () => {
     const snapshot = reduceJournal([]);
     expect(countSnapshotEntities(snapshot)).toBe(0);
