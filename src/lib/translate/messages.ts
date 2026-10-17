@@ -283,6 +283,7 @@ export type Messages =
   | 'receipts.url'
   | 'receipts.contents'
   | 'receipts.item'
+  | 'receipts.items_list'
   | 'receipts.quantity'
   | 'receipts.unit_price'
   | 'receipts.item_total'

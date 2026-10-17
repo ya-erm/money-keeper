@@ -21,13 +21,16 @@
 </script>
 
 <div class="flex-col gap-0.5" data-testId="PurchaseItemsEditor">
+  <div>{$translate('receipts.items_list')}</div>
   {#each items as item, i (i)}
     <div class="purchase-item flex-col gap-0.5" data-testId="PurchaseItem">
       <div class="item-heading">
+        <span class="item-index" aria-hidden="true">{i + 1}.</span>
         <label class="item-name">
           <input
             type="text"
             aria-label={$translate('receipts.item')}
+            placeholder={$translate('receipts.item')}
             bind:value={item.name}
             required
             maxlength="2048"
@@ -50,6 +53,7 @@
         <input
           type="number"
           aria-label={$translate('receipts.quantity')}
+          placeholder={$translate('receipts.quantity')}
           min={item.quantity !== undefined && item.quantity % 1 > 0 ? item.quantity % 1 : 1}
           step="1"
           inputmode="decimal"
@@ -62,6 +66,7 @@
         <input
           type="number"
           aria-label={$translate('receipts.unit_price')}
+          placeholder={$translate('receipts.unit_price')}
           min="0"
           step="0.01"
           inputmode="decimal"
@@ -74,6 +79,7 @@
         <input
           type="number"
           aria-label={$translate('receipts.item_total')}
+          placeholder={$translate('receipts.item_total')}
           min="0"
           step="0.01"
           inputmode="decimal"
@@ -112,6 +118,13 @@
   .item-name {
     flex: 1;
     min-width: 0;
+  }
+  .item-index {
+    min-width: 1.5rem;
+    align-self: center;
+    color: var(--secondary-text-color);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
   }
   label {
     display: flex;
