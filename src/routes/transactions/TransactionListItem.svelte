@@ -209,8 +209,8 @@
   }
   .operation-icons {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: -0.125rem;
+    right: -0.125rem;
     display: flex;
     align-items: center;
     gap: 0.125rem;
