@@ -3,6 +3,7 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import { translate } from '$lib/translate';
+  import { formatMoney } from '$lib/utils/formatMoney';
   import { calculateItemTotal, type PurchaseItemDraft } from './purchaseItems';
 
   export let items: PurchaseItemDraft[];
@@ -92,7 +93,7 @@
     </div>
   {/each}
   {#if items.length && total !== null}<div class="total" data-testId="PurchaseItemsTotal">
-      {$translate('receipts.item_total')}: {total.toFixed(2)}{currency ? ` ${currency}` : ''}
+      {$translate('receipts.item_total')}: {formatMoney(total, { currency })}
     </div>{/if}
   <Button
     color="white"
@@ -105,7 +106,7 @@
 <style>
   .purchase-item {
     --item-control-height: 2.75rem;
-    --item-index-width: 1.5rem;
+    --item-index-width: 1.25rem;
     --item-heading-gap: 0.5rem;
   }
   .purchase-item + .purchase-item {
@@ -123,7 +124,8 @@
     min-width: 0;
   }
   .item-index {
-    min-width: var(--item-index-width);
+    width: var(--item-index-width);
+    flex-shrink: 0;
     align-self: center;
     color: var(--secondary-text-color);
     text-align: right;
