@@ -67,34 +67,36 @@
   >
     <div class="icon flex-center" class:deleted={transaction.category.deleted}>
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />
-      {#if transaction.repeating}
-        <div class="repeating-icon" data-testId="RepeatingOperationIcon">
-          <Icon name="mdi:repeat" size={1} />
-        </div>
-      {:else if hasLocation}
-        <div
-          class="location-icon"
-          role="img"
-          aria-label={$translate('transactions.geolocation')}
-          title={$translate('transactions.geolocation')}
-          data-testId="OperationLocationIcon"
-        >
-          <Icon name="mdi:map-marker-outline" size={1} />
-        </div>
-      {/if}
-      {#if transaction.purchaseItems?.length}
-        <div
-          class="purchase-items-icon"
-          role="img"
-          aria-label={$translate('receipts.contents')}
-          title={$translate('receipts.contents')}
-          data-testId="OperationPurchaseItemsIcon"
-        >
-          <svg width="0.875rem" height="0.875rem" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2.5" />
-          </svg>
-        </div>
-      {/if}
+      <div class="operation-icons">
+        {#if transaction.repeating}
+          <div class="repeating-icon" data-testId="RepeatingOperationIcon">
+            <Icon name="mdi:repeat" size={1} />
+          </div>
+        {:else if hasLocation}
+          <div
+            class="location-icon"
+            role="img"
+            aria-label={$translate('transactions.geolocation')}
+            title={$translate('transactions.geolocation')}
+            data-testId="OperationLocationIcon"
+          >
+            <Icon name="mdi:map-marker-outline" size={1} />
+          </div>
+        {/if}
+        {#if transaction.purchaseItems?.length}
+          <div
+            class="purchase-items-icon"
+            role="img"
+            aria-label={$translate('receipts.contents')}
+            title={$translate('receipts.contents')}
+            data-testId="OperationPurchaseItemsIcon"
+          >
+            <svg width="0.875rem" height="0.875rem" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2.5" />
+            </svg>
+          </div>
+        {/if}
+      </div>
       {#if verificationProblem}
         <div class="verification-icon" data-testId="VerificationProblemIcon" title={transaction.verification?.status}>
           <Icon name="mdi:alert-circle" size={1} />
@@ -199,28 +201,27 @@
     background-color: var(--header-background-color);
     position: relative;
   }
+  .operation-icons {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+  }
   .repeating-icon,
   .location-icon,
   .purchase-items-icon,
   .verification-icon {
-    position: absolute;
-    bottom: 0;
-    right: 0;
+    display: flex;
     border-radius: 50%;
     background: var(--background-color);
     outline: 1px solid var(--background-color);
   }
-  .repeating-icon,
-  .location-icon {
-    left: 0;
-    right: auto;
-  }
-  .purchase-items-icon {
-    display: flex;
-  }
   .verification-icon {
+    position: absolute;
     top: 0;
-    bottom: auto;
+    right: 0;
     color: var(--orange-color);
   }
   .description {
