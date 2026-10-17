@@ -5,6 +5,7 @@
 ### Added
 
 - Added Serbian fiscal receipt scanning in the operation form's Purchase contents section. Read QR codes with the camera, from a photo, or from a pasted link. Store and items load automatically, with retry available if loading fails; the operation can still be filled from QR data. Receipt links are stored separately; purchase items have editable names, quantities, prices and totals.
+- Operations with purchase items are marked with a list icon.
 
 ## 2.29.0 - 2026-10-17
 

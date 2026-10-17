@@ -82,6 +82,17 @@
           <Icon name="mdi:map-marker" size={1} />
         </div>
       {/if}
+      {#if transaction.purchaseItems?.length}
+        <div
+          class="purchase-items-icon"
+          role="img"
+          aria-label={$translate('receipts.contents')}
+          title={$translate('receipts.contents')}
+          data-testId="OperationPurchaseItemsIcon"
+        >
+          <Icon name="mdi:format-list-bulleted" size={1} />
+        </div>
+      {/if}
       {#if verificationProblem}
         <div class="verification-icon" data-testId="VerificationProblemIcon" title={transaction.verification?.status}>
           <Icon name="mdi:alert-circle" size={1} />
@@ -188,6 +199,7 @@
   }
   .repeating-icon,
   .location-icon,
+  .purchase-items-icon,
   .verification-icon {
     position: absolute;
     bottom: 0;
@@ -195,6 +207,10 @@
     border-radius: 50%;
     background: var(--background-color);
     outline: 1px solid var(--background-color);
+  }
+  .purchase-items-icon {
+    left: 0;
+    right: auto;
   }
   .verification-icon {
     top: 0;
