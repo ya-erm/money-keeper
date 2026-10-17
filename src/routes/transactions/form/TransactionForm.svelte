@@ -602,9 +602,12 @@
     </div>
     <div class="flex-col gap-0.5" data-testId="PurchaseContentsSection">
       <SpoilerToggle bind:hidden={purchaseContentsHidden} translate={$translate}>
-        {$translate('receipts.contents')}{purchaseItems.length
-          ? ` - ${$translate('receipts.items_count', { values: { count: purchaseItems.length } })}`
-          : ''}
+        <span>{$translate('receipts.contents')}</span>
+        {#if purchaseItems.length}
+          <span class="purchase-items-count">
+            {$translate('receipts.items_count', { values: { count: purchaseItems.length } })}
+          </span>
+        {/if}
       </SpoilerToggle>
       <div
         class="flex-col gap-1 purchase-contents-body"
@@ -845,6 +848,10 @@
 </SubScreen>
 
 <style>
+  .purchase-items-count {
+    font-size: 0.85rem;
+    color: var(--secondary-text-color);
+  }
   .purchase-contents-body[hidden] {
     display: none;
   }
