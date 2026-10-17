@@ -137,6 +137,13 @@ export type Verification = {
   } | null;
 };
 
+export type PurchaseItem = {
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+};
+
 // TODO: rename to Operation
 // after adding new field don't forget to change function cloneOperation
 export type Transaction = {
@@ -149,6 +156,10 @@ export type Transaction = {
   comment?: string | null;
   /** Technical description, e.g. operation name as it is written in the bank statement */
   description?: string | null;
+  /** Fiscal receipt reference, independent of the bank statement description. */
+  receiptUrl?: string | null;
+  /** Individual purchase items from the fiscal receipt. */
+  purchaseItems?: PurchaseItem[];
   /** Result of the reconciliation with a bank statement, absent if the operation was not checked yet */
   verification?: Verification | null;
   linkedTransactionId?: string | null;

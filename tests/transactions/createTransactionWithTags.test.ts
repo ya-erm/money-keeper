@@ -34,6 +34,7 @@ test.describe('Transactions with tags', () => {
     const tagName = await tagButton.textContent();
     await tagButton.click();
     await page.getByRole('heading', { level: 1, name: 'New operation' }).click();
+    await page.getByTestId('TransactionForm').evaluate((form) => form.scrollIntoView({ block: 'start' }));
     await expect(page).toHaveScreenshot('1-transaction-tag-selected.png', {
       maxDiffPixels: 30,
     });

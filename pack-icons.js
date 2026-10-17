@@ -12,6 +12,9 @@ const target = 'src/lib/icons.ts';
 
 // Icons to bundle, array
 const iconsToBundle = [
+  'mdi:camera-outline',
+  'mdi:image-outline',
+  'mdi:stop',
   'mdi:account',
   'mdi:account-group',
   'mdi:analytics',

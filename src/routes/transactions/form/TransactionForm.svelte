@@ -42,6 +42,10 @@
   import PlaceSelector from '$lib/widgets/PlaceSelector.svelte';
   import LocationPicker from '$lib/widgets/LocationPicker.svelte';
   import { findNearbyPlaces, isValidCoordinates, type Coordinates } from '$lib/utils/geolocation';
+  import ReceiptScanner from '$lib/receipts/ReceiptScanner.svelte';
+  import type { SerbianReceipt } from '$lib/receipts/serbianReceipt';
+  import PurchaseItemsEditor from '$lib/receipts/PurchaseItemsEditor.svelte';
+  import { toPurchaseItems, type PurchaseItemDraft } from '$lib/receipts/purchaseItems';
 
   import RepeatingModal from '../../repeatings/RepeatingModal.svelte';
   import RepeatingsList from '../../repeatings/RepeatingsList.svelte';
@@ -156,6 +160,47 @@
 
   let anotherCurrencyModalOpened = false;
   let anotherCurrency: string | null = transaction?.anotherCurrency ?? null;
+  let receiptScannerOpened = !transaction && getSearchParam($page, 'scan-receipt') === '1';
+  let pendingReceiptAmount: number | null = null;
+
+  // A receipt may be scanned before the user chooses an account.
+  const resolveReceiptCurrency = (amount: number, currency: string) => {
+    pendingReceiptAmount = null;
+    if (currency.toUpperCase() === 'RSD') {
+      _value1 = amount.toString();
+      _value2 = '';
+      anotherCurrency = null;
+    }
+  };
+  $: if (pendingReceiptAmount !== null && accountCurrency) {
+    resolveReceiptCurrency(pendingReceiptAmount, accountCurrency);
+  }
+
+  const applyReceipt = (receipt: SerbianReceipt) => {
+    if (type !== receipt.type) categoryId = null;
+    type = receipt.type;
+    timeZone = 'Europe/Belgrade';
+    timeZoneShift = getTimeZoneOffset(timeZone);
+    date = dayjs(receipt.date).tz(timeZone).format('YYYY-MM-DD');
+    time = dayjs(receipt.date).tz(timeZone).format('HH:mm');
+    if (accountCurrency?.toUpperCase() === 'RSD') {
+      _value1 = receipt.amount.toString();
+      _value2 = '';
+      anotherCurrency = null;
+    } else {
+      // Keep the receipt amount in RSD; the account debit is entered by the user.
+      _value1 = '';
+      _value2 = receipt.amount.toString();
+      anotherCurrency = 'RSD';
+    }
+    pendingReceiptAmount = accountCurrency ? null : receipt.amount;
+    if (receipt.details && !comment.trim()) {
+      comment = receipt.details.merchant || receipt.details.store;
+    }
+    receiptUrl = receipt.url;
+    purchaseItems = receipt.details?.items.map((item) => ({ ...item })) ?? [];
+    receiptScannerOpened = false;
+  };
 
   let suggestions: string[] = [];
 
@@ -178,6 +223,18 @@
   };
 
   let description = transaction?.description ?? '';
+  let receiptUrl = transaction?.receiptUrl ?? '';
+  let receiptHref: string | null = null;
+  $: {
+    try {
+      const url = new URL(receiptUrl.trim());
+      receiptHref = ['http:', 'https:'].includes(url.protocol) ? url.href : null;
+    } catch {
+      receiptHref = null;
+    }
+  }
+  let purchaseItems: PurchaseItemDraft[] = transaction?.purchaseItems?.map((item) => ({ ...item })) ?? [];
+  let purchaseContentsHidden = true;
   const verification = transaction?.verification ?? null;
 
   const verificationMessage = (status: VerificationStatus): Messages => `transactions.verification.${status}`;
@@ -320,6 +377,13 @@
 
       const tagIds = selectedTags.filter((tagId) => tags.find((t) => t.id === tagId));
 
+      let savedPurchaseItems;
+      try {
+        savedPurchaseItems = toPurchaseItems(purchaseItems);
+      } catch {
+        showErrorToast($translate('receipts.invalid_items'));
+        return;
+      }
       const transactions: Transaction[] = [];
 
       transactions.push({
@@ -334,6 +398,8 @@
         amount: checkNumberFormParameter(formData, 'amount'),
         comment: checkStringOptionalFormParameter(formData, 'comment'),
         ...(description.trim() ? { description: description.trim() } : {}),
+        ...(receiptUrl.trim() ? { receiptUrl: receiptUrl.trim() } : {}),
+        ...(savedPurchaseItems.length ? { purchaseItems: savedPurchaseItems } : {}),
         tagIds,
         ...(anotherCurrency
           ? {
@@ -356,6 +422,10 @@
           amount: checkNumberFormParameter(formData, 'destinationAmount'),
           comment: checkStringOptionalFormParameter(formData, 'comment')?.trim(),
           ...(destinationTransaction?.description ? { description: destinationTransaction.description } : {}),
+          ...(destinationTransaction?.receiptUrl ? { receiptUrl: destinationTransaction.receiptUrl } : {}),
+          ...(destinationTransaction?.purchaseItems
+            ? { purchaseItems: destinationTransaction.purchaseItems.map((item) => ({ ...item })) }
+            : {}),
           tagIds,
           linkedTransactionId: transactions[0].id,
           ...(excludeFromAnalysis ? { excludeFromAnalysis } : {}),
@@ -504,11 +574,11 @@
     <Input
       label={$translate('transactions.comment')}
       name="comment"
-      value={transaction?.comment}
+      value={comment}
       onChange={handleCommentChange}
       translate={$translate}
       list="suggestions"
-      optional
+      clearable
     />
     <datalist id="suggestions">
       {#each suggestions as option (option)}
@@ -521,7 +591,7 @@
       </div>
     {/if}
     <div class="flex-col gap-0.5">
-      <InputLabel text={$translate('transactions.tags')} optional translate={$translate} />
+      <InputLabel text={$translate('transactions.tags')} />
       <TagsList
         bind:tags
         bind:selectedTags
@@ -529,6 +599,58 @@
         onEdit={(t) => operationTagsService.save(t)}
         onDelete={(t) => operationTagsService.delete(t)}
       />
+    </div>
+    <div class="flex-col gap-0.5" data-testId="PurchaseContentsSection">
+      <SpoilerToggle bind:hidden={purchaseContentsHidden} translate={$translate}>
+        {$translate('receipts.contents')}
+      </SpoilerToggle>
+      <div
+        class="flex-col gap-1 purchase-contents-body"
+        hidden={purchaseContentsHidden}
+        on:invalid|capture={(event) => {
+          purchaseContentsHidden = false;
+          event.currentTarget.hidden = false;
+        }}
+      >
+        <div class="flex-col gap-0.5">
+          <div class="flex justify-between items-center">
+            <label for="transaction-receipt-url">
+              <InputLabel text={$translate('receipts.url')} />
+            </label>
+            {#if receiptUrl.trim()}
+              <Button
+                appearance="link"
+                underlined={false}
+                disabled={!receiptHref}
+                text={$translate('common.open')}
+                testId="OpenReceiptButton"
+                onClick={() => {
+                  if (receiptHref) window.open(receiptHref, '_blank', 'noopener,noreferrer');
+                }}
+              />
+            {:else}
+              <Button
+                appearance="link"
+                underlined={false}
+                text={$translate('receipts.scan_qr')}
+                testId="ScanReceiptQrButton"
+                onClick={() => (receiptScannerOpened = true)}
+              />
+            {/if}
+          </div>
+          <Input
+            id="transaction-receipt-url"
+            aria-label={$translate('receipts.url')}
+            name="receiptUrl"
+            bind:value={receiptUrl}
+            inputmode="url"
+            testId="ReceiptUrlInput"
+            clearable
+            translate={$translate}
+          />
+        </div>
+        <PurchaseItemsEditor bind:items={purchaseItems} />
+      </div>
     </div>
     <div class="flex-col gap-0.5">
       <Spoiler hidden={additionalParametersHidden}>
@@ -542,7 +664,6 @@
             bind:value={description}
             translate={$translate}
             testId="DescriptionInput"
-            optional
           />
           {#if verification}
             <div class="verification" class:problem={verification.status !== 'ok'} data-testId="VerificationInfo">
@@ -636,6 +757,10 @@
 
 <AnotherCurrencyModal bind:opened={anotherCurrencyModalOpened} bind:anotherCurrency />
 
+{#if receiptScannerOpened}
+  <ReceiptScanner onApply={applyReceipt} onClose={() => (receiptScannerOpened = false)} />
+{/if}
+
 {#if locationPickerOpened}
   <LocationPicker
     initialPosition={locationLat !== null && locationLng !== null
@@ -718,6 +843,9 @@
 </SubScreen>
 
 <style>
+  .purchase-contents-body[hidden] {
+    display: none;
+  }
   .currency-rate-info {
     font-size: 0.9rem;
     text-align: right;
