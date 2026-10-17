@@ -98,6 +98,8 @@ export const enDict: Dictionary = {
   'auth.login.title': 'Login',
   'auth.login': 'Login',
   'auth.password': 'Password',
+  'auth.show_password': 'Show password',
+  'auth.hide_password': 'Hide password',
   'auth.sign_in': 'Sign in',
   'auth.incorrect_login_or_password': 'Incorrect login or password',
   'auth.incorrect_old_password': 'Incorrect old password',

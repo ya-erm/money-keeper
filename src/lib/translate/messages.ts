@@ -63,6 +63,8 @@ export type Messages =
   | 'auth.login.title'
   | 'auth.login'
   | 'auth.password'
+  | 'auth.show_password'
+  | 'auth.hide_password'
   | 'auth.sign_in'
   | 'auth.incorrect_login_or_password'
   | 'auth.incorrect_old_password'
