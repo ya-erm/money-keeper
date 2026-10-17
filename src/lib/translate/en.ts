@@ -9,7 +9,6 @@ export const enDict: Dictionary = {
   'receipts.another': 'Load another receipt',
   'receipts.hint': 'Serbian fiscal receipts: scan a QR, select a photo or paste a link',
   'receipts.camera': 'Camera',
-  'receipts.stop_camera': 'Stop',
   'receipts.photo': 'Choose photo',
   'receipts.link': 'Receipt link',
   'receipts.loading_details': 'Loading receipt details…',

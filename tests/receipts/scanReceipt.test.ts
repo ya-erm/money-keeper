@@ -45,6 +45,13 @@ async function waitForStoredReceipt(page: Page, comment: string) {
 }
 
 test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (navigator.mediaDevices) {
+      navigator.mediaDevices.getUserMedia = async () => {
+        throw new DOMException('Denied in test', 'NotAllowedError');
+      };
+    }
+  });
   await page.route('**/api/receipts/serbia', (route) => route.fulfill({ status: 503, json: { error: 'unavailable' } }));
   await page.clock.setSystemTime('2026-10-17T11:30:00Z');
   await openPathAsync(page);
@@ -296,7 +303,10 @@ test('scans a QR video frame and stops the camera after reading it', async ({ pa
   ).toBe('ended');
 });
 
-test('fills a square camera preview and stops the portrait stream manually', async ({ page }) => {
+test('starts the camera automatically without shifting the reserved square preview', async ({ page }, testInfo) => {
+  const scanner = page.getByTestId('ReceiptScanner');
+  await scanner.getByRole('button', { name: 'Close', exact: true }).click();
+  await expect(scanner).toHaveCount(0);
   await page.evaluate(() => {
     const canvas = document.createElement('canvas');
     canvas.width = 600;
@@ -305,20 +315,32 @@ test('fills a square camera preview and stops the portrait stream manually', asy
     const stream = canvas.captureStream(5);
     const timer = setInterval(() => context.fillRect(0, 0, 600, 1000), 100);
     Object.assign(window, { receiptTestStream: stream, receiptTestTimer: timer });
-    navigator.mediaDevices.getUserMedia = async () => stream;
+    navigator.mediaDevices.getUserMedia = () =>
+      new Promise((resolve) => {
+        Object.assign(window, { grantReceiptCamera: () => resolve(stream) });
+      });
   });
-  await page.getByTestId('ReceiptScanner').getByRole('button', { name: 'Camera', exact: true }).click();
-  await expect(page.getByTestId('ReceiptScanner').getByRole('button', { name: 'Stop', exact: true })).toHaveClass(
-    /white/,
-  );
-  const video = page.getByTestId('ReceiptScanner').locator('video');
-  await expect(video).toBeVisible();
-  const bounds = await video.boundingBox();
+  await page.getByTestId('ScanReceiptQrButton').click();
+  const preview = page.getByTestId('ReceiptCameraPreview');
+  await expect(preview).toBeVisible();
+  const bounds = await preview.boundingBox();
   expect(bounds).not.toBeNull();
   expect(Math.abs(bounds!.width - bounds!.height)).toBeLessThan(1);
+  const link = scanner.locator('input[name="receipt-link"]');
+  const linkBefore = await link.boundingBox();
+  await expect(scanner.getByRole('button', { name: 'Choose photo', exact: true })).toBeEnabled();
+  await expect(link).toBeEnabled();
+  await expect(scanner.getByRole('button', { name: 'Stop', exact: true })).toHaveCount(0);
+  await page.evaluate(() => (window as unknown as { grantReceiptCamera: () => void }).grantReceiptCamera());
+  const video = scanner.locator('video');
+  await expect(video).toHaveCSS('opacity', '1');
+  expect(await preview.boundingBox()).toEqual(bounds);
+  expect(await video.boundingBox()).toEqual(bounds);
+  expect(await link.boundingBox()).toEqual(linkBefore);
   await expect(video).toHaveCSS('object-fit', 'cover');
-  await page.getByTestId('ReceiptScanner').getByRole('button', { name: 'Stop', exact: true }).click();
-  await expect(video).not.toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('camera-preview.png') });
+  await scanner.getByRole('button', { name: 'Close', exact: true }).click();
+  await expect(scanner).toHaveCount(0);
   expect(
     await page.evaluate(
       () => (window as unknown as { receiptTestStream: MediaStream }).receiptTestStream.getTracks()[0].readyState,

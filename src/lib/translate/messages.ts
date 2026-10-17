@@ -267,7 +267,6 @@ export type Messages =
   | 'receipts.another'
   | 'receipts.hint'
   | 'receipts.camera'
-  | 'receipts.stop_camera'
   | 'receipts.photo'
   | 'receipts.link'
   | 'receipts.apply'

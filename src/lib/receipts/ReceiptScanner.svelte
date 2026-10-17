@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import dayjs from 'dayjs';
   import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
@@ -18,7 +18,7 @@
   let error: Messages | null = null;
   let busy = false;
   let camera = false;
-  let startingCamera = false;
+  let startingCamera = true;
   let video: HTMLVideoElement;
   let stream: MediaStream | null = null;
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -39,6 +39,7 @@
     clearTimeout(linkTimer);
     stream?.getTracks().forEach((track) => track.stop());
     stream = null;
+    if (video) video.srcObject = null;
     camera = false;
     startingCamera = false;
   };
@@ -47,6 +48,10 @@
     destroyed = true;
     detailsController?.abort();
     stopCamera();
+  });
+
+  onMount(() => {
+    void startCamera();
   });
 
   const readReceipt = (value: string) => {
@@ -75,7 +80,7 @@
     }, 250);
   };
 
-  const resetReceipt = () => {
+  const resetReceipt = async () => {
     stopCamera();
     detailsController?.abort();
     detailsController = null;
@@ -84,6 +89,9 @@
     error = null;
     detailsError = false;
     loadingDetails = false;
+    startingCamera = true;
+    await tick();
+    if (!destroyed) void startCamera();
   };
 
   const loadDetails = async () => {
@@ -209,6 +217,11 @@
       input.value = '';
     }
   };
+
+  const choosePhoto = () => {
+    stopCamera();
+    photoInput.click();
+  };
 </script>
 
 <svelte:document on:visibilitychange={() => document.hidden && stopCamera()} />
@@ -217,40 +230,37 @@
   <div class="flex-col gap-1" data-testId="ReceiptScanner">
     {#if !receipt}
       <p class="hint">{$translate('receipts.hint')}</p>
-      <div class="grid-col-2 gap-1">
-        <Button
-          color={camera ? 'white' : 'primary'}
-          bordered={camera}
-          disabled={busy || startingCamera}
-          onClick={camera ? stopCamera : startCamera}
-        >
-          <span class="button-content"
-            ><Icon name={camera ? 'mdi:stop' : 'mdi:camera-outline'} size={1.25} />
-            {$translate(camera ? 'receipts.stop_camera' : 'receipts.camera')}</span
-          >
-        </Button>
-        <Button color="white" bordered disabled={busy || startingCamera || camera} onClick={() => photoInput.click()}>
-          <span class="button-content"><Icon name="mdi:image-outline" size={1.25} />{$translate('receipts.photo')}</span
-          >
-        </Button>
+      <div class="camera-preview" data-testId="ReceiptCameraPreview">
+        <video bind:this={video} class:visible={camera} muted playsinline aria-label={$translate('receipts.camera')}
+        ></video>
+        {#if busy || startingCamera || error || !camera}
+          <div class="camera-status flex-col gap-1">
+            {#if busy || startingCamera}<div role="status">{$translate('common.loading')}</div>{/if}
+            {#if error}<div role="alert">{$translate(error)}</div>{/if}
+            {#if !camera && !startingCamera && !busy}
+              <Button color="white" bordered onClick={startCamera}>
+                <span class="button-content"
+                  ><Icon name="mdi:camera-outline" size={1.25} />{$translate('receipts.camera')}</span
+                >
+              </Button>
+            {/if}
+          </div>
+        {/if}
       </div>
+      <Button color="white" bordered disabled={busy} onClick={choosePhoto}>
+        <span class="button-content"><Icon name="mdi:image-outline" size={1.25} />{$translate('receipts.photo')}</span>
+      </Button>
       <input
         bind:this={photoInput}
         type="file"
         accept="image/*"
-        disabled={busy || startingCamera || camera}
+        disabled={busy}
         on:change={readPhoto}
+        on:cancel={startCamera}
         aria-label={$translate('receipts.photo')}
         data-testId="ReceiptPhotoInput"
         hidden
       />
-      <video
-        bind:this={video}
-        class:visible={camera || startingCamera}
-        muted
-        playsinline
-        aria-label={$translate('receipts.camera')}
-      ></video>
       <Input
         label={$translate('receipts.link')}
         bind:value={link}
@@ -260,8 +270,6 @@
         translate={$translate}
       />
     {/if}
-    {#if busy || startingCamera}<div role="status">{$translate('common.loading')}</div>{/if}
-    {#if error}<div role="alert">{$translate(error)}</div>{/if}
     {#if receipt}
       <div class="flex-col gap-0.5" data-testId="ReceiptPreview">
         {#if receipt.details?.journal}
@@ -311,16 +319,34 @@
   .items-error {
     text-align: center;
   }
-  video {
-    display: none;
+  .camera-preview {
+    position: relative;
     width: 100%;
     aspect-ratio: 1;
-    object-fit: cover;
+    flex-shrink: 0;
+    overflow: hidden;
     border-radius: 0.75rem;
     background: #000;
   }
+  video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+  }
   video.visible {
-    display: block;
+    opacity: 1;
+  }
+  .camera-status {
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    color: #fff;
+    text-align: center;
   }
   .button-content {
     display: flex;

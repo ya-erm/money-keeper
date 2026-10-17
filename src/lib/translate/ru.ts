@@ -9,7 +9,6 @@ export const ruDict: Dictionary = {
   'receipts.another': 'Загрузить другой чек',
   'receipts.hint': 'Фискальные чеки Сербии: отсканируйте QR, выберите фото или вставьте ссылку',
   'receipts.camera': 'Камера',
-  'receipts.stop_camera': 'Остановить',
   'receipts.photo': 'Галерея',
   'receipts.link': 'Ссылка на чек',
   'receipts.loading_details': 'Загружаем данные чека…',
