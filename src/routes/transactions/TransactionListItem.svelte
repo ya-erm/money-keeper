@@ -245,12 +245,12 @@
   .combined .location-icon {
     position: relative;
     z-index: 1;
-    margin-right: -0.3125rem;
+    margin-right: -0.375rem;
   }
   .combined .location-icon :global(svg) {
     overflow: visible;
     stroke: var(--background-color);
-    stroke-width: 3;
+    stroke-width: 4;
     stroke-linejoin: round;
     paint-order: stroke fill;
   }
