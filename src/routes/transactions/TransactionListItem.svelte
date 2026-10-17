@@ -96,7 +96,7 @@
             data-testId="OperationPurchaseItemsIcon"
           >
             <svg width="0.875rem" height="0.875rem" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2.5" />
+              <path d="M3 6h14M3 12h14M3 18h14" stroke="currentColor" stroke-width="2.5" />
             </svg>
           </div>
         {/if}
@@ -241,7 +241,7 @@
     outline: none;
   }
   .combined .location-icon {
-    margin-right: -0.25rem;
+    margin-right: -0.3125rem;
   }
   .description {
     font-size: 0.8rem;
