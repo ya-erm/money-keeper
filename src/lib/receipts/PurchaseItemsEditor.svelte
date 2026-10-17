@@ -20,12 +20,19 @@
 </script>
 
 <div class="flex-col gap-0.5" data-testId="PurchaseItemsEditor">
+  {#if items.length}<div class="currency">RSD</div>{/if}
   {#each items as item, i (i)}
     <div class="purchase-item flex-col gap-0.5" data-testId="PurchaseItem">
       <div class="item-heading">
         <label class="item-name">
-          <span>{$translate('receipts.item')}</span>
-          <input type="text" bind:value={item.name} required maxlength="2048" data-testId="PurchaseItemName" />
+          <input
+            type="text"
+            aria-label={$translate('receipts.item')}
+            bind:value={item.name}
+            required
+            maxlength="2048"
+            data-testId="PurchaseItemName"
+          />
         </label>
         <Button
           color="danger"
@@ -94,12 +101,19 @@
 
 <style>
   .purchase-item {
-    padding: 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.75rem;
+    --item-control-height: 2.75rem;
+  }
+  .purchase-item + .purchase-item {
+    margin-top: 0.25rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+  }
+  .currency {
+    color: var(--secondary-text-color);
+    font-size: 0.85rem;
+    text-align: right;
   }
   .item-heading {
-    --item-control-height: 2.75rem;
     display: flex;
     gap: 0.5rem;
     align-items: end;
@@ -107,9 +121,6 @@
   .item-name {
     flex: 1;
     min-width: 0;
-  }
-  .item-name input {
-    height: var(--item-control-height);
   }
   label {
     display: flex;
@@ -124,6 +135,7 @@
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
+    height: var(--item-control-height);
     padding: 0.65rem;
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
