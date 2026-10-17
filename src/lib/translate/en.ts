@@ -38,6 +38,7 @@ export const enDict: Dictionary = {
   // Common
   'common.back': 'Back',
   'common.select': 'Select',
+  'common.select_page': 'Select a page on the left',
   'common.accept': 'Accept',
   'common.apply': 'Apply',
   'common.available_variants': 'Available variants',

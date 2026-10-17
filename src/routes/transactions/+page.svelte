@@ -8,7 +8,7 @@
   import { deleteSearchParam, getSearchParam } from '$lib/utils';
 
   import AddTransactionButton from './AddTransactionButton.svelte';
-  import OperationsSplitView from './OperationsSplitView.svelte';
+  import OperationDetails from './OperationDetails.svelte';
   import TransactionList from './TransactionList.svelte';
 
   $: transactions = $operationsStore;
@@ -17,12 +17,11 @@
   const closeOperation = () => void deleteSearchParam($page, ['operation-id', 'accountId']);
 </script>
 
-<Layout title={$translate('transactions.title')} rightSlot={AddTransactionButton} wide>
-  <OperationsSplitView {operationId} onClose={closeOperation}>
-    <div class="container">
-      <TransactionList {transactions} inlineDetails={$isWideScreen} />
-    </div>
-  </OperationsSplitView>
+<Layout title={$translate('transactions.title')} rightSlot={AddTransactionButton}>
+  <div class="container">
+    <TransactionList {transactions} inlineDetails={$isWideScreen} />
+  </div>
+  <OperationDetails slot="details" {operationId} onClose={closeOperation} />
 </Layout>
 
 <style>

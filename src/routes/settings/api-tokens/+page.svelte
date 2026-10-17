@@ -18,6 +18,7 @@
   import { translate } from '$lib/translate';
   import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
   import Layout from '$lib/ui/layout/Layout.svelte';
+  import Settings from '../Settings.svelte';
   import ListGroup from '$lib/ui/list/ListGroup.svelte';
   import Loader from '$lib/ui/Loader.svelte';
   import Modal from '$lib/ui/Modal.svelte';
@@ -94,7 +95,12 @@
   });
 </script>
 
-<Layout title={$translate('api_tokens.title')} leftSlot={HeaderBackButton}>
+<Layout
+  title={$translate('api_tokens.title')}
+  leftSlot={HeaderBackButton}
+  section={Settings}
+  sectionTitle={$translate('settings.title')}
+>
   {#if isGuest}
     <div class="p-1">
       <p class="guest-hint">{$translate('api_tokens.guest_mode')}</p>

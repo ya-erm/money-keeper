@@ -15,7 +15,7 @@
   import AccountModal from './AccountModal.svelte';
   import AddOperationButton from './AddOperationButton.svelte';
   import OperationsList from './OperationsList.svelte';
-  import OperationsSplitView from '../transactions/OperationsSplitView.svelte';
+  import OperationDetails from '../transactions/OperationDetails.svelte';
 
   $: accounts = $accountsStore;
 
@@ -63,15 +63,14 @@
   }
 </script>
 
-<Layout {title} {leftSlot} {rightSlot} wide>
-  <OperationsSplitView {operationId} onClose={closeOperation}>
-    <div class="container" on:scroll={handlePageScroll}>
-      <AccountCards onEdit={handleAccountEdit} />
-      <div bind:this={operationsContainer}>
-        <OperationsList {account} inlineDetails={$isWideScreen} />
-      </div>
+<Layout {title} {leftSlot} {rightSlot}>
+  <div class="container" on:scroll={handlePageScroll}>
+    <AccountCards onEdit={handleAccountEdit} />
+    <div bind:this={operationsContainer}>
+      <OperationsList {account} inlineDetails={$isWideScreen} />
     </div>
-  </OperationsSplitView>
+  </div>
+  <OperationDetails slot="details" {operationId} onClose={closeOperation} />
 </Layout>
 
 {#if opened}

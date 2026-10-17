@@ -5,6 +5,7 @@
   import { translate } from '$lib/translate';
   import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
   import Layout from '$lib/ui/layout/Layout.svelte';
+  import Settings from '../settings/Settings.svelte';
 
   import RepeatingsList from './RepeatingsList.svelte';
 
@@ -14,7 +15,12 @@
   $: inactiveRepeatings = repeatings.filter((item) => dayjs(item.endDate).isBefore(dayjs()));
 </script>
 
-<Layout title={$translate('repeatings.title')} leftSlot={HeaderBackButton}>
+<Layout
+  title={$translate('repeatings.title')}
+  leftSlot={HeaderBackButton}
+  section={Settings}
+  sectionTitle={$translate('settings.title')}
+>
   {#if !repeatings.length}
     <div class="p-1 w-full no-data">{$translate('repeatings.no_data')}</div>
   {/if}

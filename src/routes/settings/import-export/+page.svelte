@@ -40,6 +40,7 @@
   import { translate } from '$lib/translate';
   import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
   import Layout from '$lib/ui/layout/Layout.svelte';
+  import Settings from '../Settings.svelte';
   import Modal from '$lib/ui/Modal.svelte';
   import { Logger, deepEqual, groupByKey, keyTransactions, useFetch } from '$lib/utils';
 
@@ -236,7 +237,12 @@
   };
 </script>
 
-<Layout title={$translate('import_export.title')} leftSlot={HeaderBackButton}>
+<Layout
+  title={$translate('import_export.title')}
+  leftSlot={HeaderBackButton}
+  section={Settings}
+  sectionTitle={$translate('settings.title')}
+>
   <div class="container p-1">
     <h2>{$translate('import_export.import')}</h2>
     <label class="flex-col gap-0.5">

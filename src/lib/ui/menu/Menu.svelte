@@ -96,6 +96,8 @@
   @media (min-width: 1024px) {
     .menu-bar {
       width: 15rem;
+      grid-column: 1;
+      grid-row: 1;
     }
     .menu-title {
       display: block;

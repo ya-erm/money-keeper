@@ -3,11 +3,17 @@
   import { activeLocale, translate } from '$lib/translate';
   import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
   import Layout from '$lib/ui/layout/Layout.svelte';
+  import Settings from '../Settings.svelte';
 
   $: changelogEntries = getChangelogEntries($activeLocale);
 </script>
 
-<Layout title={$translate('settings.changelog')} leftSlot={HeaderBackButton}>
+<Layout
+  title={$translate('settings.changelog')}
+  leftSlot={HeaderBackButton}
+  section={Settings}
+  sectionTitle={$translate('settings.title')}
+>
   <div class="changelog">
     {#each changelogEntries as entry (entry.version)}
       <article class="release">

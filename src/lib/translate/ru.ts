@@ -38,6 +38,7 @@ export const ruDict: Dictionary = {
   // Common
   'common.back': 'Назад',
   'common.select': 'Выбрать',
+  'common.select_page': 'Выберите страницу слева',
   'common.accept': 'Принять',
   'common.apply': 'Применить',
   'common.available_variants': 'Доступные варианты',

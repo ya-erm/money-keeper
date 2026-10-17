@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.32.0 - 2026-10-17
+
+### Changed
+
+- Desktop pages now share three fixed-width columns for navigation, lists, and details, keeping the layout stable between pages.
+- Settings and analytics pages open alongside their section overview on wide screens.
+
 ## 2.31.0 - 2026-10-17
 
 ### Added

@@ -5,6 +5,7 @@
   import { translate } from '$lib/translate';
   import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
   import Layout from '$lib/ui/layout/Layout.svelte';
+  import Analytics from '../../Analytics.svelte';
 
   import AddGroupingButton from './AddGroupingButton.svelte';
   import GroupingList from './GroupingList.svelte';
@@ -16,6 +17,12 @@
   };
 </script>
 
-<Layout title={$translate('analytics.groupings.title')} leftSlot={HeaderBackButton} rightSlot={AddGroupingButton}>
+<Layout
+  title={$translate('analytics.groupings.title')}
+  leftSlot={HeaderBackButton}
+  rightSlot={AddGroupingButton}
+  section={Analytics}
+  sectionTitle={$translate('analytics.title')}
+>
   <GroupingList {onClick} />
 </Layout>

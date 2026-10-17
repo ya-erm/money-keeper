@@ -1,7 +1,11 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
+  import { routes } from '$lib/routes';
   import Menu from '$lib/ui/menu/Menu.svelte';
   import type { Component } from 'svelte';
   import Header from './Header.svelte';
+  import { isWideScreen } from './media';
 
   export let title: string;
   export let onBack: VoidFunction | null = null;
@@ -12,30 +16,47 @@
   export let hideMenu = false;
   /** Render as a floating panel on wide screens (used by SubScreen) */
   export let panel = false;
-  /** Allow wider content column, e.g. for a list with a details pane */
-  export let wide = false;
+  /** Keep the section overview in the middle column while this page opens on the right. */
+  export let section: Component | null = null;
+  export let sectionTitle = '';
+
+  $: showMenu = !hideMenu && ![routes.login.path, routes.register.path].includes($page.url.pathname);
+  $: workspace = showMenu && !panel;
+  $: showSection = workspace && $isWideScreen && section !== null;
 </script>
 
-<main class:panel class:wide>
-  <div class="content">
-    <Header {title} {onBack} {leftSlot} {rightSlot} {rightSlotProps} closable={panel} />
-    <div class="page">
-      <slot />
-    </div>
+<main class:panel class:workspace>
+  <div class="content" data-testId="PrimaryColumn">
+    {#if showSection}
+      <Header title={sectionTitle} />
+      <div class="page">
+        <svelte:component this={section} />
+      </div>
+    {:else}
+      <Header {title} {onBack} {leftSlot} {rightSlot} {rightSlotProps} closable={panel} />
+      <div class="page">
+        <slot />
+      </div>
+    {/if}
   </div>
-  {#if !hideMenu}
+  {#if workspace && $isWideScreen}
+    <aside class="details" data-testId="DetailsColumn">
+      {#if showSection}
+        <Header {title} {onBack} {leftSlot} {rightSlot} {rightSlotProps} />
+        <div class="page">
+          <slot />
+        </div>
+      {:else}
+        <slot name="details" />
+      {/if}
+    </aside>
+  {/if}
+  {#if showMenu}
     <Menu />
   {/if}
 </main>
 
 <style>
-  main {
-    --content-max-width: 48rem;
-  }
-  main.wide {
-    --content-max-width: 80rem;
-  }
-
   main {
     display: flex;
     flex-direction: column;
@@ -46,7 +67,8 @@
     max-height: -webkit-fill-available;
   }
 
-  .content {
+  .content,
+  .details {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -59,7 +81,12 @@
     flex-grow: 1;
   }
 
-  /* Desktop: menu becomes a sidebar on the left, content is a centered column */
+  .details {
+    overflow: hidden;
+    border-right: 1px solid var(--border-color);
+  }
+
+  /* Tablet: menu and a single content column. */
   @media (min-width: 768px) {
     /* Sidebar and content are centered together as one block */
     main {
@@ -68,7 +95,7 @@
     }
     .content {
       width: 100%;
-      max-width: var(--content-max-width);
+      max-width: 48rem;
       border-left: 1px solid var(--border-color);
       border-right: 1px solid var(--border-color);
     }
@@ -86,6 +113,25 @@
     main.panel .content {
       max-width: none;
       border: none;
+    }
+  }
+
+  /* Every desktop route reserves the same three columns, even without a selection. */
+  @media (min-width: 1200px) {
+    main.workspace {
+      display: grid;
+      grid-template-columns: 15rem 29rem 29rem;
+      grid-template-rows: minmax(0, 1fr);
+    }
+    .workspace > .content {
+      grid-column: 2;
+      grid-row: 1;
+      width: auto;
+      max-width: none;
+    }
+    .details {
+      grid-column: 3;
+      grid-row: 1;
     }
   }
 </style>

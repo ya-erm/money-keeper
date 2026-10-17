@@ -3,6 +3,8 @@
 
   import Layout from '$lib/ui/layout/Layout.svelte';
   import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
+  import { translate } from '$lib/translate';
+  import Settings from '../settings/Settings.svelte';
   import { darkMode } from '$lib/ui/theme';
 
   import Buttons from './Buttons.svelte';
@@ -15,7 +17,7 @@
   import Toasts from './Toasts.svelte';
 </script>
 
-<Layout title="UI Kit" leftSlot={HeaderBackButton}>
+<Layout title="UI Kit" leftSlot={HeaderBackButton} section={Settings} sectionTitle={$translate('settings.title')}>
   <div class="p-1">
     <h1>Theme</h1>
     <label class="flex gap-1 items-center">
