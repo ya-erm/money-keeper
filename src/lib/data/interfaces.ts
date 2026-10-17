@@ -36,6 +36,7 @@ export type MemberSettings = {
   favoriteTimeZones?: string[];
   groupingId?: string | null;
   knownPlaces?: KnownPlace[];
+  autoDetectLocation?: boolean;
 };
 
 export type KnownPlace = {

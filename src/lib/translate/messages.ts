@@ -383,6 +383,7 @@ export type Messages =
   | 'known_places.add'
   | 'known_places.empty'
   | 'known_places.description'
+  | 'known_places.auto_detect_location'
   | 'known_places.name'
   | 'known_places.location_selected'
   | 'known_places.location_required'

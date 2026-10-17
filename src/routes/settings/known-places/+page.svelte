@@ -1,8 +1,9 @@
 <script lang="ts">
   import { SvelteMap, SvelteSet } from 'svelte/reactivity';
   import Button from '@ya-erm/svelte-ui/Button';
+  import Checkbox from '@ya-erm/svelte-ui/Checkbox';
 
-  import { memberSettingsStore } from '$lib/data';
+  import { membersService, memberSettingsStore } from '$lib/data';
   import { operationsStore } from '$lib/data/operations';
   import type { KnownPlace } from '$lib/data/interfaces';
   import { translate } from '$lib/translate';
@@ -10,6 +11,7 @@
   import Layout from '$lib/ui/layout/Layout.svelte';
   import KnownPlaceModal from '$lib/widgets/KnownPlaceModal.svelte';
   import { findNearbyPlaces } from '$lib/utils/geolocation';
+  import { handleError } from '$lib/utils';
 
   $: places = [...($memberSettingsStore?.knownPlaces ?? [])].sort((a, b) => a.name.localeCompare(b.name));
   $: operationCounts = (() => {
@@ -31,6 +33,20 @@
 
   let opened = false;
   let selectedPlace: KnownPlace | null = null;
+  let savingAutoDetection = false;
+
+  const setAutoDetectLocation = async (enabled: boolean) => {
+    const previous = $memberSettingsStore?.autoDetectLocation ?? false;
+    savingAutoDetection = true;
+    try {
+      await membersService.updateSettings({ autoDetectLocation: enabled });
+    } catch (error) {
+      await membersService.updateSettings({ autoDetectLocation: previous }, false);
+      handleError(error);
+    } finally {
+      savingAutoDetection = false;
+    }
+  };
 
   const editPlace = (place: KnownPlace) => {
     selectedPlace = place;
@@ -46,6 +62,14 @@
 <Layout title={$translate('settings.known_places')} leftSlot={HeaderBackButton}>
   <div class="flex-col gap-1 p-1">
     <p class="description">{$translate('known_places.description')}</p>
+    <div data-testId="AutoDetectLocationSetting">
+      <Checkbox
+        label={$translate('known_places.auto_detect_location')}
+        checked={$memberSettingsStore?.autoDetectLocation ?? false}
+        disabled={savingAutoDetection}
+        onChange={setAutoDetectLocation}
+      />
+    </div>
     <Button onClick={addPlace} color="primary">{$translate('known_places.add')}</Button>
     {#if places.length === 0}
       <p class="empty">{$translate('known_places.empty')}</p>

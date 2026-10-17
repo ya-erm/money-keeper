@@ -144,7 +144,11 @@
         // Browsers without a geolocation Permissions API can still use the GPS button.
       }
     };
-    void suggestNearbyPlaces();
+    if (!transaction && membersService.selectedMemberSettings?.autoDetectLocation && !hasLocation) {
+      detectLocation();
+    } else {
+      void suggestNearbyPlaces();
+    }
     return () => {
       disposed = true;
     };
