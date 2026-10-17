@@ -17,6 +17,7 @@ export const enDict: Dictionary = {
   'receipts.journal': 'Receipt journal',
   'receipts.url': 'Receipt link',
   'receipts.contents': 'Purchase contents',
+  'receipts.items_count': '{count, plural, one {# item} other {# items}}',
   'receipts.item': 'Name',
   'receipts.items_list': 'List of goods or services',
   'receipts.quantity': 'Qty',

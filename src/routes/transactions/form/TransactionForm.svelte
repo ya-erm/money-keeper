@@ -602,7 +602,9 @@
     </div>
     <div class="flex-col gap-0.5" data-testId="PurchaseContentsSection">
       <SpoilerToggle bind:hidden={purchaseContentsHidden} translate={$translate}>
-        {$translate('receipts.contents')}
+        {$translate('receipts.contents')}{purchaseItems.length
+          ? ` - ${$translate('receipts.items_count', { values: { count: purchaseItems.length } })}`
+          : ''}
       </SpoilerToggle>
       <div
         class="flex-col gap-1 purchase-contents-body"

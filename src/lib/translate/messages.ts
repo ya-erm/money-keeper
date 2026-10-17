@@ -282,6 +282,7 @@ export type Messages =
   | 'receipts.journal'
   | 'receipts.url'
   | 'receipts.contents'
+  | 'receipts.items_count'
   | 'receipts.item'
   | 'receipts.items_list'
   | 'receipts.quantity'

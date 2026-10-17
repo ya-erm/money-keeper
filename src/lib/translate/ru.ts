@@ -17,6 +17,7 @@ export const ruDict: Dictionary = {
   'receipts.journal': 'Журнал чека',
   'receipts.url': 'Ссылка на чек',
   'receipts.contents': 'Состав покупки',
+  'receipts.items_count': '{count, plural, one {# позиция} few {# позиции} other {# позиций}}',
   'receipts.item': 'Название',
   'receipts.items_list': 'Список товаров или услуг',
   'receipts.quantity': 'Кол-во',
