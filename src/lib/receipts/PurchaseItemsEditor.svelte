@@ -104,6 +104,8 @@
 <style>
   .purchase-item {
     --item-control-height: 2.75rem;
+    --item-index-width: 1.5rem;
+    --item-heading-gap: 0.5rem;
   }
   .purchase-item + .purchase-item {
     margin-top: 0.25rem;
@@ -112,7 +114,7 @@
   }
   .item-heading {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--item-heading-gap);
     align-items: end;
   }
   .item-name {
@@ -120,7 +122,7 @@
     min-width: 0;
   }
   .item-index {
-    min-width: 1.5rem;
+    min-width: var(--item-index-width);
     align-self: center;
     color: var(--secondary-text-color);
     text-align: right;
@@ -149,6 +151,7 @@
   }
   .numbers {
     display: grid;
+    margin-inline-start: calc(var(--item-index-width) + var(--item-heading-gap));
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
     gap: 0.375rem;
