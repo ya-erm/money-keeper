@@ -1,5 +1,6 @@
 <script lang="ts">
   import dayjs from 'dayjs';
+  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
 
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
@@ -87,6 +88,7 @@
       hasHiddenBalanceAccount: hasHiddenBalanceAccount(
         null,
         monthOperations.map((operation) => operation.account),
+        $localAccountBalancesHidden,
       ),
     };
   });

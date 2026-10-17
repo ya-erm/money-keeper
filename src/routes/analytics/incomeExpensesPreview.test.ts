@@ -27,6 +27,14 @@ const transaction = (
 });
 
 describe('getIncomeExpensesPreview', () => {
+  it('applies local privacy only to accounts used by included operations', () => {
+    const transactions = [transaction('1', '2026-09-01', 10, expense)];
+    const date = new Date('2026-09-03T12:00:00');
+
+    expect(getIncomeExpensesPreview(transactions, () => 1, date, { account: true }).hasHiddenBalanceAccount).toBe(true);
+    expect(getIncomeExpensesPreview(transactions, () => 1, date, { other: true }).hasHiddenBalanceAccount).toBe(false);
+  });
+
   it('groups the last twelve completed months and returns totals for the selected month', () => {
     const result = getIncomeExpensesPreview(
       [

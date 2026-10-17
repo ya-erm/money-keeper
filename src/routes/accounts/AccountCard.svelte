@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { AccountViewModel, CurrencyRate } from '$lib/data/interfaces';
   import { settingsStore } from '$lib/data';
+  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
   import { translate } from '$lib/translate';
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
@@ -8,7 +9,6 @@
   import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
 
   import AccountOptionsModal from './AccountOptionsModal.svelte';
-  import { cardBalancesHidden } from './cardBalanceVisibility';
 
   export let account: AccountViewModel;
   export let balance: number | null = null;
@@ -27,10 +27,10 @@
     showAdditionalOptions = true;
   };
 
-  $: balancesHidden = $cardBalancesHidden[account.id] ?? isBalanceHidden($settingsStore, account);
+  $: balancesHidden = isBalanceHidden($settingsStore, account, $localAccountBalancesHidden);
 
   const handleToggleBalanceVisibility = () => {
-    cardBalancesHidden.update((value) => ({ ...value, [account.id]: !balancesHidden }));
+    localAccountBalancesHidden.update((value) => ({ ...value, [account.id]: !balancesHidden }));
   };
 
   let showAdditionalOptions = false;

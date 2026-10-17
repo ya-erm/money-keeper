@@ -1,7 +1,8 @@
 import dayjs, { type Dayjs } from 'dayjs';
 
 import type { AccountViewModel, TransactionViewModel } from '$lib/data/interfaces';
-import { calculateBalance } from '$lib/utils';
+import { calculateBalance, isBalanceHidden } from '$lib/utils';
+import type { LocalBalanceVisibility } from '$lib/utils/isBalanceHidden';
 
 export type AccountPreviewItem = {
   id: string;
@@ -26,6 +27,7 @@ export function getAccountsPreview(
   getRate: (currency: string) => number,
   date: string | number | Date | Dayjs = dayjs(),
   limit = 3,
+  localVisibility: LocalBalanceVisibility = {},
 ): AccountsPreview {
   const balances = accounts
     .map((account) => {
@@ -40,7 +42,7 @@ export function getAccountsPreview(
         name: account.name,
         balance: balance * getRate(account.currency),
         color: account.color,
-        hidden: account.hideBalance ?? false,
+        hidden: isBalanceHidden(null, account, localVisibility),
       };
     })
     .filter((account) => Number(account.balance.toFixed(8)) !== 0)

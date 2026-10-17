@@ -1,5 +1,6 @@
 <script lang="ts">
   import { accountsService } from '$lib/data';
+  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
   import type { AccountViewModel } from '$lib/data/interfaces';
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
@@ -21,6 +22,11 @@
   };
 
   const handleToggleBalanceVisibility = () => {
+    localAccountBalancesHidden.update((value) => {
+      const next = { ...value };
+      delete next[account.id];
+      return next;
+    });
     accountsService.save({
       id: account.id,
       name: account.name,

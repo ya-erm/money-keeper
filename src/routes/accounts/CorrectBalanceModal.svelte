@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
   import { v4 as uuid } from 'uuid';
   import dayjs from 'dayjs';
 
@@ -27,7 +28,7 @@
   let newBalance = '';
   let balanceVisibleInModal = false;
   $: diff = parseFloat((Number(newBalance) - (balance ?? 0)).toFixed(10));
-  $: balancesHidden = isBalanceHidden($settingsStore, account);
+  $: balancesHidden = isBalanceHidden($settingsStore, account, $localAccountBalancesHidden);
   $: balanceHiddenInModal = balancesHidden && !balanceVisibleInModal;
 
   const onClose = () => (opened = false);

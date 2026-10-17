@@ -22,6 +22,15 @@ const transaction = (
 });
 
 describe('getExpenseCategoriesPreview', () => {
+  it('hides totals when an included expense is locally hidden and keeps category percentages', () => {
+    const result = getExpenseCategoriesPreview([transaction('1', 'Food', 10)], () => 1, new Date('2026-09-15'), 3, {
+      account: true,
+    });
+
+    expect(result.hasHiddenBalanceAccount).toBe(true);
+    expect(result.categories[0]).toMatchObject({ name: 'Food', amount: 10, percentage: 100 });
+  });
+
   it('returns the top three monthly expense categories and combines the rest', () => {
     const transactions = [
       transaction('1', 'Food', 60),
