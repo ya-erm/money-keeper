@@ -245,7 +245,7 @@
   .combined .location-icon {
     position: relative;
     z-index: 1;
-    margin-right: -0.375rem;
+    margin-right: -0.4375rem;
   }
   .combined .location-icon :global(svg) {
     overflow: visible;
