@@ -26,6 +26,7 @@
     transaction.locationLat != null &&
     transaction.locationLng != null &&
     isValidCoordinates(transaction.locationLat, transaction.locationLng);
+  $: combinedLocationAndItems = hasLocation && !transaction.repeating && !!transaction.purchaseItems?.length;
 
   $: categoryName = transaction.category.name.startsWith('system.category')
     ? $translate(transaction.category.name as Messages)
@@ -68,10 +69,7 @@
   >
     <div class="icon flex-center" class:deleted={transaction.category.deleted}>
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />
-      <div
-        class="operation-icons"
-        class:combined={hasLocation && !transaction.repeating && !!transaction.purchaseItems?.length}
-      >
+      <div class="operation-icons" class:combined={combinedLocationAndItems}>
         {#if transaction.repeating}
           <div class="repeating-icon" data-testId="RepeatingOperationIcon">
             <Icon name="mdi:repeat" size={1} />
@@ -96,7 +94,11 @@
             data-testId="OperationPurchaseItemsIcon"
           >
             <svg width="0.875rem" height="0.875rem" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M3 6h14M3 12h14M3 18h14" stroke="currentColor" stroke-width="2.5" />
+              <path
+                d={combinedLocationAndItems ? 'M3 6h14M3 12h14M3 18h14' : 'M3 6h18M3 12h18M3 18h18'}
+                stroke="currentColor"
+                stroke-width="2.5"
+              />
             </svg>
           </div>
         {/if}
@@ -241,7 +243,16 @@
     outline: none;
   }
   .combined .location-icon {
+    position: relative;
+    z-index: 1;
     margin-right: -0.3125rem;
+  }
+  .combined .location-icon :global(svg) {
+    overflow: visible;
+    stroke: var(--background-color);
+    stroke-width: 3;
+    stroke-linejoin: round;
+    paint-order: stroke fill;
   }
   .description {
     font-size: 0.8rem;
