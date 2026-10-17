@@ -45,7 +45,8 @@ export function parseSerbianReceipt(value: string): SerbianReceipt {
     throw new ReceiptError('unsupported');
   }
 
-  const encoded = url.searchParams.get('vl');
+  // Fiscal QR links may contain literal base64 '+', which form-style URL parsing treats as a space.
+  const encoded = new URLSearchParams(url.search.replace(/\+/g, '%2B')).get('vl');
   if (!encoded || encoded.length > 1200 || !/^[A-Za-z0-9+/]+={0,2}$/.test(encoded)) {
     throw new ReceiptError('invalid');
   }
@@ -81,6 +82,8 @@ export function parseSerbianReceipt(value: string): SerbianReceipt {
   ) {
     throw new ReceiptError('invalid');
   }
+  // Return an escaped URL so subsequent fetches and saved receipt links preserve the payload.
+  url.searchParams.set('vl', encoded);
   return {
     amount: Number(scaledAmount) / 10000,
     currency: 'RSD',

@@ -8,6 +8,10 @@ import { getTransactionFormLocators, selectAccountAsync } from '@tests/transacti
 
 const sampleUrl = new URL('../../src/lib/receipts/fixtures/serbian-receipt.txt', import.meta.url);
 const sample = readFileSync(sampleUrl, 'utf8').trim();
+const unescaped = readFileSync(
+  new URL('../../src/lib/receipts/fixtures/serbian-receipt-unescaped.txt', import.meta.url),
+  'utf8',
+).trim();
 const photo = fileURLToPath(new URL('../../src/lib/receipts/fixtures/serbian-receipt.png', import.meta.url));
 const receiptDetails = {
   merchant: 'LIDL SRBIJA KD',
@@ -119,6 +123,22 @@ test('can load another receipt after a successful read', async ({ page }) => {
   await expect(scanner.getByRole('button', { name: 'Read receipt', exact: true })).toHaveCount(0);
   await page.getByTestId('ReceiptPhotoInput').setInputFiles(photo);
   await expect(page.getByTestId('ReceiptPreview')).toContainText('525.70 RSD');
+});
+
+test('reads and saves an unescaped fiscal QR link without losing plus signs', async ({ page }) => {
+  const scanner = page.getByTestId('ReceiptScanner');
+  let requestedUrl = '';
+  await page.route('**/api/receipts/serbia', async (route) => {
+    requestedUrl = route.request().postDataJSON().url;
+    await route.fulfill({ status: 503, json: { error: 'unavailable' } });
+  });
+  await scanner.locator('input[name="receipt-link"]').fill(unescaped);
+  await expect(page.getByTestId('ReceiptPreview')).toContainText('2,055.00 RSD');
+  await expect.poll(() => requestedUrl).toContain('%2B');
+  expect(new URL(requestedUrl).searchParams.get('vl')).not.toContain(' ');
+  await scanner.getByRole('button', { name: 'Fill operation', exact: true }).click();
+  await expect(page.getByTestId('ReceiptUrlInput')).toHaveValue(requestedUrl);
+  await expect(page.locator('input[name="destinationAmount"]')).toHaveValue('2055');
 });
 
 test('opens the receipt scanner from purchase contents in a regular operation form', async ({ page }) => {

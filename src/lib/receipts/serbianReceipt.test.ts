@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { parseSerbianReceipt, ReceiptError } from './serbianReceipt';
 
 const sample = readFileSync(new URL('./fixtures/serbian-receipt.txt', import.meta.url), 'utf8').trim();
+const unescaped = readFileSync(new URL('./fixtures/serbian-receipt-unescaped.txt', import.meta.url), 'utf8').trim();
 const modified = (change: (bytes: Buffer) => void) => {
   const bytes = Buffer.from(new URL(sample).searchParams.get('vl') ?? '', 'base64');
   change(bytes);
@@ -23,6 +24,29 @@ describe('Serbian receipt QR', () => {
 
   it('recognizes refunds as income', () => {
     expect(parseSerbianReceipt(modified((b) => (b[42] = 1))).type).toBe('IN');
+  });
+
+  it('reads literal base64 plus signs from the second real receipt and returns a reusable escaped URL', () => {
+    const receipt = parseSerbianReceipt(unescaped);
+    expect(receipt).toMatchObject({
+      amount: 2055,
+      currency: 'RSD',
+      date: '2026-10-17T16:34:23.000Z',
+      number: 'DB6Y57KP-DB6Y57KP-50348',
+      type: 'OUT',
+    });
+    expect(receipt.url).toContain('%2B');
+    expect(receipt.url).not.toContain('+');
+    expect(parseSerbianReceipt(receipt.url)).toEqual(receipt);
+  });
+
+  it('accepts mixed escaped and literal base64 plus signs', () => {
+    const mixed = unescaped.replace('+', '%2B');
+    expect(parseSerbianReceipt(mixed)).toEqual(parseSerbianReceipt(unescaped));
+  });
+
+  it('does not accept an encoded space in a base64 payload', () => {
+    expect(() => parseSerbianReceipt(unescaped.replace('+', '%20'))).toThrowError(new ReceiptError('invalid'));
   });
 
   it.each([1, 2, 3, 4])('rejects non-normal invoice type %i', (type) => {
