@@ -10,6 +10,7 @@
   import { translate } from '$lib/translate';
   import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
   import Layout from '$lib/ui/layout/Layout.svelte';
+  import Analytics from '../../../Analytics.svelte';
   import { getSearchParam } from '$lib/utils';
 
   import EditGroupForm from './EditGroupForm.svelte';
@@ -46,7 +47,7 @@
   };
 </script>
 
-<Layout {title} leftSlot={HeaderBackButton}>
+<Layout {title} leftSlot={HeaderBackButton} section={Analytics} sectionTitle={$translate('analytics.title')}>
   {#if notFound}
     <GroupingNotFound />
   {:else if grouping}

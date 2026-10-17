@@ -3,6 +3,7 @@ export type Messages =
   // Common
   | 'common.back'
   | 'common.select'
+  | 'common.select_page'
   | 'common.accept'
   | 'common.apply'
   | 'common.available_variants'

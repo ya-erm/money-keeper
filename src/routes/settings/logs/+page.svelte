@@ -9,6 +9,7 @@
   import { translate } from '$lib/translate';
   import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
   import Layout from '$lib/ui/layout/Layout.svelte';
+  import Settings from '../Settings.svelte';
   import Tags from '$lib/ui/Tags.svelte';
   import { LogLevel, logs } from '$lib/utils/logger';
 
@@ -46,7 +47,12 @@
   }
 </script>
 
-<Layout title={$translate('settings.logs')} leftSlot={HeaderBackButton}>
+<Layout
+  title={$translate('settings.logs')}
+  leftSlot={HeaderBackButton}
+  section={Settings}
+  sectionTitle={$translate('settings.title')}
+>
   <div class="p-1">
     <Button appearance="link" underlined={false} onClick={() => (filtersVisible = !filtersVisible)}>
       <div class="flex items-center">

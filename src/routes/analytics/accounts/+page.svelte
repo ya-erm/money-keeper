@@ -3,6 +3,7 @@
 
   import { translate } from '$lib/translate';
   import Layout from '$lib/ui/layout/Layout.svelte';
+  import Analytics from '../Analytics.svelte';
   import AnalyticsBackButton from '../AnalyticsBackButton.svelte';
   import AnalyticsBalancesVisibilityButton from '../AnalyticsBalancesVisibilityButton.svelte';
   import { resetAnalyticsBalancesVisibility } from '../store';
@@ -12,6 +13,8 @@
 </script>
 
 <Layout
+  section={Analytics}
+  sectionTitle={$translate('analytics.title')}
   title={$translate('accounts.title')}
   leftSlot={AnalyticsBackButton}
   rightSlot={AnalyticsBalancesVisibilityButton}

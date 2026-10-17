@@ -9,6 +9,7 @@
   import { translate } from '$lib/translate';
   import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
   import Layout from '$lib/ui/layout/Layout.svelte';
+  import Settings from '../Settings.svelte';
   import KnownPlaceModal from '$lib/widgets/KnownPlaceModal.svelte';
   import { findNearbyPlaces } from '$lib/utils/geolocation';
   import { handleError } from '$lib/utils';
@@ -59,7 +60,12 @@
   };
 </script>
 
-<Layout title={$translate('settings.known_places')} leftSlot={HeaderBackButton}>
+<Layout
+  title={$translate('settings.known_places')}
+  leftSlot={HeaderBackButton}
+  section={Settings}
+  sectionTitle={$translate('settings.title')}
+>
   <div class="flex-col gap-1 p-1">
     <p class="description">{$translate('known_places.description')}</p>
     <div data-testId="AutoDetectLocationSetting">

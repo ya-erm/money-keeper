@@ -1,11 +1,13 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   export let href: string | undefined = undefined;
   export let onClick: (() => void) | undefined = undefined;
 </script>
 
 <li class="list-group-item">
   {#if href}
-    <a class="item" {href}>
+    <a class="item" {href} aria-current={$page.url.pathname === href ? 'page' : undefined}>
       <slot />
     </a>
   {:else}
@@ -46,5 +48,11 @@
     background: none;
     font-size: inherit;
     padding: 0;
+  }
+  @media (min-width: 1200px) {
+    .item[aria-current='page'] {
+      color: var(--active-color);
+      background: var(--hover-background-color);
+    }
   }
 </style>
