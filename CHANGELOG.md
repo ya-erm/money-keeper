@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.32.0 - 2026-10-22
+
+### Added
+
+- Added an experimental on-device receipt text reader for unreadable Serbian QR codes. Take a photo or select an image, review and edit recognized verification details, then copy them into the tax authority's manual verification form and return to import its QR code. Missing details can also be entered manually.
+
 ## 2.31.0 - 2026-10-17
 
 ### Added

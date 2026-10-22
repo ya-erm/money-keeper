@@ -8,11 +8,13 @@
   import { translate } from '$lib/translate';
   import type { Messages } from '$lib/translate/messages';
   import { parseSerbianReceipt, ReceiptError, type SerbianReceipt, type ReceiptDetails } from './serbianReceipt';
+  import ReceiptTextReader from './ReceiptTextReader.svelte';
 
   export let onApply: (receipt: SerbianReceipt) => void;
   export let onClose: () => void;
 
   let opened = true;
+  let textMode = false;
   let link = '';
   let receipt: SerbianReceipt | null = null;
   let error: Messages | null = null;
@@ -222,13 +224,26 @@
     stopCamera();
     photoInput.click();
   };
+
+  const readText = () => {
+    stopCamera();
+    textMode = true;
+  };
+
+  const backToQr = async () => {
+    textMode = false;
+    await tick();
+    if (!destroyed) void startCamera();
+  };
 </script>
 
 <svelte:document on:visibilitychange={() => document.hidden && stopCamera()} />
 
-<Modal bind:opened header={$translate('receipts.scan')} width={24}>
+<Modal bind:opened header={$translate(textMode ? 'receipts.ocr.title' : 'receipts.scan')} width={24}>
   <div class="flex-col gap-1" data-testId="ReceiptScanner">
-    {#if !receipt}
+    {#if textMode}
+      <ReceiptTextReader onBack={backToQr} />
+    {:else if !receipt}
       <p class="hint">{$translate('receipts.hint')}</p>
       <div class="camera-preview" data-testId="ReceiptCameraPreview">
         <video bind:this={video} class:visible={camera} muted playsinline aria-label={$translate('receipts.camera')}
@@ -269,6 +284,7 @@
         clearable
         translate={$translate}
       />
+      <Button appearance="link" text={$translate('receipts.ocr.start')} onClick={readText} disabled={busy} />
     {/if}
     {#if receipt}
       <div class="flex-col gap-0.5" data-testId="ReceiptPreview">

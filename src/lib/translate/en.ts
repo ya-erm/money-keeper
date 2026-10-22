@@ -4,6 +4,30 @@ import type { Dictionary } from './types';
 
 export const enDict: Dictionary = {
   'app.title': 'Money Keeper',
+  'receipts.ocr.title': 'Receipt details',
+  'receipts.ocr.start': 'QR unreadable? Read receipt text',
+  'receipts.ocr.hint':
+    'Photograph the whole receipt with its PFR number, counter, total and time visible. Text is recognized on this device. Language models download on first use.',
+  'receipts.ocr.take_photo': 'Take photo',
+  'receipts.ocr.photo': 'Receipt photo',
+  'receipts.ocr.progress': 'Reading receipt… {progress}%',
+  'receipts.ocr.failed': 'Could not read the receipt. Try another photo or fill in the fields manually.',
+  'receipts.ocr.no_fields': 'No receipt details found. Take a closer photo or fill in the fields manually.',
+  'receipts.ocr.review':
+    'Check every field against the receipt, especially similar characters 0/O, 5/S and U/Y. Complete or correct empty and highlighted fields.',
+  'receipts.ocr.manual': 'You can enter the details manually. Labels match the fields on the tax authority website.',
+  'receipts.ocr.check_field': 'Check this value against the receipt',
+  'receipts.ocr.invoice': 'PFR number · ПФР број рачуна',
+  'receipts.ocr.counter': 'Counter · Бројач рачуна',
+  'receipts.ocr.extension': 'Letters after the counter',
+  'receipts.ocr.amount': 'Total · Укупан износ',
+  'receipts.ocr.date': 'Date and time · ПФР време',
+  'receipts.ocr.copy_field': 'Copy: {field}',
+  'receipts.ocr.copy_failed': 'Could not copy. Select and copy the field value manually.',
+  'receipts.ocr.verify_hint':
+    'Open the tax authority verification form and paste these details using the copy buttons. Complete verification on the website. Then return to QR and upload a screenshot of the result page’s QR or paste the link it contains.',
+  'receipts.ocr.verify': 'Open tax authority verification',
+  'receipts.ocr.back': 'Return to QR',
   'receipts.scan': 'Scan receipt QR',
   'receipts.scan_qr': 'Scan QR',
   'receipts.another': 'Load another receipt',
