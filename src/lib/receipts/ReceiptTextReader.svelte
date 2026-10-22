@@ -27,10 +27,10 @@
   let galleryInput: HTMLInputElement;
   let copyTimer: ReturnType<typeof setTimeout> | undefined;
   const inputs: { key: Exclude<keyof ReceiptTextFields, 'extension'>; label: Messages; placeholder: string }[] = [
-    { key: 'invoiceNumber', label: 'receipts.ocr.invoice', placeholder: '625HUY57-625HUY57-55646' },
-    { key: 'counter', label: 'receipts.ocr.counter', placeholder: '55237/55646' },
-    { key: 'amount', label: 'receipts.ocr.amount', placeholder: '580.00' },
-    { key: 'dateTime', label: 'receipts.ocr.date', placeholder: '21.10.2026. 21:19:12' },
+    { key: 'invoiceNumber', label: 'receipts.ocr.invoice', placeholder: 'XXXXXXXX-XXXXXXXX-00000' },
+    { key: 'counter', label: 'receipts.ocr.counter', placeholder: '00000/00000' },
+    { key: 'amount', label: 'receipts.ocr.amount', placeholder: '0.00' },
+    { key: 'dateTime', label: 'receipts.ocr.date', placeholder: 'DD.MM.YYYY HH:mm:ss' },
   ];
   $: valid = {
     invoiceNumber: /^[A-Z0-9]{8}-[A-Z0-9]{8}-\d{1,12}$/.test(fields.invoiceNumber),

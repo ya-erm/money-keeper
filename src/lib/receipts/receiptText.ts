@@ -59,45 +59,54 @@ export const parseReceiptText = (text: string): ReceiptTextFields => {
     .replace(/[–—−]/g, '-')
     .split(/\r?\n/)
     .map((line) => line.trim());
-  const ids = normalizeIds(text.replace(/[–—−]/g, '-'));
-  const invoices = [...ids.matchAll(/\b([A-Z0-9]{8})\s*-\s*([A-Z0-9]{8})\s*-\s*(\d{1,12})\b/g)];
-  const uniqueInvoices = [...new Set(invoices.map((match) => `${match[1]}-${match[2]}-${match[3]}`))];
-  const invoiceNumber = uniqueInvoices.length === 1 ? uniqueInvoices[0] : '';
+  // Extraction is deliberately more permissive than validation: a damaged OCR
+  // value is useful for editing and must not disappear into an empty input.
+  const invoices = lines.flatMap((line) => [
+    ...normalizeIds(line).matchAll(/([\p{L}\d|!?]{4,14})\s*-\s*([\p{L}\d|!?]{4,14})\s*-\s*([\p{L}\d|!?]{1,14})/gu),
+  ]);
+  const invoiceLine = lines.find(
+    (line) => /(?:ПФ[РЕ]|PFR).*(?:ра[чц]уна|računa|racuna|broj)/i.test(line) && /\d/.test(line),
+  );
+  const labeledInvoice = invoiceLine?.replace(/^.*(?:ра[чц]уна|računa|racuna|broj)[\s:：]*/i, '');
+  const invoiceNumber = labeledInvoice
+    ? normalizeIds(labeledInvoice).replace(/\s/g, '')
+    : invoices[0]
+      ? `${invoices[0][1]}-${invoices[0][2]}-${invoices[0][3]}`
+      : '';
   const invoiceCounter = invoiceNumber.split('-')[2];
   const counters = lines.flatMap((line) => [
-    ...line.matchAll(/\b(\d{1,12})\s*\/\s*(\d{1,12})\s*([ППРКОДА]{2}|PP|PR|KP|KR|OP|OR|PD|RD|AP|AR)?/gi),
+    ...line.matchAll(/\b(\d{1,12})\s*\/\s*([\p{L}\d|!?]+(?:[ \t]+[\p{L}\d|!?]+)*)/gu),
   ]);
-  const matchingCounter =
-    counters.find((match) => match[2] === invoiceCounter) ?? (counters.length === 1 ? counters[0] : undefined);
-  const counter =
-    matchingCounter && (!invoiceCounter || matchingCounter[2] === invoiceCounter)
-      ? `${matchingCounter[1]}/${matchingCounter[2]}`
-      : '';
+  const matchingCounter = counters.find((match) => match[2].startsWith(invoiceCounter)) ?? counters[0];
+  const counterText = matchingCounter ? `${matchingCounter[1]}/${matchingCounter[2].replace(/\s/g, '')}` : '';
+  const extensionMatch = counterText.match(/(ПП|ПР|КП|КР|ОП|ОР|ПД|РД|АП|АР|PP|PR|KP|KR|OP|OR|PD|RD|AP|AR)$/i);
   const extension =
-    matchingCounter?.[3]
-      ?.toUpperCase()
+    extensionMatch?.[1]
+      .toUpperCase()
       .replace(/[PKODAR]/g, (letter) => ({ P: 'П', K: 'К', O: 'О', D: 'Д', A: 'А', R: 'Р' })[letter] ?? letter) ?? '';
+  const counter = extensionMatch ? counterText.slice(0, -extensionMatch[1].length) : counterText;
   const totals = lines
     .filter(
       (line) => /(?:укупан\s+износ|ukupan\s+iznos|total\s+amount)/i.test(line) && !/(?:порез|porez|tax)/i.test(line),
     )
-    .map((line) => normalizeReceiptAmount(line.match(/\d[\d\s.,]*[.,]\d{2}(?!\d)/)?.[0] ?? ''))
+    .map((line) => {
+      const value = line.replace(/^.*?(?:укупан\s+износ|ukupan\s+iznos|total\s+amount)[\s:：'"-]*/i, '').trim();
+      return normalizeReceiptAmount(value) || value;
+    })
     .filter(Boolean);
-  const dates = [
-    ...text.matchAll(
-      /\b(\d{1,2})\s*\.\s*(\d{1,2})\s*\.\s*(20\d{2})\.?\s+(\d{1,2})\s*:\s*(\d{2})(?:\s*:\s*(\d{2}))?(?!\d)/g,
-    ),
-  ]
+  const dates = lines
+    .flatMap((line) => [
+      ...line.matchAll(/\b(\d{1,2})\s*\.\s*(\d{1,2})\s*\.\s*(20\d{2})\.?[ \t]+(\d{1,2})[ \t]*:[ \t]*([\d: \t]+)/g),
+    ])
     .map(
       (match) =>
-        `${match[1].padStart(2, '0')}.${match[2].padStart(2, '0')}.${match[3]}. ${match[4].padStart(2, '0')}:${match[5]}${match[6] ? `:${match[6]}` : ''}`,
-    )
-    .filter(validReceiptDateTime);
+        `${match[1].padStart(2, '0')}.${match[2].padStart(2, '0')}.${match[3]}. ${match[4].padStart(2, '0')}:${match[5].replace(/\s/g, '')}`,
+    );
   return {
     invoiceNumber,
     counter,
     extension: counter && counterExtensions.includes(extension) ? extension : '',
-    amount: new Set(totals).size === 1 ? totals[0] : '',
-    dateTime: new Set(dates).size === 1 ? dates[0] : '',
+    amount: totals[0] ?? '',
+    dateTime: dates[0] ?? '',
   };
 };

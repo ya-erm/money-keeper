@@ -37,14 +37,34 @@ describe('receipt text recognition', () => {
   it('does not guess missing fields or silently replace ambiguous ID characters', () => {
     expect(parseReceiptText('ПФР број: 625H0Y57-625HUY57-55646').invoiceNumber).toBe('625H0Y57-625HUY57-55646');
     expect(parseReceiptText('')).toEqual({ invoiceNumber: '', counter: '', extension: '', amount: '', dateTime: '' });
-    expect(parseReceiptText('625HUY57-625HUY57-55646\n55237/5564607Л\n21.10.2026 21:1970').counter).toBe('');
-    expect(parseReceiptText('21.10.2026 21:1970').dateTime).toBe('');
+    expect(parseReceiptText('625HUY57-625HUY57-55646\n55237/5564607Л\n21.10.2026 21:1970').counter).toBe(
+      '55237/5564607Л',
+    );
+    expect(parseReceiptText('21.10.2026 21:1970').dateTime).toBe('21.10.2026. 21:1970');
   });
-  it('leaves ambiguous receipts and contradictory counters for manual input', () => {
+  it('preserves the first candidate and contradictory counters for correction', () => {
     const text = 'ABCD1234-EFGH5678-12\nABCD1234-EFGH5678-13\nУкупан износ: 10,00\nУкупан износ: 20,00';
-    expect(parseReceiptText(text).invoiceNumber).toBe('');
-    expect(parseReceiptText(text).amount).toBe('');
-    expect(parseReceiptText('ABCD1234-EFGH5678-12\n10/13ПП').counter).toBe('');
+    expect(parseReceiptText(text).invoiceNumber).toBe('ABCD1234-EFGH5678-12');
+    expect(parseReceiptText(text).amount).toBe('10.00');
+    expect(parseReceiptText('ABCD1234-EFGH5678-12\n10/13ПП').counter).toBe('10/13');
+  });
+  it('keeps malformed OCR as editable values instead of requiring re-entry', () => {
+    expect(
+      parseReceiptText(`ПФР број рачуна: 625H?Y57-625HUY5?-5564G
+      Бројач рачуна: 55237/55б46ПП
+      Укупан износ: 58O,OO
+      ПФР време: 21.10.2026. 21:1970`),
+    ).toEqual({
+      invoiceNumber: '625H?Y57-625HUY5?-5564G',
+      counter: '55237/55б46',
+      extension: 'ПП',
+      amount: '58O,OO',
+      dateTime: '21.10.2026. 21:1970',
+    });
+  });
+  it('preserves a labeled PFR value even with missing separators or spaces inside IDs', () => {
+    expect(parseReceiptText('ПФР број рачуна: 625HU Y57 625HUY57-5564G').invoiceNumber).toBe('625HUY57625HUY57-5564G');
+    expect(parseReceiptText('ПФЕ У рачуна: 625HU Y57-625HUY57-55646').invoiceNumber).toBe('625HUY57-625HUY57-55646');
   });
   it.each([
     ['1,234.70', '1234.70'],

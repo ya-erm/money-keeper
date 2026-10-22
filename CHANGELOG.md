@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.32.1 - 2026-10-22
+
+### Fixed
+
+- Preserve imperfect OCR results as editable receipt field values so individual characters can be corrected without retyping the whole field.
+
 ## 2.32.0 - 2026-10-22
 
 ### Added
