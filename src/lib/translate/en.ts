@@ -4,6 +4,7 @@ import type { Dictionary } from './types';
 
 export const enDict: Dictionary = {
   'app.title': 'Money Keeper',
+  'receipts.manual': 'Manually',
   'receipts.scan': 'Scan receipt QR',
   'receipts.scan_qr': 'Scan QR',
   'receipts.another': 'Load another receipt',

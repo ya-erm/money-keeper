@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.32.2 - 2026-10-22
+
+### Added
+
+- Added a “Manually” link beside the receipt URL field in the QR scanner, opening the Serbian tax authority's manual verification page in a new tab.
+
 ## 2.31.0 - 2026-10-17
 
 ### Added

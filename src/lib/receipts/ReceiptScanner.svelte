@@ -261,8 +261,14 @@
         data-testId="ReceiptPhotoInput"
         hidden
       />
+      <div class="receipt-link-heading">
+        <label for="receipt-link">{$translate('receipts.link')}</label>
+        <a href="https://suf.purs.gov.rs/verify" target="_blank" rel="noopener noreferrer">
+          {$translate('receipts.manual')}
+        </a>
+      </div>
       <Input
-        label={$translate('receipts.link')}
+        id="receipt-link"
         bind:value={link}
         name="receipt-link"
         onChange={handleLinkChange}
@@ -318,6 +324,16 @@
   }
   .items-error {
     text-align: center;
+  }
+  .receipt-link-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: -0.5rem;
+  }
+  .receipt-link-heading a {
+    text-decoration: none;
   }
   .camera-preview {
     position: relative;

@@ -4,6 +4,7 @@ import type { Dictionary } from './types';
 
 export const ruDict: Dictionary = {
   'app.title': 'Money Keeper',
+  'receipts.manual': 'Вручную',
   'receipts.scan': 'Сканировать QR чека',
   'receipts.scan_qr': 'Сканировать QR',
   'receipts.another': 'Загрузить другой чек',

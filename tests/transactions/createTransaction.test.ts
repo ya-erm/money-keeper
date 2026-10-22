@@ -116,6 +116,7 @@ test.describe('Transactions > Create', () => {
       const comment = 'E2E incoming';
       await commentInput.fill(comment);
       await page.getByRole('heading', { level: 1, name: 'New operation' }).click();
+      await page.getByTestId('TransactionForm').evaluate((form) => form.scrollIntoView({ block: 'start' }));
       await expect(page).toHaveScreenshot('1-incoming-transaction-form-filled.png', {
         maxDiffPixels: 30,
       });
