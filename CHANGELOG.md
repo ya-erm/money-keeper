@@ -1,16 +1,10 @@
 # Changelog
 
-## 2.32.1 - 2026-10-22
-
-### Fixed
-
-- Preserve imperfect OCR results as editable receipt field values so individual characters can be corrected without retyping the whole field.
-
-## 2.32.0 - 2026-10-22
+## 2.32.2 - 2026-10-22
 
 ### Added
 
-- Added an experimental on-device receipt text reader for unreadable Serbian QR codes. Take a photo or select an image, review and edit recognized verification details, then copy them into the tax authority's manual verification form and return to import its QR code. Missing details can also be entered manually.
+- Added a “Manually” link beside the receipt URL field in the QR scanner, opening the Serbian tax authority's manual verification page in a new tab.
 
 ## 2.31.0 - 2026-10-17
 

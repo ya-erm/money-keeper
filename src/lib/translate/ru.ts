@@ -4,30 +4,7 @@ import type { Dictionary } from './types';
 
 export const ruDict: Dictionary = {
   'app.title': 'Money Keeper',
-  'receipts.ocr.title': 'Реквизиты чека',
-  'receipts.ocr.start': 'QR не читается? Распознать реквизиты',
-  'receipts.ocr.hint':
-    'Сфотографируйте весь чек, чтобы были видны номер ПФР, счётчик, сумма и время. Текст распознаётся на устройстве. При первом запуске загрузятся языковые модели.',
-  'receipts.ocr.take_photo': 'Снять чек',
-  'receipts.ocr.photo': 'Фото чека',
-  'receipts.ocr.progress': 'Распознаём реквизиты… {progress}%',
-  'receipts.ocr.failed': 'Не удалось распознать чек. Попробуйте другое фото или заполните поля вручную.',
-  'receipts.ocr.no_fields': 'Реквизиты не найдены. Попробуйте снять чек ближе или заполните поля вручную.',
-  'receipts.ocr.review':
-    'Сверьте все поля с чеком, особенно похожие символы 0/O, 5/S и U/Y. Пустые и подсвеченные поля нужно заполнить или исправить.',
-  'receipts.ocr.manual': 'Можно заполнить реквизиты вручную. Названия соответствуют полям на сайте налоговой.',
-  'receipts.ocr.check_field': 'Проверьте значение по чеку',
-  'receipts.ocr.invoice': 'Номер ПФР · ПФР број рачуна',
-  'receipts.ocr.counter': 'Счётчик · Бројач рачуна',
-  'receipts.ocr.extension': 'Буквы после счётчика',
-  'receipts.ocr.amount': 'Сумма · Укупан износ',
-  'receipts.ocr.date': 'Дата и время · ПФР време',
-  'receipts.ocr.copy_field': 'Скопировать: {field}',
-  'receipts.ocr.copy_failed': 'Не удалось скопировать. Выделите и скопируйте значение в поле.',
-  'receipts.ocr.verify_hint':
-    'Откройте проверку налоговой и вставьте реквизиты, копируя их кнопками справа. Пройдите проверку на сайте. Затем вернитесь к QR и загрузите скриншот QR со страницы результата или вставьте ссылку из него.',
-  'receipts.ocr.verify': 'Открыть проверку налоговой',
-  'receipts.ocr.back': 'Вернуться к QR',
+  'receipts.manual': 'Вручную',
   'receipts.scan': 'Сканировать QR чека',
   'receipts.scan_qr': 'Сканировать QR',
   'receipts.another': 'Загрузить другой чек',
