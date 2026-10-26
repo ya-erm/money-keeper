@@ -8,6 +8,8 @@
   import { translate } from '$lib/translate';
   import type { Messages } from '$lib/translate/messages';
   import { parseSerbianReceipt, ReceiptError, type SerbianReceipt, type ReceiptDetails } from './serbianReceipt';
+  import { QrDecoder } from './qrDecoder';
+  import { qrCanvasSize, qrScanRegions } from './qrScanRegions';
 
   export let onApply: (receipt: SerbianReceipt) => void;
   export let onClose: () => void;
@@ -29,12 +31,20 @@
   let detailsError = false;
   let detailsController: AbortController | null = null;
   let photoInput: HTMLInputElement;
-  const decoder = () => import('jsqr').then((module) => module.default);
+  let decoder: QrDecoder | undefined;
+  let scanCanvas: HTMLCanvasElement | undefined;
 
   $: if (!opened) onClose();
 
+  const stopDecoder = () => {
+    decoder?.destroy();
+    decoder = undefined;
+    if (scanCanvas) scanCanvas.width = scanCanvas.height = 1;
+  };
+
   const stopCamera = () => {
     revision++;
+    stopDecoder();
     clearTimeout(timer);
     clearTimeout(linkTimer);
     stream?.getTracks().forEach((track) => track.stop());
@@ -120,17 +130,28 @@
     }
   };
 
-  const readPixels = async (source: HTMLImageElement | HTMLVideoElement, width: number, height: number) => {
-    const jsQR = await decoder();
-    const canvas = document.createElement('canvas');
-    const scale = Math.min(1, 1800 / Math.max(width, height));
-    canvas.width = Math.max(1, Math.round(width * scale));
-    canvas.height = Math.max(1, Math.round(height * scale));
+  const readPixels = async (
+    source: HTMLImageElement | HTMLVideoElement,
+    width: number,
+    height: number,
+    photo = false,
+  ) => {
+    const current = revision;
+    const reader = (decoder ??= new QrDecoder());
+    const canvas = (scanCanvas ??= document.createElement('canvas'));
     const context = canvas.getContext('2d', { willReadFrequently: true });
     if (!context) throw new Error('Canvas unavailable');
-    context.drawImage(source, 0, 0, canvas.width, canvas.height);
-    const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
-    return jsQR(pixels.data, pixels.width, pixels.height)?.data;
+    for (const region of qrScanRegions(width, height, photo)) {
+      if (destroyed || current !== revision) return;
+      const size = qrCanvasSize(region);
+      if (canvas.width !== size.width) canvas.width = size.width;
+      if (canvas.height !== size.height) canvas.height = size.height;
+      context.imageSmoothingEnabled = false;
+      context.drawImage(source, region.x, region.y, region.width, region.height, 0, 0, canvas.width, canvas.height);
+      const value = await reader.decode(context.getImageData(0, 0, canvas.width, canvas.height), photo);
+      if (destroyed || current !== revision) return;
+      if (value) return value;
+    }
   };
 
   const startCamera = async () => {
@@ -145,7 +166,7 @@
     startingCamera = true;
     try {
       const media = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 3840 }, height: { ideal: 2160 } },
         audio: false,
       });
       if (destroyed || current !== revision) {
@@ -153,6 +174,17 @@
         return;
       }
       stream = media;
+      const track = media.getVideoTracks()[0];
+      try {
+        const capabilities = track?.getCapabilities?.() as { focusMode?: string[] } | undefined;
+        if (capabilities?.focusMode?.includes('continuous')) {
+          void track
+            .applyConstraints({ advanced: [{ focusMode: 'continuous' } as ReturnType<typeof track.getConstraints>] })
+            .catch(() => {});
+        }
+      } catch {
+        // Unsupported camera controls must never prevent the stream from starting.
+      }
       video.srcObject = media;
       await video.play();
       if (destroyed || current !== revision) return;
@@ -170,7 +202,7 @@
               return;
             }
           }
-          timer = setTimeout(() => void scan(), 250);
+          timer = setTimeout(() => void scan(), 150);
         } catch {
           if (destroyed || current !== revision) return;
           stopCamera();
@@ -205,13 +237,14 @@
       image.src = url;
       await image.decode();
       if (destroyed || current !== revision) return;
-      const value = await readPixels(image, image.naturalWidth, image.naturalHeight);
+      const value = await readPixels(image, image.naturalWidth, image.naturalHeight, true);
       if (destroyed || current !== revision) return;
       if (value) readReceipt(value);
       else error = 'receipts.no_qr';
     } catch {
       if (!destroyed && current === revision) error = 'receipts.photo_failed';
     } finally {
+      if (current === revision) stopDecoder();
       URL.revokeObjectURL(url);
       busy = false;
       input.value = '';

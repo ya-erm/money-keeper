@@ -1,6 +1,6 @@
 {
   "name": "money-keeper",
-  "version": "2.32.2",
+  "version": "2.32.3",
   "private": true,
   "scripts": {
     "dev": "vite dev",
@@ -69,7 +69,8 @@
     "leaflet": "1.9.4",
     "svelte-dnd-action": "^0.9.79",
     "timezones-list": "^3.1.0",
-    "uuid": "^14.0.2"
+    "uuid": "^14.0.2",
+    "zxing-wasm": "3.1.6"
   },
   "type": "module",
   "overrides": {

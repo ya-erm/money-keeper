@@ -344,6 +344,42 @@ test('scans a QR video frame and stops the camera after reading it', async ({ pa
   ).toBe('ended');
 });
 
+test('reads a small dense QR in a high-resolution camera frame', async ({ page }) => {
+  await page.evaluate(
+    async (dataUrl) => {
+      const image = new Image();
+      image.src = dataUrl;
+      await image.decode();
+      const canvas = document.createElement('canvas');
+      canvas.width = 3840;
+      canvas.height = 2160;
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Canvas unavailable');
+      context.fillStyle = 'white';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.imageSmoothingEnabled = false;
+      context.drawImage(image, 1695, 855, 450, 450);
+      const stream = canvas.captureStream(5);
+      Object.assign(window, { receiptTestStream: stream });
+      navigator.mediaDevices.getUserMedia = async () => stream;
+    },
+    `data:image/png;base64,${readFileSync(photo).toString('base64')}`,
+  );
+  await page.getByTestId('ReceiptScanner').getByRole('button', { name: 'Camera', exact: true }).click();
+  await expect(page.getByTestId('ReceiptPreview')).toContainText('525.70 RSD');
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { receiptTestStream: MediaStream }).receiptTestStream.getTracks()[0].readyState,
+    ),
+  ).toBe('ended');
+});
+
+test('can read a photo when the WASM asset cannot be loaded', async ({ page }) => {
+  await page.route('**/*zxing_reader*.wasm', (route) => route.abort());
+  await page.getByTestId('ReceiptPhotoInput').setInputFiles(photo);
+  await expect(page.getByTestId('ReceiptPreview')).toContainText('525.70 RSD');
+});
+
 test('starts the camera automatically without shifting the reserved square preview', async ({ page }, testInfo) => {
   const scanner = page.getByTestId('ReceiptScanner');
   await scanner.getByRole('button', { name: 'Close', exact: true }).click();
