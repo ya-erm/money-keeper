@@ -7,6 +7,9 @@ type UserConfigWithTest = UserConfig & {
 };
 
 const config: UserConfigWithTest = {
+  // Worker imports are not discovered by the initial browser dependency scan.
+  // Prebundle them so the first QR read does not reload the open operation form.
+  optimizeDeps: { include: ['jsqr', 'zxing-wasm/reader'] },
   plugins: [
     sveltekit(),
     // SvelteKitPWA({

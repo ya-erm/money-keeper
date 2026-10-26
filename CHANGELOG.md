@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.32.3 - 2026-10-26
+
+### Fixed
+
+- Improved dense receipt QR reading with a local ZXing-C++ decoder in a worker, higher camera resolution and continuous focus where supported. Scanning preserves more image detail and tries overlapping photo regions; the previous decoder remains available as a fallback.
+
 ## 2.32.2 - 2026-10-22
 
 ### Added
