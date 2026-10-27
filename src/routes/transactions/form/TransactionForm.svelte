@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import dayjs from 'dayjs';
   import { v4 as uuid } from 'uuid';
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
 
   import Button from '@ya-erm/svelte-ui/Button';
   import Checkbox from '@ya-erm/svelte-ui/Checkbox';
@@ -12,8 +12,8 @@
   import Spoiler from '@ya-erm/svelte-ui/Spoiler';
   import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
 
-  import { membersService, memberSettingsStore, operationTagsService } from '$lib/data';
-  import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
+  import { membersService, memberSettingsStore, operationTagsService } from '#lib/data/index.js';
+  import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '#lib/data/categories.js';
   import type {
     AccountViewModel,
     Category,
@@ -22,30 +22,30 @@
     Transaction,
     TransactionViewModel,
     VerificationStatus,
-  } from '$lib/data/interfaces';
-  import { operationsCommentsStore, operationsStore } from '$lib/data/operations';
-  import { withVerification } from '$lib/data/verification';
-  import { repeatingsService, repeatingsStore } from '$lib/data/repeatings';
-  import { translate } from '$lib/translate';
-  import type { Messages } from '$lib/translate/messages';
-  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
+  } from '#lib/data/interfaces.js';
+  import { operationsCommentsStore, operationsStore } from '#lib/data/operations.js';
+  import { withVerification } from '#lib/data/verification.js';
+  import { repeatingsService, repeatingsStore } from '#lib/data/repeatings.js';
+  import { translate } from '#lib/translate/index.js';
+  import type { Messages } from '#lib/translate/messages.js';
+  import SubScreen from '#lib/ui/layout/SubScreen.svelte';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
-  import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '$lib/utils';
-  import { replaceCalcExpressions } from '$lib/utils/calc';
+  import { formatMoney, getSearchParam, getTimeZoneOffset, handleError } from '#lib/utils/index.js';
+  import { replaceCalcExpressions } from '#lib/utils/calc.js';
   import {
     checkNumberFormParameter,
     checkStringFormParameter,
     checkStringOptionalFormParameter,
-  } from '$lib/utils/checkFormParams';
-  import TagsList from '$lib/widgets/TagsList.svelte';
-  import TimeZoneList from '$lib/widgets/TimeZoneList.svelte';
-  import PlaceSelector from '$lib/widgets/PlaceSelector.svelte';
-  import LocationPicker from '$lib/widgets/LocationPicker.svelte';
-  import { findNearbyPlaces, isValidCoordinates, type Coordinates } from '$lib/utils/geolocation';
-  import ReceiptScanner from '$lib/receipts/ReceiptScanner.svelte';
-  import type { SerbianReceipt } from '$lib/receipts/serbianReceipt';
-  import PurchaseItemsEditor from '$lib/receipts/PurchaseItemsEditor.svelte';
-  import { toPurchaseItems, type PurchaseItemDraft } from '$lib/receipts/purchaseItems';
+  } from '#lib/utils/checkFormParams.js';
+  import TagsList from '#lib/widgets/TagsList.svelte';
+  import TimeZoneList from '#lib/widgets/TimeZoneList.svelte';
+  import PlaceSelector from '#lib/widgets/PlaceSelector.svelte';
+  import LocationPicker from '#lib/widgets/LocationPicker.svelte';
+  import { findNearbyPlaces, isValidCoordinates, type Coordinates } from '#lib/utils/geolocation.js';
+  import ReceiptScanner from '#lib/receipts/ReceiptScanner.svelte';
+  import type { SerbianReceipt } from '#lib/receipts/serbianReceipt.js';
+  import PurchaseItemsEditor from '#lib/receipts/PurchaseItemsEditor.svelte';
+  import { toPurchaseItems, type PurchaseItemDraft } from '#lib/receipts/purchaseItems.js';
 
   import RepeatingModal from '../../repeatings/RepeatingModal.svelte';
   import RepeatingsList from '../../repeatings/RepeatingsList.svelte';
@@ -422,9 +422,13 @@
           amount: checkNumberFormParameter(formData, 'destinationAmount'),
           comment: checkStringOptionalFormParameter(formData, 'comment')?.trim(),
           ...(destinationTransaction?.description ? { description: destinationTransaction.description } : {}),
+
           ...(destinationTransaction?.receiptUrl ? { receiptUrl: destinationTransaction.receiptUrl } : {}),
+
           ...(destinationTransaction?.purchaseItems
-            ? { purchaseItems: destinationTransaction.purchaseItems.map((item) => ({ ...item })) }
+            ? {
+                purchaseItems: destinationTransaction.purchaseItems.map((item) => ({ ...item })),
+              }
             : {}),
           tagIds,
           linkedTransactionId: transactions[0].id,
@@ -487,9 +491,8 @@
     {/if}
     <div class="flex-col gap-0.5">
       <div class="flex gap-1 justify-between">
-        <span class="flex-shrink-0">
-          <InputLabel text={$translate('transactions.dateTime')} />
-        </span>
+        <span class="flex-shrink-0"><InputLabel text={$translate('transactions.dateTime')} /></span>
+
         <Button appearance="link" underlined={false} onClick={() => (timeZoneListVisible = true)}>
           {#if timeZone}
             <div class="flex gap-0.25">
@@ -523,9 +526,9 @@
               {$translate('transactions.another_currency')}
             </Button>
           {:else}
-            <Button appearance="link" underlined={false} onClick={() => (anotherCurrency = null)}>
-              {$translate('transactions.same_currency')}
-            </Button>
+            <Button appearance="link" underlined={false} onClick={() => (anotherCurrency = null)}
+              >{$translate('transactions.same_currency')}</Button
+            >
           {/if}
         {/if}
       </div>
@@ -701,9 +704,9 @@
               />
             </div>
             {#if repeatingChecked}
-              <Button appearance="link" underlined={false} onClick={() => (repeatingModalOpened = true)}>
-                {$translate('transactions.repeatings.configure')}
-              </Button>
+              <Button appearance="link" underlined={false} onClick={() => (repeatingModalOpened = true)}
+                >{$translate('transactions.repeatings.configure')}</Button
+              >
             {/if}
           </div>
         </div>
@@ -754,9 +757,9 @@
       </div>
     </div>
 
-    <slot />
-    <slot name="button" />
-    <slot name="footer" />
+    <slot></slot>
+    <slot name="button"></slot>
+    <slot name="footer"></slot>
   </div>
 </form>
 

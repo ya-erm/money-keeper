@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import { unexpectedCase } from '$lib/utils';
+import { unexpectedCase } from '#lib/utils/index.js';
 
 import type { Repeating } from './interfaces';
 import { BaseService } from './service';

@@ -3,10 +3,10 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import { showSuccessToast } from '@ya-erm/svelte-ui/toasts';
 
-  import type { TransactionViewModel } from '$lib/data/interfaces';
-  import { copyOperation, deleteOperation } from '$lib/data/operations';
-  import { translate } from '$lib/translate';
-  import Modal from '$lib/ui/Modal.svelte';
+  import type { TransactionViewModel } from '#lib/data/interfaces.js';
+  import { copyOperation, deleteOperation } from '#lib/data/operations.js';
+  import { translate } from '#lib/translate/index.js';
+  import Modal from '#lib/ui/Modal.svelte';
 
   export let opened: boolean;
   export let operation: TransactionViewModel;

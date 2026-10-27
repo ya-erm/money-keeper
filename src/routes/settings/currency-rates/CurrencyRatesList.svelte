@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
 
   import Input from '@ya-erm/svelte-ui/Input';
 
-  import { currencyRatesStore, memberSettingsStore } from '$lib/data';
-  import type { CurrencyRate } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import { deleteSearchParam, findRate, getSearchParam, groupByKeyToMap } from '$lib/utils';
+  import { currencyRatesStore, memberSettingsStore } from '#lib/data/index.js';
+  import type { CurrencyRate } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import { deleteSearchParam, findRate, getSearchParam, groupByKeyToMap } from '#lib/utils/index.js';
 
   import CurrencyRateModal from './CurrencyRateModal.svelte';
 

@@ -3,9 +3,15 @@
 ### ✏️ Rename `.env.example` to `.env` and fill variables
 
 ```
-DATABASE_URL="..."
+POSTGRES_PRISMA_URL="..."
+POSTGRES_URL_NON_POOLING="..."
 ORIGIN="..."
 ```
+
+SvelteKit 3 requires Node 22.17 or later. The Docker image uses Node 24.
+For a standalone Node build, run `BUILD_ADAPTER=node pnpm build`.
+`ORIGIN` is read at build time as `paths.origin`; rebuild the Docker image when it changes.
+Vercel builds use the automatic adapter and derive their origin from the request.
 
 ## Launch local database in docker
 

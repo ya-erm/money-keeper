@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { accountsService } from '$lib/data';
-  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
-  import type { AccountViewModel } from '$lib/data/interfaces';
+  import { accountsService } from '#lib/data/index.js';
+  import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
+  import type { AccountViewModel } from '#lib/data/interfaces.js';
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
 
-  import { translate } from '$lib/translate';
-  import Modal from '$lib/ui/Modal.svelte';
+  import { translate } from '#lib/translate/index.js';
+  import Modal from '#lib/ui/Modal.svelte';
   import CorrectBalanceModal from './CorrectBalanceModal.svelte';
 
   export let opened: boolean;

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { accountsStore, settingsStore } from '$lib/data';
-  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
-  import HeaderButton from '$lib/ui/layout/HeaderButton.svelte';
-  import { translate } from '$lib/translate';
-  import { hasHiddenBalanceAccount } from '$lib/utils';
+  import { accountsStore, settingsStore } from '#lib/data/index.js';
+  import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
+  import HeaderButton from '#lib/ui/layout/HeaderButton.svelte';
+  import { translate } from '#lib/translate/index.js';
+  import { hasHiddenBalanceAccount } from '#lib/utils/index.js';
   import { analyticsBalancesVisibilityMode } from './store';
 
   export let triState = false;

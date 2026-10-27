@@ -1,6 +1,6 @@
 import { readable } from 'svelte/store';
 
-import { browser } from '$app/environment';
+import { browser } from '$app/env';
 
 /** Reactive `window.matchMedia` result, always `false` during SSR */
 export function createMediaQuery(query: string) {

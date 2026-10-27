@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
+  import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
   import { v4 as uuid } from 'uuid';
   import dayjs from 'dayjs';
 
@@ -8,16 +8,16 @@
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Icon from '@ya-erm/svelte-ui/Icon';
-  import type { AccountViewModel, Transaction } from '$lib/data/interfaces';
+  import type { AccountViewModel, Transaction } from '#lib/data/interfaces.js';
 
-  import { settingsStore } from '$lib/data';
-  import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '$lib/data/categories';
-  import { operationsService } from '$lib/data/operations';
-  import { translate } from '$lib/translate';
-  import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
-  import Modal from '$lib/ui/Modal.svelte';
-  import { formatMoney, isBalanceHidden } from '$lib/utils';
-  import { Logger } from '$lib/utils/logger';
+  import { settingsStore } from '#lib/data/index.js';
+  import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '#lib/data/categories.js';
+  import { operationsService } from '#lib/data/operations.js';
+  import { translate } from '#lib/translate/index.js';
+  import HiddenMoney from '#lib/ui/HiddenMoney.svelte';
+  import Modal from '#lib/ui/Modal.svelte';
+  import { formatMoney, isBalanceHidden } from '#lib/utils/index.js';
+  import { Logger } from '#lib/utils/logger.js';
 
   const logger = new Logger('CorrectBalanceModal');
 

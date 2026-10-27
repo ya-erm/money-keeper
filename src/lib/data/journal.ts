@@ -2,14 +2,14 @@ import type {
   GetJournalResponse,
   PostManyJournalRequestData,
   PostManyJournalResponseData,
-} from '$lib/server/api/v2/journal';
-import type { GetJournalRequest } from '$lib/server/api/v2/journal/getJournal';
-import { isApiError } from '$lib/api/ApiError';
-import { store } from '$lib/store';
+} from '#lib/server/api/v2/journal/index.js';
+import type { GetJournalRequest } from '#lib/server/api/v2/journal/getJournal.js';
+import { isApiError } from '#lib/api/ApiError.js';
+import { store } from '#lib/store.js';
 import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
-import { unexpectedCase } from '$lib/utils';
-import { Logger } from '$lib/utils/logger';
-import { useFetch } from '$lib/utils/useFetch';
+import { unexpectedCase } from '#lib/utils/index.js';
+import { Logger } from '#lib/utils/logger.js';
+import { useFetch } from '#lib/utils/useFetch.js';
 
 import { decryptAsync, encryptAsync } from './crypto';
 import type { EncryptionVersion, Initialisable, JournalItem, JournalOperation, JournalSubscriber } from './interfaces';

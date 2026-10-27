@@ -16,6 +16,8 @@ declare namespace App {
     // groupId: number | null;
     // uuid?: string | null;
   }
-  // interface Error {}
+  interface Error {
+    code?: import('#lib/api/ApiError.js').ApiErrorCode;
+  }
   // interface Platform {}
 }

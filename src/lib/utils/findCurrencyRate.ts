@@ -1,4 +1,4 @@
-import type { CurrencyRate } from '$lib/data/interfaces';
+import type { CurrencyRate } from '#lib/data/interfaces.js';
 
 export function findCurrencyRate(
   currencyRates: CurrencyRate[],

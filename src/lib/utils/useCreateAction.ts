@@ -1,5 +1,5 @@
-import { Store } from '$lib/store';
-import type { Page } from '@sveltejs/kit';
+import type { Page } from '$app/state';
+import { Store } from '#lib/store.js';
 import type { Readable } from 'svelte/store';
 import { deleteSearchParam, getSearchParam } from './getSearchParam';
 

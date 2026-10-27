@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { route } from '$lib/routes';
-  import { translate } from '$lib/translate';
+  import { route } from '#lib/routes.js';
+  import { translate } from '#lib/translate/index.js';
 </script>
 
 <div class="flex-col flex-center">

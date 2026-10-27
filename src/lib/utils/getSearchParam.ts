@@ -1,6 +1,5 @@
+import type { Page } from '$app/state';
 import { goto } from '$app/navigation';
-import { resolve } from '$app/paths';
-import type { Page } from '@sveltejs/kit';
 
 export function getNumberSearchParam(page: Page, name: string) {
   return Number.parseInt(page.url.searchParams.get(name) ?? '') || null;
@@ -17,7 +16,7 @@ function getPathWithSearchParams(page: Page, searchParams: URLSearchParams) {
 
 /** Path of the current page with some search params changed (`null` removes a param) */
 export function withSearchParams(page: Page, params: Record<string, string | null>) {
-  const searchParams = new URLSearchParams(page.url.searchParams);
+  const searchParams = new URLSearchParams(page.url.search);
   for (const [name, value] of Object.entries(params)) {
     if (value === null) searchParams.delete(name);
     else searchParams.set(name, value);
@@ -31,15 +30,19 @@ export async function setSearchParam(
   value: string,
   { replace }: { replace: boolean } = { replace: true },
 ) {
-  const searchParams = new URLSearchParams(page.url.searchParams);
+  const searchParams = new URLSearchParams(page.url.search);
   searchParams.set(name, value);
-  await goto(resolve(getPathWithSearchParams(page, searchParams), {}), { replaceState: replace });
+  // The current pathname already includes the configured base path.
+  // eslint-disable-next-line svelte/no-navigation-without-resolve
+  await goto(getPathWithSearchParams(page, searchParams), { replace });
 }
 
 export async function deleteSearchParam(page: Page, name: string | string[]) {
-  const searchParams = new URLSearchParams(page.url.searchParams);
+  const searchParams = new URLSearchParams(page.url.search);
   for (const item of Array.isArray(name) ? name : [name]) {
     searchParams.delete(item);
   }
-  await goto(resolve(getPathWithSearchParams(page, searchParams), {}), { replaceState: true });
+  // The current pathname already includes the configured base path.
+  // eslint-disable-next-line svelte/no-navigation-without-resolve
+  await goto(getPathWithSearchParams(page, searchParams), { replace: true });
 }

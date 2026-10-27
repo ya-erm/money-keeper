@@ -1,15 +1,15 @@
 <script lang="ts">
   import dayjs from 'dayjs';
-  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
+  import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
 
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
 
-  import { currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
-  import { translate } from '$lib/translate';
-  import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
-  import { findRate, formatMoney, hasHiddenBalanceAccount } from '$lib/utils';
-  import { formatHiddenMoney } from '$lib/utils/formatHiddenMoney';
+  import { currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '#lib/data/index.js';
+  import { translate } from '#lib/translate/index.js';
+  import HiddenMoney from '#lib/ui/HiddenMoney.svelte';
+  import { findRate, formatMoney, hasHiddenBalanceAccount } from '#lib/utils/index.js';
+  import { formatHiddenMoney } from '#lib/utils/formatHiddenMoney.js';
 
   import Chart from '../balance/Chart.svelte';
   import { analyticsBalancesVisibilityMode } from '../store';

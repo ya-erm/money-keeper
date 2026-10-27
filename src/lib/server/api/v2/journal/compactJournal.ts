@@ -1,8 +1,8 @@
-import { ApiError } from '$lib/api';
-import { countSnapshotEntities } from '$lib/data/snapshot';
-import { db } from '$lib/server';
-import { loadJournalSnapshot } from '$lib/server/api/v2/snapshot';
-import { checkNumberOptionalParameter } from '$lib/utils';
+import { ApiError } from '#lib/api/index.js';
+import { countSnapshotEntities } from '#lib/data/snapshot.js';
+import { db } from '#lib/server/index.js';
+import { loadJournalSnapshot } from '#lib/server/api/v2/snapshot/index.js';
+import { checkNumberOptionalParameter } from '#lib/utils/index.js';
 
 export type JournalStatsResponseData = {
   /** Number of journal items */

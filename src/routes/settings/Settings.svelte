@@ -1,22 +1,28 @@
 <script lang="ts">
-  import { version } from '$app/environment';
+  import { version } from '$app/env';
   import { goto } from '$app/navigation';
 
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Portal from '@ya-erm/svelte-ui/Portal';
 
-  import { membersService, selectedMemberStore, settingsService, settingsStore, memberSettingsStore } from '$lib/data';
-  import { route, routes } from '$lib/routes';
-  import { activeLocaleName, translate } from '$lib/translate';
-  import LanguageModal from '$lib/translate/LanguageModal.svelte';
-  import Loader from '$lib/ui/Loader.svelte';
-  import ListGroup from '$lib/ui/list/ListGroup.svelte';
-  import ListLinkItem from '$lib/ui/list/ListLinkItem.svelte';
-  import ListSelectItem from '$lib/ui/list/ListSelectItem.svelte';
-  import ListSwitchItem from '$lib/ui/list/ListSwitchItem.svelte';
-  import { darkMode } from '$lib/ui/theme';
-  import createBooleanStore from '$lib/utils/createBooleanStore';
+  import {
+    membersService,
+    selectedMemberStore,
+    settingsService,
+    settingsStore,
+    memberSettingsStore,
+  } from '#lib/data/index.js';
+  import { route, routes } from '#lib/routes.js';
+  import { activeLocaleName, translate } from '#lib/translate/index.js';
+  import LanguageModal from '#lib/translate/LanguageModal.svelte';
+  import Loader from '#lib/ui/Loader.svelte';
+  import ListGroup from '#lib/ui/list/ListGroup.svelte';
+  import ListLinkItem from '#lib/ui/list/ListLinkItem.svelte';
+  import ListSelectItem from '#lib/ui/list/ListSelectItem.svelte';
+  import ListSwitchItem from '#lib/ui/list/ListSwitchItem.svelte';
+  import { darkMode } from '#lib/ui/theme/index.js';
+  import createBooleanStore from '#lib/utils/createBooleanStore.js';
 
   import MainCurrencyModal from './currency-rates/MainCurrencyModal.svelte';
 
@@ -55,7 +61,9 @@
 
 <ListGroup title={$translate('settings.common')}>
   <ListSelectItem title={$translate('settings.language')} value={$activeLocaleName} onClick={openLanguageModal} />
+
   <ListSwitchItem title={$translate('settings.darkMode')} bind:checked={$darkMode} />
+
   <ListSwitchItem
     title={$translate('settings.hideBalances')}
     bind:checked={balancesHidden}

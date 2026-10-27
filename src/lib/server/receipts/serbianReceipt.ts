@@ -1,5 +1,5 @@
 import { load } from 'cheerio';
-import { parseSerbianReceipt, type ReceiptDetails, type ReceiptItem } from '$lib/receipts/serbianReceipt';
+import { parseSerbianReceipt, type ReceiptDetails, type ReceiptItem } from '#lib/receipts/serbianReceipt.js';
 
 const ORIGIN = 'https://suf.purs.gov.rs';
 

@@ -1,4 +1,4 @@
-import { calculate } from '$lib/calc/calculator';
+import { calculate } from '#lib/calc/calculator.js';
 
 import { Logger } from './logger';
 

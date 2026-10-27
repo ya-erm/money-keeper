@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { groupingsStore } from '$lib/data';
-  import type { Grouping } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
+  import { groupingsStore } from '#lib/data/index.js';
+  import type { Grouping } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
 
   import GroupingListItem from './GroupingListItem.svelte';
 

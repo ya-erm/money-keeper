@@ -1,16 +1,16 @@
 <script lang="ts">
   import dayjs from 'dayjs';
 
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
 
   import ShowMoreContainer from '@ya-erm/svelte-ui/ShowMoreContainer';
 
-  import { currencyRatesStore, memberSettingsStore } from '$lib/data';
-  import type { TransactionViewModel } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import HeaderFormSubmitButton from '$lib/ui/layout/HeaderFormSubmitButton.svelte';
-  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
-  import { findCurrencyRate, getSearchParam, setSearchParam } from '$lib/utils';
+  import { currencyRatesStore, memberSettingsStore } from '#lib/data/index.js';
+  import type { TransactionViewModel } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import HeaderFormSubmitButton from '#lib/ui/layout/HeaderFormSubmitButton.svelte';
+  import SubScreen from '#lib/ui/layout/SubScreen.svelte';
+  import { findCurrencyRate, getSearchParam, setSearchParam } from '#lib/utils/index.js';
 
   import TransactionListItem from './TransactionListItem.svelte';
   import EditTransaction from './edit/EditTransaction.svelte';

@@ -2,9 +2,9 @@
   import { tick } from 'svelte';
   import { v4 as uuid } from 'uuid';
   import Icon from '@ya-erm/svelte-ui/Icon';
-  import type { KnownPlace } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import type { Coordinates } from '$lib/utils/geolocation';
+  import type { KnownPlace } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import type { Coordinates } from '#lib/utils/geolocation.js';
 
   export let places: KnownPlace[];
   export let nearby: KnownPlace[];

@@ -1,4 +1,4 @@
-import type { PurchaseItem } from '$lib/data/interfaces';
+import type { PurchaseItem } from '#lib/data/interfaces.js';
 
 export type PurchaseItemDraft = {
   name: string;

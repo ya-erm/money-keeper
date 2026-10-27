@@ -5,8 +5,8 @@ import 'dayjs/locale/ru';
 import './en';
 import './ru';
 
-import { getCookie } from '$lib/utils/cookie';
-import { Logger } from '$lib/utils/logger';
+import { getCookie } from '#lib/utils/cookie.js';
+import { Logger } from '#lib/utils/logger.js';
 
 import { languages } from './constants';
 import type { Locales } from './types';

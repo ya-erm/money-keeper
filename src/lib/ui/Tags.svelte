@@ -2,10 +2,10 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
   // import Modal from '@ya-erm/svelte-ui/Modal'; // TODO: разобраться почему ломается при ssr
-  import Modal from '$lib/ui/Modal.svelte';
+  import Modal from '#lib/ui/Modal.svelte';
 
-  import { translate } from '$lib/translate';
-  import { longPress } from '$lib/utils';
+  import { translate } from '#lib/translate/index.js';
+  import { longPress } from '#lib/utils/index.js';
 
   export let tags: { id: string; title: string }[];
   export let selected: string[];

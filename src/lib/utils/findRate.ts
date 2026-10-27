@@ -1,7 +1,7 @@
-import { currencyRatesService } from '$lib/data';
-import type { CurrencyRate } from '$lib/data/interfaces';
-import { findCurrencyRate } from '$lib/utils';
-import { Logger } from '$lib/utils/logger';
+import { currencyRatesService } from '#lib/data/index.js';
+import type { CurrencyRate } from '#lib/data/interfaces.js';
+import { findCurrencyRate } from '#lib/utils/index.js';
+import { Logger } from '#lib/utils/logger.js';
 
 const logger = new Logger('findRate');
 

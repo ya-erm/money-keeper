@@ -1,5 +1,5 @@
-import type { DateIntervalType } from '$lib/data/interfaces';
-import { storable } from '$lib/storable';
+import type { DateIntervalType } from '#lib/data/interfaces.js';
+import { storable } from '#lib/storable.js';
 
 export const intervalTypeStore = storable<DateIntervalType>('month', 'intervalType');
 

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
   import { derived } from 'svelte/store';
 
   import Icon from '@ya-erm/svelte-ui/Icon';
 
-  import { routes } from '$lib/routes';
-  import { translate } from '$lib/translate';
+  import { routes } from '#lib/routes.js';
+  import { translate } from '#lib/translate/index.js';
 
   import { menu } from './menu';
 

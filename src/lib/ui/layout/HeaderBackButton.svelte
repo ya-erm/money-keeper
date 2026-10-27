@@ -2,7 +2,7 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Button from '@ya-erm/svelte-ui/Button';
 
-  import { translate } from '$lib/translate';
+  import { translate } from '#lib/translate/index.js';
 
   export let href: string | null = null;
   export let onClick: (() => void) | null = null;

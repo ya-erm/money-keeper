@@ -5,8 +5,8 @@
   import Input from '@ya-erm/svelte-ui/Input';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Modal from '@ya-erm/svelte-ui/Modal';
-  import { translate } from '$lib/translate';
-  import type { Messages } from '$lib/translate/messages';
+  import { translate } from '#lib/translate/index.js';
+  import type { Messages } from '#lib/translate/messages.js';
   import { parseSerbianReceipt, ReceiptError, type SerbianReceipt, type ReceiptDetails } from './serbianReceipt';
   import { QrDecoder } from './qrDecoder';
   import { qrCanvasSize, qrScanRegions } from './qrScanRegions';

@@ -1,9 +1,9 @@
 <script lang="ts">
   import { v4 as uuid } from 'uuid';
 
-  import type { Tag } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import Tags from '$lib/ui/Tags.svelte';
+  import type { Tag } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import Tags from '#lib/ui/Tags.svelte';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 
   export let tags: Tag[];

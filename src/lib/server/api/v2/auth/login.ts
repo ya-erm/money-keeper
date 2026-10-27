@@ -1,7 +1,7 @@
-import { ApiError } from '$lib/api';
-import { encryptRsa } from '$lib/data/crypto';
-import { db } from '$lib/server';
-import { checkStringParameter } from '$lib/utils';
+import { ApiError } from '#lib/api/index.js';
+import { encryptRsa } from '#lib/data/crypto.js';
+import { db } from '#lib/server/index.js';
+import { checkStringParameter } from '#lib/utils/index.js';
 
 export type LoginRequestData = {
   login: string;

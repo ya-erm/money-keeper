@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
 
-  import { operationsStore } from '$lib/data';
-  import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/layout/Layout.svelte';
-  import { isWideScreen } from '$lib/ui/layout/media';
-  import { deleteSearchParam, getSearchParam } from '$lib/utils';
+  import { operationsStore } from '#lib/data/index.js';
+  import { translate } from '#lib/translate/index.js';
+  import Layout from '#lib/ui/layout/Layout.svelte';
+  import { isWideScreen } from '#lib/ui/layout/media.js';
+  import { deleteSearchParam, getSearchParam } from '#lib/utils/index.js';
 
   import AddTransactionButton from './AddTransactionButton.svelte';
   import OperationsSplitView from './OperationsSplitView.svelte';

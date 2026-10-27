@@ -1,10 +1,10 @@
 <script lang="ts">
   import dayjs from 'dayjs';
 
-  import { repeatingsStore } from '$lib/data';
-  import { translate } from '$lib/translate';
-  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
-  import Layout from '$lib/ui/layout/Layout.svelte';
+  import { repeatingsStore } from '#lib/data/index.js';
+  import { translate } from '#lib/translate/index.js';
+  import HeaderBackButton from '#lib/ui/layout/HeaderBackButton.svelte';
+  import Layout from '#lib/ui/layout/Layout.svelte';
 
   import RepeatingsList from './RepeatingsList.svelte';
 

@@ -1,14 +1,14 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { memberSettingsStore, settingsStore } from '$lib/data';
-  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
-  import { currencySymbols } from '$lib/data/currencySymbols';
-  import type { AccountViewModel } from '$lib/data/interfaces';
-  import { route } from '$lib/routes';
-  import { translate } from '$lib/translate';
-  import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
-  import { formatMoney, hasHiddenBalanceAccount, isBalanceHidden } from '$lib/utils';
-  import type { LocalBalanceVisibility } from '$lib/utils/isBalanceHidden';
+  import { memberSettingsStore, settingsStore } from '#lib/data/index.js';
+  import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
+  import { currencySymbols } from '#lib/data/currencySymbols.js';
+  import type { AccountViewModel } from '#lib/data/interfaces.js';
+  import { route } from '#lib/routes.js';
+  import { translate } from '#lib/translate/index.js';
+  import HiddenMoney from '#lib/ui/HiddenMoney.svelte';
+  import { formatMoney, hasHiddenBalanceAccount, isBalanceHidden } from '#lib/utils/index.js';
+  import type { LocalBalanceVisibility } from '#lib/utils/isBalanceHidden.js';
 
   import { analyticsBalancesVisibilityMode } from '../store';
   import type { GroupSummary } from './interfaces';

@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
 
-  import { accountsStore } from '$lib/data';
-  import type { AccountViewModel } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/layout/Layout.svelte';
-  import { isWideScreen } from '$lib/ui/layout/media';
-  import ModalContainer from '$lib/ui/ModalContainer.svelte';
-  import ReloadPageButton from '$lib/ui/ReloadPageButton.svelte';
-  import { deleteSearchParam, getSearchParam } from '$lib/utils';
+  import { accountsStore } from '#lib/data/index.js';
+  import type { AccountViewModel } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import Layout from '#lib/ui/layout/Layout.svelte';
+  import { isWideScreen } from '#lib/ui/layout/media.js';
+  import ModalContainer from '#lib/ui/ModalContainer.svelte';
+  import ReloadPageButton from '#lib/ui/ReloadPageButton.svelte';
+  import { deleteSearchParam, getSearchParam } from '#lib/utils/index.js';
 
   import AccountButtons from './AccountButtons.svelte';
   import AccountCards from './AccountCards.svelte';
@@ -28,9 +28,13 @@
   const closeOperation = () => void deleteSearchParam($page, ['operation-id', 'accountId']);
 
   let opened = false;
+  let previousAction: string | null = null;
 
-  $: if (action === 'create') {
-    opened = true;
+  $: if (action !== previousAction) {
+    if (action === 'create' || previousAction === 'create') opened = action === 'create';
+    // Read again when the URL changes, including browser back/forward.
+    // eslint-disable-next-line no-useless-assignment
+    previousAction = action;
   }
   $: if (!!action && !opened) {
     void deleteSearchParam($page, 'action');
@@ -67,9 +71,7 @@
   <OperationsSplitView {operationId} onClose={closeOperation}>
     <div class="container" on:scroll={handlePageScroll}>
       <AccountCards onEdit={handleAccountEdit} />
-      <div bind:this={operationsContainer}>
-        <OperationsList {account} inlineDetails={$isWideScreen} />
-      </div>
+      <div bind:this={operationsContainer}><OperationsList {account} inlineDetails={$isWideScreen} /></div>
     </div>
   </OperationsSplitView>
 </Layout>

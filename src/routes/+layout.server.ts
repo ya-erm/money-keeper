@@ -1,7 +1,7 @@
-import { building } from '$app/environment';
+import { building } from '$app/env';
 
-import { activeLocale } from '$lib/translate';
-import { getLocaleFromAcceptLanguageHeader, initI18N, initialLocale } from '$lib/translate/init';
+import { activeLocale } from '#lib/translate/index.js';
+import { getLocaleFromAcceptLanguageHeader, initI18N, initialLocale } from '#lib/translate/init.js';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ cookies, request }) => {

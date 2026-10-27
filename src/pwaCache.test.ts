@@ -3,10 +3,12 @@ import vm from 'node:vm';
 import ts from 'typescript';
 import { describe, expect, it, vi } from 'vitest';
 
-const source = readFileSync(new URL('./service-worker.ts', import.meta.url), 'utf8').replace(
-  /import \{ build, files, prerendered, version \} from '\$service-worker';/,
-  `const build = ['/app.js']; const files = ['/logo192.png']; const prerendered = ['/']; const version = 'test';`,
-);
+const source = readFileSync(new URL('./service-worker/index.ts', import.meta.url), 'utf8')
+  .replace(/import \{ version \} from '\$app\/env';/, `const version = 'test';`)
+  .replace(
+    /import \{ assets, immutable, prerendered \} from '\$app\/manifest';/,
+    `const immutable = [{ path: 'app.js' }]; const assets = [{ path: 'logo192.png' }, { path: '.DS_Store' }, { path: '.hidden/file' }]; const prerendered = [{ path: '' }];`,
+  );
 const compiled = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText;
 
 function setup() {

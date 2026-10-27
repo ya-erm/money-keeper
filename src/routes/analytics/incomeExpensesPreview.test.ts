@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Account, Category, TransactionViewModel } from '$lib/data/interfaces';
+import type { Account, Category, TransactionViewModel } from '#lib/data/interfaces.js';
 
 import { getIncomeExpensesPreview, getNiceChartGrid } from './incomeExpensesPreview';
 

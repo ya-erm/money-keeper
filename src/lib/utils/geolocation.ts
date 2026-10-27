@@ -1,4 +1,4 @@
-import type { KnownPlace } from '$lib/data/interfaces';
+import type { KnownPlace } from '#lib/data/interfaces.js';
 
 export type Coordinates = { latitude: number; longitude: number };
 

@@ -2,7 +2,7 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Modal from '@ya-erm/svelte-ui/Modal';
 
-  import { translate } from '$lib/translate';
+  import { translate } from '#lib/translate/index.js';
 
   export let opened: boolean;
   export let onCreateNew: () => void;

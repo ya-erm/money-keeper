@@ -1,10 +1,16 @@
 <script lang="ts">
   import dayjs from 'dayjs';
-  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
+  import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
 
-  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
-  import { activeLocale, translate } from '$lib/translate';
-  import { findRate, formatHiddenMoney, formatMoney, hasHiddenBalanceAccount } from '$lib/utils';
+  import {
+    accountsStore,
+    currencyRatesStore,
+    memberSettingsStore,
+    operationsStore,
+    settingsStore,
+  } from '#lib/data/index.js';
+  import { activeLocale, translate } from '#lib/translate/index.js';
+  import { findRate, formatHiddenMoney, formatMoney, hasHiddenBalanceAccount } from '#lib/utils/index.js';
 
   import { getBalancePreview, getTotalBalanceAt, type BalancePreviewSeries } from './balancePreview';
   import { getNiceChartGrid } from './incomeExpensesPreview';

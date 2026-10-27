@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { translate } from '$lib/translate';
+  import { translate } from '#lib/translate/index.js';
   import Icon from '@ya-erm/svelte-ui/Icon';
 
   import ListGroupItem from './ListGroupItem.svelte';

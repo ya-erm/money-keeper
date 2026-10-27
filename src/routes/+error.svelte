@@ -1,10 +1,10 @@
 <script>
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 </script>
 
 <div class="content">
-  <h2>{$page.status}</h2>
-  <span>{$page.error?.message}</span>
+  <h2>{page.status}</h2>
+  <span>{page.error?.message}</span>
 </div>
 
 <style>

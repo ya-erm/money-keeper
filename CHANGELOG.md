@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.32.4 - 2026-10-27
+
+### Fixed
+
+- Migrated to SvelteKit 3 and updated compatible dependencies, preserving reactive navigation and offline startup. Updated the Node Docker build and Playwright image.
+
 ## 2.32.3 - 2026-10-26
 
 ### Fixed

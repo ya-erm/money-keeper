@@ -1,8 +1,8 @@
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
-import type { Account, TransactionViewModel } from '$lib/data/interfaces';
-import { calculateBalance } from '$lib/utils';
+import type { Account, TransactionViewModel } from '#lib/data/interfaces.js';
+import { calculateBalance } from '#lib/utils/index.js';
 
 type AccountBalance = {
   balance: number;

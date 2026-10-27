@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Menu from '$lib/ui/menu/Menu.svelte';
+  import Menu from '#lib/ui/menu/Menu.svelte';
   import type { Component } from 'svelte';
   import Header from './Header.svelte';
 

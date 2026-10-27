@@ -1,5 +1,5 @@
-import { store } from '$lib/store';
-import { Logger } from '$lib/utils/logger';
+import { store } from '#lib/store.js';
+import { Logger } from '#lib/utils/logger.js';
 import type { Initialisable, JournalItem, JournalSubscriber, KnownPlace, Member, MemberSettings } from './interfaces';
 import { journalService } from './journal';
 import { settingsService } from './settings';

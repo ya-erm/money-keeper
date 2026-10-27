@@ -1,8 +1,8 @@
 <script lang="ts">
   import { v4 as uuid } from 'uuid';
-  import { membersService, memberSettingsStore } from '$lib/data';
-  import type { KnownPlace } from '$lib/data/interfaces';
-  import type { Coordinates } from '$lib/utils/geolocation';
+  import { membersService, memberSettingsStore } from '#lib/data/index.js';
+  import type { KnownPlace } from '#lib/data/interfaces.js';
+  import type { Coordinates } from '#lib/utils/geolocation.js';
   import LocationPicker from './LocationPicker.svelte';
 
   export let opened: boolean;

@@ -4,7 +4,7 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
 
-  import type { DateIntervalType } from '$lib/data/interfaces';
+  import type { DateIntervalType } from '#lib/data/interfaces.js';
 
   import DateIntervalModal from './DateIntervalModal.svelte';
   import { intervalEndStore, intervalStartStore, intervalTypeStore } from './store';

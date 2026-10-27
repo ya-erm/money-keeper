@@ -1,6 +1,6 @@
-import { isApiError } from '$lib/api/ApiError';
-import { checkParameter, type CheckParameterOptions } from '$lib/utils';
-import { serverError } from '$lib/server/serverError';
+import { isApiError } from '#lib/api/ApiError.js';
+import { checkParameter, type CheckParameterOptions } from '#lib/utils/index.js';
+import { serverError } from '#lib/server/serverError.js';
 
 /**
  * Extract parameter from FormData and validate it

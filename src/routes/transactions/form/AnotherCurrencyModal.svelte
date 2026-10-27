@@ -6,8 +6,8 @@
   import Modal from '@ya-erm/svelte-ui/Modal';
   import Tags from '@ya-erm/svelte-ui/Tags';
 
-  import { memberSettingsStore, membersService, operationsStore } from '$lib/data';
-  import { translate } from '$lib/translate';
+  import { memberSettingsStore, membersService, operationsStore } from '#lib/data/index.js';
+  import { translate } from '#lib/translate/index.js';
 
   $: settings = $memberSettingsStore;
 

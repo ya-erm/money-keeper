@@ -2,9 +2,9 @@ import dayjs from 'dayjs';
 import { derived, get, type Readable } from 'svelte/store';
 import { v4 as uuid } from 'uuid';
 
-import { translate } from '$lib/translate';
+import { translate } from '#lib/translate/index.js';
 import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
-import { Logger } from '$lib/utils/logger';
+import { Logger } from '#lib/utils/logger.js';
 
 import { accountsService, accountsStore } from './accounts';
 import {

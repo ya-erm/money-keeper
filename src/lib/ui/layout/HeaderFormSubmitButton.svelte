@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from '@ya-erm/svelte-ui/Button';
 
-  import { translate } from '$lib/translate';
+  import { translate } from '#lib/translate/index.js';
 
   const handleSave = () => {
     const form = document.querySelector('form');

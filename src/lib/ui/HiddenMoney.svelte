@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { translate } from '$lib/translate';
+  import { translate } from '#lib/translate/index.js';
 
   export let currency: string | null | undefined = undefined;
   export let size: 'sm' | 'md' | 'lg' = 'md';

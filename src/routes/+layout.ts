@@ -2,10 +2,10 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 
-import { browser } from '$app/environment';
+import { browser } from '$app/env';
 
-import { journalService, mainService, membersService } from '$lib/data';
-import { handleError } from '$lib/utils';
+import { journalService, mainService, membersService } from '#lib/data/index.js';
+import { handleError } from '#lib/utils/index.js';
 
 import type { LayoutLoad } from './$types';
 

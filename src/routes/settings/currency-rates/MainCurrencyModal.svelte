@@ -6,8 +6,8 @@
   import Modal from '@ya-erm/svelte-ui/Modal';
   import Tags from '@ya-erm/svelte-ui/Tags';
 
-  import { accountsStore, membersService } from '$lib/data';
-  import { translate } from '$lib/translate';
+  import { accountsStore, membersService } from '#lib/data/index.js';
+  import { translate } from '#lib/translate/index.js';
 
   export let opened: boolean;
 

@@ -1,9 +1,9 @@
 <script lang="ts">
   import Button from '@ya-erm/svelte-ui/Button';
 
-  import { accountsStore, categoriesStore, operationsService, operationTagsStore } from '$lib/data';
-  import type { Transaction } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
+  import { accountsStore, categoriesStore, operationsService, operationTagsStore } from '#lib/data/index.js';
+  import type { Transaction } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
 
   import TransactionForm from '../form/TransactionForm.svelte';
 

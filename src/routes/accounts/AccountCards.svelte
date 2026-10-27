@@ -1,11 +1,11 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
   import { onMount } from 'svelte';
 
-  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
-  import type { AccountViewModel } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
+  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '#lib/data/index.js';
+  import type { AccountViewModel } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import {
     calculateBalance,
@@ -13,7 +13,7 @@
     getSearchParam,
     groupBySelector,
     pastOperationsPredicate,
-  } from '$lib/utils';
+  } from '#lib/utils/index.js';
 
   import AccountCard from './AccountCard.svelte';
 
@@ -44,7 +44,7 @@
       if (index < accounts.length) {
         const id = accounts[index].id;
         if (`${id}` !== cardId) {
-          await goto(`?account-card=${id}`, { noScroll: true });
+          await goto(`?account-card=${id}`, { reset: false });
         }
       }
     }
@@ -55,7 +55,7 @@
       scrollToCard(cardId);
     } else if (accounts.length) {
       // Select first account card by default
-      await goto(`?account-card=${accounts[0].id}`, { noScroll: true });
+      await goto(`?account-card=${accounts[0].id}`, { reset: false });
     }
   });
 </script>

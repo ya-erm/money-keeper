@@ -1,4 +1,4 @@
-import type { AccountViewModel, Group } from '$lib/data/interfaces';
+import type { AccountViewModel, Group } from '#lib/data/interfaces.js';
 
 export type AccountSummary = {
   account: AccountViewModel;

@@ -2,10 +2,10 @@
   import dayjs from 'dayjs';
   import timezones from 'timezones-list';
 
-  import { memberSettingsStore, membersService } from '$lib/data';
-  import { translate } from '$lib/translate';
+  import { memberSettingsStore, membersService } from '#lib/data/index.js';
+  import { translate } from '#lib/translate/index.js';
   import Input from '@ya-erm/svelte-ui/Input';
-  import ListGroup from '$lib/ui/list/ListGroup.svelte';
+  import ListGroup from '#lib/ui/list/ListGroup.svelte';
   import { showSuccessToast } from '@ya-erm/svelte-ui/toasts';
 
   import TimeZoneListItem from './TimeZoneListItem.svelte';

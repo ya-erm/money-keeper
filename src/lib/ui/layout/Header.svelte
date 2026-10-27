@@ -1,7 +1,7 @@
 <script lang="ts">
   import { type Component } from 'svelte';
 
-  import { translate } from '$lib/translate';
+  import { translate } from '#lib/translate/index.js';
 
   import SyncState from './SyncState.svelte';
   import HeaderBackButton from './HeaderBackButton.svelte';

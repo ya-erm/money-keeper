@@ -1,6 +1,6 @@
 <script>
   import Button from '@ya-erm/svelte-ui/Button';
-  import Modal from '$lib/ui/Modal.svelte';
+  import Modal from '#lib/ui/Modal.svelte';
 
   let modalOpened = false;
 </script>

@@ -1,4 +1,4 @@
-import { store } from '$lib/store';
+import { store } from '#lib/store.js';
 import { derived, type Readable } from 'svelte/store';
 
 import type {

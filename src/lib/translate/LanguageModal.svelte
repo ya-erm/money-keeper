@@ -6,10 +6,10 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Modal from '@ya-erm/svelte-ui/Modal';
 
-  import { activeLocale, translate } from '$lib/translate';
-  import { languages } from '$lib/translate/constants';
-  import type { Locales } from '$lib/translate/types';
-  import { setCookie } from '$lib/utils/cookie';
+  import { activeLocale, translate } from '#lib/translate/index.js';
+  import { languages } from '#lib/translate/constants.js';
+  import type { Locales } from '#lib/translate/types.js';
+  import { setCookie } from '#lib/utils/cookie.js';
 
   export let opened: boolean;
 

@@ -5,7 +5,7 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import { showErrorToast, showInfoToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
 
-  import { isApiError } from '$lib/api/ApiError';
+  import { isApiError } from '#lib/api/ApiError.js';
 
   import {
     accountTagsService,
@@ -21,7 +21,7 @@
     operationsStore,
     repeatingsService,
     memberSettingsStore,
-  } from '$lib/data';
+  } from '#lib/data/index.js';
   import type {
     Account,
     Category,
@@ -31,17 +31,17 @@
     Repeating,
     Tag,
     Transaction,
-  } from '$lib/data/interfaces';
+  } from '#lib/data/interfaces.js';
   import type {
     CompactJournalRequestData,
     CompactJournalResponseData,
     JournalStatsResponseData,
-  } from '$lib/server/api/v2/journal';
-  import { translate } from '$lib/translate';
-  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
-  import Layout from '$lib/ui/layout/Layout.svelte';
-  import Modal from '$lib/ui/Modal.svelte';
-  import { Logger, deepEqual, groupByKey, keyTransactions, useFetch } from '$lib/utils';
+  } from '#lib/server/api/v2/journal/index.js';
+  import { translate } from '#lib/translate/index.js';
+  import HeaderBackButton from '#lib/ui/layout/HeaderBackButton.svelte';
+  import Layout from '#lib/ui/layout/Layout.svelte';
+  import Modal from '#lib/ui/Modal.svelte';
+  import { Logger, deepEqual, groupByKey, keyTransactions, useFetch } from '#lib/utils/index.js';
 
   const logger = new Logger('Import/Export');
 
