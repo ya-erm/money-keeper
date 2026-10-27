@@ -6,22 +6,22 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import { showErrorToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
 
-  import { membersService } from '$lib/data';
-  import { route } from '$lib/routes';
+  import { membersService } from '#lib/data/index.js';
+  import { route } from '#lib/routes.js';
   import type {
     CreateTokenResponseData,
     ListTokensResponseData,
     RevokeTokenRequestData,
     RevokeTokenResponseData,
     TokenInfo,
-  } from '$lib/server/api/v2/auth';
-  import { translate } from '$lib/translate';
-  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
-  import Layout from '$lib/ui/layout/Layout.svelte';
-  import ListGroup from '$lib/ui/list/ListGroup.svelte';
-  import Loader from '$lib/ui/Loader.svelte';
-  import Modal from '$lib/ui/Modal.svelte';
-  import { useFetch } from '$lib/utils';
+  } from '#lib/server/api/v2/auth/index.js';
+  import { translate } from '#lib/translate/index.js';
+  import HeaderBackButton from '#lib/ui/layout/HeaderBackButton.svelte';
+  import Layout from '#lib/ui/layout/Layout.svelte';
+  import ListGroup from '#lib/ui/list/ListGroup.svelte';
+  import Loader from '#lib/ui/Loader.svelte';
+  import Modal from '#lib/ui/Modal.svelte';
+  import { useFetch } from '#lib/utils/index.js';
 
   const isGuest = membersService.isGuest;
 

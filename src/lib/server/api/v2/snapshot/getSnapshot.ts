@@ -1,7 +1,7 @@
-import { ApiError } from '$lib/api';
-import type { JournalOperation } from '$lib/data/interfaces';
-import { reduceJournal, type ReduceJournalOptions, type Snapshot } from '$lib/data/snapshot';
-import { db } from '$lib/server';
+import { ApiError } from '#lib/api/index.js';
+import type { JournalOperation } from '#lib/data/interfaces.js';
+import { reduceJournal, type ReduceJournalOptions, type Snapshot } from '#lib/data/snapshot.js';
+import { db } from '#lib/server/index.js';
 
 export type GetSnapshotResponse = Snapshot & {
   /** Max journal order included in the snapshot, null if journal is empty */

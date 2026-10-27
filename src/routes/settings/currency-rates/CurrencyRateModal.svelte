@@ -5,10 +5,10 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
 
-  import { currencyRatesService } from '$lib/data';
-  import type { CurrencyRate } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import Modal from '$lib/ui/Modal.svelte';
+  import { currencyRatesService } from '#lib/data/index.js';
+  import type { CurrencyRate } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import Modal from '#lib/ui/Modal.svelte';
 
   export let opened: boolean;
   export let item: CurrencyRate | null = null;

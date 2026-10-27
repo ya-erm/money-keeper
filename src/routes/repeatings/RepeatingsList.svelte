@@ -1,19 +1,25 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
   import dayjs from 'dayjs';
 
   import Button from '@ya-erm/svelte-ui/Button';
   import ButtonBase from '@ya-erm/svelte-ui/ButtonBase';
   import Icon from '@ya-erm/svelte-ui/Icon';
 
-  import { currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
-  import type { Repeating, Transaction } from '$lib/data/interfaces';
-  import { copyOperation, operationsService } from '$lib/data/operations';
-  import { getNextRepeatingDate, repeatingsService } from '$lib/data/repeatings';
-  import { translate } from '$lib/translate';
-  import { deleteSearchParam, findCurrencyRate, getSearchParam, groupBySelector, setSearchParam } from '$lib/utils';
-  import { goBack } from '$lib/utils/goBack';
-  import { maxBySelector } from '$lib/utils/minMax';
+  import { currencyRatesStore, memberSettingsStore, operationsStore } from '#lib/data/index.js';
+  import type { Repeating, Transaction } from '#lib/data/interfaces.js';
+  import { copyOperation, operationsService } from '#lib/data/operations.js';
+  import { getNextRepeatingDate, repeatingsService } from '#lib/data/repeatings.js';
+  import { translate } from '#lib/translate/index.js';
+  import {
+    deleteSearchParam,
+    findCurrencyRate,
+    getSearchParam,
+    groupBySelector,
+    setSearchParam,
+  } from '#lib/utils/index.js';
+  import { goBack } from '#lib/utils/goBack.js';
+  import { maxBySelector } from '#lib/utils/minMax.js';
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
   import RepeatingIntervalText from './RepeatingIntervalText.svelte';

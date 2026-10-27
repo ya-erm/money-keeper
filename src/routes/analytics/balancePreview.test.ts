@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { AccountViewModel, Category, TransactionViewModel } from '$lib/data/interfaces';
+import type { AccountViewModel, Category, TransactionViewModel } from '#lib/data/interfaces.js';
 
 import { getBalancePreview, getTotalBalanceAt } from './balancePreview';
 

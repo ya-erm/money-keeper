@@ -28,7 +28,7 @@ test.describe('Accounts > Create', () => {
   test('create new account', async ({ page }) => {
     await openPathAsync(page, '/accounts?action=create');
 
-    const { nameInput, currencyInput, iconInput, colorInput, submitButton, accountCardName } = getLocators(page);
+    const { form, nameInput, currencyInput, iconInput, colorInput, submitButton, accountCardName } = getLocators(page);
 
     const accountName = 'Bank card';
 
@@ -39,6 +39,7 @@ test.describe('Accounts > Create', () => {
     await expect(page).toHaveScreenshot('1-account-create-form-filled.png');
     await submitButton.click();
 
+    await expect(form).toHaveCount(0);
     await expect(accountCardName.filter({ hasText: accountName })).toBeVisible();
     await expect(page).toHaveScreenshot('2-account-created-card.png');
 

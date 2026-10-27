@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { format, locale } from 'svelte-i18n';
 import { derived, writable, type Readable } from 'svelte/store';
 
-import { getCookie } from '$lib/utils/cookie';
+import { getCookie } from '#lib/utils/cookie.js';
 
 import { languages } from './constants';
 import { initI18N, initialized, initialLocale } from './init';

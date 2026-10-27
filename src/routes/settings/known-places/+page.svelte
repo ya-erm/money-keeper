@@ -3,15 +3,15 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Checkbox from '@ya-erm/svelte-ui/Checkbox';
 
-  import { membersService, memberSettingsStore } from '$lib/data';
-  import { operationsStore } from '$lib/data/operations';
-  import type { KnownPlace } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
-  import Layout from '$lib/ui/layout/Layout.svelte';
-  import KnownPlaceModal from '$lib/widgets/KnownPlaceModal.svelte';
-  import { findNearbyPlaces } from '$lib/utils/geolocation';
-  import { handleError } from '$lib/utils';
+  import { membersService, memberSettingsStore } from '#lib/data/index.js';
+  import { operationsStore } from '#lib/data/operations.js';
+  import type { KnownPlace } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import HeaderBackButton from '#lib/ui/layout/HeaderBackButton.svelte';
+  import Layout from '#lib/ui/layout/Layout.svelte';
+  import KnownPlaceModal from '#lib/widgets/KnownPlaceModal.svelte';
+  import { findNearbyPlaces } from '#lib/utils/geolocation.js';
+  import { handleError } from '#lib/utils/index.js';
 
   $: places = [...($memberSettingsStore?.knownPlaces ?? [])].sort((a, b) => a.name.localeCompare(b.name));
   $: operationCounts = (() => {

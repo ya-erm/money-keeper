@@ -1,14 +1,14 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
 
-  import { accountsStore } from '$lib/data';
-  import type { Account } from '$lib/data/interfaces';
-  import { route } from '$lib/routes';
-  import { translate } from '$lib/translate';
-  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
-  import Layout from '$lib/ui/layout/Layout.svelte';
-  import { deleteSearchParam, getSearchParam } from '$lib/utils';
+  import { accountsStore } from '#lib/data/index.js';
+  import type { Account } from '#lib/data/interfaces.js';
+  import { route } from '#lib/routes.js';
+  import { translate } from '#lib/translate/index.js';
+  import HeaderBackButton from '#lib/ui/layout/HeaderBackButton.svelte';
+  import Layout from '#lib/ui/layout/Layout.svelte';
+  import { deleteSearchParam, getSearchParam } from '#lib/utils/index.js';
 
   import AccountModal from '../AccountModal.svelte';
   import AccountList from './AccountList.svelte';
@@ -30,7 +30,7 @@
   $: sortable = action === 'sort';
 
   $: if (action === 'sort' && !sortable) {
-    void goto('?', { replaceState: true });
+    void goto('?', { replace: true });
   }
 
   const onClick = async (item: Account) => {

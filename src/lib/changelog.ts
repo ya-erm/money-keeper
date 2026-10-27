@@ -1,7 +1,7 @@
 import changelogMarkdownEn from '../../CHANGELOG.md?raw';
 import changelogMarkdownRu from '../../CHANGELOG.ru.md?raw';
 
-import type { Locales } from '$lib/translate/types';
+import type { Locales } from '#lib/translate/types.js';
 
 export type ChangelogSection = {
   title: string;

@@ -1,5 +1,5 @@
-import { page } from '$app/stores';
-import type { Messages } from '$lib/translate/messages';
+import { page } from '#lib/page.js';
+import type { Messages } from '#lib/translate/messages.js';
 import { derived, readable } from 'svelte/store';
 import { routes } from '../../routes';
 

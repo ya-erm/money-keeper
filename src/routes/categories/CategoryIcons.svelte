@@ -1,11 +1,11 @@
 <script lang="ts">
   import Button from '@ya-erm/svelte-ui/Button';
-  import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
+  import GridCircleItem from '#lib/ui/GridCircleItem.svelte';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
   import MultiSwitch from '@ya-erm/svelte-ui/MultiSwitch';
 
-  import { translate } from '$lib/translate';
+  import { translate } from '#lib/translate/index.js';
 
   import { categoryIcons } from './icons';
 

@@ -1,9 +1,9 @@
 <script lang="ts">
   import dayjs from 'dayjs';
-  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
-  import { currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
-  import { translate } from '$lib/translate';
-  import { findRate, formatMoney } from '$lib/utils';
+  import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
+  import { currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '#lib/data/index.js';
+  import { translate } from '#lib/translate/index.js';
+  import { findRate, formatMoney } from '#lib/utils/index.js';
 
   import { getExpenseCategoriesPreview } from './categoryPreview';
 

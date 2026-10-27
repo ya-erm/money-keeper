@@ -1,4 +1,4 @@
-import type { Messages } from '$lib/translate/messages';
+import type { Messages } from '#lib/translate/messages.js';
 
 export type CategorySuggestionMessage = `categories.list.${string}` & Messages;
 

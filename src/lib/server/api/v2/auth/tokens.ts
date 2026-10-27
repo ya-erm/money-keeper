@@ -1,6 +1,6 @@
-import { ApiError } from '$lib/api';
-import { db } from '$lib/server';
-import { checkStringParameter } from '$lib/utils';
+import { ApiError } from '#lib/api/index.js';
+import { db } from '#lib/server/index.js';
+import { checkStringParameter } from '#lib/utils/index.js';
 
 /** Length of the token prefix that is exposed to the client as an identifier */
 const TOKEN_ID_LENGTH = 8;

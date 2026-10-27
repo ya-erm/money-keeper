@@ -1,10 +1,10 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import type { Group } from '$lib/data/interfaces';
-  import { route } from '$lib/routes';
-  import { translate } from '$lib/translate';
-  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
-  import Layout from '$lib/ui/layout/Layout.svelte';
+  import type { Group } from '#lib/data/interfaces.js';
+  import { route } from '#lib/routes.js';
+  import { translate } from '#lib/translate/index.js';
+  import HeaderBackButton from '#lib/ui/layout/HeaderBackButton.svelte';
+  import Layout from '#lib/ui/layout/Layout.svelte';
 
   import AddGroupingButton from './AddGroupingButton.svelte';
   import GroupingList from './GroupingList.svelte';

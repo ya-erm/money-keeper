@@ -1,10 +1,10 @@
-FROM node:16
+FROM node:24-bookworm
 
 WORKDIR /app
 
-COPY ./package.json ./package-lock.json ./
+COPY ./package.json ./pnpm-lock.yaml ./
 
-RUN npm ci
+RUN corepack enable && pnpm install --frozen-lockfile
 
 COPY ./prisma/schema.prisma ./prisma/
 
@@ -12,8 +12,7 @@ RUN npx prisma generate
 
 COPY . .
 
-RUN sed -i 's/adapter-auto/adapter-node/g' ./svelte.config.js
+ARG ORIGIN
+RUN BUILD_ADAPTER=node pnpm build
 
-RUN npm run build
-
-ENTRYPOINT node build
+CMD ["node", "build"]

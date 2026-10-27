@@ -1,10 +1,10 @@
 <script lang="ts">
   import Checkbox from '@ya-erm/svelte-ui/Checkbox';
 
-  import { accountTagsStore } from '$lib/data';
-  import type { AccountViewModel } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import Tags from '$lib/ui/Tags.svelte';
+  import { accountTagsStore } from '#lib/data/index.js';
+  import type { AccountViewModel } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import Tags from '#lib/ui/Tags.svelte';
 
   import { hideZeroBalanceAccounts } from './store';
 

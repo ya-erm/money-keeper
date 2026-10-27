@@ -1,8 +1,8 @@
 <script lang="ts">
   import Button from '@ya-erm/svelte-ui/Button';
 
-  import { translate } from '$lib/translate';
-  import Modal from '$lib/ui/Modal.svelte';
+  import { translate } from '#lib/translate/index.js';
+  import Modal from '#lib/ui/Modal.svelte';
 
   export let opened: boolean;
   export let onDelete: () => void;

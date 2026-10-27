@@ -1,9 +1,9 @@
 <script lang="ts">
   import Icon from '@ya-erm/svelte-ui/Icon';
 
-  import { translate } from '$lib/translate';
-  import HeaderButton from '$lib/ui/layout/HeaderButton.svelte';
-  import { isWideScreen } from '$lib/ui/layout/media';
+  import { translate } from '#lib/translate/index.js';
+  import HeaderButton from '#lib/ui/layout/HeaderButton.svelte';
+  import { isWideScreen } from '#lib/ui/layout/media.js';
 
   import CreateTransaction from './create/CreateTransaction.svelte';
   import EditTransaction from './edit/EditTransaction.svelte';

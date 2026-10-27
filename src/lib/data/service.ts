@@ -1,4 +1,4 @@
-import { store } from '$lib/store';
+import { store } from '#lib/store.js';
 import { derived, type Readable } from 'svelte/store';
 
 import type {
@@ -156,12 +156,14 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
   }
 
   /** Save item */
-  save(item: T) {
+  async save(item: T) {
     const operation = { [this._journalKey]: item };
     // Apply changes in memory and save to DB
-    void this.applyChanges([{ data: operation }], true);
-    // Add operation to queue
-    void journalService.addOperationToQueue(operation);
+    await Promise.all([
+      this.applyChanges([{ data: operation }], true),
+      // Persist the outgoing journal entry before callers report completion.
+      journalService.addOperationToQueue(operation),
+    ]);
   }
 
   /** Delete item */

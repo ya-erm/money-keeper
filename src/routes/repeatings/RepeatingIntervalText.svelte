@@ -3,8 +3,8 @@
 
   import Button from '@ya-erm/svelte-ui/Button';
 
-  import type { Repeating } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
+  import type { Repeating } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
 
   export let count: number;
   export let interval: Repeating['interval'];

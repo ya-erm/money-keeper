@@ -8,10 +8,10 @@
   import Spoiler from '@ya-erm/svelte-ui/Spoiler';
   import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
 
-  import { currencyRatesStore, memberSettingsStore, membersService, operationsStore } from '$lib/data';
-  import type { Account, AccountViewModel } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import { calculateBalance, findCurrencyRate, groupBySelector, pastOperationsPredicate } from '$lib/utils';
+  import { currencyRatesStore, memberSettingsStore, membersService, operationsStore } from '#lib/data/index.js';
+  import type { Account, AccountViewModel } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import { calculateBalance, findCurrencyRate, groupBySelector, pastOperationsPredicate } from '#lib/utils/index.js';
 
   import { hideZeroBalanceAccounts } from './store';
 

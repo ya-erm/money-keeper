@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { isApiError } from '$lib/api/ApiError';
+import { isApiError } from '#lib/api/ApiError.js';
 import type { Action } from '@sveltejs/kit';
 import { isServerError, serverError } from './serverError';
 

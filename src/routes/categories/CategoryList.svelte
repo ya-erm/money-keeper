@@ -2,9 +2,9 @@
   import { dndzone, type DndEvent } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
 
-  import type { Category } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
+  import type { Category } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import GridCircleItem from '#lib/ui/GridCircleItem.svelte';
 
   export let items: Category[];
 

@@ -4,13 +4,13 @@
   import Spoiler from '@ya-erm/svelte-ui/Spoiler';
   import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
 
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
 
-  import { operationsStore } from '$lib/data';
-  import type { Account } from '$lib/data/interfaces';
-  import { route } from '$lib/routes';
-  import { translate } from '$lib/translate';
-  import { futureOperationsPredicate, pastOperationsPredicate, withSearchParams } from '$lib/utils';
+  import { operationsStore } from '#lib/data/index.js';
+  import type { Account } from '#lib/data/interfaces.js';
+  import { route } from '#lib/routes.js';
+  import { translate } from '#lib/translate/index.js';
+  import { futureOperationsPredicate, pastOperationsPredicate, withSearchParams } from '#lib/utils/index.js';
 
   import GroupedOperationsList from './GroupedOperationsList.svelte';
 
@@ -78,10 +78,12 @@
             {$translate('common.count', { values: { count: futureOperations.length } })}
           </span>
         </SpoilerToggle>
+
         <GroupedOperationsList {account} operations={futureOperations} showDescription={!!search} {inlineDetails} />
       </Spoiler>
       <hr class="line" />
     {/if}
+
     <GroupedOperationsList {account} operations={pastOperations} showDescription={!!search} {inlineDetails} />
   </div>
 </ShowMoreContainer>

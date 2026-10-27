@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import { Logger } from '$lib/utils/logger';
+import { Logger } from '#lib/utils/logger.js';
 
 import type { Initialisable, Service } from './interfaces';
 

@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import type { TransactionViewModel } from '$lib/data/interfaces';
+import type { TransactionViewModel } from '#lib/data/interfaces.js';
 
 export const operationBeforeDatePredicate = (date: Date) => (operation: TransactionViewModel) =>
   dayjs(operation.date).isBefore(date);

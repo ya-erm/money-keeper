@@ -1,15 +1,15 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { createKeyFromPassword, encryptAes, generateRsaKeys } from '$lib/data/crypto';
-  import { route } from '$lib/routes';
-  import type { RegisterRequestData, RegisterResponseData } from '$lib/server/api/v2/auth';
-  import { translate } from '$lib/translate';
+  import { createKeyFromPassword, encryptAes, generateRsaKeys } from '#lib/data/crypto.js';
+  import { route } from '#lib/routes.js';
+  import type { RegisterRequestData, RegisterResponseData } from '#lib/server/api/v2/auth/index.js';
+  import { translate } from '#lib/translate/index.js';
   import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
-  import Loader from '$lib/ui/Loader.svelte';
-  import Modal from '$lib/ui/Modal.svelte';
+  import Loader from '#lib/ui/Loader.svelte';
+  import Modal from '#lib/ui/Modal.svelte';
   import { showErrorToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
-  import { useFetch } from '$lib/utils/useFetch';
+  import { useFetch } from '#lib/utils/useFetch.js';
   import { v4 as uuid } from 'uuid';
 
   export let login: string;

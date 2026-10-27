@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { translate } from '$lib/translate';
-  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
-  import HeaderFormSubmitButton from '$lib/ui/layout/HeaderFormSubmitButton.svelte';
-  import Layout from '$lib/ui/layout/Layout.svelte';
+  import { translate } from '#lib/translate/index.js';
+  import HeaderBackButton from '#lib/ui/layout/HeaderBackButton.svelte';
+  import HeaderFormSubmitButton from '#lib/ui/layout/HeaderFormSubmitButton.svelte';
+  import Layout from '#lib/ui/layout/Layout.svelte';
 
   import CreateTransaction from './CreateTransaction.svelte';
 </script>

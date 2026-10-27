@@ -8,12 +8,12 @@
   import Input from '@ya-erm/svelte-ui/Input';
   import Modal from '@ya-erm/svelte-ui/Modal';
   import { showErrorToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
-  import type { KnownPlace } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import type { Messages } from '$lib/translate/messages';
-  import { handleError } from '$lib/utils';
-  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
-  import { isValidCoordinates, type Coordinates } from '$lib/utils/geolocation';
+  import type { KnownPlace } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import type { Messages } from '#lib/translate/messages.js';
+  import { handleError } from '#lib/utils/index.js';
+  import SubScreen from '#lib/ui/layout/SubScreen.svelte';
+  import { isValidCoordinates, type Coordinates } from '#lib/utils/geolocation.js';
 
   export let initialPosition: Coordinates | null = null;
   export let currentPosition: Coordinates | null = null;

@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
   import { onDestroy } from 'svelte';
 
-  import { categoriesService, categoriesStore, memberSettingsStore, membersService } from '$lib/data';
-  import type { Category } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import ModalContainer from '$lib/ui/ModalContainer.svelte';
-  import Layout from '$lib/ui/layout/Layout.svelte';
-  import { deleteSearchParam, getSearchParam } from '$lib/utils';
+  import { categoriesService, categoriesStore, memberSettingsStore, membersService } from '#lib/data/index.js';
+  import type { Category } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import ModalContainer from '#lib/ui/ModalContainer.svelte';
+  import Layout from '#lib/ui/layout/Layout.svelte';
+  import { deleteSearchParam, getSearchParam } from '#lib/utils/index.js';
 
   import CategoryList from './CategoryList.svelte';
   import CategoryListButtons from './CategoryListButtons.svelte';
@@ -69,9 +69,11 @@
 
 <Layout title={$translate('categories.title')} rightSlot={CategoryListButtons}>
   <h2>{$translate('categories.incomings')}</h2>
+
   <CategoryList items={incomings} {onClick} sortable onSort={(order) => (categoriesInOrder = order)} />
 
   <h2 class="mt-2">{$translate('categories.outgoings')}</h2>
+
   <CategoryList items={outgoings} {onClick} sortable onSort={(order) => (categoriesOutOrder = order)} />
 </Layout>
 

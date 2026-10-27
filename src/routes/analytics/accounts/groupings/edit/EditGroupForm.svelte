@@ -1,8 +1,8 @@
 <script lang="ts">
   import { v4 as uuid } from 'uuid';
 
-  import type { Group, Grouping } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
+  import type { Group, Grouping } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
   import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
 

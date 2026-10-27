@@ -2,14 +2,14 @@
   import Iconify from '@iconify/svelte';
   import Icon from '@ya-erm/svelte-ui/Icon';
 
-  import { memberSettingsStore } from '$lib/data';
-  import type { CurrencyRate, TransactionViewModel } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import type { Messages } from '$lib/translate/messages';
-  import { longPress } from '$lib/utils';
-  import { replaceCalcExpressions } from '$lib/utils/calc';
-  import { formatMoney } from '$lib/utils/formatMoney';
-  import { findNearbyPlaces, isValidCoordinates } from '$lib/utils/geolocation';
+  import { memberSettingsStore } from '#lib/data/index.js';
+  import type { CurrencyRate, TransactionViewModel } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import type { Messages } from '#lib/translate/messages.js';
+  import { longPress } from '#lib/utils/index.js';
+  import { replaceCalcExpressions } from '#lib/utils/calc.js';
+  import { formatMoney } from '#lib/utils/formatMoney.js';
+  import { findNearbyPlaces, isValidCoordinates } from '#lib/utils/geolocation.js';
 
   export let transaction: TransactionViewModel;
   export let currencyRate: CurrencyRate | null = null;

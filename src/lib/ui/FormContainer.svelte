@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
-  import type { ActionResult } from '@sveltejs/kit';
+  import { applyAction, enhance, type ActionResult } from '$app/forms';
 
   export let width: string | number | null = 15;
   export let action: string | undefined = undefined;
@@ -27,9 +26,10 @@
         await applyAction(result);
       }}
   >
-    <slot />
+    <slot></slot>
   </form>
-  <slot name="footer" />
+
+  <slot name="footer"></slot>
 </div>
 
 <style>

@@ -2,12 +2,12 @@
   /** Deprecated: use AccountSelector */
 
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
 
-  import type { Account } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
-  import { getSearchParam } from '$lib/utils';
+  import type { Account } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import GridCircleItem from '#lib/ui/GridCircleItem.svelte';
+  import { getSearchParam } from '#lib/utils/index.js';
 
   export let name = 'accountId';
   export let label = $translate('transactions.account');
@@ -22,8 +22,9 @@
 
   const setAccountId = async (value: string) => {
     if (fromUrl) {
-      $page.url.searchParams.set(name, value);
-      await goto($page.url, { replaceState: true, invalidateAll: true });
+      const url = new URL($page.url.href);
+      url.searchParams.set(name, value);
+      await goto(url, { replace: true, refreshAll: true });
     } else {
       accountId = value;
     }
@@ -33,6 +34,7 @@
 <div class="flex-col gap-0.5" data-testId={testId}>
   <label class="label">
     <span data-testId={`${testId}.Label`}>{label}</span>
+
     <input {name} value={_accountId} class="hidden" readonly required />
   </label>
   <div class="grid" data-testId={`${testId}.Grid`}>

@@ -1,16 +1,16 @@
 <script lang="ts">
   import { v4 as uuid } from 'uuid';
 
-  import { accountTagsService, accountTagsStore, accountsService } from '$lib/data';
-  import type { Account } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
+  import { accountTagsService, accountTagsStore, accountsService } from '#lib/data/index.js';
+  import type { Account } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
-  import Modal from '$lib/ui/Modal.svelte';
+  import Modal from '#lib/ui/Modal.svelte';
   import { showErrorToast, showSuccessToast } from '@ya-erm/svelte-ui/toasts';
-  import TagsList from '$lib/widgets/TagsList.svelte';
+  import TagsList from '#lib/widgets/TagsList.svelte';
 
   import DeleteAccountModal from './DeleteAccountModal.svelte';
 
@@ -27,7 +27,7 @@
   let archived = account?.archived;
 
   const handleSave = async () => {
-    accountsService.save({
+    await accountsService.save({
       ...account,
       id: account?.id ?? uuid(),
       name,

@@ -1,7 +1,7 @@
 <script lang="ts">
   import Checkbox from '@ya-erm/svelte-ui/Checkbox';
 
-  import Tags from '$lib/ui/Tags.svelte';
+  import Tags from '#lib/ui/Tags.svelte';
 
   let tags = [
     { id: '1', title: 'Food' },

@@ -8,13 +8,13 @@
     memberSettingsStore,
     membersService,
     operationsStore,
-  } from '$lib/data';
-  import type { AccountViewModel, Grouping } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
+  } from '#lib/data/index.js';
+  import type { AccountViewModel, Grouping } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
   import Button from '@ya-erm/svelte-ui/Button';
 
-  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
-  import { calculateBalance, findRate, groupBySelector, pastOperationsPredicate } from '$lib/utils';
+  import SubScreen from '#lib/ui/layout/SubScreen.svelte';
+  import { calculateBalance, findRate, groupBySelector, pastOperationsPredicate } from '#lib/utils/index.js';
 
   import AccountsTableTable from './AccountsAnalyticsTable.svelte';
   import AddGroupingButton from './groupings/AddGroupingButton.svelte';

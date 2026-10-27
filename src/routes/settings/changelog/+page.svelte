@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getChangelogEntries } from '$lib/changelog';
-  import { activeLocale, translate } from '$lib/translate';
-  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
-  import Layout from '$lib/ui/layout/Layout.svelte';
+  import { getChangelogEntries } from '#lib/changelog.js';
+  import { activeLocale, translate } from '#lib/translate/index.js';
+  import HeaderBackButton from '#lib/ui/layout/HeaderBackButton.svelte';
+  import Layout from '#lib/ui/layout/Layout.svelte';
 
   $: changelogEntries = getChangelogEntries($activeLocale);
 </script>

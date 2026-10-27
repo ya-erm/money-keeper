@@ -14,9 +14,9 @@ export class AccountTagsService extends BaseService<Tag> {
     return this.$items;
   }
 
-  save(item: Tag): void {
+  override save(item: Tag) {
     // TODO: check if tag name is unique
-    super.save(item);
+    return super.save(item);
   }
 }
 

@@ -1,8 +1,8 @@
 import type { Cookies } from '@sveltejs/kit';
 
-import { ApiError } from '$lib/api';
-import { db } from '$lib/server';
-import { SESSION_COOKIE_NAME, setSessionCookie } from '$lib/server/api/v2/auth/sessionCookie';
+import { ApiError } from '#lib/api/index.js';
+import { db } from '#lib/server/index.js';
+import { SESSION_COOKIE_NAME, setSessionCookie } from '#lib/server/api/v2/auth/sessionCookie.js';
 
 const BEARER_PREFIX = 'Bearer ';
 

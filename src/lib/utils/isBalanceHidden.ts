@@ -1,4 +1,4 @@
-import type { Account, GlobalSettings } from '$lib/data/interfaces';
+import type { Account, GlobalSettings } from '#lib/data/interfaces.js';
 
 export type LocalBalanceVisibility = Partial<Record<string, boolean>>;
 

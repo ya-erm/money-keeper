@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { replaceState } from '$app/navigation';
-  import { page } from '$app/stores';
-
   import Icon from '@ya-erm/svelte-ui/Icon';
 
   export let href: string | null = null;
@@ -13,14 +10,10 @@
 
 {#if href}
   <button {disabled}>
-    <a title={label} aria-label={label} {href} on:click={() => replaceState(href, $page.state)}>
-      <Icon name={icon} padding={1} />
-    </a>
+    <a title={label} aria-label={label} {href}><Icon name={icon} padding={1} /></a>
   </button>
 {:else}
-  <button title={label} aria-label={label} on:click={onClick} {disabled}>
-    <Icon name={icon} padding={1} />
-  </button>
+  <button title={label} aria-label={label} on:click={onClick} {disabled}><Icon name={icon} padding={1} /></button>
 {/if}
 
 <style>

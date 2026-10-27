@@ -8,11 +8,11 @@
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import Modal from '@ya-erm/svelte-ui/Modal';
 
-  import type { Repeating, TransactionViewModel } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
-  import Select from '$lib/ui/Select.svelte';
-  import { checkNumberFormParameter } from '$lib/utils/checkFormParams';
+  import type { Repeating, TransactionViewModel } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import SubScreen from '#lib/ui/layout/SubScreen.svelte';
+  import Select from '#lib/ui/Select.svelte';
+  import { checkNumberFormParameter } from '#lib/utils/checkFormParams.js';
 
   import GroupedOperationsList from '../accounts/GroupedOperationsList.svelte';
   import RepeatingIntervalText from './RepeatingIntervalText.svelte';

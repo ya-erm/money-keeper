@@ -13,11 +13,15 @@ services:
       - '5432:5432'
 
   front:
-    build: .
+    build:
+      context: .
+      args:
+        ORIGIN: ${ORIGIN}
     environment:
       PORT: 5173
       ORIGIN: ${ORIGIN}
-      DATABASE_URL: ${DATABASE_URL}
+      POSTGRES_PRISMA_URL: ${POSTGRES_PRISMA_URL:-${DATABASE_URL}}
+      POSTGRES_URL_NON_POOLING: ${POSTGRES_URL_NON_POOLING:-${DATABASE_URL}}
     ports:
       - '5173:5173'
 

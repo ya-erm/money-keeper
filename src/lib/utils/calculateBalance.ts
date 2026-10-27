@@ -1,4 +1,4 @@
-import type { TransactionViewModel } from '$lib/data/interfaces';
+import type { TransactionViewModel } from '#lib/data/interfaces.js';
 
 export function calculateBalance(transactions: TransactionViewModel[]) {
   return transactions?.reduce((res, t) => res + (t.category.type === 'IN' ? 1 : -1) * t.amount, 0) ?? 0;

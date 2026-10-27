@@ -25,7 +25,7 @@ export default [
       ecmaVersion: 2020,
       sourceType: 'module',
       parserOptions: {
-        project: ['./tsconfig.json'],
+        project: ['./tsconfig.json', './src/service-worker/tsconfig.json'],
         extraFileExtensions: ['.svelte'],
       },
     },

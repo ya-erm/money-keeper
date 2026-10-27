@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ListGroupItem from '$lib/ui/list/ListGroupItem.svelte';
-  import { longPress, toShortTimezoneOffset } from '$lib/utils';
+  import ListGroupItem from '#lib/ui/list/ListGroupItem.svelte';
+  import { longPress, toShortTimezoneOffset } from '#lib/utils/index.js';
 
   export let timezone: {
     tzCode: string;

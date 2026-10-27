@@ -1,14 +1,14 @@
 <script lang="ts">
   import dayjs from 'dayjs';
 
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
 
-  import { currencyRatesStore, memberSettingsStore } from '$lib/data';
-  import type { Account, TransactionViewModel } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
-  import HeaderFormSubmitButton from '$lib/ui/layout/HeaderFormSubmitButton.svelte';
-  import { findCurrencyRate, formatMoney, getSearchParam, setSearchParam } from '$lib/utils';
+  import { currencyRatesStore, memberSettingsStore } from '#lib/data/index.js';
+  import type { Account, TransactionViewModel } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import SubScreen from '#lib/ui/layout/SubScreen.svelte';
+  import HeaderFormSubmitButton from '#lib/ui/layout/HeaderFormSubmitButton.svelte';
+  import { findCurrencyRate, formatMoney, getSearchParam, setSearchParam } from '#lib/utils/index.js';
 
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
   import EditTransaction from '../transactions/edit/EditTransaction.svelte';

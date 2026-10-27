@@ -2,26 +2,28 @@
   import '../../static/styles.css';
   import { afterNavigate } from '$app/navigation';
 
-  import { browser, dev } from '$app/environment';
+  import { browser, dev } from '$app/env';
   import { page } from '$app/state';
   import { inject } from '@vercel/analytics';
 
-  import '$lib/icons';
-  import '$lib/translate';
+  import '#lib/icons.js';
+  import '#lib/translate/index.js';
 
   import Toasts from '@ya-erm/svelte-ui/toasts/Toasts';
   import { showInfoToast } from '@ya-erm/svelte-ui/toasts';
 
-  import { membersService } from '$lib/data';
-  import { routes } from '$lib/routes';
-  import { translate } from '$lib/translate';
+  import { membersService } from '#lib/data/index.js';
+  import { routes } from '#lib/routes.js';
+  import { translate } from '#lib/translate/index.js';
 
-  import ThemeProvider from '$lib/ui/theme/ThemeProvider.svelte';
+  import ThemeProvider from '#lib/ui/theme/ThemeProvider.svelte';
 
   inject({ mode: dev ? 'development' : 'production', debug: false });
 
   // Initial / redirects to /accounts. Keep the shell until that navigation finishes.
-  afterNavigate(() => {
+  afterNavigate(({ shallow, type }) => {
+    if (shallow && type === 'goto') return;
+
     if (page.data.startupFailed) {
       document.getElementById('app-startup')?.setAttribute('data-startup-error', '');
       return;
@@ -38,7 +40,4 @@
   }
 </script>
 
-<Toasts />
-<ThemeProvider />
-
-<slot />
+<Toasts /><ThemeProvider /><slot></slot>

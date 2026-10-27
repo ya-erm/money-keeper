@@ -2,7 +2,7 @@
 
 import type { RequestHandler } from '@sveltejs/kit';
 
-import { isApiError } from '$lib/api/ApiError';
+import { isApiError } from '#lib/api/ApiError.js';
 
 import { serverErrorResponse } from './serverError';
 

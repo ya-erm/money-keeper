@@ -2,10 +2,10 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
 
-  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '$lib/data';
-  import { translate } from '$lib/translate';
-  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
-  import { calculateBalance, findCurrencyRate, groupBySelector } from '$lib/utils';
+  import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '#lib/data/index.js';
+  import { translate } from '#lib/translate/index.js';
+  import SubScreen from '#lib/ui/layout/SubScreen.svelte';
+  import { calculateBalance, findCurrencyRate, groupBySelector } from '#lib/utils/index.js';
 
   import AccountList from '../../accounts/list/AccountList.svelte';
   import AccountListItem from '../../accounts/list/AccountListItem.svelte';

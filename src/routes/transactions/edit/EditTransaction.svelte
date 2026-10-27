@@ -1,8 +1,14 @@
 <script lang="ts">
-  import { accountsStore, categoriesStore, operationsService, operationsStore, operationTagsStore } from '$lib/data';
-  import type { Transaction } from '$lib/data/interfaces';
-  import { deleteOperation } from '$lib/data/operations';
-  import { translate } from '$lib/translate';
+  import {
+    accountsStore,
+    categoriesStore,
+    operationsService,
+    operationsStore,
+    operationTagsStore,
+  } from '#lib/data/index.js';
+  import type { Transaction } from '#lib/data/interfaces.js';
+  import { deleteOperation } from '#lib/data/operations.js';
+  import { translate } from '#lib/translate/index.js';
   import Button from '@ya-erm/svelte-ui/Button';
   import { showSuccessToast } from '@ya-erm/svelte-ui/toasts';
 

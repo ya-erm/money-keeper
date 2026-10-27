@@ -7,20 +7,20 @@
   import Input from '@ya-erm/svelte-ui/Input';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 
-  import { ApiError, isApiError } from '$lib/api/ApiError';
-  import { journalService, mainService, membersService, settingsService } from '$lib/data';
-  import { createKeyFromPassword, decryptAes, decryptRsa } from '$lib/data/crypto';
+  import { ApiError, isApiError } from '#lib/api/ApiError.js';
+  import { journalService, mainService, membersService, settingsService } from '#lib/data/index.js';
+  import { createKeyFromPassword, decryptAes, decryptRsa } from '#lib/data/crypto.js';
   import type {
     LoginConfirmRequestData,
     LoginConfirmResponseData,
     LoginRequestData,
     LoginResponseData,
-  } from '$lib/server/api/v2/auth';
-  import { translate } from '$lib/translate';
-  import LanguageButton from '$lib/translate/LanguageButton.svelte';
-  import Layout from '$lib/ui/layout/Layout.svelte';
-  import Loader from '$lib/ui/Loader.svelte';
-  import { useFetch, useSmartLoading } from '$lib/utils';
+  } from '#lib/server/api/v2/auth/index.js';
+  import { translate } from '#lib/translate/index.js';
+  import LanguageButton from '#lib/translate/LanguageButton.svelte';
+  import Layout from '#lib/ui/layout/Layout.svelte';
+  import Loader from '#lib/ui/Loader.svelte';
+  import { useFetch, useSmartLoading } from '#lib/utils/index.js';
 
   let login = '';
   let password = '';

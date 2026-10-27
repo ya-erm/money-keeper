@@ -1,8 +1,8 @@
-import { ApiError } from '$lib/api';
-import { db } from '$lib/server';
+import { ApiError } from '#lib/api/index.js';
+import { db } from '#lib/server/index.js';
 import type { Cookies } from '@sveltejs/kit';
 
-import { checkStringParameter } from '$lib/utils';
+import { checkStringParameter } from '#lib/utils/index.js';
 
 import { setSessionCookie } from './sessionCookie';
 

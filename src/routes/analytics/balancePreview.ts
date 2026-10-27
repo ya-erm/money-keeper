@@ -1,7 +1,7 @@
 import dayjs, { type Dayjs } from 'dayjs';
 
-import type { AccountViewModel, TransactionViewModel } from '$lib/data/interfaces';
-import { calculateBalance } from '$lib/utils';
+import type { AccountViewModel, TransactionViewModel } from '#lib/data/interfaces.js';
+import { calculateBalance } from '#lib/utils/index.js';
 
 export type BalancePreviewSeries = {
   id: string;

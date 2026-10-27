@@ -1,9 +1,9 @@
 <script lang="ts">
   import { derived } from 'svelte/store';
 
-  import { journalService } from '$lib/data';
-  import { translate } from '$lib/translate';
-  import { useSmartLoading } from '$lib/utils';
+  import { journalService } from '#lib/data/index.js';
+  import { translate } from '#lib/translate/index.js';
+  import { useSmartLoading } from '#lib/utils/index.js';
 
   const state = journalService.$state;
 

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { translate } from '$lib/translate';
-  import Layout from '$lib/ui/layout/Layout.svelte';
+  import { translate } from '#lib/translate/index.js';
+  import Layout from '#lib/ui/layout/Layout.svelte';
   import AnalyticsBackButton from '../AnalyticsBackButton.svelte';
   import AnalyticsBalancesVisibilityButton from '../AnalyticsBalancesVisibilityButton.svelte';
   import { resetAnalyticsBalancesVisibility } from '../store';

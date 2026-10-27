@@ -1,10 +1,10 @@
 <script lang="ts">
   import Icon from '@ya-erm/svelte-ui/Icon';
 
-  import { route } from '$lib/routes';
-  import { translate } from '$lib/translate';
-  import type { Messages } from '$lib/translate/types';
-  import Layout from '$lib/ui/layout/Layout.svelte';
+  import { route } from '#lib/routes.js';
+  import { translate } from '#lib/translate/index.js';
+  import type { Messages } from '#lib/translate/types.js';
+  import Layout from '#lib/ui/layout/Layout.svelte';
 
   import AccountsCardPreview from './AccountsCardPreview.svelte';
   import BalanceCardPreview from './BalanceCardPreview.svelte';

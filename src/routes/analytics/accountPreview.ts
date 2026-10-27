@@ -1,8 +1,8 @@
 import dayjs, { type Dayjs } from 'dayjs';
 
-import type { AccountViewModel, TransactionViewModel } from '$lib/data/interfaces';
-import { calculateBalance, isBalanceHidden } from '$lib/utils';
-import type { LocalBalanceVisibility } from '$lib/utils/isBalanceHidden';
+import type { AccountViewModel, TransactionViewModel } from '#lib/data/interfaces.js';
+import { calculateBalance, isBalanceHidden } from '#lib/utils/index.js';
+import type { LocalBalanceVisibility } from '#lib/utils/isBalanceHidden.js';
 
 export type AccountPreviewItem = {
   id: string;

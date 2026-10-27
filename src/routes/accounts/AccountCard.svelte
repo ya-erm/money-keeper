@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { AccountViewModel, CurrencyRate } from '$lib/data/interfaces';
-  import { settingsStore } from '$lib/data';
-  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
-  import { translate } from '$lib/translate';
+  import type { AccountViewModel, CurrencyRate } from '#lib/data/interfaces.js';
+  import { settingsStore } from '#lib/data/index.js';
+  import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
+  import { translate } from '#lib/translate/index.js';
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
-  import { formatMoney, isBalanceHidden } from '$lib/utils';
-  import HiddenMoney from '$lib/ui/HiddenMoney.svelte';
+  import { formatMoney, isBalanceHidden } from '#lib/utils/index.js';
+  import HiddenMoney from '#lib/ui/HiddenMoney.svelte';
 
   import AccountOptionsModal from './AccountOptionsModal.svelte';
 

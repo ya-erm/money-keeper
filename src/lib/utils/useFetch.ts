@@ -1,4 +1,4 @@
-import { ApiError } from '$lib/api/ApiError';
+import { ApiError } from '#lib/api/ApiError.js';
 import { writable, type Readable } from 'svelte/store';
 
 /**

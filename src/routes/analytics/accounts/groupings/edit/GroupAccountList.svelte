@@ -2,8 +2,8 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
 
-  import type { Group } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
+  import type { Group } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
 
   import GroupAccountListItem from './GroupAccountListItem.svelte';
 

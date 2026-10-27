@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
   import { v4 as uuid } from 'uuid';
 
   import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
   import MultiSwitch from '@ya-erm/svelte-ui/MultiSwitch';
 
-  import type { Category, CategoryType } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import GridCircleItem from '$lib/ui/GridCircleItem.svelte';
-  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
-  import Modal from '$lib/ui/Modal.svelte';
-  import { deleteSearchParam, getSearchParam, setSearchParam } from '$lib/utils';
+  import type { Category, CategoryType } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import GridCircleItem from '#lib/ui/GridCircleItem.svelte';
+  import SubScreen from '#lib/ui/layout/SubScreen.svelte';
+  import Modal from '#lib/ui/Modal.svelte';
+  import { deleteSearchParam, getSearchParam, setSearchParam } from '#lib/utils/index.js';
 
   import CategoryIcons from './CategoryIcons.svelte';
   import { categoryDataList, type CategorySuggestionMessage } from './datalist';
@@ -82,6 +82,7 @@
 <Modal width={20} header={category?.name ?? $translate('categories.new_category')} bind:opened>
   <form class="flex-col gap-1 items-center" on:submit|preventDefault={handleSave}>
     <MultiSwitch {options} selected={selectedOption} onChange={handleChangeType} />
+
     <div class="w-full flex gap-1 items-center">
       <Input
         label={$translate('categories.name')}

@@ -4,8 +4,8 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
 
-  import type { Grouping } from '$lib/data/interfaces';
-  import { route } from '$lib/routes';
+  import type { Grouping } from '#lib/data/interfaces.js';
+  import { route } from '#lib/routes.js';
 
   export let grouping: Grouping;
   export let description = grouping.groups

@@ -6,11 +6,11 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
 
-  import { translate } from '$lib/translate';
-  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
-  import Layout from '$lib/ui/layout/Layout.svelte';
-  import Tags from '$lib/ui/Tags.svelte';
-  import { LogLevel, logs } from '$lib/utils/logger';
+  import { translate } from '#lib/translate/index.js';
+  import HeaderBackButton from '#lib/ui/layout/HeaderBackButton.svelte';
+  import Layout from '#lib/ui/layout/Layout.svelte';
+  import Tags from '#lib/ui/Tags.svelte';
+  import { LogLevel, logs } from '#lib/utils/logger.js';
 
   let filtersVisible = false;
 

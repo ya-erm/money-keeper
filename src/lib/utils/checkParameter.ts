@@ -1,4 +1,4 @@
-import { ApiError } from '$lib/api/ApiError';
+import { ApiError } from '#lib/api/ApiError.js';
 
 export type CheckParameterType = 'string' | 'number' | 'boolean' | 'object' | 'array';
 

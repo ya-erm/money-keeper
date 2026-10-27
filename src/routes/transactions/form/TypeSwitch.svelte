@@ -1,19 +1,20 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
 
   import MultiSwitch from '@ya-erm/svelte-ui/MultiSwitch';
 
-  import { translate } from '$lib/translate';
-  import { getSearchParam } from '$lib/utils';
+  import { translate } from '#lib/translate/index.js';
+  import { getSearchParam } from '#lib/utils/index.js';
 
   export let type: 'IN' | 'OUT' | 'TRANSFER' | string = getSearchParam($page, 'type') ?? 'OUT';
   export let disabled: boolean = false;
 
   const handleChange = async (option: { id: string; title: string }) => {
     type = option.id;
-    $page.url.searchParams.set('type', option.id);
-    await goto($page.url, { replaceState: true });
+    const url = new URL($page.url.href);
+    url.searchParams.set('type', option.id);
+    await goto(url, { replace: true });
   };
 
   const options = [

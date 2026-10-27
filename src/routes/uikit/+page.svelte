@@ -1,9 +1,9 @@
 <script>
   import Switch from '@ya-erm/svelte-ui/Switch';
 
-  import Layout from '$lib/ui/layout/Layout.svelte';
-  import HeaderBackButton from '$lib/ui/layout/HeaderBackButton.svelte';
-  import { darkMode } from '$lib/ui/theme';
+  import Layout from '#lib/ui/layout/Layout.svelte';
+  import HeaderBackButton from '#lib/ui/layout/HeaderBackButton.svelte';
+  import { darkMode } from '#lib/ui/theme/index.js';
 
   import Buttons from './Buttons.svelte';
   import Colors from './Colors.svelte';

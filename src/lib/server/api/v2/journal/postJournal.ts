@@ -1,5 +1,5 @@
-import type { EncryptionVersion } from '$lib/data/interfaces';
-import { db } from '$lib/server';
+import type { EncryptionVersion } from '#lib/data/interfaces.js';
+import { db } from '#lib/server/index.js';
 
 export type PostJournalRequestData = {
   order: number;

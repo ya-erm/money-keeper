@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { translate } from '$lib/translate';
-  import LanguageButton from '$lib/translate/LanguageButton.svelte';
+  import { translate } from '#lib/translate/index.js';
+  import LanguageButton from '#lib/translate/LanguageButton.svelte';
   import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
 
-  import Layout from '$lib/ui/layout/Layout.svelte';
+  import Layout from '#lib/ui/layout/Layout.svelte';
 
   import PasswordModal from './PasswordModal.svelte';
 

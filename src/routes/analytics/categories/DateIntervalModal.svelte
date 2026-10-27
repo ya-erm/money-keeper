@@ -5,9 +5,9 @@
   import Input from '@ya-erm/svelte-ui/Input';
   import MultiSwitch from '@ya-erm/svelte-ui/MultiSwitch';
 
-  import type { DateIntervalType } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import Modal from '$lib/ui/Modal.svelte';
+  import type { DateIntervalType } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import Modal from '#lib/ui/Modal.svelte';
 
   export let opened = false;
 

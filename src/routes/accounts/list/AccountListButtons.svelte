@@ -1,23 +1,24 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '#lib/page.js';
 
-  import { translate } from '$lib/translate';
-  import HeaderButton from '$lib/ui/layout/HeaderButton.svelte';
-  import { getSearchParam } from '$lib/utils';
+  import { translate } from '#lib/translate/index.js';
+  import HeaderButton from '#lib/ui/layout/HeaderButton.svelte';
+  import { getSearchParam } from '#lib/utils/index.js';
 
   $: action = getSearchParam($page, 'action');
   const handleSortClick = async () => {
     if (action === 'sort') {
-      await goto('?', { replaceState: true });
+      await goto('?', { replace: true });
     } else {
-      await goto('?action=sort', { replaceState: true });
+      await goto('?action=sort', { replace: true });
     }
   };
 </script>
 
 <div class="flex">
   <HeaderButton icon="mdi:sort" label={$translate('accounts.sort')} onClick={handleSortClick} href="?action=sort" />
+
   <HeaderButton
     icon="mdi:credit-card-plus-outline"
     href="?action=create"

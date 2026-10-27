@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client';
 
-import { ApiError } from '$lib/api';
-import type { EncryptionVersion } from '$lib/data/interfaces';
-import { db } from '$lib/server';
+import { ApiError } from '#lib/api/index.js';
+import type { EncryptionVersion } from '#lib/data/interfaces.js';
+import { db } from '#lib/server/index.js';
 
 export type PostManyJournalRequestData = {
   items: {

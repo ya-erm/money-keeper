@@ -1,7 +1,7 @@
 import dayjs, { type Dayjs } from 'dayjs';
 
-import type { TransactionViewModel } from '$lib/data/interfaces';
-import { isBalanceHidden, type LocalBalanceVisibility } from '$lib/utils/isBalanceHidden';
+import type { TransactionViewModel } from '#lib/data/interfaces.js';
+import { isBalanceHidden, type LocalBalanceVisibility } from '#lib/utils/isBalanceHidden.js';
 
 export type ExpenseCategoryPreview = {
   id: string;

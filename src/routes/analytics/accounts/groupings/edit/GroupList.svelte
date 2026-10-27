@@ -6,10 +6,10 @@
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 
-  import { accountsStore } from '$lib/data';
-  import type { Group } from '$lib/data/interfaces';
-  import { translate } from '$lib/translate';
-  import SubScreen from '$lib/ui/layout/SubScreen.svelte';
+  import { accountsStore } from '#lib/data/index.js';
+  import type { Group } from '#lib/data/interfaces.js';
+  import { translate } from '#lib/translate/index.js';
+  import SubScreen from '#lib/ui/layout/SubScreen.svelte';
 
   import AccountList from '../../../../accounts/list/AccountList.svelte';
   import GroupAccountList from './GroupAccountList.svelte';

@@ -1,10 +1,10 @@
 <script lang="ts">
   import dayjs from 'dayjs';
-  import { localAccountBalancesHidden } from '$lib/accountBalanceVisibility';
+  import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
 
-  import { currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '$lib/data';
-  import { activeLocale, translate } from '$lib/translate';
-  import { findRate, formatMoney } from '$lib/utils';
+  import { currencyRatesStore, memberSettingsStore, operationsStore, settingsStore } from '#lib/data/index.js';
+  import { activeLocale, translate } from '#lib/translate/index.js';
+  import { findRate, formatMoney } from '#lib/utils/index.js';
 
   import { getIncomeExpensesPreview, getNiceChartGrid } from './incomeExpensesPreview';
 

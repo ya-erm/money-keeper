@@ -2,8 +2,8 @@
   import Button from '@ya-erm/svelte-ui/Button';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
-  import { translate } from '$lib/translate';
-  import { formatMoney } from '$lib/utils/formatMoney';
+  import { translate } from '#lib/translate/index.js';
+  import { formatMoney } from '#lib/utils/formatMoney.js';
   import { calculateItemTotal, type PurchaseItemDraft } from './purchaseItems';
 
   export let items: PurchaseItemDraft[];

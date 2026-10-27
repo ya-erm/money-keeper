@@ -1,27 +1,29 @@
+import adapterAuto from '@sveltejs/adapter-auto';
+import adapterNode from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
-// import { SvelteKitPWA } from '@vite-pwa/sveltekit';
-import type { UserConfig } from 'vite';
+import autoprefixer from 'autoprefixer';
+import { readFileSync } from 'node:fs';
+import { sveltePreprocess } from 'svelte-preprocess';
+import { loadEnv } from 'vite';
+import { defineConfig } from 'vitest/config';
 
-type UserConfigWithTest = UserConfig & {
-  test: { include: string[] };
-};
+const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 
-const config: UserConfigWithTest = {
-  // Worker imports are not discovered by the initial browser dependency scan.
-  // Prebundle them so the first QR read does not reload the open operation form.
+export default defineConfig(({ mode }) => ({
+  // Prebundle worker dependencies before the first QR read.
   optimizeDeps: { include: ['jsqr', 'zxing-wasm/reader'] },
   plugins: [
-    sveltekit(),
-    // SvelteKitPWA({
-    //   registerType: 'autoUpdate',
-    //   devOptions: {
-    //     enabled: true,
-    //   },
-    // }),
+    sveltekit({
+      preprocess: sveltePreprocess({ postcss: { plugins: [autoprefixer()] } }),
+      adapter: process.env.BUILD_ADAPTER === 'node' ? adapterNode() : adapterAuto(),
+      paths: {
+        origin:
+          process.env.BUILD_ADAPTER === 'node' ? loadEnv(mode, process.cwd(), 'ORIGIN').ORIGIN || undefined : undefined,
+      },
+      // Inline small route styles so the HTML startup screen can paint before downloads.
+      inlineStyleThreshold: 16384,
+      version: { name: pkg.version },
+    }),
   ],
-  test: {
-    include: ['src/**/*.test.ts'],
-  },
-};
-
-export default config;
+  test: { include: ['src/**/*.test.ts'] },
+}));

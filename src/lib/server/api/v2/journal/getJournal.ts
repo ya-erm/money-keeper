@@ -1,5 +1,5 @@
-import { db } from '$lib/server';
-import { checkNumberOptionalParameter } from '$lib/utils';
+import { db } from '#lib/server/index.js';
+import { checkNumberOptionalParameter } from '#lib/utils/index.js';
 
 export type GetJournalRequest = {
   start?: number;
