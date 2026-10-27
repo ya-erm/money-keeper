@@ -5,6 +5,7 @@
 ### Fixed
 
 - Migrated to SvelteKit 3 and updated compatible dependencies, preserving reactive navigation and offline startup. Updated the Node Docker build and Playwright image.
+- Wait for new accounts and operations to be saved locally before closing their forms, so an immediate reload retains them.
 
 ## 2.32.3 - 2026-10-26
 

@@ -27,7 +27,7 @@
   let archived = account?.archived;
 
   const handleSave = async () => {
-    accountsService.save({
+    await accountsService.save({
       ...account,
       id: account?.id ?? uuid(),
       name,

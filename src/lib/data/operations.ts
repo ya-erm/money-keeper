@@ -223,7 +223,7 @@ export function copyOperation(operation: Transaction, { save }: { save: boolean 
     }
   }
   if (save) {
-    newOperations.forEach((operation) => operationsService.save(operation));
+    newOperations.forEach((operation) => void operationsService.save(operation));
   }
   return newOperations;
 }

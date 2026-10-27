@@ -14,7 +14,7 @@
   $: tags = $operationTagsStore;
 
   const handleSubmit = async (transactions: Transaction[]) => {
-    transactions.forEach((transaction) => operationsService.save(transaction));
+    await Promise.all(transactions.map((transaction) => operationsService.save(transaction)));
     onDone();
   };
 </script>
