@@ -143,6 +143,8 @@ test('remembers the organization separately through save, reload, edit and JSON 
   await expect(comment).toHaveValue('Лидл');
   await comment.fill('Pet supplies');
   await page.getByTestId('CategorySelect').getByRole('button', { name: 'T_Pets', exact: true }).click();
+  await expect(comment).toHaveValue('Pet supplies');
+  await expectCategory(page, petsCategory);
   await page.getByTestId('SaveTransactionButton').click();
   await expect(page.getByTestId('TransactionForm')).toHaveCount(0);
   await expect

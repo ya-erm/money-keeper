@@ -9,6 +9,7 @@
 ### Fixed
 
 - Opening an operation edit link directly no longer fails during server rendering.
+- Operation edits finish saving locally before navigating back, so receipt metadata and manual changes survive leaving the page.
 
 ## 2.32.4 - 2026-10-27
 
