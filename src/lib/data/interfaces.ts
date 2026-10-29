@@ -158,6 +158,8 @@ export type Transaction = {
   description?: string | null;
   /** Fiscal receipt reference, independent of the bank statement description. */
   receiptUrl?: string | null;
+  /** Hidden organization name from receipt merchant details, used to reuse the user's comment and category. */
+  receiptOrganizationName?: string | null;
   /** Individual purchase items from the fiscal receipt. */
   purchaseItems?: PurchaseItem[];
   /** Result of the reconciliation with a bank statement, absent if the operation was not checked yet */

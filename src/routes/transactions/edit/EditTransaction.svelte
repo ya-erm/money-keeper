@@ -25,7 +25,7 @@
   $: transaction = transactions.find((t) => t.id === id);
 
   const handleSubmit = async (transactions: Transaction[]) => {
-    transactions.forEach((transaction) => operationsService.save(transaction));
+    await Promise.all(transactions.map((transaction) => operationsService.save(transaction)));
     onBack();
   };
 

@@ -45,6 +45,34 @@ Unit tests run with Vitest and cover pure modules such as the journal reducer in
 pnpm test:unit
 ```
 
+## Receipt organization defaults
+
+`Transaction.receiptOrganizationName` is optional hidden metadata from the receipt's `merchant` (organization) field.
+The branch's `store` label is never used as a fallback. It is independent of the editable comment and survives
+the normal operation copy, journal sync, compaction and JSON import/export paths; no database migration
+or inference from legacy comments is needed.
+
+Scanning a receipt reuses the latest matching operation in the selected workspace, ordered by operation
+date with an id tie-breaker. Matching ignores only letter case and whitespace. Deleted operations,
+transfers, the operation being edited, and operations of the opposite direction are excluded. The latest
+comment is reused even if its category has been removed; only an available category of the same direction
+is suggested. Operations whose category cannot be resolved at all are omitted by the existing view-model
+store. Receipts do not fall back to the unrelated comment-based category lookup on submit, including when
+the organization is unavailable.
+
+Manual comment/category edits (including clearing a comment) are preserved; a category incompatible
+with the receipt direction is discarded before finding a compatible default. Repeated
+scans can refresh automatic defaults. Applying before details load leaves the organization metadata absent; late
+details from the dismissed scanner cannot change the operation. Manually replacing/removing the receipt
+URL clears its organization metadata rather than retaining an identity for a different receipt.
+
+Focused checks:
+
+```sh
+pnpm test:unit src/lib/receipts/organizationDefaults.test.ts src/lib/data/snapshot.test.ts
+pnpm test:linux tests/receipts/organizationDefaults.test.ts
+```
+
 ## API for scripts
 
 Every API endpoint accepts either the session cookie or the `Authorization: Bearer <token>` header.

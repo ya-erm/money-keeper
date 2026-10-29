@@ -46,6 +46,7 @@
   import type { SerbianReceipt } from '#lib/receipts/serbianReceipt.js';
   import PurchaseItemsEditor from '#lib/receipts/PurchaseItemsEditor.svelte';
   import { toPurchaseItems, type PurchaseItemDraft } from '#lib/receipts/purchaseItems.js';
+  import { findReceiptOrganizationDefaults, getReceiptOrganizationName } from '#lib/receipts/organizationDefaults.js';
 
   import RepeatingModal from '../../repeatings/RepeatingModal.svelte';
   import RepeatingsList from '../../repeatings/RepeatingsList.svelte';
@@ -111,6 +112,9 @@
   let selectedTags = transaction?.tags.map((t) => `${t.id}`) ?? [];
 
   let comment = transaction?.comment ?? '';
+  // Protect explicit edits, including clearing a field, from later/repeated receipt reads.
+  let commentTouched = !!transaction || !!comment;
+  let categoryTouched = !!transaction || !!categoryId;
 
   let locationLat = transaction?.locationLat ?? null;
   let locationLng = transaction?.locationLng ?? null;
@@ -177,7 +181,17 @@
   }
 
   const applyReceipt = (receipt: SerbianReceipt) => {
-    if (type !== receipt.type) categoryId = null;
+    // A manual/preselected category only survives if it is valid for this receipt's direction.
+    if (
+      categoryId &&
+      !categories.some(
+        (category) =>
+          category.id === categoryId && category.type === receipt.type && !category.deleted && !category.system,
+      )
+    ) {
+      categoryId = null;
+      categoryTouched = false;
+    }
     type = receipt.type;
     timeZone = 'Europe/Belgrade';
     timeZoneShift = getTimeZoneOffset(timeZone);
@@ -194,9 +208,16 @@
       anotherCurrency = 'RSD';
     }
     pendingReceiptAmount = accountCurrency ? null : receipt.amount;
-    if (receipt.details && !comment.trim()) {
-      comment = receipt.details.merchant || receipt.details.store;
-    }
+    receiptOrganizationName = getReceiptOrganizationName(receipt.details);
+    const defaults = findReceiptOrganizationDefaults(
+      receiptOrganizationName,
+      receipt.type,
+      $operationsStore,
+      categories,
+      transaction?.id,
+    );
+    if (!commentTouched) comment = defaults?.comment ?? receiptOrganizationName ?? '';
+    if (!categoryTouched) categoryId = defaults?.categoryId ?? null;
     receiptUrl = receipt.url;
     purchaseItems = receipt.details?.items.map((item) => ({ ...item })) ?? [];
     receiptScannerOpened = false;
@@ -207,6 +228,7 @@
   const comments = $operationsCommentsStore;
 
   const handleCommentChange = (value: string) => {
+    commentTouched = true;
     comment = value;
     if (comment.length < 2) {
       suggestions = [];
@@ -224,6 +246,7 @@
 
   let description = transaction?.description ?? '';
   let receiptUrl = transaction?.receiptUrl ?? '';
+  let receiptOrganizationName: string | null | undefined = transaction?.receiptOrganizationName;
   let receiptHref: string | null = null;
   $: {
     try {
@@ -351,9 +374,18 @@
       }
       let resolvedCategoryId = formData.get('categoryId') as string | null;
       if ((type === 'IN' || type === 'OUT') && !resolvedCategoryId) {
-        const matchingOperation = comment.trim()
-          ? $operationsStore.find((op) => op.comment?.trim() === comment.trim() && op.category.type === type)
-          : undefined;
+        // A receipt match must not fall back to an unrelated operation with the same free-form comment.
+        const matchingOperation =
+          comment.trim() && !receiptOrganizationName && !receiptUrl.trim()
+            ? $operationsStore.find(
+                (op) =>
+                  op.comment?.trim() === comment.trim() &&
+                  categories.some(
+                    (category) =>
+                      category.id === op.categoryId && category.type === type && !category.deleted && !category.system,
+                  ),
+              )
+            : undefined;
         if (matchingOperation) {
           resolvedCategoryId = matchingOperation.categoryId;
           categoryId = resolvedCategoryId;
@@ -399,6 +431,7 @@
         comment: checkStringOptionalFormParameter(formData, 'comment'),
         ...(description.trim() ? { description: description.trim() } : {}),
         ...(receiptUrl.trim() ? { receiptUrl: receiptUrl.trim() } : {}),
+        ...(receiptOrganizationName ? { receiptOrganizationName } : {}),
         ...(savedPurchaseItems.length ? { purchaseItems: savedPurchaseItems } : {}),
         tagIds,
         ...(anotherCurrency
@@ -424,6 +457,10 @@
           ...(destinationTransaction?.description ? { description: destinationTransaction.description } : {}),
 
           ...(destinationTransaction?.receiptUrl ? { receiptUrl: destinationTransaction.receiptUrl } : {}),
+
+          ...(destinationTransaction?.receiptOrganizationName
+            ? { receiptOrganizationName: destinationTransaction.receiptOrganizationName }
+            : {}),
 
           ...(destinationTransaction?.purchaseItems
             ? {
@@ -479,6 +516,7 @@
         bind:categoryId
         categories={categories.filter((c) => c.type === type)}
         onChange={() => {
+          categoryTouched = true;
           if (!inputRef?.value) {
             inputRef?.focus({ preventScroll: true });
             inputRef?.scrollIntoView({ behavior: 'smooth' });
@@ -651,6 +689,7 @@
             aria-label={$translate('receipts.url')}
             name="receiptUrl"
             bind:value={receiptUrl}
+            onChange={() => (receiptOrganizationName = undefined)}
             inputmode="url"
             testId="ReceiptUrlInput"
             clearable
