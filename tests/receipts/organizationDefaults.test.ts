@@ -152,7 +152,7 @@ test('remembers the organization separately through save, reload, edit and JSON 
     .toMatchObject({ receiptOrganizationName: organizationName, comment: 'Pet supplies', categoryId: petsCategory });
 
   await openReadyPath(page, '/settings/import-export');
-  await page.getByRole('button', { name: 'Show', exact: true }).click();
+  await page.getByText('Show', { exact: true }).click();
   const exported = JSON.parse(await page.locator('textarea').nth(1).inputValue());
   expect(exported.operations.find((item: Transaction) => item.id === saved.id)).toMatchObject({
     receiptOrganizationName: organizationName,
