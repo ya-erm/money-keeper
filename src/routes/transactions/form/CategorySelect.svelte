@@ -39,14 +39,20 @@
       const style = getComputedStyle(grid);
       itemsInRow = style.getPropertyValue('grid-template-columns').split(' ').length;
       rowsCount = Math.ceil((categories.length + 1) / itemsInRow);
-      if (categoryId && categories.findIndex((category) => category.id === categoryId) >= itemsInRow * 2 - 1) {
-        showAll = true;
-      }
     }
   };
 
   // recalculate rows count on categories change
   $: if (categories) getRowsNumber();
+
+  // Receipt defaults can select a category after the grid has already been measured.
+  $: if (
+    itemsInRow > 0 &&
+    categoryId &&
+    categories.findIndex((category) => category.id === categoryId) >= itemsInRow * 2 - 1
+  ) {
+    showAll = true;
+  }
 
   $: showMoreButton = rowsCount > 2 && !showAll;
   $: filteredItems = showMoreButton ? categories.slice(0, itemsInRow * 2 - 1) : categories;

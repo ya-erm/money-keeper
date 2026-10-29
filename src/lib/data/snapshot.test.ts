@@ -22,11 +22,33 @@ describe('reduceJournal', () => {
     const operation = transaction({
       description: 'Bank statement description',
       receiptUrl: 'https://suf.purs.gov.rs/v/?vl=example',
+      receiptOrganizationName: 'LIDL SRBIJA KD',
+      comment: 'Лидл',
       purchaseItems: [{ name: 'Cheese', quantity: 1, unitPrice: 100, total: 100 }],
     });
     const snapshot = reduceJournal([{ order: 1, data: { transaction: operation } }]);
     const compacted = reduceJournal([{ order: 1, data: { snapshot: JSON.parse(JSON.stringify(snapshot)) } }]);
     expect(compacted.operations).toEqual([operation]);
+  });
+
+  it('removes cleared organization metadata when a complete edited operation replaces the original', () => {
+    const original = transaction({ receiptOrganizationName: 'LIDL SRBIJA KD', comment: 'Лидл' });
+    const edited = transaction({ receiptUrl: 'https://example.com/new-receipt', comment: 'Лидл' });
+    const snapshot = reduceJournal([
+      { order: 1, data: { transaction: original } },
+      { order: 2, data: { transaction: edited } },
+    ]);
+    const compacted = reduceJournal([{ order: 2, data: { snapshot: JSON.parse(JSON.stringify(snapshot)) } }]);
+    expect(compacted.operations).toEqual([edited]);
+    expect(compacted.operations[0]).not.toHaveProperty('receiptOrganizationName');
+  });
+
+  it('keeps legacy operations without receipt organization metadata unchanged', () => {
+    const operation = transaction({ comment: 'Not a reliable organization identity' });
+    const snapshot = reduceJournal([{ order: 1, data: { transaction: operation } }]);
+    const imported = reduceJournal([{ order: 2, data: { snapshot: JSON.parse(JSON.stringify(snapshot)) } }]);
+    expect(imported.operations).toEqual([operation]);
+    expect(imported.operations[0]).not.toHaveProperty('receiptOrganizationName');
   });
 
   it('returns empty snapshot for empty journal', () => {

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.33.0 - 2026-10-29
+
+### Added
+
+- Receipt scans now keep the organization name (not the branch) as hidden operation metadata and reuse the latest matching operation’s comment and available category in the current workspace. Manual edits are preserved; organization metadata survives editing, copying, synchronization and JSON backups.
+
 ## 2.32.4 - 2026-10-27
 
 ### Fixed
