@@ -12,5 +12,5 @@
 </script>
 
 <Layout title={$translate('transactions.edit_transaction')} rightSlot={HeaderFormSubmitButton}
-  ><EditTransaction {id} onBack={history.back} /></Layout
+  ><EditTransaction {id} onBack={() => history.back()} /></Layout
 >

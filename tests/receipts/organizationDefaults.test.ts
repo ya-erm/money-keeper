@@ -56,8 +56,15 @@ async function seed(
   await importMockDataAsync(page, JSON.stringify(data));
 }
 
+async function openReadyPath(page: Page, path: string) {
+  await openPathAsync(page, path);
+  // Native fill/dispatchEvent can run before hydration attaches the form's handlers.
+  await expect(page.locator('#app-startup')).toHaveCount(0);
+  await expect(page.locator('#app-content')).not.toHaveAttribute('inert', '');
+}
+
 async function openForm(page: Page) {
-  await page.goto('/transactions/create?accountId=receipt-test-account');
+  await openReadyPath(page, '/transactions/create?accountId=receipt-test-account');
   await expect(page.getByTestId('TransactionForm')).toBeVisible();
 }
 
@@ -132,7 +139,7 @@ test('remembers the organization separately through save, reload, edit and JSON 
   const saved = (await storedOperations(page)).find((item) => item.comment === 'Лидл')!;
 
   await page.reload();
-  await page.goto(`/transactions/edit?id=${saved.id}`);
+  await openReadyPath(page, `/transactions/edit?id=${saved.id}`);
   await expect(comment).toHaveValue('Лидл');
   await comment.fill('Pet supplies');
   await page.getByTestId('CategorySelect').getByRole('button', { name: 'T_Pets', exact: true }).click();
@@ -142,7 +149,7 @@ test('remembers the organization separately through save, reload, edit and JSON 
     .poll(async () => (await storedOperations(page)).find((item) => item.id === saved.id))
     .toMatchObject({ receiptOrganizationName: organizationName, comment: 'Pet supplies', categoryId: petsCategory });
 
-  await page.goto('/settings/import-export');
+  await openReadyPath(page, '/settings/import-export');
   await page.getByRole('button', { name: 'Show', exact: true }).click();
   const exported = JSON.parse(await page.locator('textarea').nth(1).inputValue());
   expect(exported.operations.find((item: Transaction) => item.id === saved.id)).toMatchObject({
@@ -244,6 +251,7 @@ test('keeps a manually entered comment and category when applying a receipt', as
   await seed(page, [operation('previous')]);
   await openForm(page);
   await page.locator('input[name="comment"]').fill('My own comment');
+  await expect(page.locator('input[name="comment"]')).toHaveValue('My own comment');
   await page.getByTestId('CategorySelect').getByRole('button', { name: 'T_Pets', exact: true }).click();
   await applyScan(page);
   await expect(page.locator('input[name="comment"]')).toHaveValue('My own comment');
@@ -287,7 +295,9 @@ test('does not let details from a dismissed scanner overwrite subsequent user in
   const scanner = await openScanner(page);
   await expect(scanner.getByRole('status')).toHaveText('Loading receipt details…');
   await scanner.getByRole('button', { name: 'Fill operation', exact: true }).click();
+  await expect(scanner).toHaveCount(0);
   await page.locator('input[name="comment"]').fill('Typed while details were pending');
+  await expect(page.locator('input[name="comment"]')).toHaveValue('Typed while details were pending');
   await page.getByTestId('CategorySelect').getByRole('button', { name: 'T_Pets', exact: true }).click();
   await pending.route?.fulfill({ json: details() }).catch(() => {});
   await expect(page.locator('input[name="comment"]')).toHaveValue('Typed while details were pending');
@@ -306,14 +316,14 @@ test('does not let details from a dismissed scanner overwrite subsequent user in
 test('preserves hidden organization metadata when duplicating an operation', async ({ page }) => {
   const original = operation('receipt-to-copy', { receiptUrl, comment: 'Receipt to duplicate' });
   await seed(page, [original]);
-  await page.goto('/accounts?account-card=receipt-test-account');
+  await openReadyPath(page, '/accounts?account-card=receipt-test-account');
   const item = page.getByTestId('TransactionListItem').filter({ hasText: original.comment! });
   await expect(item).toBeVisible();
   // Long press opens the account list's operation menu without clicking through to editing.
   await item.dispatchEvent('pointerdown');
-  await expect(page.getByRole('button', { name: 'Duplicate', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Duplicate', exact: true, includeHidden: true })).toBeVisible();
   await item.dispatchEvent('pointerup');
-  await page.getByRole('button', { name: 'Duplicate', exact: true }).click();
+  await page.getByRole('button', { name: 'Duplicate', exact: true, includeHidden: true }).click();
   await expect
     .poll(async () => (await storedOperations(page)).filter((operation) => operation.comment === original.comment))
     .toHaveLength(2);
@@ -333,7 +343,7 @@ test('preserves hidden organization metadata when duplicating an operation', asy
 test('clears stale organization metadata when the receipt URL is manually replaced', async ({ page }) => {
   const original = operation('replace-receipt-url', { receiptUrl });
   await seed(page, [original]);
-  await page.goto(`/transactions/edit?id=${original.id}`);
+  await openReadyPath(page, `/transactions/edit?id=${original.id}`);
   await page
     .getByTestId('PurchaseContentsSection')
     .getByRole('button', { name: /Purchase contents/ })
@@ -435,7 +445,7 @@ test('keeps the existing comment and category when rescanning during editing', a
     categoryId: petsCategory,
   });
   await seed(page, [original, operation('newer', { date: '2026-10-16T10:00:00Z', comment: 'Different defaults' })]);
-  await page.goto(`/transactions/edit?id=${original.id}`);
+  await openReadyPath(page, `/transactions/edit?id=${original.id}`);
   await applyScan(page);
   await expect(page.locator('input[name="comment"]')).toHaveValue(original.comment!);
   await expectCategory(page, petsCategory);
@@ -450,6 +460,7 @@ test('fills category independently of a manually entered comment', async ({ page
   await seed(page, [operation('previous')]);
   await openForm(page);
   await page.locator('input[name="comment"]').fill('My manual comment');
+  await expect(page.locator('input[name="comment"]')).toHaveValue('My manual comment');
   await applyScan(page);
   await expect(page.locator('input[name="comment"]')).toHaveValue('My manual comment');
   await expectCategory(page, shopCategory);
@@ -457,7 +468,7 @@ test('fills category independently of a manually entered comment', async ({ page
 
 test('fills comment independently of a preselected compatible category', async ({ page }) => {
   await seed(page, [operation('previous', { comment: 'Лидл' })]);
-  await page.goto(`/transactions/create?accountId=receipt-test-account&categoryId=${petsCategory}`);
+  await openReadyPath(page, `/transactions/create?accountId=receipt-test-account&categoryId=${petsCategory}`);
   await applyScan(page);
   await expect(page.locator('input[name="comment"]')).toHaveValue('Лидл');
   await expectCategory(page, petsCategory);
@@ -465,7 +476,7 @@ test('fills comment independently of a preselected compatible category', async (
 
 test('replaces an incompatible preselected category when the receipt changes direction', async ({ page }) => {
   await seed(page, [operation('previous', { comment: 'Лидл' })]);
-  await page.goto(`/transactions/create?accountId=receipt-test-account&type=IN&categoryId=${incomeCategory}`);
+  await openReadyPath(page, `/transactions/create?accountId=receipt-test-account&type=IN&categoryId=${incomeCategory}`);
   await expectCategory(page, incomeCategory);
   await applyScan(page);
   await expect(page.locator('input[name="comment"]')).toHaveValue('Лидл');
