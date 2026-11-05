@@ -9,9 +9,11 @@ ORIGIN="..."
 ```
 
 SvelteKit 3 requires Node 22.17 or later. The Docker image uses Node 24.
+Vercel functions explicitly target the supported Node 24 runtime, independently of
+the Node version selected for the build.
 For a standalone Node build, run `BUILD_ADAPTER=node pnpm build`.
 `ORIGIN` is read at build time as `paths.origin`; rebuild the Docker image when it changes.
-Vercel builds use the automatic adapter and derive their origin from the request.
+Vercel builds use the Vercel adapter and derive their origin from the request.
 
 ## Launch local database in docker
 
@@ -108,6 +110,9 @@ E2E tests run with Playwright in guest mode and use local IndexedDB, so database
 
 This is the same command that runs in CI. It runs Playwright inside the official Linux container, so screenshot assertions use Linux baselines both locally and in GitHub Actions.
 
+The test container installs the pinned pnpm 9.7.0 directly because Corepack is no
+longer included in the Playwright image. Keep this version in sync with `packageManager`.
+
 Start Docker locally with Colima first:
 
 ```sh
@@ -164,3 +169,25 @@ Updates wait for existing tabs/PWA windows to close so cached HTML and hashed as
 on the same release. Close all Money Keeper windows and reopen to activate a waiting update;
 a normal reload alone may keep the old release active. Do not reuse a released application
 version, since `package.json` supplies the service-worker cache version.
+
+## Dependency security overrides
+
+The npm and pnpm override sections in `package.json` are kept in sync. Use the pinned
+pnpm version to regenerate `pnpm-lock.yaml`; do not replace all minimatch versions
+with one major version.
+
+- [CVE-2026-118764](https://github.com/advisories/GHSA-g3hv-75wg-m249): only
+  minimatch versions `>=7.0.0 <11.0.1` are overridden to `11.0.1`. The legacy
+  `@eslint/eslintrc` dependency remains on unaffected `3.1.5`, preserving its
+  callable CommonJS API.
+- [CVE-2026-118773](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4):
+  `@vercel/nft@1.11.0` is pinned to glob `14.0.2` until NFT supports a patched
+  version itself. The Vercel tracing build must be tested when removing this override.
+- The deepmerge report [CVE-2026-93753](https://www.cve.org/CVERecord?id=CVE-2026-93753)
+  was rejected on 2026-11-02 because it does not describe a security vulnerability.
+  The GitHub advisory and npm audit can still show the stale report. No downgrade,
+  blanket audit suppression, or unsupported replacement is applied for that report.
+
+After dependency changes, run `pnpm audit`, unit tests, lint/type checks, and Node
+and Vercel builds. Review remaining audit findings individually rather than hiding
+them by severity.

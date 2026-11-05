@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.33.1 - 2026-11-05
+
+### Fixed
+
+- Updated affected transitive minimatch dependencies to 11.0.1 for CVE-2026-118764, retaining the unaffected 3.x dependency for compatibility with legacy ESLint configuration.
+- Updated the Vercel tracing dependency glob to 14.0.2 for CVE-2026-118773.
+- Explicitly selected the supported Node 24 runtime for Vercel functions, so builds on Node 26 do not fail during automatic runtime detection.
+- Restored browser tests by installing the pinned pnpm version directly in the Playwright container, which no longer includes Corepack.
+
 ## 2.33.0 - 2026-10-29
 
 ### Added
