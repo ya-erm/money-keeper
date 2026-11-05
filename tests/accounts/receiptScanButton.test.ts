@@ -194,11 +194,18 @@ for (const width of [390, 1440]) {
     await scanner.getByRole('button', { name: 'Close', exact: true }).click();
     await expect(scanner).toHaveCount(0);
     await expect(page.getByTestId('TransactionForm')).toBeVisible();
+    await page.getByTestId('TypeSwitch').getByRole('button', { name: 'Incoming', exact: true }).click();
+    await expect(page).toHaveURL(/type=IN/);
+    await expect(scanner).toHaveCount(0);
     await page.getByRole('button', { name: 'Back', exact: true }).click();
     await expect(page.getByTestId('AccountScanReceiptButton')).toBeVisible();
     await page.goForward();
     await expect(page).toHaveURL(/scan-receipt=1/);
-    await expect(scanner).toBeVisible();
+    // History can restore the dismissed scanner's form. Only an explicit new QR action
+    // must start scanning again; returning to a draft must never save it automatically.
+    await expect(page.getByTestId('TransactionForm')).toBeVisible();
+    await expect(page.locator('input[name="accountId"]')).toHaveValue(accountId);
+    expect(await storedRows<Transaction>(page, 'transactions')).toEqual([]);
     await page.goBack();
     await expect(scanner).toHaveCount(0);
     await page.getByTestId('AccountScanReceiptButton').click();
