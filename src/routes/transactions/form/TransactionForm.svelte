@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { afterNavigate } from '$app/navigation';
   import dayjs from 'dayjs';
   import { v4 as uuid } from 'uuid';
   import { page } from '#lib/page.js';
@@ -27,6 +28,7 @@
   import { withVerification } from '#lib/data/verification.js';
   import { repeatingsService, repeatingsStore } from '#lib/data/repeatings.js';
   import { translate } from '#lib/translate/index.js';
+  import { route } from '#lib/routes.js';
   import type { Messages } from '#lib/translate/messages.js';
   import SubScreen from '#lib/ui/layout/SubScreen.svelte';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
@@ -165,6 +167,18 @@
   let anotherCurrencyModalOpened = false;
   let anotherCurrency: string | null = transaction?.anotherCurrency ?? null;
   let receiptScannerOpened = !transaction && getSearchParam($page, 'scan-receipt') === '1';
+  afterNavigate(({ from, to }) => {
+    // A new entry from the accounts screen requests another scan, even if navigation
+    // restores this form. Same-page changes (such as the operation type) do not.
+    if (
+      !transaction &&
+      to?.url.pathname === route('transactions.create') &&
+      to.url.searchParams.get('scan-receipt') === '1' &&
+      from?.url.pathname !== to.url.pathname
+    ) {
+      receiptScannerOpened = true;
+    }
+  });
   let pendingReceiptAmount: number | null = null;
 
   // A receipt may be scanned before the user chooses an account.

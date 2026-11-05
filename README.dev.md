@@ -49,6 +49,16 @@ pnpm test:unit
 
 ## Receipt organization defaults
 
+The optional `Account.showReceiptScanButton` preference enables a camera / QR code shortcut in that
+account's operations header. It defaults to off for new and existing accounts, and travels with the
+account through journal sync and JSON backups without a database migration. The shortcut opens the
+existing receipt-first operation form with the account preselected; applying a receipt still requires
+reviewing and saving the operation. The regular Add action is unchanged.
+
+```sh
+pnpm test:linux tests/accounts/receiptScanButton.test.ts
+```
+
 `Transaction.receiptOrganizationName` is optional hidden metadata from the receipt's `merchant` (organization) field.
 The branch's `store` label is never used as a fallback. It is independent of the editable comment and survives
 the normal operation copy, journal sync, compaction and JSON import/export paths; no database migration

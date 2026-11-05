@@ -1,6 +1,7 @@
 export type Messages =
   | 'app.title'
   | 'receipts.manual'
+  | 'receipts.qr_code'
   // Common
   | 'common.back'
   | 'common.select'
@@ -112,6 +113,7 @@ export type Messages =
   | 'accounts.color'
   | 'accounts.select_color'
   | 'accounts.tags'
+  | 'accounts.show_receipt_scan_button'
   | 'accounts.sort'
   | 'accounts.archived_accounts'
   | 'accounts.archive'

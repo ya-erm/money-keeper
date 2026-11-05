@@ -18,6 +18,24 @@ function transaction(overrides: Partial<Transaction> = {}): Transaction {
 }
 
 describe('reduceJournal', () => {
+  it('preserves per-account QR scan preferences through journal updates, compaction and JSON backups', () => {
+    const enabled = { ...account, showReceiptScanButton: true };
+    const legacy = { ...account, id: 'legacy-account' };
+    const snapshot = reduceJournal([
+      { order: 1, data: { account: enabled } },
+      { order: 2, data: { account: legacy } },
+    ]);
+    const imported = reduceJournal([{ order: 2, data: { snapshot: JSON.parse(JSON.stringify(snapshot)) } }]);
+    expect(imported.accounts).toEqual([enabled, legacy]);
+
+    const disabled = { ...enabled, showReceiptScanButton: false };
+    const updated = reduceJournal([
+      { order: 2, data: { snapshot: imported } },
+      { order: 3, data: { account: disabled } },
+    ]);
+    expect(updated.accounts).toEqual([disabled, legacy]);
+  });
+
   it('retains receipt fields independently of bank descriptions through compaction and JSON export', () => {
     const operation = transaction({
       description: 'Bank statement description',

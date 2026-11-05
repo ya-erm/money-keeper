@@ -5,6 +5,7 @@
   import type { Account } from '#lib/data/interfaces.js';
   import { translate } from '#lib/translate/index.js';
   import Button from '@ya-erm/svelte-ui/Button';
+  import Checkbox from '@ya-erm/svelte-ui/Checkbox';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
@@ -25,6 +26,7 @@
   let currency = account?.currency ?? '';
   let selectedTags = account?.tagIds;
   let archived = account?.archived;
+  let showReceiptScanButton = account?.showReceiptScanButton ?? false;
 
   const handleSave = async () => {
     await accountsService.save({
@@ -36,6 +38,7 @@
       currency,
       tagIds: selectedTags,
       archived,
+      showReceiptScanButton,
     });
     opened = false;
   };
@@ -95,6 +98,7 @@
         onDelete={(t) => accountTagsService.delete(t)}
       />
     </div>
+    <Checkbox bind:checked={showReceiptScanButton} label={$translate('accounts.show_receipt_scan_button')} />
     <div class="grid-col-2 gap-1">
       {#if !!account}
         {#if archived}

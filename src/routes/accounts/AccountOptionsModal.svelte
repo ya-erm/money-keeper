@@ -37,6 +37,7 @@
       deleted: account.deleted,
       archived: account.archived,
       hideBalance: !account.hideBalance,
+      showReceiptScanButton: account.showReceiptScanButton,
     });
     onClose();
   };
