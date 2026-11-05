@@ -19,7 +19,7 @@ const receiptDetails = {
   address: 'Test address',
   city: 'Test city',
   taxId: '000000001',
-  journal: 'Test receipt',
+  journal: 'LIDL SRBIJA KD\nTest receipt',
   items: [{ name: 'Test item', quantity: 1, unitPrice: 525.7, total: 525.7 }],
   itemsAvailable: true,
 };
@@ -51,7 +51,7 @@ async function openAccountOptions(page: Page) {
 
 async function editAccount(page: Page) {
   await openAccountOptions(page);
-  await page.getByRole('button', { name: 'Edit', exact: true }).click();
+  await page.locator('.modal').getByText('Edit', { exact: true }).click();
   return page.getByTestId('AccountForm');
 }
 
@@ -92,9 +92,9 @@ test('defaults to hidden and saves the preference independently for each account
   const shortcut = page.getByTestId('AccountScanReceiptButton');
   await expect(shortcut).toHaveCount(0);
   let form = await editAccount(page);
-  await expect(form.getByRole('checkbox', { name: preferenceLabel })).not.toBeChecked();
-  await form.getByRole('checkbox', { name: preferenceLabel }).check();
-  await form.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(form.getByLabel(preferenceLabel)).not.toBeChecked();
+  await form.getByLabel(preferenceLabel).check();
+  await form.locator('button[type="submit"]').click();
   await expect(form).toHaveCount(0);
   await expect(shortcut).toBeVisible();
   await expect(shortcut).toHaveText('QR code');
@@ -107,25 +107,29 @@ test('defaults to hidden and saves the preference independently for each account
   await page.reload();
   await expect(shortcut).toBeVisible();
   form = await editAccount(page);
-  await expect(form.getByRole('checkbox', { name: preferenceLabel })).toBeChecked();
-  await form.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(form.getByLabel(preferenceLabel)).toBeChecked();
+  await form.getByLabel(preferenceLabel).uncheck();
+  await page.keyboard.press('Escape');
+  await expect(form).toHaveCount(0);
+  await expect(shortcut).toBeVisible();
 
   // The balance-visibility action writes a complete account, so it must retain this preference.
   await openAccountOptions(page);
-  await page.getByRole('button', { name: 'Hide amount', exact: true }).click();
-  await expect(shortcut).toBeVisible();
-  await page.reload();
+  await page.locator('.modal').getByText('Hide amount', { exact: true }).click();
   await expect(shortcut).toBeVisible();
   await expect
     .poll(async () => (await storedRows<Account>(page, 'accounts')).find((a) => a.id === accountId))
     .toMatchObject({ showReceiptScanButton: true, hideBalance: true });
+  await page.reload();
+  await expect(shortcut).toBeVisible();
 
   await openReadyPath(page, `/accounts?account-card=${otherAccountId}`);
   await expect(shortcut).toHaveCount(0);
   await openReadyPath(page, `/accounts?account-card=${accountId}`);
   form = await editAccount(page);
-  await form.getByRole('checkbox', { name: preferenceLabel }).uncheck();
-  await form.getByRole('button', { name: 'Save', exact: true }).click();
+  await form.getByLabel(preferenceLabel).uncheck();
+  await form.locator('button[type="submit"]').click();
+  await expect(form).toHaveCount(0);
   await expect(shortcut).toHaveCount(0);
   await page.reload();
   await expect(shortcut).toHaveCount(0);
@@ -134,11 +138,11 @@ test('defaults to hidden and saves the preference independently for each account
 test('can enable the shortcut when creating an account and retains it in JSON export', async ({ page }) => {
   await openReadyPath(page, '/accounts?action=create');
   const form = page.getByTestId('AccountForm');
-  await expect(form.getByRole('checkbox', { name: preferenceLabel })).not.toBeChecked();
+  await expect(form.getByLabel(preferenceLabel)).not.toBeChecked();
   await form.locator('input[name="name"]').fill(accountName);
   await form.locator('input[name="currency"]').fill('RSD');
-  await form.getByRole('checkbox', { name: preferenceLabel }).check();
-  await form.getByRole('button', { name: 'Save', exact: true }).click();
+  await form.getByLabel(preferenceLabel).check();
+  await form.locator('button[type="submit"]').click();
   await expect(form).toHaveCount(0);
   await page.reload();
   await expect(page.getByTestId('AccountScanReceiptButton')).toBeVisible();
@@ -193,6 +197,7 @@ for (const width of [390, 1440]) {
     await page.getByRole('button', { name: 'Back', exact: true }).click();
     await expect(page.getByTestId('AccountScanReceiptButton')).toBeVisible();
     await page.goForward();
+    await expect(page).toHaveURL(/scan-receipt=1/);
     await expect(scanner).toBeVisible();
     await page.goBack();
     await expect(scanner).toHaveCount(0);

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { afterNavigate } from '$app/navigation';
   import dayjs from 'dayjs';
   import { v4 as uuid } from 'uuid';
   import { page } from '#lib/page.js';
@@ -164,7 +165,17 @@
 
   let anotherCurrencyModalOpened = false;
   let anotherCurrency: string | null = transaction?.anotherCurrency ?? null;
-  let receiptScannerOpened = !transaction && getSearchParam($page, 'scan-receipt') === '1';
+  let receiptScannerOpened = false;
+  let initialReceiptScanHandled = false;
+  afterNavigate(({ to }) => {
+    // Read the completed navigation, including Back/Forward, rather than a possibly stale
+    // legacy page-store snapshot during component initialization. Consume the request once
+    // so closing the scanner or changing the operation type does not reopen it.
+    if (!initialReceiptScanHandled && !transaction && to?.url.searchParams.get('scan-receipt') === '1') {
+      initialReceiptScanHandled = true;
+      receiptScannerOpened = true;
+    }
+  });
   let pendingReceiptAmount: number | null = null;
 
   // A receipt may be scanned before the user chooses an account.
