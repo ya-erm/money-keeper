@@ -250,7 +250,7 @@ test('fits Russian action labels to the available width and keeps icon actions a
   expect(await header.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath('qr-mobile-320.png') });
-  await expect.soft(page).toHaveScreenshot('qr-shortcut-ru-narrow.png');
+  await expect(page).toHaveScreenshot('qr-shortcut-ru-narrow.png');
 
   // Repeated resizes must restore the labels rather than retaining a compact state.
   for (const width of [390, 320, 390, 1440]) {
