@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
   import ShowMoreContainer from '@ya-erm/svelte-ui/ShowMoreContainer';
   import Spoiler from '@ya-erm/svelte-ui/Spoiler';
@@ -23,6 +24,11 @@
   $: addOperationHref = inlineDetails
     ? withSearchParams($page, { 'operation-id': 'new', accountId: account?.id ?? null })
     : route('transactions.create') + (account?.id ? `?accountId=${account?.id}` : '');
+
+  $: scanReceiptHref = `${route('transactions.create')}?${new URLSearchParams({
+    accountId: account?.id ?? '',
+    'scan-receipt': '1',
+  })}`;
 
   let search: string = '';
   let limit = 20;
@@ -49,16 +55,24 @@
 
 <ShowMoreContainer bind:limit step={20} total={allFilteredOperations.length} translate={$translate}>
   <div class="operations-container p-1">
-    <div class="flex gap-1">
+    <div class="flex gap-1" class:with-receipt-scan={!!account?.showReceiptScanButton}>
       <h3 class="m-0 flex-grow font-normal">
         <span>{$translate('transactions.title')}</span>
         <span class="operations-count">
           {$translate('common.count', { values: { count: allFilteredOperations.length } })}
         </span>
       </h3>
-      <a href={addOperationHref} data-testId="AddOperationButton">
-        {$translate('common.add')}
-      </a>
+      <div class="operation-actions gap-1">
+        {#if account?.showReceiptScanButton}
+          <a href={scanReceiptHref} class="scan-receipt-button" data-testId="AccountScanReceiptButton">
+            <Icon name="mdi:camera" size={1.1} />
+            <span>{$translate('receipts.qr_code')}</span>
+          </a>
+        {/if}
+        <a href={addOperationHref} data-testId="AddOperationButton">
+          {$translate('common.add')}
+        </a>
+      </div>
     </div>
     <div class="operations-search-container flex gap-0.5">
       <div class="flex-grow">
@@ -89,6 +103,24 @@
 </ShowMoreContainer>
 
 <style>
+  .with-receipt-scan {
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .operation-actions {
+    display: contents;
+  }
+  .with-receipt-scan .operation-actions {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  .scan-receipt-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
   .operations-search-container {
     padding: 1rem 0;
     background: var(--background-color);

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.34.0 - 2026-11-05
+
+### Added
+
+- Accounts can show a camera / QR code shortcut beside Add in their operations list. Enable it in the account settings to open the receipt scanner with that account selected, then review and save the operation. The preference is off by default and is preserved in synchronization and JSON backups.
+
 ## 2.33.1 - 2026-11-05
 
 ### Fixed

@@ -97,6 +97,7 @@ export type Account = {
   deleted?: boolean;
   archived?: boolean;
   hideBalance?: boolean;
+  showReceiptScanButton?: boolean;
 };
 
 export type AccountViewModel = Account & {
