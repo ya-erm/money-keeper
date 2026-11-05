@@ -5,6 +5,7 @@
 ### Added
 
 - Accounts can show a camera / QR code shortcut beside Add in their operations list. Enable it in the account settings to open the receipt scanner with that account selected, then review and save the operation. The preference is off by default and is preserved in synchronization and JSON backups.
+- When the operations header is too narrow for the labels, QR and Add automatically become camera and plus icons with accessible names and tooltips. Labels return as soon as there is enough room.
 
 ## 2.33.1 - 2026-11-05
 

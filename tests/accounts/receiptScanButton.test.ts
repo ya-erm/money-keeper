@@ -218,19 +218,88 @@ for (const width of [390, 1440]) {
   });
 }
 
-test('keeps the Russian QR shortcut and Add button visible on a narrow phone', async ({ page, context }) => {
+test('fits Russian action labels to the available width and keeps icon actions accessible', async ({
+  page,
+  context,
+}, testInfo) => {
   await seed(page, true);
   await context.addCookies([{ name: 'locale', value: 'ru-RU', url: 'http://127.0.0.1:4173' }]);
   await page.setViewportSize({ width: 320, height: 844 });
   await page.reload();
-  await expect(page.getByTestId('AccountScanReceiptButton')).toHaveText('QR код');
-  await expect(page.getByTestId('AddOperationButton')).toHaveText('Добавить');
-  for (const id of ['AccountScanReceiptButton', 'AddOperationButton']) {
-    const box = await page.getByTestId(id).boundingBox();
-    expect(box!.x).toBeGreaterThanOrEqual(0);
-    expect(box!.x + box!.width).toBeLessThanOrEqual(320);
+  const header = page.getByTestId('OperationsHeader');
+  const qr = page.getByRole('link', { name: 'QR код', exact: true });
+  const add = page.getByRole('link', { name: 'Добавить', exact: true });
+  for (const [link, label] of [
+    [qr, 'QR код'],
+    [add, 'Добавить'],
+  ] as const) {
+    await expect(link).toHaveAttribute('title', label);
+    await expect(link.locator('svg')).toBeVisible();
+    await expect(link.locator('.action-label')).toBeHidden();
+    const box = (await link.boundingBox())!;
+    const heading = (await header.locator('h3').boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(heading.x + heading.width);
+    expect(box.x + box.width).toBeLessThanOrEqual(320);
+    expect(heading.y + heading.height / 2).toBeGreaterThanOrEqual(box.y);
+    expect(heading.y + heading.height / 2).toBeLessThanOrEqual(box.y + box.height);
   }
-  await expect(page).toHaveScreenshot('qr-shortcut-ru-narrow.png');
+  await qr.focus();
+  await page.keyboard.press('Tab');
+  await expect(add).toBeFocused();
+  await add.blur();
+  expect(await header.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('qr-mobile-320.png') });
+  await expect.soft(page).toHaveScreenshot('qr-shortcut-ru-narrow.png');
+
+  // Repeated resizes must restore the labels rather than retaining a compact state.
+  for (const width of [390, 320, 390, 1440]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const link of [qr, add]) {
+      if (width === 320) await expect(link.locator('.action-label')).toBeHidden();
+      else await expect(link.locator('.action-label')).toBeVisible();
+    }
+    if (width === 390) await page.screenshot({ path: testInfo.outputPath('qr-mobile-390.png') });
+  }
+  await page.screenshot({ path: testInfo.outputPath('qr-desktop-1440.png') });
+
+  // A narrow panel on a wide screen needs icons too: this is not a viewport breakpoint.
+  await header.evaluate((element) => {
+    element.style.width = '288px';
+  });
+  await expect(qr.locator('.action-label')).toBeHidden();
+  await expect(add.locator('.action-label')).toBeHidden();
+  await header.evaluate((element) => {
+    element.style.width = '';
+  });
+  await expect(qr.locator('.action-label')).toBeVisible();
+
+  // A longer count and enlarged text also affect available space at the same viewport size.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await header.locator('.operations-count').evaluate((element) => {
+    element.textContent = '100 000 000 шт.';
+  });
+  await expect(qr.locator('.action-label')).toBeHidden();
+  await page.reload();
+  await expect(qr.locator('.action-label')).toBeVisible();
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '20px';
+  });
+  await expect(qr.locator('.action-label')).toBeHidden();
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '';
+  });
+  await expect(qr.locator('.action-label')).toBeVisible();
+
+  // Icon-only links still perform their original actions.
+  await page.setViewportSize({ width: 320, height: 844 });
+  await qr.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByTestId('ReceiptScanner')).toBeVisible();
+  await page.goBack();
+  await add.click();
+  await expect(page.getByTestId('TransactionForm')).toBeVisible();
+  await expect(page.getByTestId('ReceiptScanner')).toHaveCount(0);
 });
 
 test('starts a fresh scan for another selected account after cancelling', async ({ page }) => {
