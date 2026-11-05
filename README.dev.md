@@ -9,9 +9,11 @@ ORIGIN="..."
 ```
 
 SvelteKit 3 requires Node 22.17 or later. The Docker image uses Node 24.
+Vercel functions explicitly target the supported Node 24 runtime, independently of
+the Node version selected for the build.
 For a standalone Node build, run `BUILD_ADAPTER=node pnpm build`.
 `ORIGIN` is read at build time as `paths.origin`; rebuild the Docker image when it changes.
-Vercel builds use the automatic adapter and derive their origin from the request.
+Vercel builds use the Vercel adapter and derive their origin from the request.
 
 ## Launch local database in docker
 
@@ -107,6 +109,9 @@ E2E tests run with Playwright in guest mode and use local IndexedDB, so database
 ### Run all e2e tests
 
 This is the same command that runs in CI. It runs Playwright inside the official Linux container, so screenshot assertions use Linux baselines both locally and in GitHub Actions.
+
+The test container installs the pinned pnpm 9.7.0 directly because Corepack is no
+longer included in the Playwright image. Keep this version in sync with `packageManager`.
 
 Start Docker locally with Colima first:
 

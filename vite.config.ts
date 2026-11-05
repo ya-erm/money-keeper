@@ -1,5 +1,6 @@
 import adapterAuto from '@sveltejs/adapter-auto';
 import adapterNode from '@sveltejs/adapter-node';
+import adapterVercel from '@sveltejs/adapter-vercel';
 import { sveltekit } from '@sveltejs/kit/vite';
 import autoprefixer from 'autoprefixer';
 import { readFileSync } from 'node:fs';
@@ -15,7 +16,12 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     sveltekit({
       preprocess: sveltePreprocess({ postcss: { plugins: [autoprefixer()] } }),
-      adapter: process.env.BUILD_ADAPTER === 'node' ? adapterNode() : adapterAuto(),
+      adapter:
+        process.env.BUILD_ADAPTER === 'node'
+          ? adapterNode()
+          : process.env.VERCEL
+            ? adapterVercel({ runtime: 'nodejs24.x' })
+            : adapterAuto(),
       paths: {
         origin:
           process.env.BUILD_ADAPTER === 'node' ? loadEnv(mode, process.cwd(), 'ORIGIN').ORIGIN || undefined : undefined,

@@ -7,7 +7,7 @@
     "start": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "docker run --rm -e CI=true -v \"$PWD:/work\" -v money-keeper-node-modules:/work/node_modules -v money-keeper-pnpm-store:/pnpm/store -w /work mcr.microsoft.com/playwright:v1.64.1-noble bash -lc \"corepack enable && pnpm config set store-dir /pnpm/store && pnpm install --frozen-lockfile && pnpm exec playwright test \\\"\\$@\\\"\" --",
+    "test": "docker run --rm -e CI=true -v \"$PWD:/work\" -v money-keeper-node-modules:/work/node_modules -v money-keeper-pnpm-store:/pnpm/store -w /work mcr.microsoft.com/playwright:v1.64.1-noble bash -lc \"npm install --global pnpm@9.7.0 && pnpm config set store-dir /pnpm/store && pnpm install --frozen-lockfile && pnpm exec playwright test \\\"\\$@\\\"\" --",
     "test:linux": "playwright test",
     "test:unit": "vitest run",
     "test:headed": "playwright test --headed",
