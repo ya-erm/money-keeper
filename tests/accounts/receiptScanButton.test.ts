@@ -30,11 +30,11 @@ async function openReadyPath(page: Page, path: string) {
   await expect(page.locator('#app-content')).not.toHaveAttribute('inert', '');
 }
 
-async function seed(page: Page, enabled?: boolean) {
+async function seed(page: Page, enabled?: boolean, otherEnabled = false) {
   const data = JSON.parse(mockData);
   data.accounts = [
     { id: accountId, name: accountName, currency: 'RSD', showReceiptScanButton: enabled },
-    { id: otherAccountId, name: 'Other account', currency: 'EUR' },
+    { id: otherAccountId, name: 'Other account', currency: 'EUR', showReceiptScanButton: otherEnabled },
   ];
   data.operations = [];
   await importMockDataAsync(page, JSON.stringify(data));
@@ -231,4 +231,23 @@ test('keeps the Russian QR shortcut and Add button visible on a narrow phone', a
     expect(box!.x + box!.width).toBeLessThanOrEqual(320);
   }
   await expect(page).toHaveScreenshot('qr-shortcut-ru-narrow.png');
+});
+
+test('starts a fresh scan for another selected account after cancelling', async ({ page }) => {
+  await seed(page, true, true);
+  const scanner = page.getByTestId('ReceiptScanner');
+  await page.getByTestId('AccountScanReceiptButton').click();
+  await expect(scanner).toBeVisible();
+  await scanner.getByRole('button', { name: 'Close', exact: true }).click();
+  await page.locator('input[name="comment"]').fill('Unsaved draft');
+  await page.goBack();
+  await expect(page.getByTestId('AccountScanReceiptButton')).toBeVisible();
+  await page.getByTestId('AccountCard').filter({ hasText: 'Other account' }).getByTestId('AccountName').click();
+  await expect(page).toHaveURL(new RegExp(`account-card=${otherAccountId}`));
+  await page.getByTestId('AccountScanReceiptButton').click();
+  await expect(scanner).toBeVisible();
+  await expect(page.locator('input[name="accountId"]')).toHaveValue(otherAccountId);
+  await scanner.getByRole('button', { name: 'Close', exact: true }).click();
+  await expect(page.locator('input[name="comment"]')).toHaveValue('');
+  expect(await storedRows<Transaction>(page, 'transactions')).toEqual([]);
 });
