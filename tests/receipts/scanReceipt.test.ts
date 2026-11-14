@@ -164,6 +164,7 @@ test('fills and saves fuel items with a wrapped tax label at mobile width', asyn
   await expect(page.getByTestId('ReceiptJournal')).toHaveText(fuelJournal.trim());
   await expect(scanner.getByRole('status')).toHaveCount(0);
   await scanner.getByRole('button', { name: 'Fill operation', exact: true }).click();
+  await expect(scanner).toHaveCount(0);
 
   await expect(page.getByTestId('PurchaseItemName')).toHaveValue('EVRO PREMIJUM BMB-95,2710124500 /LIT');
   await expect(page.getByTestId('PurchaseItemQuantity')).toHaveValue('38.16');
