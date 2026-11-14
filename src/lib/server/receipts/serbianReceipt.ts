@@ -128,7 +128,8 @@ export function parseReceiptJournal(journal: string, expectedAmount: number): Re
       continue;
     }
     const label = nameLines.join(' ');
-    const taxLabel = /\s+\([\p{L}](?:,\s*[\p{L}])*\)$/u;
+    // Fixed-width journals can wrap within a tax label, including before its closing parenthesis.
+    const taxLabel = /\s+\(\s*[\p{L}](?:\s*,\s*[\p{L}])*\s*\)$/u;
     if (!taxLabel.test(label)) throw new Error('Invalid journal item label');
     const unitPrice = decimal(match[1]);
     const quantity = decimal(match[2]);

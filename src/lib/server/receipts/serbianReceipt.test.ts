@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { loadSerbianReceiptDetails, parseReceiptItems, parseReceiptJournal, parseReceiptPage } from './serbianReceipt';
 
 const sample = readFileSync(new URL('../../receipts/fixtures/serbian-receipt.txt', import.meta.url), 'utf8').trim();
+const fuelJournal = readFileSync(new URL('../../receipts/fixtures/serbian-fuel-journal.txt', import.meta.url), 'utf8');
+const fuelItem = { name: 'EVRO PREMIJUM BMB-95,2710124500 /LIT', quantity: 38.16, unitPrice: 207, total: 7899.12 };
 const html = `<span id="invoiceNumberLabel">FTH7EX9W-FTH7EX9W-19890</span>
 <span id="totalAmountLabel">525,70</span><span id="tinLabel">106884584</span>
 <span id="shopFullNameLabel">1057443-Prodavnica br. 0153</span>
@@ -99,6 +101,41 @@ name/KG/001 (A, B)
     expect(parseReceiptJournal(source, 450)).toEqual([
       { name: 'Long product name', quantity: 0.375, unitPrice: 1200, total: 450 },
     ]);
+  });
+
+  it.each(['(Ђ\n)', '(\nЂ)', '(\nЂ\n)', '(А,\nЂ\n)'])(
+    'reads fuel items when the tax label wraps across receipt lines: %s',
+    (taxLabel) => {
+      expect(parseReceiptJournal(fuelJournal.replace('(Ђ\n)', taxLabel), 7899.12)).toEqual([fuelItem]);
+    },
+  );
+
+  it('loads NIS fuel items from the journal when specifications are unavailable', async () => {
+    // A synthetic QR keeps this regression independent of the customer's receipt URL.
+    const bytes = Buffer.from(new URL(sample).searchParams.get('vl') ?? '', 'base64');
+    bytes.writeBigUInt64LE(78991200n, 25);
+    const url = new URL(sample);
+    url.searchParams.set('vl', bytes.toString('base64'));
+    const page = html.replace('525,70', '7.899,12').replace('LIDL SRBIJA KD', 'NIS A.D. NOVI SAD');
+    const request = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(page.replace('Item: 525,70', fuelJournal)))
+      .mockResolvedValueOnce(Response.json({ success: false }));
+
+    const result = await loadSerbianReceiptDetails(url.href, request);
+    expect(result.merchant).toBe('NIS A.D. NOVI SAD');
+    expect(result.itemsAvailable).toBe(true);
+    expect(result.items).toEqual([fuelItem]);
+    expect(result.journal).toContain('(Ђ\n)');
+  });
+
+  it.each([
+    fuelJournal.replace('207,00', '200,00'),
+    fuelJournal.replace('7.899,12', '7.899,00'),
+    fuelJournal.replace('(Ђ\n)', '(Ђ\nunknown)'),
+    fuelJournal.replace('(Ђ\n)', '(Ђ\n'),
+  ])('rejects inconsistent fuel totals and malformed wrapped tax labels', (source) => {
+    expect(() => parseReceiptJournal(source, 7899.12)).toThrow();
   });
 
   it.each([

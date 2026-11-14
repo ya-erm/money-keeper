@@ -23,6 +23,10 @@ const receiptDetails = {
   itemsAvailable: true,
   items: [{ name: 'Cheese', quantity: 1, unitPrice: 525.7, total: 525.7 }],
 };
+const fuelJournal = readFileSync(
+  new URL('../../src/lib/receipts/fixtures/serbian-fuel-journal.txt', import.meta.url),
+  'utf8',
+);
 
 async function expandPurchaseContents(page: Page) {
   const contents = page.getByTestId('PurchaseContentsSection');
@@ -132,6 +136,55 @@ test('can load another receipt after a successful read', async ({ page }) => {
   await expect(scanner.getByRole('button', { name: 'Read receipt', exact: true })).toHaveCount(0);
   await page.getByTestId('ReceiptPhotoInput').setInputFiles(photo);
   await expect(page.getByTestId('ReceiptPreview')).toContainText('525.70 RSD');
+});
+
+test('fills and saves fuel items with a wrapped tax label at mobile width', async ({ page }, testInfo) => {
+  // Match the public QR amount to the fuel journal without publishing the customer's receipt URL.
+  const bytes = Buffer.from(new URL(sample).searchParams.get('vl') ?? '', 'base64');
+  bytes.writeBigUInt64LE(78991200n, 25);
+  const url = new URL(sample);
+  url.searchParams.set('vl', bytes.toString('base64'));
+  await page.route('**/api/receipts/serbia', async (route) => {
+    expect(route.request().postDataJSON()).toEqual({ url: url.href });
+    await route.fulfill({
+      json: {
+        ...receiptDetails,
+        merchant: 'NIS A.D. NOVI SAD',
+        journal: fuelJournal,
+        items: [{ name: 'EVRO PREMIJUM BMB-95,2710124500 /LIT', quantity: 38.16, unitPrice: 207, total: 7899.12 }],
+      },
+    });
+  });
+  const scanner = page.getByTestId('ReceiptScanner');
+  await scanner.getByRole('button', { name: 'Close', exact: true }).click();
+  await selectAccountAsync(page, 'SourceAccountSelect', 'T_RSD');
+  await expandPurchaseContents(page);
+  await page.getByTestId('ScanReceiptQrButton').click();
+  await scanner.locator('input[name="receipt-link"]').fill(url.href);
+  await expect(page.getByTestId('ReceiptJournal')).toHaveText(fuelJournal.trim());
+  await expect(scanner.getByRole('status')).toHaveCount(0);
+  await scanner.getByRole('button', { name: 'Fill operation', exact: true }).click();
+
+  await expect(page.getByTestId('PurchaseItemName')).toHaveValue('EVRO PREMIJUM BMB-95,2710124500 /LIT');
+  await expect(page.getByTestId('PurchaseItemQuantity')).toHaveValue('38.16');
+  await expect(page.getByTestId('PurchaseItemUnitPrice')).toHaveValue('207');
+  await expect(page.getByTestId('PurchaseItemTotal')).toHaveValue('7899.12');
+  await expect(page.getByTestId('PurchaseItemsTotal')).toHaveText(/^Total: 7\s899\.12\sRSD$/);
+  await expect(page.locator('input[name="amount"]')).toHaveValue('7899.12');
+  await page.getByTestId('PurchaseItemsEditor').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: testInfo.outputPath('nis-fuel-items-390px.png') });
+
+  await page.getByTestId('CategorySelect').getByRole('button', { name: 'T_Shop' }).click();
+  await page.getByTestId('CreateTransactionButton').click();
+  await page.waitForURL(/\/accounts(?:\?|$)/);
+  await waitForStoredReceipt(page, 'NIS A.D. NOVI SAD');
+  await page.goto('/transactions');
+  await page.reload();
+  await page.getByTestId('TransactionListItem').filter({ hasText: 'NIS A.D. NOVI SAD' }).click();
+  await expect(page.getByTestId('PurchaseItemName')).toHaveValue('EVRO PREMIJUM BMB-95,2710124500 /LIT');
+  await expect(page.getByTestId('PurchaseItemQuantity')).toHaveValue('38.16');
+  await expect(page.getByTestId('PurchaseItemUnitPrice')).toHaveValue('207');
+  await expect(page.getByTestId('PurchaseItemTotal')).toHaveValue('7899.12');
 });
 
 test('reads and saves an unescaped fiscal QR link without losing plus signs', async ({ page }) => {

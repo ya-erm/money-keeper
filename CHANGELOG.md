@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.34.1 - 2026-11-14
+
+### Fixed
+
+- Serbian NIS fuel receipts now populate purchase items when a tax label wraps across printed lines. Fractional quantities, prices and totals are preserved and checked against the receipt amount.
+
 ## 2.34.0 - 2026-11-05
 
 ### Added
