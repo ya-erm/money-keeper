@@ -60,7 +60,7 @@
 
 <div class="flex-col gap-0.5" data-testId={testId}>
   <InputLabel testId={`${testId}.Label`} text={$translate('transactions.category')} />
-  <input name="categoryId" value={categoryId} class="hidden" readonly required />
+  <input type="hidden" name="categoryId" value={categoryId} readonly />
   <div bind:this={grid} class="grid" data-testId={`${testId}.Grid`} use:resizeObserver={{ onResize: getRowsNumber }}>
     {#each filteredItems as category (category.id)}
       <GridCircleItem

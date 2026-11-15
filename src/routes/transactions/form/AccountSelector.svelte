@@ -3,6 +3,7 @@
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
 
   import { accountsStore, currencyRatesStore, memberSettingsStore, operationsStore } from '#lib/data/index.js';
+  import type { AccountViewModel } from '#lib/data/interfaces.js';
   import { translate } from '#lib/translate/index.js';
   import SubScreen from '#lib/ui/layout/SubScreen.svelte';
   import { calculateBalance, findCurrencyRate, groupBySelector } from '#lib/utils/index.js';
@@ -15,8 +16,9 @@
   export let label: string = $translate('transactions.account');
   export let accountId: string | null | undefined;
   export let selecting: boolean;
+  export let accountFilter: ((account: AccountViewModel) => boolean) | null = null;
 
-  $: accounts = $accountsStore;
+  $: accounts = $accountsStore.filter((account) => !accountFilter || accountFilter(account));
   $: currencyRates = $currencyRatesStore;
   $: settings = $memberSettingsStore;
 

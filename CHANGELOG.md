@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.35.0 - 2026-11-15
+
+### Added
+
+- All debt entry points use one form with debt / repayment type and direction. Repayments explicitly select who repaid whom. Account selection reuses the operation picker with icons and balances, filtered to the entry currency.
+- Field labels in debt and contact forms use the shared component and a consistent style.
+- Contact rows use chevrons to open details, with editing in the contact header. Add contact sits below the list and is also available as a header plus; the empty archive has its own message.
+- Existing payments are selected on a separate screen using the operation list, date groups, full-list search and pagination. Linking preserves the original payment without creating duplicates.
+- Debt portions can use a different currency from the account. Tap the currency inside a participant's amount to choose it with recent currency suggestions. Personal analytics use the payment's recorded exchange amounts or a manually entered personal share.
+- Operation rows keep location, debts and tags in a single third line. Debt contacts show their note below their name.
+- The system debt payment category uses the same person-and-banknote icon as the Debts menu item.
+- Account payments created from Debts can choose a category. Fully allocated debt payments default to the debt category when none is selected; payments with a personal portion require a regular category. Manual history entries are marked “(no operation)”.
+- Debt history rows follow the operation layout: category or manual entry type, comment, then account or additional details.
+- Debt contacts and a new-record shortcut live in the header; filters collapse behind a button beside search. Contact selection uses consistent contact labels, and debt forms no longer ask for a due date.
+- Private debt accounting with separate, searchable contacts, renaming and archiving. The participant picker shows contacts with avatars and outstanding balances per currency, recent people first, and can add a new contact without leaving an expense.
+- Split an expense into exact amounts owed by other people and your own share. Personal expense analytics use only your share while account balances retain the full payment.
+- Add debt participants directly from additional parameters. Participants have avatars and a red remove action; no checkbox or separate debt type selector is needed. Income / expense direction determines the balance change, and your share is shown only for partially shared expenses.
+- Record loans and starting debts in either direction, and full or partial repayments. Link existing bank operations without creating duplicates; only the debt portion is excluded from personal income and expenses.
+- Add a debt or repayment from a contact card, including repayments without an account operation. Contact editing lives in the header, and debt deletion uses the app confirmation dialog.
+- Debt history, separate balances per currency, and backup / synchronization support for contacts, debts and payment links. Select a history row to edit its record or linked operation; manual records can be deleted from their editor.
+- Contacts can store grammatical gender or plural form for Russian debt labels. Debt history shows category icons and groups entries by date; operation rows mark participants with the debt icon and abbreviate the personal share to “Me:”.
+
 ## 2.34.0 - 2026-11-05
 
 ### Added

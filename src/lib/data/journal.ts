@@ -7,7 +7,7 @@ import type { GetJournalRequest } from '#lib/server/api/v2/journal/getJournal.js
 import { isApiError } from '#lib/api/ApiError.js';
 import { store } from '#lib/store.js';
 import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
-import { unexpectedCase } from '#lib/utils/index.js';
+import { unexpectedCase } from '#lib/utils/unexpectedCase.js';
 import { Logger } from '#lib/utils/logger.js';
 import { useFetch } from '#lib/utils/useFetch.js';
 

@@ -1,6 +1,6 @@
 import { derived } from 'svelte/store';
 
-import { filterNotEmpty } from '#lib/utils/index.js';
+import { filterNotEmpty } from '#lib/utils/filterNotEmpty.js';
 
 import { accountTagsStore } from './accountTags';
 import type { Account, AccountViewModel, Tag } from './interfaces';

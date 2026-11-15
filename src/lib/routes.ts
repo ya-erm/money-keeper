@@ -6,6 +6,8 @@ type Route = {
 };
 
 type RouteKey =
+  | 'debts'
+  | 'debts.contacts'
   | 'root'
   | 'login'
   | 'logout'
@@ -43,6 +45,8 @@ type RouteKey =
   | 'uikit';
 
 export const routes: { [key in RouteKey]: Route } = {
+  debts: { path: '/debts', title: 'debts.title' },
+  'debts.contacts': { path: '/debts/contacts', title: 'debts.contacts' },
   root: {
     path: '/',
     title: 'app.title',

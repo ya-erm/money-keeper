@@ -48,3 +48,18 @@ export const SYSTEM_CATEGORY_TRANSFER_OUT: Category = {
   icon: 'mdi:swap-horizontal',
   system: true,
 };
+
+export const SYSTEM_CATEGORY_DEBT_IN: Category = {
+  id: 'system-debt-in',
+  type: 'IN',
+  name: 'system.category.debt_in',
+  icon: 'mdi:account-cash-outline',
+  system: true,
+};
+export const SYSTEM_CATEGORY_DEBT_OUT: Category = {
+  id: 'system-debt-out',
+  type: 'OUT',
+  name: 'system.category.debt_out',
+  icon: 'mdi:account-cash-outline',
+  system: true,
+};

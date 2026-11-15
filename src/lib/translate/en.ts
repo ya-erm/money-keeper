@@ -1,8 +1,10 @@
 import { addMessages } from 'svelte-i18n';
 
 import type { Dictionary } from './types';
+import { debtEn } from './debtMessages';
 
 export const enDict: Dictionary = {
+  ...debtEn,
   'app.title': 'Money Keeper',
   'receipts.manual': 'Manually',
   'receipts.scan': 'Scan receipt QR',

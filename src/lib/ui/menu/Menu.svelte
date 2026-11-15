@@ -44,13 +44,15 @@
   }
   .menu-item {
     flex-grow: 1;
+    flex-basis: 0;
+    min-width: 0;
     text-decoration: none;
     color: var(--secondary-text-color);
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
-    padding: 10px;
+    padding: 10px 4px;
   }
   .menu-item.active {
     color: var(--active-color);
@@ -65,6 +67,10 @@
   }
   .menu-item .text {
     font-size: 0.7em;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Tablet: vertical rail with icons only */
@@ -81,6 +87,7 @@
     }
     .menu-item {
       flex-grow: 0;
+      flex-basis: auto;
       border-radius: 0.5rem;
       padding: 0.6rem 0.75rem;
     }

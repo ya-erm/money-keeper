@@ -10,11 +10,15 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
-  import Spoiler from '@ya-erm/svelte-ui/Spoiler';
   import SpoilerToggle from '@ya-erm/svelte-ui/SpoilerToggle';
 
   import { membersService, memberSettingsStore, operationTagsService } from '#lib/data/index.js';
-  import { SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT } from '#lib/data/categories.js';
+  import {
+    SYSTEM_CATEGORY_TRANSFER_IN,
+    SYSTEM_CATEGORY_TRANSFER_OUT,
+    SYSTEM_CATEGORY_DEBT_IN,
+    SYSTEM_CATEGORY_DEBT_OUT,
+  } from '#lib/data/categories.js';
   import type {
     AccountViewModel,
     Category,
@@ -23,8 +27,12 @@
     Transaction,
     TransactionViewModel,
     VerificationStatus,
+    TransactionDebt,
   } from '#lib/data/interfaces.js';
   import { operationsCommentsStore, operationsStore } from '#lib/data/operations.js';
+  import { debtContactsStore } from '#lib/data/debtContacts.js';
+  import { personalAmount, validateDebt } from '#lib/debts/calculations.js';
+  import DebtAllocationEditor from '#lib/debts/DebtAllocationEditor.svelte';
   import { withVerification } from '#lib/data/verification.js';
   import { repeatingsService, repeatingsStore } from '#lib/data/repeatings.js';
   import { translate } from '#lib/translate/index.js';
@@ -66,7 +74,10 @@
 
   export let transaction: TransactionViewModel | null = null;
 
-  export let onSubmit: (transactions: Transaction[]) => void;
+  export let onSubmit: (transactions: Transaction[]) => void | Promise<void>;
+  let saving = false;
+  const savedTransactionId = transaction?.id ?? uuid();
+  const savedDestinationId = transaction?.linkedTransactionId ?? uuid();
 
   const isTransfer = !!transaction?.linkedTransactionId;
   const sourceTransaction =
@@ -277,11 +288,36 @@
   const verificationMessage = (status: VerificationStatus): Messages => `transactions.verification.${status}`;
 
   let additionalParametersHidden =
-    transaction?.excludeFromAnalysis || transaction?.repeating || transaction?.description || verification
+    transaction?.debt ||
+    transaction?.excludeFromAnalysis ||
+    transaction?.repeating ||
+    transaction?.description ||
+    verification
       ? false
       : true;
 
   let excludeFromAnalysis = transaction?.excludeFromAnalysis ?? false;
+  let debt: TransactionDebt | undefined = transaction?.debt ? structuredClone(transaction.debt) : undefined;
+  $: fullyDebtPayment =
+    type !== 'TRANSFER' &&
+    !!debt?.shares.length &&
+    Number(_value1) > 0 &&
+    personalAmount({
+      amount: Number(_value1),
+      debt,
+      anotherCurrency,
+      anotherCurrencyAmount: Number(_value2),
+      account: { currency: accountCurrency ?? '' },
+    }) === 0;
+  $: defaultDebtCategory = type === 'IN' ? SYSTEM_CATEGORY_DEBT_IN : SYSTEM_CATEGORY_DEBT_OUT;
+  $: availableCategories = [
+    ...categories.filter((category) => category.type === type && !category.deleted && !category.system),
+    ...(fullyDebtPayment ? [{ ...defaultDebtCategory, name: $translate(defaultDebtCategory.name as Messages) }] : []),
+  ];
+  $: effectiveCategoryId =
+    availableCategories.find((category) => category.id === categoryId)?.id ??
+    (fullyDebtPayment ? defaultDebtCategory.id : null);
+  $: systemDebtCategory = effectiveCategoryId === 'system-debt-in' || effectiveCategoryId === 'system-debt-out';
 
   let repeating = transaction?.repeating;
   let repeatingChecked = transaction?.repeating ? true : false;
@@ -380,6 +416,8 @@
   };
 
   const handleSubmit = async (e: Event) => {
+    if (saving) return;
+    saving = true;
     try {
       const formData = new FormData(e.target as HTMLFormElement);
       if (!formData.get('accountId') || formData.get('accountId') === 'undefined') {
@@ -387,6 +425,14 @@
         return;
       }
       let resolvedCategoryId = formData.get('categoryId') as string | null;
+      if (
+        (type === 'IN' || type === 'OUT') &&
+        !systemDebtCategory &&
+        !categories.some((category) => category.id === resolvedCategoryId && category.type === type)
+      ) {
+        resolvedCategoryId = null;
+        categoryId = null;
+      }
       if ((type === 'IN' || type === 'OUT') && !resolvedCategoryId) {
         // A receipt match must not fall back to an unrelated operation with the same free-form comment.
         const matchingOperation =
@@ -433,7 +479,7 @@
       const transactions: Transaction[] = [];
 
       transactions.push({
-        id: transaction?.id ?? uuid(),
+        id: savedTransactionId,
         accountId: checkStringFormParameter(formData, 'accountId'),
         categoryId:
           type === 'TRANSFER'
@@ -461,7 +507,7 @@
 
       if (type === 'TRANSFER') {
         transactions.push({
-          id: transaction?.linkedTransactionId ?? uuid(),
+          id: savedDestinationId,
           accountId: checkStringFormParameter(formData, 'destinationAccountId'),
           categoryId: SYSTEM_CATEGORY_TRANSFER_IN.id,
           date: datetime,
@@ -490,15 +536,36 @@
         transactions[0].linkedTransactionId = transactions[1].id;
       }
 
+      if (type !== 'TRANSFER' && debt) {
+        if (repeatingChecked) {
+          showErrorToast($translate('debts.no_repeating'));
+          return;
+        }
+        const saved = transactions[0];
+        saved.debt = { ...debt, kind: 'payment' };
+        const currency = accountCurrency ?? '';
+        const error = validateDebt(saved, currency, type === 'IN' ? 'IN' : 'OUT', $debtContactsStore);
+        if (error) {
+          showErrorToast($translate(`debts.${error}`));
+          return;
+        }
+        if (systemDebtCategory && personalAmount({ ...saved, account: { currency } }) > 0) {
+          showErrorToast($translate('debts.invalid'));
+          return;
+        }
+      }
+
       if (repeating) {
-        repeatingsService.save(repeating);
+        await repeatingsService.save(repeating);
       }
 
       // Keep verification of edited operations if date, amount and account are the same
       const originalTransactions = [isTransfer ? sourceTransaction : transaction, destinationTransaction];
-      onSubmit(transactions.map((item, i) => withVerification(originalTransactions[i], item)));
+      await onSubmit(transactions.map((item, i) => withVerification(originalTransactions[i], item)));
     } catch (e) {
       handleError(e);
+    } finally {
+      saving = false;
     }
   };
 </script>
@@ -527,9 +594,10 @@
     {#if type === 'IN' || type === 'OUT'}
       <CategorySelect
         {type}
-        bind:categoryId
-        categories={categories.filter((c) => c.type === type)}
-        onChange={() => {
+        categoryId={effectiveCategoryId}
+        categories={availableCategories}
+        onChange={(value) => {
+          categoryId = value;
           categoryTouched = true;
           if (!inputRef?.value) {
             inputRef?.focus({ preventScroll: true });
@@ -713,57 +781,75 @@
         <PurchaseItemsEditor bind:items={purchaseItems} currency={anotherCurrency || accountCurrency} />
       </div>
     </div>
-    <div class="flex-col gap-0.5">
-      <Spoiler hidden={additionalParametersHidden}>
-        <SpoilerToggle slot="spoiler-header" bind:hidden={additionalParametersHidden} translate={$translate}>
-          {$translate('transactions.additional_parameters')}
-        </SpoilerToggle>
-        <div class="flex-col gap-1">
-          <Input
-            label={$translate('transactions.description')}
-            name="description"
-            bind:value={description}
-            translate={$translate}
-            testId="DescriptionInput"
+    <div class="flex-col gap-0.5" data-testId="AdditionalParameters">
+      <SpoilerToggle bind:hidden={additionalParametersHidden} translate={$translate}>
+        {$translate('transactions.additional_parameters')}
+      </SpoilerToggle>
+      <div
+        class="flex-col gap-1 additional-parameters-body"
+        hidden={additionalParametersHidden}
+        on:invalid|capture={(event) => {
+          additionalParametersHidden = false;
+          event.currentTarget.hidden = false;
+        }}
+      >
+        {#if type !== 'TRANSFER'}
+          <DebtAllocationEditor
+            bind:debt
+            amount={Number(_value1)}
+            currency={accountCurrency ?? ''}
+            {anotherCurrency}
+            anotherCurrencyAmount={Number(_value2)}
+            direction={type}
+            onChange={(next) => {
+              if (!next && systemDebtCategory) categoryId = null;
+            }}
           />
-          {#if verification}
-            <div class="verification" class:problem={verification.status !== 'ok'} data-testId="VerificationInfo">
-              <Icon
-                name={verification.status === 'ok' ? 'mdi:check-decagram-outline' : 'mdi:alert-circle-outline'}
-                size={1}
-              />
-              <span>
-                {$translate(verificationMessage(verification.status), {
-                  values: { statement: verification.statement },
+        {/if}
+        <Input
+          label={$translate('transactions.description')}
+          name="description"
+          bind:value={description}
+          translate={$translate}
+          testId="DescriptionInput"
+        />
+        {#if verification}
+          <div class="verification" class:problem={verification.status !== 'ok'} data-testId="VerificationInfo">
+            <Icon
+              name={verification.status === 'ok' ? 'mdi:check-decagram-outline' : 'mdi:alert-circle-outline'}
+              size={1}
+            />
+            <span>
+              {$translate(verificationMessage(verification.status), {
+                values: { statement: verification.statement },
+              })}
+              {#if verification.status === 'mismatch' && verification.expected}
+                {$translate('transactions.verification.expected', {
+                  values: {
+                    date: verification.expected.date ?? '—',
+                    amount: verification.expected.amount ?? '—',
+                  },
                 })}
-                {#if verification.status === 'mismatch' && verification.expected}
-                  {$translate('transactions.verification.expected', {
-                    values: {
-                      date: verification.expected.date ?? '—',
-                      amount: verification.expected.amount ?? '—',
-                    },
-                  })}
-                {/if}
-              </span>
-            </div>
-          {/if}
-          <Checkbox bind:checked={excludeFromAnalysis} label={$translate('transactions.exclude_from_analytics')} />
-          <div class="flex gap-1">
-            <div class="flex-grow">
-              <Checkbox
-                bind:checked={repeatingChecked}
-                onChange={handleRepeatingCheckboxChange}
-                label={$translate('transactions.repeatings')}
-              />
-            </div>
-            {#if repeatingChecked}
-              <Button appearance="link" underlined={false} onClick={() => (repeatingModalOpened = true)}
-                >{$translate('transactions.repeatings.configure')}</Button
-              >
-            {/if}
+              {/if}
+            </span>
           </div>
+        {/if}
+        <Checkbox bind:checked={excludeFromAnalysis} label={$translate('transactions.exclude_from_analytics')} />
+        <div class="flex gap-1">
+          <div class="flex-grow">
+            <Checkbox
+              bind:checked={repeatingChecked}
+              onChange={handleRepeatingCheckboxChange}
+              label={$translate('transactions.repeatings')}
+            />
+          </div>
+          {#if repeatingChecked}
+            <Button appearance="link" underlined={false} onClick={() => (repeatingModalOpened = true)}
+              >{$translate('transactions.repeatings.configure')}</Button
+            >
+          {/if}
         </div>
-      </Spoiler>
+      </div>
     </div>
 
     <div class="flex-col gap-0.25">
@@ -909,6 +995,9 @@
     color: var(--secondary-text-color);
   }
   .purchase-contents-body[hidden] {
+    display: none;
+  }
+  .additional-parameters-body[hidden] {
     display: none;
   }
   .currency-rate-info {

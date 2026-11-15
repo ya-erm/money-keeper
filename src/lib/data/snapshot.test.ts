@@ -18,6 +18,30 @@ function transaction(overrides: Partial<Transaction> = {}): Transaction {
 }
 
 describe('reduceJournal', () => {
+  it('preserves contacts, manual debts and embedded payment portions through compaction and old backups', () => {
+    const debtContact = { id: 'anna', name: 'Anna', grammaticalForm: 'feminine' as const };
+    const debtRecord = { id: 'old-debt', contactId: 'anna', amount: -20, currency: 'EUR', date: '2026-11-01' };
+    const operation = transaction({
+      debt: { kind: 'expense', shares: [{ contactId: 'anna', amount: 1, currency: 'EUR' }], personalAmount: 50 },
+    });
+    const snapshot = reduceJournal([
+      { order: 1, data: { debtContact } },
+      { order: 2, data: { debtRecord } },
+      { order: 3, data: { transaction: operation } },
+    ]);
+    const restored = reduceJournal([{ order: 3, data: { snapshot: JSON.parse(JSON.stringify(snapshot)) } }]);
+    expect(restored.debtContacts).toEqual([debtContact]);
+    expect(restored.debtRecords).toEqual([debtRecord]);
+    expect(restored.operations).toEqual([operation]);
+    const legacy = JSON.parse(JSON.stringify(snapshot));
+    delete legacy.debtContacts;
+    delete legacy.debtRecords;
+    expect(reduceJournal([{ order: 4, data: { snapshot: legacy } }]).debtContacts).toEqual([]);
+    const deleted = reduceJournal([{ order: 1, data: { debtContact: { ...debtContact, deleted: true } } }], {
+      deleted: 'referenced',
+    });
+    expect(deleted.debtContacts).toHaveLength(1);
+  });
   it('preserves per-account QR scan preferences through journal updates, compaction and JSON backups', () => {
     const enabled = { ...account, showReceiptScanButton: true };
     const legacy = { ...account, id: 'legacy-account' };

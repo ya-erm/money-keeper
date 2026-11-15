@@ -10,6 +10,7 @@ export type MenuItem = {
 };
 
 export const menu = readable<MenuItem[]>([
+  { icon: 'mdi:account-cash-outline', title: 'debts.title', path: routes.debts.path },
   {
     icon: 'mdi:shape-outline',
     title: 'categories.title',

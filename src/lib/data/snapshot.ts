@@ -2,6 +2,8 @@ import type {
   Account,
   Category,
   CurrencyRate,
+  DebtContact,
+  DebtRecord,
   Grouping,
   KnownPlace,
   JournalOperation,
@@ -15,6 +17,8 @@ import type {
  * The shape matches the JSON export of the import/export page.
  */
 export type Snapshot = {
+  debtContacts?: DebtContact[];
+  debtRecords?: DebtRecord[];
   categories: Category[];
   accountTags: Tag[];
   accounts: Account[];
@@ -34,10 +38,12 @@ export type SnapshotEntityKey = Exclude<
   'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder' | 'knownPlaces'
 >;
 
-type SnapshotEntity = Snapshot[SnapshotEntityKey][number];
+type SnapshotEntity = NonNullable<Snapshot[SnapshotEntityKey]>[number];
 
 /** Map from journal operation key to snapshot collection */
 const ENTITY_KEYS: { [key in keyof JournalOperation]: SnapshotEntityKey | 'setting' | 'snapshot' } = {
+  debtContact: 'debtContacts',
+  debtRecord: 'debtRecords',
   category: 'categories',
   accountTag: 'accountTags',
   account: 'accounts',
@@ -55,6 +61,8 @@ const ENTITY_KEYS: { [key in keyof JournalOperation]: SnapshotEntityKey | 'setti
 
 /** Map from local storage name to snapshot collection */
 export const SNAPSHOT_KEY_BY_STORAGE = {
+  debtContacts: 'debtContacts',
+  debtRecords: 'debtRecords',
   categories: 'categories',
   accountTags: 'accountTags',
   accounts: 'accounts',
@@ -66,6 +74,8 @@ export const SNAPSHOT_KEY_BY_STORAGE = {
 } as const satisfies Record<string, SnapshotEntityKey>;
 
 export const SNAPSHOT_ENTITY_KEYS: SnapshotEntityKey[] = [
+  'debtContacts',
+  'debtRecords',
   'categories',
   'accountTags',
   'accounts',
@@ -100,6 +110,8 @@ const DEFAULT_OPTIONS: ReduceJournalOptions = { deleted: 'none' };
 
 export function createEmptySnapshot(): Snapshot {
   return {
+    debtContacts: [],
+    debtRecords: [],
     categories: [],
     accountTags: [],
     accounts: [],
@@ -183,5 +195,5 @@ export function reduceJournal(
 
 /** Count entities in a snapshot */
 export function countSnapshotEntities(snapshot: Snapshot) {
-  return SNAPSHOT_ENTITY_KEYS.reduce((sum, key) => sum + snapshot[key].length, 0);
+  return SNAPSHOT_ENTITY_KEYS.reduce((sum, key) => sum + (snapshot[key]?.length ?? 0), 0);
 }
