@@ -4,11 +4,8 @@
   import SearchInput from '#lib/ui/SearchInput.svelte';
   import { debtContactsStore } from '#lib/data/debtContacts.js';
   import { debtEntriesStore } from '#lib/data/debts.js';
-  import { accountsStore } from '#lib/data/accounts.js';
   import { settingsStore } from '#lib/data/settings.js';
-  import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
   import HiddenMoney from '#lib/ui/HiddenMoney.svelte';
-  import { isBalanceHidden } from '#lib/utils/isBalanceHidden.js';
   import { formatDebtMoney } from './formatMoney';
   import type { DebtContact } from '#lib/data/interfaces.js';
   import { translate } from '#lib/translate/index.js';
@@ -28,26 +25,15 @@
   $: rows = results.map((contact) => ({
     contact,
     balances: Object.entries(contactBalances($debtEntriesStore, contact.id)).filter(([, amount]) => amount !== 0),
-    hidden:
-      $settingsStore.hideBalances ||
-      $debtEntriesStore.some(
-        (entry) =>
-          entry.contactId === contact.id &&
-          entry.accountId &&
-          isBalanceHidden(
-            null,
-            $accountsStore.find((account) => account.id === entry.accountId),
-            $localAccountBalancesHidden,
-          ),
-      ),
   }));
+  $: hidden = $settingsStore.hideBalances ?? false;
 </script>
 
 <SubScreen visible title={$translate('debts.select_contact')} onBack={onClose} testId="ContactPicker">
   <div class="flex-col gap-1 p-1">
     <SearchInput bind:value={query} name="contact-search" />
     <ul class="contact-list">
-      {#each rows as { contact, balances, hidden } (contact.id)}
+      {#each rows as { contact, balances } (contact.id)}
         <li>
           <button
             type="button"

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.35.4 - 2026-11-16
+
+### Improved
+
+- Debt filters stay on one line and scroll horizontally when space is limited.
+- Debt balances, contact history and participant balances follow only the global Hide amounts setting. Hiding an individual account no longer hides debts.
+
 ## 2.35.3 - 2026-11-16
 
 ### Improved

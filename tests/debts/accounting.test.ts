@@ -616,7 +616,7 @@ test('manual debt deletion uses the app modal and supports cancellation', async 
   await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Миша' })).toContainText('Нет записей');
 });
 
-test('contact picker shows debt direction and per-currency balances before the arrow, respecting hidden amounts', async ({
+test('contact picker shows per-currency debt balances even when the linked account is hidden', async ({
   page,
 }, testInfo) => {
   await importMockDataAsync(
@@ -648,10 +648,53 @@ test('contact picker shows debt direction and per-currency balances before the a
   await page.goto('/debts');
   await page.getByTestId('RecordDebt').click();
   await page.getByTestId('PaymentContact').click();
-  const hidden = page.getByTestId('PickContact').filter({ hasText: 'Анна' }).getByTestId('PickerDebtStatus');
-  await expect(hidden).toContainText('******');
-  await expect(hidden).not.toContainText('35');
-  await expect(hidden).not.toContainText('400');
+  const balances = page.getByTestId('PickContact').filter({ hasText: 'Анна' }).getByTestId('PickerDebtStatus');
+  await expect(balances).not.toContainText('******');
+  await expect(balances).toContainText('35\u00a0EUR');
+  await expect(balances).toContainText('2\u00a0400\u00a0RSD');
+});
+
+test('debt totals, history and contact picker follow global visibility independently of a locally hidden account', async ({
+  page,
+}) => {
+  await page.goto('/accounts');
+  const account = page.getByTestId('AccountCard').filter({ hasText: 'Карта EUR' });
+  await account.getByRole('button', { name: 'Скрыть сумму', exact: true }).click();
+  await expect(account.getByRole('button', { name: 'Показать сумму', exact: true })).toContainText('******');
+
+  for (const [index, hidden] of [false, true, false].entries()) {
+    if (index > 0) {
+      await page.goto('/settings');
+      const toggle = page.locator('.theme-switch').filter({ hasText: 'Скрывать суммы' });
+      await toggle.getByText('Скрывать суммы', { exact: true }).click();
+      await expect(toggle.locator(':scope > input')).toBeChecked({ checked: hidden });
+    }
+    await page.getByRole('link', { name: 'Долги', exact: true }).click();
+    const anna = page.getByTestId('DebtPerson').filter({ hasText: 'Анна' });
+    if (hidden) {
+      await expect(page.locator('.summary')).toContainText('******');
+      await expect(anna).toContainText('******');
+      await expect(anna).not.toContainText('35');
+    } else {
+      await expect(page.locator('.summary')).toContainText('55');
+      await expect(anna).toContainText('35');
+      await expect(page.locator('.debts-page')).not.toContainText('******');
+    }
+    await anna.click();
+    const details = page.getByTestId('ContactDetails');
+    await expect(details.locator('.balance')).toContainText(hidden ? '******' : '35');
+    await expect(page.getByTestId('DebtHistoryEntry')).toContainText(hidden ? '******' : '+35');
+    if (hidden) await expect(page.getByTestId('DebtHistoryEntry')).not.toContainText('35');
+    await details.getByRole('button', { name: 'Назад', exact: true }).click();
+    await page.getByTestId('RecordDebt').click();
+    await page.getByTestId('PaymentContact').click();
+    const status = page.getByTestId('PickContact').filter({ hasText: 'Анна' }).getByTestId('PickerDebtStatus');
+    await expect(status).toContainText(hidden ? '******' : '35');
+    await page.getByTestId('ContactPicker').getByRole('button', { name: 'Назад', exact: true }).click();
+    await page.getByTestId('DebtPaymentForm').getByRole('button', { name: 'Назад', exact: true }).click();
+  }
+  await page.goto('/accounts');
+  await expect(account.getByRole('button', { name: 'Показать сумму', exact: true })).toContainText('******');
 });
 
 test('contact gender and number persist and change the wording in Russian without changing the English label', async ({
@@ -917,12 +960,22 @@ test('debt header actions and collapsible filters work alongside search', async 
   for (const width of [320, 390]) {
     await page.setViewportSize({ width, height: 844 });
     const bounds = await filters.evaluate((element) => ({
-      height: element.getBoundingClientRect().height,
-      rowHeight: element.querySelector('button')?.getBoundingClientRect().height ?? 0,
+      rows: [...new Set([...element.querySelectorAll('button')].map((button) => button.getBoundingClientRect().top))],
+      scrollWidth: element.scrollWidth,
+      width: element.clientWidth,
+      pageWidth: document.documentElement.scrollWidth,
     }));
-    expect(bounds.height).toBeLessThanOrEqual(bounds.rowHeight * 2 + 8);
+    expect(bounds.rows).toHaveLength(1);
+    expect(bounds.scrollWidth).toBeGreaterThan(bounds.width);
+    expect(bounds.pageWidth).toBeLessThanOrEqual(width);
   }
-  await page.screenshot({ path: testInfo.outputPath('debt-compact-filters-mobile.png') });
+  await page.screenshot({ path: testInfo.outputPath('debt-horizontal-filters-mobile.png') });
+  await filters.hover();
+  await page.mouse.wheel(500, 0);
+  await expect.poll(() => filters.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+  await filters.getByRole('button', { name: 'Архивные контакты', exact: true }).click();
+  await expect(page.getByTestId('DebtEmptyState')).toHaveText('Архивных контактов нет.');
+  await filters.getByRole('button', { name: 'Все контакты', exact: true }).click();
   await filters.getByRole('button', { name: 'Я должен', exact: true }).click();
   await expect(page.getByTestId('DebtPerson')).toHaveCount(1);
   await expect(page.getByTestId('DebtPerson')).toContainText('Миша');

@@ -4,9 +4,7 @@
   import SearchInput from '#lib/ui/SearchInput.svelte';
   import { debtContactsStore } from '#lib/data/debtContacts.js';
   import { debtEntriesStore } from '#lib/data/debts.js';
-  import { accountsStore } from '#lib/data/accounts.js';
   import { settingsStore } from '#lib/data/settings.js';
-  import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
   import { contactBalances, fromMinor, toMinor } from '#lib/debts/calculations.js';
   import ContactDetails from '#lib/debts/ContactDetails.svelte';
   import DebtPaymentForm from '#lib/debts/DebtPaymentForm.svelte';
@@ -17,7 +15,6 @@
   import Layout from '#lib/ui/layout/Layout.svelte';
   import HiddenMoney from '#lib/ui/HiddenMoney.svelte';
   import { formatDebtMoney as formatMoney } from '#lib/debts/formatMoney.js';
-  import { isBalanceHidden } from '#lib/utils/isBalanceHidden.js';
   import DebtHeaderActions from './DebtHeaderActions.svelte';
   let filter: 'all' | 'in' | 'out' | 'settled' | 'archived' = 'all';
   let query = '';
@@ -59,17 +56,7 @@
               ? !!last && !active
               : Object.values(balances).some((amount) => (filter === 'in' ? amount > 0 : amount < 0))))),
   );
-  $: hidden =
-    $settingsStore.hideBalances ||
-    $debtEntriesStore.some(
-      (entry) =>
-        entry.accountId &&
-        isBalanceHidden(
-          null,
-          $accountsStore.find((account) => account.id === entry.accountId),
-          $localAccountBalancesHidden,
-        ),
-    );
+  $: hidden = $settingsStore.hideBalances ?? false;
   $: totals = people.reduce(
     (sums, person) => {
       for (const [currency, amount] of Object.entries(person.balances)) {
@@ -272,10 +259,18 @@
   }
   .filters {
     display: flex;
-    flex-wrap: wrap;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
     gap: 0.25rem;
   }
+  .filters::-webkit-scrollbar {
+    display: none;
+  }
   .filters button {
+    flex-shrink: 0;
+    white-space: nowrap;
     background: var(--header-background-color);
     color: var(--secondary-text-color);
     padding: 0.35rem 0.5rem;

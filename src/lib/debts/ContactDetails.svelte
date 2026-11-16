@@ -4,8 +4,6 @@
   import { debtEntriesStore, debtRecordsService } from '#lib/data/debts.js';
   import { debtContactsStore } from '#lib/data/debtContacts.js';
   import { settingsStore } from '#lib/data/settings.js';
-  import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
-  import { accountsStore } from '#lib/data/accounts.js';
   import type { DebtRecord } from '#lib/data/interfaces.js';
   import { route } from '#lib/routes.js';
   import { translate } from '#lib/translate/index.js';
@@ -13,7 +11,6 @@
   import Layout from '#lib/ui/layout/Layout.svelte';
   import ContactEditButton from './ContactEditButton.svelte';
   import { formatDebtMoney as formatMoney } from './formatMoney';
-  import { isBalanceHidden } from '#lib/utils/isBalanceHidden.js';
   import { contactBalances } from './calculations';
   import ContactEditor from './ContactEditor.svelte';
   import DebtPaymentForm from './DebtPaymentForm.svelte';
@@ -28,17 +25,7 @@
   $: contact = $debtContactsStore.find((contact) => contact.id === contactId);
   $: entries = $debtEntriesStore.filter((entry) => entry.contactId === contactId);
   $: balances = contactBalances(entries, contactId);
-  $: hidden =
-    $settingsStore.hideBalances ||
-    entries.some(
-      (entry) =>
-        entry.accountId &&
-        isBalanceHidden(
-          null,
-          $accountsStore.find((account) => account.id === entry.accountId),
-          $localAccountBalancesHidden,
-        ),
-    );
+  $: hidden = $settingsStore.hideBalances ?? false;
   const showOperation = (operationId: string) => {
     void goto(`${route('transactions')}?operation-id=${encodeURIComponent(operationId)}`);
   };
