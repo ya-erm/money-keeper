@@ -21,11 +21,15 @@
     operationsStore,
     repeatingsService,
     memberSettingsStore,
+    debtContactsService,
+    debtRecordsService,
   } from '#lib/data/index.js';
   import type {
     Account,
     Category,
     CurrencyRate,
+    DebtContact,
+    DebtRecord,
     Grouping,
     KnownPlace,
     Repeating,
@@ -57,6 +61,8 @@
     groupings: Grouping[];
     repeatings?: Repeating[];
     knownPlaces?: KnownPlace[];
+    debtContacts?: DebtContact[];
+    debtRecords?: DebtRecord[];
   } = {
     categories: [],
     accountTags: [],
@@ -86,6 +92,8 @@
     groupings: groupingsService.items,
     repeatings: repeatingsService.items,
     knownPlaces: $memberSettingsStore?.knownPlaces ?? [],
+    debtContacts: debtContactsService.items,
+    debtRecords: debtRecordsService.items,
   };
 
   // eslint-disable-next-line svelte/no-immutable-reactive-statements
@@ -106,6 +114,15 @@
       await mainService.init();
 
       let count = 0;
+
+      for (const debtContact of v2.debtContacts?.filter(notExists(debtContactsService.items)) ?? []) {
+        await journalService.addOperationToQueue({ debtContact }, { upload: false });
+        count += 1;
+      }
+      for (const debtRecord of v2.debtRecords?.filter(notExists(debtRecordsService.items)) ?? []) {
+        await journalService.addOperationToQueue({ debtRecord }, { upload: false });
+        count += 1;
+      }
 
       v2.categories?.filter(notExists(categoriesService.items)).forEach((category) => {
         void journalService.addOperationToQueue({ category }, { upload: false });
@@ -258,6 +275,8 @@
         <span>{$translate('import_export.currency_rates')}: <b>{v2.currencyRates?.length ?? 0}</b></span>
         <span>{$translate('import_export.groupings')}: <b>{v2.groupings?.length ?? 0}</b>,</span>
         <span>{$translate('import_export.repeatings')}: <b>{v2.repeatings?.length ?? 0}</b></span>
+        <span>{$translate('debts.contacts')}: <b>{v2.debtContacts?.length ?? 0}</b></span>
+        <span>{$translate('debts.title')}: <b>{v2.debtRecords?.length ?? 0}</b></span>
         <span>{$translate('settings.known_places')}: <b>{v2.knownPlaces?.length ?? 0}</b></span>
       </p>
 
@@ -270,9 +289,15 @@
     <label class="flex-col gap-0.5">
       <span>{$translate('import_export.raw_data_json')}:</span>
       {#if textboxVisible}
-        <textarea class="text-area-json" value={currentJson}></textarea>
+        <textarea class="text-area-json" value={currentJson} data-testId="ExportTextArea"></textarea>
       {:else}
-        <Button class="w-full" color="white" bordered onClick={() => (textboxVisible = true)}>
+        <Button
+          class="w-full"
+          color="white"
+          bordered
+          onClick={() => (textboxVisible = true)}
+          testId="ShowExportTextAreaButton"
+        >
           {$translate('import_export.show_textbox')}
         </Button>
       {/if}
@@ -286,6 +311,8 @@
       <span>{$translate('import_export.currency_rates')}: <b>{current.currencyRates?.length ?? 0}</b></span>
       <span>{$translate('import_export.groupings')}: <b>{current.groupings?.length ?? 0}</b>,</span>
       <span>{$translate('import_export.repeatings')}: <b>{current.repeatings?.length ?? 0}</b></span>
+      <span>{$translate('debts.contacts')}: <b>{current.debtContacts.length}</b></span>
+      <span>{$translate('debts.title')}: <b>{current.debtRecords.length}</b></span>
       <span>{$translate('settings.known_places')}: <b>{current.knownPlaces?.length ?? 0}</b></span>
     </p>
     <a href={URL.createObjectURL(currentJsonFile)} download={`export-${dayjs().format('YYYY-MM-DD')}.json`}>

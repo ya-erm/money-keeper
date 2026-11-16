@@ -155,6 +155,7 @@ pnpm test -- --update-snapshots
 - Pull request runs publish the HTML report to GitHub Pages and update a PR comment with the report link.
 - Published reports keep the latest 5 runs per PR and the latest 200 runs overall.
 - Screenshot baselines for visual checks are stored рядом с тестами в папках `tests/**/*.test.ts-snapshots/`.
+- Visual comparisons use soft assertions: a mismatch still fails the test, while later functional steps and screenshots run to provide a complete report.
 - The Playwright dev server is started automatically by the test runner.
 
 ## PWA startup

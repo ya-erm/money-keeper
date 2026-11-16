@@ -1,4 +1,5 @@
 import dayjs, { type Dayjs } from 'dayjs';
+import { personalAmount } from '#lib/debts/calculations.js';
 
 import type { TransactionViewModel } from '#lib/data/interfaces.js';
 import { isBalanceHidden, type LocalBalanceVisibility } from '#lib/utils/isBalanceHidden.js';
@@ -43,7 +44,7 @@ export function getExpenseCategoriesPreview(
     }
 
     const current = amounts.get(transaction.categoryId);
-    const amount = transaction.amount * getRate(transaction.account.currency);
+    const amount = personalAmount(transaction) * getRate(transaction.account.currency);
     hasHiddenBalanceAccount ||= isBalanceHidden(null, transaction.account, localVisibility);
     amounts.set(transaction.categoryId, {
       name: transaction.category.name,

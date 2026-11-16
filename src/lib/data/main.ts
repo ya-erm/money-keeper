@@ -8,6 +8,8 @@ import { accountTagsService } from './accountTags';
 import { accountsService } from './accounts';
 import { categoriesService } from './categories';
 import { currencyRatesService } from './currencyRates';
+import { debtContactsService } from './debtContacts';
+import { debtRecordsService } from './debts';
 import { groupingsService } from './groupings';
 import { $initialized } from './initialized';
 import { journalService } from './journal';
@@ -45,6 +47,8 @@ class MainService implements Initialisable {
     await membersService.init();
 
     const services: Service[] = [
+      debtContactsService,
+      debtRecordsService,
       categoriesService,
       accountTagsService,
       accountsService,

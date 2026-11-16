@@ -28,13 +28,15 @@ export async function setSearchParam(
   page: Page,
   name: string,
   value: string,
-  { replace }: { replace: boolean } = { replace: true },
+  { replace, state, persistState }: { replace: boolean; state?: Page['state']; persistState?: boolean } = {
+    replace: true,
+  },
 ) {
   const searchParams = new URLSearchParams(page.url.search);
   searchParams.set(name, value);
   // The current pathname already includes the configured base path.
   // eslint-disable-next-line svelte/no-navigation-without-resolve
-  await goto(getPathWithSearchParams(page, searchParams), { replace });
+  await goto(getPathWithSearchParams(page, searchParams), { replace, state, persistState });
 }
 
 export async function deleteSearchParam(page: Page, name: string | string[]) {

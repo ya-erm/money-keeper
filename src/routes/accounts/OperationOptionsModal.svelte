@@ -6,10 +6,13 @@
   import type { TransactionViewModel } from '#lib/data/interfaces.js';
   import { copyOperation, deleteOperation } from '#lib/data/operations.js';
   import { translate } from '#lib/translate/index.js';
+  import { handleError } from '#lib/utils/handleError.js';
   import Modal from '#lib/ui/Modal.svelte';
+  import DeleteDebtModal from '#lib/debts/DeleteDebtModal.svelte';
 
   export let opened: boolean;
   export let operation: TransactionViewModel;
+  let deleteOpened = false;
 
   const onClose = () => (opened = false);
 
@@ -18,12 +21,23 @@
     onClose();
   };
 
-  const handleDelete = () => {
-    deleteOperation(operation.id);
+  const performDelete = async () => {
+    await deleteOperation(operation.id);
     showSuccessToast($translate('transactions.delete_transaction_success'), {
       testId: 'DeleteTransactionSuccessToast',
     });
     onClose();
+  };
+  const handleDelete = async () => {
+    if (operation.debt) {
+      deleteOpened = true;
+      return;
+    }
+    try {
+      await performDelete();
+    } catch (error) {
+      handleError(error);
+    }
   };
 </script>
 
@@ -42,3 +56,4 @@
     </Button>
   </div>
 </Modal>
+<DeleteDebtModal bind:opened={deleteOpened} linkedOperation onDelete={performDelete} />

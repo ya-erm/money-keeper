@@ -1,5 +1,6 @@
 <script lang="ts">
   import dayjs, { type Dayjs } from 'dayjs';
+  import { personalAmount } from '#lib/debts/calculations.js';
   import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
 
   import {
@@ -73,7 +74,7 @@
         ),
         sum:
           transactions?.reduce(
-            (sum, t) => sum + (t.category.type === 'IN' ? 1 : -1) * t.amount * findRateFn(t.account.currency),
+            (sum, t) => sum + (t.category.type === 'IN' ? 1 : -1) * personalAmount(t) * findRateFn(t.account.currency),
             0,
           ) ?? 0,
       };
@@ -87,7 +88,9 @@
     ? groupTransactionsByComment(
         selectedGroup.transactions,
         (transaction) =>
-          (transaction.category.type === 'IN' ? 1 : -1) * transaction.amount * findRateFn(transaction.account.currency),
+          (transaction.category.type === 'IN' ? 1 : -1) *
+          personalAmount(transaction) *
+          findRateFn(transaction.account.currency),
       ).map((group) => ({
         ...group,
         hasHiddenBalanceAccount: hasHiddenBalanceAccount(

@@ -1,10 +1,12 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { fade } from 'svelte/transition';
+  import { subScreenHistory } from './layout/subScreenHistory';
 
   export let opened: boolean;
   export let header: string | null = null;
   export let width: string | number | null = null;
+  export let manageHistory = false;
 
   const dispatch = createEventDispatcher();
   const close = () => {
@@ -26,6 +28,7 @@
 {#if opened}
   <div
     class="modal-background flex-center"
+    use:subScreenHistory={manageHistory ? close : null}
     in:fade={{ duration: 300 }}
     out:fade={{ duration: 300 }}
     on:click={close}

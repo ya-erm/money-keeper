@@ -33,6 +33,7 @@ export type MemberSettings = {
   categoriesInOrder?: string[];
   categoriesOutOrder?: string[];
   lastAnotherCurrency?: string | null;
+  lastDebtCurrency?: string | null;
   favoriteTimeZones?: string[];
   groupingId?: string | null;
   knownPlaces?: KnownPlace[];
@@ -52,6 +53,8 @@ export type JournalItem = {
 };
 
 export type JournalOperation = {
+  debtContact?: DebtContact;
+  debtRecord?: DebtRecord;
   category?: Category;
   account?: Account;
   accountTag?: Tag;
@@ -145,9 +148,53 @@ export type PurchaseItem = {
   total: number;
 };
 
+/** A privately managed contact, independent of workspace members and authentication. */
+export type ContactGrammaticalForm = 'masculine' | 'feminine' | 'neuter' | 'plural';
+
+export type DebtContact = {
+  id: string;
+  name: string;
+  createdAt?: string;
+  note?: string;
+  /** Grammatical agreement, also available for future avatar placeholders. */
+  grammaticalForm?: ContactGrammaticalForm;
+  archived?: boolean;
+  deleted?: boolean;
+};
+
+/** A starting balance / IOU without movement on an account. Positive means owed to me. */
+export type DebtRecord = {
+  id: string;
+  kind?: 'debt' | 'repayment';
+  contactId: string;
+  amount: number;
+  currency: string;
+  date: string;
+  comment?: string;
+  dueDate?: string;
+  deleted?: boolean;
+};
+
+export type DebtShare = {
+  contactId: string;
+  amount: number;
+  /** Defaults to the operation's account currency. */
+  currency?: string;
+};
+
+/** Stored atomically with the actual payment, so edits and deletion cannot leave orphan debts. */
+export type TransactionDebt = {
+  kind: 'expense' | 'loan' | 'repayment' | 'payment';
+  shares: DebtShare[];
+  /** Manual personal income/expense amount in the account currency, including zero. */
+  personalAmount?: number;
+  dueDate?: string;
+};
+
 // TODO: rename to Operation
 // after adding new field don't forget to change function cloneOperation
 export type Transaction = {
+  debt?: TransactionDebt;
   id: string;
   accountId: string;
   categoryId: string;
@@ -211,6 +258,16 @@ export type Repeating = {
 };
 
 export interface LocalDB extends DBSchema {
+  debtContacts: {
+    key: string;
+    value: WithOwner<DebtContact>;
+    indexes: { 'by-owner': string };
+  };
+  debtRecords: {
+    key: string;
+    value: WithOwner<DebtRecord>;
+    indexes: { 'by-owner': string };
+  };
   globalSettings: {
     key: string;
     value: GlobalSettings;

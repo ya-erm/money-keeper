@@ -5,6 +5,8 @@ import type {
   Account,
   Category,
   CurrencyRate,
+  DebtContact,
+  DebtRecord,
   Initialisable,
   JournalItem,
   JournalOperation,
@@ -19,9 +21,18 @@ import { SNAPSHOT_KEY_BY_STORAGE } from './snapshot';
 import { useDB } from './useDB';
 
 type StorageName =
-  'categories' | 'accounts' | 'transactions' | 'tags' | 'accountTags' | 'currencyRates' | 'groupings' | 'repeatings';
+  | 'categories'
+  | 'accounts'
+  | 'transactions'
+  | 'tags'
+  | 'accountTags'
+  | 'currencyRates'
+  | 'groupings'
+  | 'repeatings'
+  | 'debtContacts'
+  | 'debtRecords';
 
-type EntityType = Category | Account | Transaction | Tag | CurrencyRate | Repeating;
+type EntityType = Category | Account | Transaction | Tag | CurrencyRate | Repeating | DebtContact | DebtRecord;
 
 export class BaseService<T extends EntityType> implements Initialisable, JournalSubscriber {
   private _name: string;

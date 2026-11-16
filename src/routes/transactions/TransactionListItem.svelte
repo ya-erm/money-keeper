@@ -3,6 +3,9 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
 
   import { memberSettingsStore } from '#lib/data/index.js';
+  import { debtContactsStore } from '#lib/data/debtContacts.js';
+  import { personalAmount } from '#lib/debts/calculations.js';
+  import { formatDebtMoney } from '#lib/debts/formatMoney.js';
   import type { CurrencyRate, TransactionViewModel } from '#lib/data/interfaces.js';
   import { translate } from '#lib/translate/index.js';
   import type { Messages } from '#lib/translate/messages.js';
@@ -19,6 +22,7 @@
   export let onClick: ((transaction: TransactionViewModel) => void) | null = null;
   export let onLongPress: ((transaction: TransactionViewModel) => void) | null = null;
   export let selected: boolean = false;
+  const metadataSeparator = ' · ';
 
   $: incoming = transaction.category.type === 'IN';
   $: outgoing = transaction.category.type === 'OUT';
@@ -65,6 +69,7 @@
 
 <li>
   <button
+    type="button"
     data-testId="TransactionListItem"
     data-id={transaction.id}
     class:interactive={!!onClick}
@@ -134,25 +139,44 @@
           {/if}
         {/if}
       </div>
-      {#if transaction.comment}
+      {#if transaction.comment || (showDescription && transaction.description)}
         <div class="comment small-text">
-          {replaceCalcExpressions(transaction.comment)}
+          {transaction.comment ? replaceCalcExpressions(transaction.comment) : ''}{transaction.comment &&
+          showDescription &&
+          transaction.description
+            ? ' · '
+            : ''}{showDescription ? (transaction.description ?? '') : ''}
         </div>
       {/if}
-      {#if showDescription && transaction.description}
-        <div class="description small-text">{transaction.description}</div>
-      {/if}
-      {#if knownPlace?.name || transaction.tags?.length}
-        <div class="metadata">
-          {#if knownPlace?.name}
-            <span class="place-name" data-testId="OperationPlaceName">{knownPlace.name}</span>
+      {#if knownPlace?.name || transaction.debt || transaction.tags?.length}
+        <div class="metadata" data-testId="OperationMetadata">
+          {#if knownPlace?.name}<span class="place-name" data-testId="OperationPlaceName">{knownPlace.name}</span
+            >{/if}{#if knownPlace?.name && (transaction.debt || transaction.tags?.length)}
+            {metadataSeparator}
+          {/if}{#if transaction.debt}<span class="debt-info" data-testId="TransactionDebtInfo">
+              <span class="debt-symbol" data-testId="TransactionDebtIcon" aria-hidden="true"
+                ><Icon name="mdi:account-cash-outline" size={1} /></span
+              >
+              <span class="debt-description"
+                >{transaction.debt.shares
+                  .map((share) => $debtContactsStore.find((contact) => contact.id === share.contactId)?.name ?? '…')
+                  .join(', ')}
+                {#if outgoing && personalAmount(transaction) > 0}{metadataSeparator}{$translate('debts.me')}: {formatDebtMoney(
+                    personalAmount(transaction),
+                    {
+                      currency: transaction.account.currency,
+                    },
+                  )}{/if}</span
+              >
+            </span>{/if}{#if transaction.debt && transaction.tags?.length}
+            {metadataSeparator}
           {/if}
           {#if transaction.tags?.length}
-            <div class="tags">
+            <span class="tags">
               {#each transaction.tags as tag (tag.id)}
                 <span class="tag" class:deleted={tag.deleted}>#{tag.name}</span>
               {/each}
-            </div>
+            </span>
           {/if}
         </div>
       {/if}
@@ -269,10 +293,6 @@
     stroke-linejoin: round;
     paint-order: stroke fill;
   }
-  .description {
-    font-size: 0.8rem;
-    color: var(--secondary-text-color);
-  }
   .text {
     gap: 0.125rem;
     overflow: hidden;
@@ -281,26 +301,24 @@
   .small-text {
     font-size: 0.9rem;
   }
-  .metadata {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    max-width: 100%;
-    font-size: 0.85rem;
-    color: var(--secondary-text-color);
+  .debt-symbol {
+    display: inline-flex;
+    vertical-align: -0.15rem;
   }
-  .tags {
-    min-width: 0;
+  .metadata {
+    display: block;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: 0.85rem;
+    color: var(--secondary-text-color);
   }
   .tag:not(:last-child)::after {
     content: ' ';
   }
   .source,
   .comment,
-  .description,
   .place-name,
   .destination {
     text-overflow: ellipsis;

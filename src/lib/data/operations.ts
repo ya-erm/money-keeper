@@ -7,9 +7,13 @@ import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
 import { Logger } from '#lib/utils/logger.js';
 
 import { accountsService, accountsStore } from './accounts';
+import { debtContactsService } from './debtContacts';
+import { personalAmount, validateDebt } from '../debts/calculations';
 import {
   SYSTEM_CATEGORY_TRANSFER_IN,
   SYSTEM_CATEGORY_TRANSFER_OUT,
+  SYSTEM_CATEGORY_DEBT_IN,
+  SYSTEM_CATEGORY_DEBT_OUT,
   categoriesService,
   categoriesStore,
 } from './categories';
@@ -34,6 +38,21 @@ export class OperationsService extends BaseService<Transaction> {
     return this._comments;
   }
 
+  override async save(item: Transaction) {
+    if (item.debt && !item.deleted) {
+      const account = accountsService.getById(item.accountId);
+      const category =
+        categoriesService.getById(item.categoryId) ??
+        [SYSTEM_CATEGORY_DEBT_IN, SYSTEM_CATEGORY_DEBT_OUT].find((category) => category.id === item.categoryId);
+      if (!account || !category || item.repeatingId) throw new Error(get(translate)('debts.invalid'));
+      const error = validateDebt(item, account.currency, category.type, debtContactsService.items);
+      if (error) throw new Error(get(translate)(`debts.${error}`));
+      if (category.system && personalAmount({ ...item, account }) !== 0)
+        throw new Error(get(translate)('debts.invalid'));
+    }
+    return super.save(item);
+  }
+
   constructor() {
     super('OperationsService', 'transactions', 'transaction');
 
@@ -44,7 +63,12 @@ export class OperationsService extends BaseService<Transaction> {
       ([transactions, initialized, accounts, _categories, tags, repeatings]) => {
         if (!initialized) return [];
 
-        const categories = _categories.concat(SYSTEM_CATEGORY_TRANSFER_IN, SYSTEM_CATEGORY_TRANSFER_OUT);
+        const categories = _categories.concat(
+          SYSTEM_CATEGORY_TRANSFER_IN,
+          SYSTEM_CATEGORY_TRANSFER_OUT,
+          SYSTEM_CATEGORY_DEBT_IN,
+          SYSTEM_CATEGORY_DEBT_OUT,
+        );
 
         const warnings: Array<unknown> = [];
 
@@ -166,14 +190,14 @@ export const operationsStore = operationsService.$operations;
 export const operationsCommentsStore = operationsService.$comments;
 
 /** Delete operation and linked operation */
-export function deleteOperation(id: string) {
+export async function deleteOperation(id: string) {
   const item = operationsService.getById(id);
   if (item) {
-    operationsService.delete(item);
+    await operationsService.save({ ...item, deleted: true });
     if (item.linkedTransactionId) {
       const linkedOperation = operationsService.getById(item.linkedTransactionId);
       if (linkedOperation) {
-        operationsService.delete(linkedOperation);
+        await operationsService.save({ ...linkedOperation, deleted: true });
       }
     }
   }
@@ -191,6 +215,7 @@ export function cloneOperation(item: Transaction): Transaction {
     date: item.date,
     timeZone: item.timeZone,
     amount: item.amount,
+    debt: item.debt ? structuredClone(item.debt) : undefined,
     comment: item.comment,
     description: item.description,
     receiptUrl: item.receiptUrl,
@@ -212,6 +237,8 @@ export function copyOperation(operation: Transaction, { save }: { save: boolean 
   const newOperations: Transaction[] = [];
   const copiedOperation = cloneOperation(operation);
   copiedOperation.id = uuid();
+  // Duplicating a payment must never duplicate its IOUs or repayments silently.
+  delete copiedOperation.debt;
   newOperations.push(copiedOperation);
   if (operation.linkedTransactionId) {
     const linkedOperation = operationsService.getById(operation.linkedTransactionId);

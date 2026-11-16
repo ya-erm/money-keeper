@@ -1,4 +1,7 @@
+import type { DebtMessage } from './debtMessages';
+
 export type Messages =
+  | DebtMessage
   | 'app.title'
   | 'receipts.manual'
   | 'receipts.qr_code'

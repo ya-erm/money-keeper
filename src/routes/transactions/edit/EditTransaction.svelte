@@ -9,13 +9,16 @@
   import type { Transaction } from '#lib/data/interfaces.js';
   import { deleteOperation } from '#lib/data/operations.js';
   import { translate } from '#lib/translate/index.js';
+  import { handleError } from '#lib/utils/handleError.js';
   import Button from '@ya-erm/svelte-ui/Button';
   import { showSuccessToast } from '@ya-erm/svelte-ui/toasts';
 
   import TransactionForm from '../form/TransactionForm.svelte';
+  import DeleteDebtModal from '#lib/debts/DeleteDebtModal.svelte';
 
   export let id: string | null;
   export let onBack: () => void;
+  let deleteOpened = false;
 
   $: transactions = $operationsStore;
   $: accounts = $accountsStore;
@@ -29,13 +32,24 @@
     onBack();
   };
 
-  const handleDelete = () => {
+  const performDelete = async () => {
     if (!transaction) return;
-    deleteOperation(transaction.id);
+    await deleteOperation(transaction.id);
     showSuccessToast($translate('transactions.delete_transaction_success'), {
       testId: 'DeleteTransactionSuccessToast',
     });
     onBack();
+  };
+  const handleDelete = async () => {
+    if (transaction?.debt) {
+      deleteOpened = true;
+      return;
+    }
+    try {
+      await performDelete();
+    } catch (error) {
+      handleError(error);
+    }
   };
 </script>
 
@@ -50,3 +64,4 @@
     color="danger"
   />
 </TransactionForm>
+<DeleteDebtModal bind:opened={deleteOpened} linkedOperation onDelete={performDelete} />

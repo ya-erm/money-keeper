@@ -5,6 +5,10 @@
 // and what to do when importing types
 
 declare namespace App {
+  interface PageState {
+    subScreens?: string[];
+    debtContactFromList?: boolean;
+  }
   interface Locals {
     // userId: number | null;
     // groupId: number | null;

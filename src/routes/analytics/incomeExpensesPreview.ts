@@ -1,4 +1,5 @@
 import dayjs, { type Dayjs } from 'dayjs';
+import { personalAmount } from '#lib/debts/calculations.js';
 
 import type { TransactionViewModel } from '#lib/data/interfaces.js';
 import { isBalanceHidden, type LocalBalanceVisibility } from '#lib/utils/isBalanceHidden.js';
@@ -59,7 +60,7 @@ export function getIncomeExpensesPreview(
       continue;
     }
 
-    const amount = transaction.amount * getRate(transaction.account.currency);
+    const amount = personalAmount(transaction) * getRate(transaction.account.currency);
     const monthIndex = transactionDate.startOf('month').diff(start, 'month');
     if (transaction.category.type === 'IN') incomeByMonth[monthIndex] += amount;
     else expensesByMonth[monthIndex] += amount;

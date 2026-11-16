@@ -1,5 +1,6 @@
 <script lang="ts">
   import dayjs from 'dayjs';
+  import { personalAmount } from '#lib/debts/calculations.js';
   import { localAccountBalancesHidden } from '#lib/accountBalanceVisibility.js';
 
   import Button from '@ya-erm/svelte-ui/Button';
@@ -76,7 +77,7 @@
     let expenses = 0;
 
     monthOperations.forEach((operation) => {
-      const amount = operation.amount * findRateFn(operation.account.currency);
+      const amount = personalAmount(operation) * findRateFn(operation.account.currency);
       if (operation.category.type === 'IN') income += amount;
       else expenses += amount;
     });

@@ -1,4 +1,6 @@
 export { accountsService, accountsStore } from './accounts';
+export { debtContactsService, debtContactsStore } from './debtContacts';
+export { debtRecordsService, debtRecordsStore, debtEntriesStore } from './debts';
 export { accountTagsService, accountTagsStore } from './accountTags';
 export { categoriesService, categoriesStore } from './categories';
 export { currencyRatesService, currencyRatesStore } from './currencyRates';

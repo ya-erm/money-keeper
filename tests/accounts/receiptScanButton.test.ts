@@ -30,11 +30,13 @@ async function openReadyPath(page: Page, path: string) {
   await expect(page.locator('#app-content')).not.toHaveAttribute('inert', '');
 }
 
-async function seed(page: Page, enabled?: boolean, otherEnabled = false) {
+async function seed(page: Page, enabled?: boolean, { otherEnabled = false, includeOtherAccount = true } = {}) {
   const data = JSON.parse(mockData);
   data.accounts = [
     { id: accountId, name: accountName, currency: 'RSD', showReceiptScanButton: enabled },
-    { id: otherAccountId, name: 'Other account', currency: 'EUR', showReceiptScanButton: otherEnabled },
+    ...(includeOtherAccount
+      ? [{ id: otherAccountId, name: 'Other account', currency: 'EUR', showReceiptScanButton: otherEnabled }]
+      : []),
   ];
   data.operations = [];
   await importMockDataAsync(page, JSON.stringify(data));
@@ -222,7 +224,8 @@ test('fits Russian action labels to the available width and keeps icon actions a
   page,
   context,
 }, testInfo) => {
-  await seed(page, true);
+  // Resizing the carousel can select its other card; this scenario checks action layout only.
+  await seed(page, true, { includeOtherAccount: false });
   await context.addCookies([{ name: 'locale', value: 'ru-RU', url: 'http://127.0.0.1:4173' }]);
   await page.setViewportSize({ width: 320, height: 844 });
   await page.reload();
@@ -250,7 +253,7 @@ test('fits Russian action labels to the available width and keeps icon actions a
   expect(await header.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath('qr-mobile-320.png') });
-  await expect(page).toHaveScreenshot('qr-shortcut-ru-narrow.png');
+  await expect.soft(page).toHaveScreenshot('qr-shortcut-ru-narrow.png');
 
   // Repeated resizes must restore the labels rather than retaining a compact state.
   for (const width of [390, 320, 390, 1440]) {
@@ -303,7 +306,7 @@ test('fits Russian action labels to the available width and keeps icon actions a
 });
 
 test('starts a fresh scan for another selected account after cancelling', async ({ page }) => {
-  await seed(page, true, true);
+  await seed(page, true, { otherEnabled: true });
   const scanner = page.getByTestId('ReceiptScanner');
   await page.getByTestId('AccountScanReceiptButton').click();
   await expect(scanner).toBeVisible();

@@ -19,13 +19,16 @@
   export let hideAccount: boolean = false;
   /** Details are shown next to the list by the parent, do not open them as a nested screen */
   export let inlineDetails: boolean = false;
+  /** Selection mode for linking a payment without opening its editor. */
+  export let onSelect: ((transaction: TransactionViewModel) => void) | null = null;
+  export let selectedId: string | null = null;
 
   $: currencyRates = $currencyRatesStore;
   $: settings = $memberSettingsStore;
 
   let limit = 20;
 
-  $: sortedTransactions = transactions.sort((a, b) => dayjs(b.date).diff(dayjs(a.date)));
+  $: sortedTransactions = [...transactions].sort((a, b) => dayjs(b.date).diff(dayjs(a.date)));
   $: transactionsByDate = sortedTransactions
     .slice(0, limit)
     .reduce((res: { [key: string]: TransactionViewModel[] }, t) => {
@@ -49,22 +52,23 @@
           {transaction}
           {hideAccount}
           currencyRate={findCurrencyRate(currencyRates, settings?.currency, transaction.account.currency)}
-          onClick={({ id }) => openOperationForm(id)}
-          selected={inlineDetails && transaction.id === operationId}
+          onClick={(transaction) => (onSelect ? onSelect(transaction) : openOperationForm(transaction.id))}
+          selected={onSelect ? transaction.id === selectedId : inlineDetails && transaction.id === operationId}
         />
       {/each}
     {/each}
   </ul>
 </ShowMoreContainer>
 
-<SubScreen
-  visible={!inlineDetails && operationId !== null}
-  title={$translate('transactions.edit_transaction')}
-  onBack={closeOperationForm}
-  rightSlot={HeaderFormSubmitButton}
->
-  <EditTransaction id={operationId} onBack={closeOperationForm} />
-</SubScreen>
+{#if !onSelect}<SubScreen
+    manageHistory={false}
+    visible={!inlineDetails && operationId !== null}
+    title={$translate('transactions.edit_transaction')}
+    onBack={closeOperationForm}
+    rightSlot={HeaderFormSubmitButton}
+  >
+    <EditTransaction id={operationId} onBack={closeOperationForm} />
+  </SubScreen>{/if}
 
 <style>
   ul {

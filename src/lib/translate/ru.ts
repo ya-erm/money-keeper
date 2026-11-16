@@ -1,8 +1,10 @@
 import { addMessages } from 'svelte-i18n';
 
 import type { Dictionary } from './types';
+import { debtRu } from './debtMessages';
 
 export const ruDict: Dictionary = {
+  ...debtRu,
   'app.title': 'Money Keeper',
   'receipts.manual': 'Вручную',
   'receipts.scan': 'Сканировать QR чека',
