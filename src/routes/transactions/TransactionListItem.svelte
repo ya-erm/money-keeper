@@ -22,6 +22,7 @@
   export let onClick: ((transaction: TransactionViewModel) => void) | null = null;
   export let onLongPress: ((transaction: TransactionViewModel) => void) | null = null;
   export let selected: boolean = false;
+  const metadataSeparator = ' · ';
 
   $: incoming = transaction.category.type === 'IN';
   $: outgoing = transaction.category.type === 'OUT';
@@ -151,7 +152,7 @@
         <div class="metadata" data-testId="OperationMetadata">
           {#if knownPlace?.name}<span class="place-name" data-testId="OperationPlaceName">{knownPlace.name}</span
             >{/if}{#if knownPlace?.name && (transaction.debt || transaction.tags?.length)}
-            <span class="metadata-separator" aria-hidden="true">·</span>
+            {metadataSeparator}
           {/if}{#if transaction.debt}<span class="debt-info" data-testId="TransactionDebtInfo">
               <span class="debt-symbol" data-testId="TransactionDebtIcon" aria-hidden="true"
                 ><Icon name="mdi:account-cash-outline" size={1} /></span
@@ -160,7 +161,7 @@
                 >{transaction.debt.shares
                   .map((share) => $debtContactsStore.find((contact) => contact.id === share.contactId)?.name ?? '…')
                   .join(', ')}
-                {#if outgoing && personalAmount(transaction) > 0}· {$translate('debts.me')}: {formatDebtMoney(
+                {#if outgoing && personalAmount(transaction) > 0}{metadataSeparator}{$translate('debts.me')}: {formatDebtMoney(
                     personalAmount(transaction),
                     {
                       currency: transaction.account.currency,
@@ -168,7 +169,7 @@
                   )}{/if}</span
               >
             </span>{/if}{#if transaction.debt && transaction.tags?.length}
-            <span class="metadata-separator" aria-hidden="true">·</span>
+            {metadataSeparator}
           {/if}
           {#if transaction.tags?.length}
             <span class="tags">
@@ -303,9 +304,6 @@
   .debt-symbol {
     display: inline-flex;
     vertical-align: -0.15rem;
-  }
-  .metadata-separator {
-    margin: 0 0.35rem;
   }
   .metadata {
     display: block;

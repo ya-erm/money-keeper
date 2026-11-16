@@ -10,7 +10,7 @@
   import { route } from '#lib/routes.js';
   import { translate } from '#lib/translate/index.js';
   import HiddenMoney from '#lib/ui/HiddenMoney.svelte';
-  import SubScreen from '#lib/ui/layout/SubScreen.svelte';
+  import Layout from '#lib/ui/layout/Layout.svelte';
   import ContactEditButton from './ContactEditButton.svelte';
   import { formatDebtMoney as formatMoney } from './formatMoney';
   import { isBalanceHidden } from '#lib/utils/isBalanceHidden.js';
@@ -40,59 +40,60 @@
         ),
     );
   const showOperation = (operationId: string) => {
-    onClose();
     void goto(`${route('transactions')}?operation-id=${encodeURIComponent(operationId)}`);
   };
 </script>
 
 {#if contact}
-  <SubScreen
-    visible
-    title={contact.name}
-    onBack={onClose}
-    testId="ContactDetails"
-    rightSlot={ContactEditButton}
-    rightSlotProps={{ onClick: () => (editing = true) }}
-  >
-    <div class="details">
-      {#if contact.note}<p class="caption">{contact.note}</p>{/if}
-      {#if Object.values(balances).every((value) => !value)}<p class="settled">{$translate('debts.settled')}</p>
-        <Button
-          text={$translate('debts.add_entry')}
-          onClick={() => (payment = { repayment: false, currency: Object.keys(balances)[0] ?? '' })}
-        />{/if}
-      {#each Object.entries(balances).filter(([, amount]) => amount !== 0) as [currency, amount] (currency)}
-        <div class="balance-row">
-          <div>
-            <span class="caption">{$translate(debtDirectionMessage(contact, amount))}</span>
-            <div class="balance" class:receivable={amount > 0} class:payable={amount < 0}>
-              {#if hidden}<HiddenMoney {currency} />{:else}{formatMoney(Math.abs(amount), { currency })}{/if}
-            </div>
-          </div>
+  <div data-testId="ContactDetails">
+    <Layout
+      title={contact.name}
+      onBack={onClose}
+      rightSlot={ContactEditButton}
+      rightSlotProps={{ onClick: () => (editing = true) }}
+    >
+      <div class="details">
+        {#if contact.note}<p class="caption">{contact.note}</p>{/if}
+        {#if Object.values(balances).every((value) => !value)}<p class="caption" class:settled={entries.length > 0}>
+            {$translate(entries.length ? 'debts.settled' : 'debts.no_entries')}
+          </p>
           <Button
-            onClick={() => (payment = { repayment: true, currency })}
             text={$translate('debts.add_entry')}
-            testId="RecordRepayment"
-          />
-        </div>
-      {/each}
-      <h2>{$translate('debts.history')}</h2>
-      <DebtHistory
-        entries={entries.slice(0, limit)}
-        {hidden}
-        onOpenOperation={showOperation}
-        onEditRecord={(id) => {
-          const record = debtRecordsService.getById(id);
-          if (record) payment = { repayment: false, currency: record.currency, record };
-        }}
-      />
-      {#if entries.length > limit}<Button
-          appearance="link"
-          onClick={() => (limit += 30)}
-          text={$translate('common.show_more')}
-        />{/if}
-    </div>
-  </SubScreen>
+            onClick={() => (payment = { repayment: false, currency: Object.keys(balances)[0] ?? '' })}
+          />{/if}
+        {#each Object.entries(balances).filter(([, amount]) => amount !== 0) as [currency, amount] (currency)}
+          <div class="balance-row">
+            <div>
+              <span class="caption">{$translate(debtDirectionMessage(contact, amount))}</span>
+              <div class="balance" class:receivable={amount > 0} class:payable={amount < 0}>
+                {#if hidden}<HiddenMoney {currency} />{:else}{formatMoney(Math.abs(amount), { currency })}{/if}
+              </div>
+            </div>
+            <Button
+              onClick={() => (payment = { repayment: true, currency })}
+              text={$translate('debts.add_entry')}
+              testId="RecordRepayment"
+            />
+          </div>
+        {/each}
+        <h2>{$translate('debts.history')}</h2>
+        <DebtHistory
+          entries={entries.slice(0, limit)}
+          {hidden}
+          onOpenOperation={showOperation}
+          onEditRecord={(id) => {
+            const record = debtRecordsService.getById(id);
+            if (record) payment = { repayment: false, currency: record.currency, record };
+          }}
+        />
+        {#if entries.length > limit}<Button
+            appearance="link"
+            onClick={() => (limit += 30)}
+            text={$translate('common.show_more')}
+          />{/if}
+      </div>
+    </Layout>
+  </div>
   {#if editing}<ContactEditor {contact} onClose={() => (editing = false)} />{/if}
   {#if payment}<DebtPaymentForm
       {contact}

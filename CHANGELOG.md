@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.35.2 - 2026-11-16
+
+### Improved
+
+- Debts and contacts share one screen, including settled contacts, new contacts and an archive filter. The old contact directory URL redirects to Debts.
+- Contact history has its own page header and retains the main navigation. Nested screens cover the pinned iOS header correctly.
+- Operation metadata uses uniform compact spacing between location, debts and tags.
+
 ## 2.35.1 - 2026-11-16
 
 ### Improved

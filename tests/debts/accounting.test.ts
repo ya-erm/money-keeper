@@ -69,39 +69,86 @@ test.beforeEach(async ({ page }) => {
   await importMockDataAsync(page, backup);
 });
 
-test('contacts are separate, searchable and can be renamed without losing debt history', async ({ page }, testInfo) => {
+test('debts include all contacts and allow searching, renaming and adding without a separate directory', async ({
+  page,
+}, testInfo) => {
   await page.goto('/debts');
-  await expect(page.getByTestId('DebtPerson')).toHaveCount(3);
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
   await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Анна' })).toContainText('35');
   await page.screenshot({ path: testInfo.outputPath('debts-mobile.png') });
-  await page.getByRole('link', { name: 'Контакты', exact: true }).click();
-  await expect(page.getByTestId('ContactRow')).toHaveCount(15);
-  await page.locator('input[name=contact-search]').fill('Анна');
-  await expect(page.getByTestId('ContactRow')).toHaveCount(1);
-  await page.getByTestId('ContactRow').click();
+  await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Контакт 12' })).toContainText('Нет записей');
+  await page.locator('input[name=debt-search]').fill('Анна');
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(1);
+  await page.getByTestId('DebtPerson').click();
   await expect(page.getByTestId('ContactDetails')).toBeVisible();
   await page.getByTestId('ContactDetails').getByRole('button', { name: 'Редактировать', exact: true }).click();
   await page.getByTestId('ContactForm').locator('input[name=name]').fill('Анна Петрова');
   await page.screenshot({ path: testInfo.outputPath('contact-editor-mobile.png') });
   await page.getByTestId('SaveContact').click();
-  await expect(page.getByTestId('ContactRow')).toContainText('Анна Петрова');
+  await expect(
+    page.getByTestId('ContactDetails').getByRole('heading', { name: 'Анна Петрова', exact: true }),
+  ).toBeVisible();
   await page.getByTestId('ContactDetails').getByRole('button', { name: 'Назад', exact: true }).click();
   await page.screenshot({ path: testInfo.outputPath('contacts-actions-mobile.png') });
-  await page.locator('input[name=contact-search]').fill('');
-  await expect(page.getByTestId('ContactRow')).toHaveCount(15);
+  await page.locator('input[name=debt-search]').fill('');
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
   await page.screenshot({ path: testInfo.outputPath('contacts-mobile.png') });
-  await page.locator('.navigation-right-button').getByRole('button', { name: 'Добавить контакт', exact: true }).click();
+  await page.getByTestId('AddContact').click();
   await expect(page.getByTestId('ContactEditor')).toBeVisible();
   await page.getByTestId('ContactEditor').getByRole('button', { name: 'Назад', exact: true }).click();
   await page.getByTestId('AddContact').click();
   await expect(page.getByTestId('ContactEditor')).toBeVisible();
   await page.getByTestId('ContactForm').locator('[name=name]').fill('Новый контакт');
   await page.getByTestId('SaveContact').click();
-  await expect(page.getByTestId('ContactRow')).toHaveCount(16);
-  await page.goto('/debts');
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(16);
+  await page.goto('/debts/contacts');
+  await expect(page).toHaveURL(/\/debts$/);
   await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Анна Петрова' })).toContainText('35');
   await page.reload();
   await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Анна Петрова' })).toContainText('35');
+});
+
+test('contact history owns its header, retains navigation and opens editors above a pinned mobile header', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/debts');
+  // Emulate the fixed header enabled by iOS CSS, including its stacking context.
+  await page.addStyleTag({
+    content: '.navigation-bar { position: fixed !important; top: 0; left: 0; right: 0; z-index: 10; }',
+  });
+  await page.getByTestId('DebtPerson').filter({ hasText: 'Анна' }).click();
+  await expect(page).toHaveURL(/contact-id=anna/);
+  const details = page.getByTestId('ContactDetails');
+  await expect(details.getByRole('heading', { name: 'Анна', exact: true })).toBeVisible();
+  await expect(details.locator('.menu-bar .menu-item')).toHaveCount(5);
+  await expect(page.getByTestId('RecordDebt')).toHaveCount(0);
+  await page.screenshot({ path: testInfo.outputPath('contact-history-navigation-mobile.png') });
+  await details.getByRole('button', { name: 'Редактировать', exact: true }).click();
+  await expect(page.getByTestId('ContactEditor')).toBeVisible();
+  await expect(
+    page.getByTestId('ContactEditor').getByRole('heading', { name: 'Редактировать контакт', exact: true }),
+  ).toBeVisible();
+  const editorTitle = page.getByTestId('ContactEditor').locator('.navigation-title');
+  await expect(editorTitle).toBeInViewport();
+  expect(
+    await editorTitle.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      return element.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2));
+    }),
+  ).toBe(true);
+  await page.getByTestId('ContactEditor').getByRole('button', { name: 'Назад', exact: true }).click();
+  await expect(page.getByTestId('ContactEditor')).not.toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/debts$/);
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
+  await page.goForward();
+  await expect(details).toBeVisible();
+  await page.reload();
+  await expect(details.getByRole('heading', { name: 'Анна', exact: true })).toBeVisible();
+  await details.getByRole('link', { name: 'Счета', exact: true }).click();
+  await expect(page).toHaveURL(/\/accounts(?:\?|$)/);
+  await page.getByRole('link', { name: 'Долги', exact: true }).click();
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
 });
 
 test('editing an expense and linking an existing repayment updates debt and personal analytics', async ({
@@ -137,7 +184,7 @@ test('editing an expense and linking an existing repayment updates debt and pers
   await expect(page.getByTestId('DebtPaymentForm')).not.toBeVisible();
   await expect(page.getByTestId('ContactDetails')).toContainText('20');
   await page.reload();
-  await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Анна' })).toContainText('20');
+  await expect(page.getByTestId('ContactDetails')).toContainText('20');
   await page.goto('/settings/import-export');
   await page.getByTestId('ShowExportTextAreaButton').click();
   const exported = JSON.parse(await page.getByTestId('ExportTextArea').inputValue());
@@ -169,7 +216,9 @@ test('expense picker is bounded and can find or create a person in place', async
   await expect(page.getByTestId('DebtShare')).toHaveCount(4);
 });
 
-test('full repayment settles the person and deletion of its payment restores the balance', async ({ page }) => {
+test('full repayment keeps the settled contact in the list and deletion of its payment restores the balance', async ({
+  page,
+}, testInfo) => {
   await page.goto('/debts');
   await page.getByTestId('DebtPerson').filter({ hasText: 'Миша' }).click();
   await page.getByTestId('RecordRepayment').click();
@@ -181,7 +230,17 @@ test('full repayment settles the person and deletion of its payment restores the
   await expect(page.getByTestId('DebtPaymentForm')).not.toBeVisible();
   await expect(page.getByTestId('ContactDetails')).toContainText('Вы рассчитались');
   await page.reload();
-  await expect(page.getByTestId('DebtPerson')).toHaveCount(2);
+  await expect(page.getByTestId('ContactDetails')).toContainText('Вы рассчитались');
+  await page.getByTestId('ContactDetails').getByRole('button', { name: 'Назад', exact: true }).click();
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
+  await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Миша' })).toContainText('Рассчитались');
+  await page.getByTestId('DebtFiltersButton').click();
+  await page.locator('#debt-filters').getByRole('button', { name: 'Рассчитались', exact: true }).click();
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(1);
+  await expect(page.getByTestId('DebtPerson')).toContainText('Миша');
+  await page.screenshot({ path: testInfo.outputPath('debts-settled-mobile.png') });
+  await page.getByTestId('DebtPerson').click();
+  await expect(page.getByTestId('DebtHistoryEntry')).toHaveCount(2);
   await page.goto('/transactions');
   await page.getByTestId('TransactionListItem').filter({ hasText: 'Расчёты по долгам' }).click();
   await page.getByTestId('DeleteTransactionButton').click();
@@ -195,7 +254,7 @@ test('new loan and manual debt can be saved offline and survive reload', async (
   // Before noon, a date-only debt must take effect immediately rather than become a future operation.
   await page.clock.setSystemTime('2026-11-15T05:00:00Z');
   await page.goto('/debts');
-  await expect(page.getByTestId('DebtPerson')).toHaveCount(3);
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
   await page.context().setOffline(true);
   await page.getByTestId('RecordDebt').click();
   await page.getByTestId('PaymentContact').click();
@@ -224,22 +283,26 @@ test('new loan and manual debt can be saved offline and survive reload', async (
 });
 
 test('archiving preserves outstanding debts but removes a contact from the picker', async ({ page }, testInfo) => {
-  await page.goto('/debts/contacts');
-  await expect(page.getByTestId('ContactRow')).toHaveCount(15);
-  await page.getByRole('button', { name: 'Архивные контакты', exact: true }).click();
-  await expect(page.getByTestId('ContactRow')).toHaveCount(0);
-  await expect(page.locator('.empty')).toHaveText('Архивных контактов нет.');
+  await page.goto('/debts');
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
+  await page.getByTestId('DebtFiltersButton').click();
+  const filters = page.locator('#debt-filters');
+  await filters.getByRole('button', { name: 'Архивные контакты', exact: true }).click();
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(0);
+  await expect(page.getByTestId('DebtEmptyState')).toHaveText('Архивных контактов нет.');
   await page.screenshot({ path: testInfo.outputPath('contacts-empty-archive-mobile.png') });
-  await page.getByRole('button', { name: 'Все контакты', exact: true }).click();
-  await page.locator('input[name=contact-search]').fill('Анна');
-  await expect(page.getByTestId('ContactRow')).toHaveCount(1);
-  await page.getByTestId('ContactRow').click();
+  await filters.getByRole('button', { name: 'Все контакты', exact: true }).click();
+  await page.locator('input[name=debt-search]').fill('Анна');
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(1);
+  await page.getByTestId('DebtPerson').click();
   await page.getByTestId('ContactDetails').getByRole('button', { name: 'Редактировать', exact: true }).click();
   await page.getByRole('button', { name: 'В архив', exact: true }).click();
   await expect(page.getByTestId('ContactEditor')).not.toBeVisible();
-  await expect(page.getByTestId('ContactRow')).toHaveCount(0);
-  await page.goto('/debts');
+  await page.getByTestId('ContactDetails').getByRole('button', { name: 'Назад', exact: true }).click();
   await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Анна' })).toContainText('35');
+  await filters.getByRole('button', { name: 'Архивные контакты', exact: true }).click();
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(1);
+  await expect(page.getByTestId('DebtPerson')).toContainText('Анна');
   await page.getByTestId('RecordDebt').click();
   await page.getByTestId('PaymentContact').click();
   await page.locator('input[name=contact-search]').fill('Анна');
@@ -248,7 +311,7 @@ test('archiving preserves outstanding debts but removes a contact from the picke
 
 test('debt screens fit mobile and desktop, and follow the dark theme', async ({ page }, testInfo) => {
   await page.goto('/debts');
-  await expect(page.getByTestId('DebtPerson')).toHaveCount(3);
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
   const menu = page.locator('.menu-bar .menu-item');
   await expect(menu.nth(0)).toHaveText('Долги');
   await expect(menu.nth(2)).toHaveText('Счета');
@@ -273,7 +336,7 @@ test('debt screens fit mobile and desktop, and follow the dark theme', async ({ 
   await page.evaluate(() => localStorage.setItem('mk_dark_mode', 'true'));
   await page.reload();
   await expect(page.locator('body')).toHaveClass(/dark-mode/);
-  await expect(page.getByTestId('DebtPerson')).toHaveCount(3);
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
   await page.screenshot({ path: testInfo.outputPath('debts-dark-mobile.png') });
 });
 
@@ -356,8 +419,8 @@ test('cancelling participant selection leaves the operation unlinked and removin
   await page.getByTestId('SaveTransactionButton').click();
   await expect(page.getByTestId('SaveTransactionButton')).not.toBeVisible();
   await page.goto('/debts');
-  await expect(page.getByTestId('DebtPerson')).toHaveCount(1);
-  await expect(page.getByTestId('DebtPerson')).toContainText('Миша');
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
+  await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Анна' })).toContainText('Нет записей');
   await page.goto('/analytics/categories');
   await expect(page.locator('li[data-id=food] .amount')).toContainText('90');
 });
@@ -465,10 +528,11 @@ test('manual debt deletion uses the app modal and supports cancellation', async 
   await page.getByTestId('ConfirmDebtDeletion').click();
   await expect(page.getByTestId('DebtDeleteConfirm')).not.toBeVisible();
   await expect(page.getByTestId('DebtPaymentForm')).not.toBeVisible();
-  await expect(page.getByTestId('ContactDetails')).toContainText('Вы рассчитались');
+  await expect(page.getByTestId('ContactDetails')).toContainText('Нет записей');
   expect(systemDialog).toBe(false);
   await page.reload();
-  await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Миша' })).toHaveCount(0);
+  await page.goto('/debts');
+  await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Миша' })).toContainText('Нет записей');
 });
 
 test('contact picker shows debt direction and per-currency balances before the arrow, respecting hidden amounts', async ({
@@ -512,11 +576,11 @@ test('contact picker shows debt direction and per-currency balances before the a
 test('contact gender and number persist and change the wording in Russian without changing the English label', async ({
   page,
 }, testInfo) => {
-  await page.goto('/debts/contacts');
-  await expect(page.getByTestId('ContactRow')).toHaveCount(15);
-  await page.locator('[name=contact-search]').fill('Анна');
-  await expect(page.getByTestId('ContactRow')).toHaveCount(1);
-  await page.getByTestId('ContactRow').click();
+  await page.goto('/debts');
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
+  await page.locator('[name=debt-search]').fill('Анна');
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(1);
+  await page.getByTestId('DebtPerson').click();
   await page.getByTestId('ContactDetails').getByRole('button', { name: 'Редактировать', exact: true }).click();
   await expect(page.getByTestId('ContactGrammaticalForm')).toHaveValue('');
   await page.getByTestId('ContactGrammaticalForm').selectOption('feminine');
@@ -767,7 +831,7 @@ test('debt header actions and collapsible filters work alongside search', async 
   const filters = page.locator('#debt-filters');
   await expect(filters).not.toBeVisible();
   await expect(page.locator('.navigation-right-button').getByTestId('RecordDebt')).toBeVisible();
-  await expect(page.locator('.navigation-back-button').getByRole('link', { name: 'Контакты' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Контакты', exact: true })).toHaveCount(0);
   await filterButton.click();
   await filters.getByRole('button', { name: 'Я должен', exact: true }).click();
   await expect(page.getByTestId('DebtPerson')).toHaveCount(1);
@@ -779,8 +843,8 @@ test('debt header actions and collapsible filters work alongside search', async 
   await expect(page.getByTestId('DebtPerson')).toHaveCount(0);
   await page.locator('[name=debt-search]').fill('');
   await filterButton.click();
-  await filters.getByRole('button', { name: 'Все долги', exact: true }).click();
-  await expect(page.getByTestId('DebtPerson')).toHaveCount(3);
+  await filters.getByRole('button', { name: 'Все контакты', exact: true }).click();
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
   await filterButton.click();
   await expect(filterButton).not.toHaveClass(/active/);
   await page.screenshot({ path: testInfo.outputPath('debts-header-search-mobile.png') });
@@ -788,7 +852,9 @@ test('debt header actions and collapsible filters work alongside search', async 
   await expect(page.getByTestId('DebtPaymentForm')).toBeVisible();
   await page.getByTestId('PaymentContact').click();
   await expect(page.getByRole('heading', { name: 'Выбрать контакт', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Добавить контакт', exact: true })).toBeVisible();
+  await expect(
+    page.getByTestId('ContactPicker').getByRole('button', { name: 'Добавить контакт', exact: true }),
+  ).toBeVisible();
 });
 
 test('fully allocated debt operations use the default category while a personal portion requires a regular category', async ({
@@ -894,7 +960,7 @@ test('the main add entry form supports repayments in both directions and preserv
   await expect(page.locator('[name=debt-amount]')).toHaveValue('45');
   await page.getByTestId('SaveDebtPayment').click();
   await expect(form).not.toBeVisible();
-  await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Миша' })).toHaveCount(0);
+  await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Миша' })).toContainText('Рассчитались');
   await page.goto('/settings/import-export');
   await page.getByTestId('ShowExportTextAreaButton').click();
   const data = JSON.parse(await page.getByTestId('ExportTextArea').inputValue());

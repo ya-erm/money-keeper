@@ -36,6 +36,10 @@
 </Portal>
 
 <style>
+  /* iOS pins page headers at z-index 10. Nested screens must cover that header. */
+  :global(dialog.portal):has(> .sub-screen) {
+    z-index: 20;
+  }
   .sub-screen {
     height: 100%;
   }
