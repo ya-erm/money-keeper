@@ -91,8 +91,10 @@ export const debtRu = {
   'debts.existing_payment': 'Связать существующую операцию',
   'debts.select_payment': 'Выбрать операцию',
   'debts.payment_required': 'Выберите операцию.',
+  'debts.operation_currency_unavailable':
+    'В операции нет суммы в этой валюте. Выберите валюту счёта или укажите сумму покупки в другой валюте в самой операции.',
   'debts.payment': 'Операция',
-  'debts.no_payments': 'Нет подходящих операций в этой валюте и направлении.',
+  'debts.no_payments': 'Нет доступных операций для привязки.',
   'debts.remove_record': 'Удалить запись',
   'debts.delete_confirm': 'Удалить запись долга? Остаток будет пересчитан.',
   'debts.delete_payment': 'Удаление операции также удалит её долговые доли и пересчитает остатки. Продолжить?',
@@ -200,8 +202,10 @@ export const debtEn: Record<DebtMessage, string> = {
   'debts.existing_payment': 'Link existing operation',
   'debts.select_payment': 'Select operation',
   'debts.payment_required': 'Select an operation.',
+  'debts.operation_currency_unavailable':
+    'This operation has no amount in that currency. Select its account currency or add the purchase amount in the other currency to the operation.',
   'debts.payment': 'Operation',
-  'debts.no_payments': 'No eligible operations with this currency and direction.',
+  'debts.no_payments': 'No operations available to link.',
   'debts.remove_record': 'Delete entry',
   'debts.delete_confirm': 'Delete this debt entry? The balance will be recalculated.',
   'debts.delete_payment':

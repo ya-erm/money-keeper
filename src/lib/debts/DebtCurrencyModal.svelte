@@ -4,6 +4,8 @@
   import Tags from '@ya-erm/svelte-ui/Tags';
   import { operationsStore } from '#lib/data/operations.js';
   import { debtRecordsStore } from '#lib/data/debts.js';
+  import { membersService, memberSettingsStore } from '#lib/data/members.js';
+  import { handleError } from '#lib/utils/handleError.js';
   import Modal from '#lib/ui/Modal.svelte';
   import { translate } from '#lib/translate/index.js';
 
@@ -13,6 +15,7 @@
   export let onClose: () => void;
   let opened = true;
   let value = currency;
+  let saving = false;
   $: recent = [
     ...$operationsStore.map((operation) => ({
       date: operation.date,
@@ -25,21 +28,32 @@
     ...$debtRecordsStore.map((record) => ({ date: record.date, currencies: [record.currency] })),
   ].sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
   $: currencies = [
-    ...new Set([...suggestions, ...recent.flatMap((item) => item.currencies)].filter((item): item is string => !!item)),
+    ...new Set(
+      [$memberSettingsStore?.lastDebtCurrency, ...suggestions, ...recent.flatMap((item) => item.currencies)].filter(
+        (item): item is string => !!item,
+      ),
+    ),
   ]
     .slice(0, 6)
     .map((id) => ({ id, title: id }));
+  async function save() {
+    if (saving) return;
+    saving = true;
+    try {
+      const nextCurrency = value.trim().toUpperCase();
+      await membersService.updateSettings({ lastDebtCurrency: nextCurrency });
+      onSelect(nextCurrency);
+      onClose();
+    } catch (error) {
+      handleError(error);
+    } finally {
+      saving = false;
+    }
+  }
 </script>
 
 <Modal bind:opened on:close={onClose} header={$translate('debts.currency')} width={18}>
-  <form
-    class="flex-col gap-1"
-    data-testId="DebtCurrencyForm"
-    on:submit|preventDefault|stopPropagation={() => {
-      onSelect(value.trim().toUpperCase());
-      onClose();
-    }}
-  >
+  <form class="flex-col gap-1" data-testId="DebtCurrencyForm" on:submit|preventDefault|stopPropagation={save}>
     <Input
       name="debt-currency"
       bind:value
@@ -53,8 +67,14 @@
         <Tags tags={currencies} selected={[]} readOnly onChange={(id) => (value = id)} />
       </div>{/if}
     <div class="grid-col-2 gap-1">
-      <Button color="secondary" text={$translate('common.cancel')} onClick={onClose} testId="CancelDebtCurrency" />
-      <Button type="submit" text={$translate('common.save')} testId="SaveDebtCurrency" />
+      <Button
+        color="secondary"
+        text={$translate('common.cancel')}
+        onClick={onClose}
+        disabled={saving}
+        testId="CancelDebtCurrency"
+      />
+      <Button type="submit" text={$translate('common.save')} disabled={saving} testId="SaveDebtCurrency" />
     </div>
   </form>
 </Modal>

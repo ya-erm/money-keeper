@@ -9,19 +9,21 @@
   import { categoriesStore, SYSTEM_CATEGORY_DEBT_IN, SYSTEM_CATEGORY_DEBT_OUT } from '#lib/data/categories.js';
   import type { Messages } from '#lib/translate/messages.js';
   import { debtEntriesStore, debtRecordsService } from '#lib/data/debts.js';
-  import { memberSettingsStore } from '#lib/data/members.js';
+  import { memberSettingsStore, membersService } from '#lib/data/members.js';
   import { operationsService, operationsStore } from '#lib/data/operations.js';
-  import type { DebtContact, DebtRecord, Transaction } from '#lib/data/interfaces.js';
+  import type { DebtContact, DebtRecord, Transaction, TransactionViewModel } from '#lib/data/interfaces.js';
   import { translate } from '#lib/translate/index.js';
   import SubScreen from '#lib/ui/layout/SubScreen.svelte';
   import { formatDebtMoney as formatMoney } from './formatMoney';
-  import { contactBalances, currencyPrecision, fromMinor, isValidMoney, toMinor } from './calculations';
+  import { contactBalances, currencyPrecision, fromMinor, isValidMoney, toMinor, validateDebt } from './calculations';
+  import { handleError } from '#lib/utils/handleError.js';
   import ContactPicker from './ContactPicker.svelte';
   import DeleteDebtModal from './DeleteDebtModal.svelte';
   import { debtDirectionMessage, repaymentDirectionMessage } from './grammar';
   import AccountSelector from '../../routes/transactions/form/AccountSelector.svelte';
   import TransactionListItem from '../../routes/transactions/TransactionListItem.svelte';
   import DebtOperationPicker from './DebtOperationPicker.svelte';
+  import DebtCurrencyModal from './DebtCurrencyModal.svelte';
 
   export let contact: DebtContact | null = null;
   export let repayment = false;
@@ -30,7 +32,13 @@
   export let onClose: () => void;
   repayment = record?.kind === 'repayment' || repayment;
   let entryType = repayment ? 'repayment' : 'debt';
-  let currency = record?.currency ?? (initialCurrency || $memberSettingsStore?.currency || 'EUR');
+  let currency =
+    record?.currency ??
+    (initialCurrency ||
+      $memberSettingsStore?.lastDebtCurrency ||
+      $debtEntriesStore[0]?.currency ||
+      $memberSettingsStore?.currency ||
+      'EUR');
   $: currency = currency.trim().toUpperCase();
   let amount = record
     ? String(Math.abs(record.amount))
@@ -49,8 +57,10 @@
   let comment = record?.comment ?? '';
   const dueDate = record?.dueDate ?? '';
   let accountId = '';
+  let paymentDirection: 'IN' | 'OUT' = 'OUT';
   let selectingAccount = false;
   let selectingOperation = false;
+  let selectingCurrency = false;
   let categoryId = '';
   let operationId = '';
   let picking = false;
@@ -80,8 +90,6 @@
       !operation.linkedTransactionId &&
       !operation.repeatingId &&
       !operation.category.system &&
-      operation.account.currency === currency &&
-      operation.category.type === paymentDirection &&
       new Date(operation.date) <= new Date(),
   );
   $: defaultCategory = paymentDirection === 'IN' ? SYSTEM_CATEGORY_DEBT_IN : SYSTEM_CATEGORY_DEBT_OUT;
@@ -100,6 +108,37 @@
     }
     operationId = '';
     error = '';
+  }
+
+  async function rememberCurrency(value: string) {
+    if ($memberSettingsStore?.lastDebtCurrency !== value) {
+      await membersService.updateSettings({ lastDebtCurrency: value });
+    }
+  }
+
+  async function selectOperation(operation: TransactionViewModel) {
+    try {
+      await rememberCurrency(operation.account.currency);
+      operationId = operation.id;
+      currency = operation.account.currency;
+      amount = String(operation.amount);
+      accountId = operation.accountId;
+      direction = operation.category.type === (repayment ? 'IN' : 'OUT') ? 'receivable' : 'payable';
+      selectingOperation = false;
+      error = '';
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
+  function changeCurrency(value: string) {
+    currency = value;
+    error = '';
+    if (repayment && !record && contact && !selectedOperation) {
+      const selectedBalance = contactBalances($debtEntriesStore, contact.id)[currency] ?? 0;
+      direction = selectedBalance < 0 ? 'payable' : 'receivable';
+      amount = String(Math.abs(selectedBalance));
+    }
   }
 
   async function save() {
@@ -130,20 +169,13 @@
       error = $translate('debts.payment_required');
       return;
     }
-    if (
-      method === 'existing' &&
-      selectedOperation &&
-      toMinor(value, currency) > toMinor(selectedOperation.amount, currency)
-    ) {
-      error = $translate('debts.too_much');
-      return;
-    }
     if (method === 'new' && !accountId) {
       error = $translate('debts.no_account');
       return;
     }
     saving = true;
     try {
+      await rememberCurrency(currency);
       const recordedAt =
         record && dayjs(record.date).format('YYYY-MM-DD') === date
           ? record.date
@@ -164,7 +196,15 @@
       } else {
         const debt = {
           kind: repayment ? ('repayment' as const) : ('loan' as const),
-          shares: [{ contactId: contact.id, amount: value }],
+          shares: [
+            {
+              contactId: contact.id,
+              amount: value,
+              ...(method === 'existing' && selectedOperation && currency !== selectedOperation.account.currency
+                ? { currency }
+                : {}),
+            },
+          ],
           ...(dueDate ? { dueDate } : {}),
         };
         const operation: Transaction =
@@ -179,6 +219,24 @@
                 comment: comment.trim(),
                 debt,
               };
+        const operationAccount =
+          method === 'existing' && selectedOperation
+            ? selectedOperation.account
+            : accounts.find((account) => account.id === accountId);
+        const validation = operationAccount
+          ? validateDebt(
+              operation,
+              operationAccount.currency,
+              method === 'existing' && selectedOperation ? selectedOperation.category.type : paymentDirection,
+              [contact],
+            )
+          : 'invalid';
+        if (validation) {
+          error = $translate(
+            validation === 'personal_required' ? 'debts.operation_currency_unavailable' : `debts.${validation}`,
+          );
+          return;
+        }
         await operationsService.save(operation);
       }
       onClose();
@@ -255,23 +313,19 @@
         step={10 ** -currencyPrecision(currency)}
         required
       />
-      <Input
-        label={$translate('accounts.currency')}
-        name="currency"
-        bind:value={currency}
-        readonly={!!record}
-        onChange={(value) => {
-          currency = value.trim().toUpperCase();
-          if (repayment && !record && contact) {
-            const selectedBalance = contactBalances($debtEntriesStore, contact.id)[currency] ?? 0;
-            direction = selectedBalance < 0 ? 'payable' : 'receivable';
-            amount = String(Math.abs(selectedBalance));
-            operationId = '';
-          }
-        }}
-        maxlength={3}
-        required
-      />
+      <div class="field">
+        <InputLabel text={$translate('accounts.currency')} />
+        <button
+          type="button"
+          class="currency-button"
+          data-testId="DebtCurrencyButton"
+          disabled={!!record}
+          aria-label={`${$translate('accounts.currency')}: ${currency}`}
+          on:click={() => (selectingCurrency = true)}
+        >
+          <span>{currency}</span>{#if !record}<Icon name="mdi:chevron-down" size={1.1} />{/if}
+        </button>
+      </div>
     </div>
     {#if !record}
       <label class="field"
@@ -339,11 +393,16 @@
     operations={candidates}
     selectedId={operationId}
     onClose={() => (selectingOperation = false)}
-    onSelect={(operation) => {
-      operationId = operation.id;
-      selectingOperation = false;
-      error = '';
-    }}
+    onSelect={selectOperation}
+  />{/if}
+{#if selectingCurrency}<DebtCurrencyModal
+    {currency}
+    suggestions={[
+      currency,
+      ...(selectedOperation ? [selectedOperation.account.currency, selectedOperation.anotherCurrency ?? ''] : []),
+    ]}
+    onSelect={changeCurrency}
+    onClose={() => (selectingCurrency = false)}
   />{/if}
 <DeleteDebtModal
   bind:opened={deleteOpened}
@@ -367,6 +426,25 @@
   />{/if}
 
 <style>
+  .currency-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    font: inherit;
+    color: var(--active-color);
+    background: var(--header-background-color);
+    cursor: pointer;
+  }
+  .currency-button:disabled {
+    color: var(--primary-text-color);
+    cursor: default;
+  }
   .selected-operation {
     list-style: none;
     margin: 0;

@@ -33,6 +33,7 @@ export type MemberSettings = {
   categoriesInOrder?: string[];
   categoriesOutOrder?: string[];
   lastAnotherCurrency?: string | null;
+  lastDebtCurrency?: string | null;
   favoriteTimeZones?: string[];
   groupingId?: string | null;
   knownPlaces?: KnownPlace[];

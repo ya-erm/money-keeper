@@ -1,7 +1,15 @@
 import { test, expect } from '@tests/fixtures';
 import { importMockDataAsync } from '@tests/helpers';
+import type { Page } from '@playwright/test';
 
 test.use({ locale: 'ru-RU' });
+
+async function setDebtCurrency(page: Page, currency: string) {
+  await page.getByTestId('DebtCurrencyButton').click();
+  await page.locator('[name=debt-currency]').fill(currency);
+  await page.getByTestId('SaveDebtCurrency').click();
+  await expect(page.getByTestId('DebtCurrencyForm')).not.toBeVisible();
+}
 
 const backup = JSON.stringify({
   categories: [
@@ -194,7 +202,7 @@ test('new loan and manual debt can be saved offline and survive reload', async (
   await page.locator('input[name=contact-search]').fill('Анна');
   await page.getByTestId('PickContact').click();
   await page.locator('input[name=debt-amount]').fill('25');
-  await page.locator('input[name=currency]').fill('EUR');
+  await setDebtCurrency(page, 'EUR');
   await page.getByTestId('DebtPaymentMethod').selectOption('new');
   await page.getByTestId('SaveDebtPayment').click();
   await expect(page.getByTestId('DebtPaymentForm')).not.toBeVisible();
@@ -204,7 +212,7 @@ test('new loan and manual debt can be saved offline and survive reload', async (
   await page.locator('input[name=contact-search]').fill('Максим');
   await page.getByTestId('PickContact').click();
   await page.locator('input[name=debt-amount]').fill('10');
-  await page.locator('input[name=currency]').fill('RSD');
+  await setDebtCurrency(page, 'RSD');
   await page.getByTestId('SaveDebtPayment').click();
   await expect(page.getByTestId('DebtPaymentForm')).not.toBeVisible();
   await page.context().setOffline(false);
@@ -861,7 +869,7 @@ test('the main add entry form supports repayments in both directions and preserv
   await page.getByTestId('PaymentContact').click();
   await page.locator('[name=contact-search]').fill('Анна');
   await page.getByTestId('PickContact').click();
-  await page.locator('[name=currency]').fill('EUR');
+  await setDebtCurrency(page, 'EUR');
   await expect(page.locator('[name=debt-amount]')).toHaveValue('35');
   await expect(page.getByTestId('DebtDirection')).toHaveValue('receivable');
   await expect(page.getByTestId('DebtDirection').locator('option:checked')).toHaveText('Они вернули');
@@ -879,7 +887,7 @@ test('the main add entry form supports repayments in both directions and preserv
   await page.getByTestId('PaymentContact').click();
   await page.locator('[name=contact-search]').fill('Миша');
   await page.getByTestId('PickContact').click();
-  await page.locator('[name=currency]').fill('EUR');
+  await setDebtCurrency(page, 'EUR');
   await page.getByTestId('DebtEntryType').selectOption('repayment');
   await expect(page.getByTestId('DebtDirection')).toHaveValue('payable');
   await expect(page.getByTestId('DebtDirection').locator('option:checked')).toHaveText('Я вернул');
@@ -924,7 +932,7 @@ test('the shared account picker shows balances, filters by currency and excludes
   await page.getByTestId('PaymentContact').click();
   await page.locator('[name=contact-search]').fill('Максим');
   await page.getByTestId('PickContact').click();
-  await page.locator('[name=currency]').fill('EUR');
+  await setDebtCurrency(page, 'EUR');
   await page.locator('[name=debt-amount]').fill('10');
   await page.locator('[name=comment]').fill('Выбор счёта');
   await page.getByTestId('DebtPaymentMethod').selectOption('new');
@@ -988,7 +996,7 @@ test('existing payment selection searches all eligible operations and links the 
       categoryId: 'food',
       date: '2026-11-15T10:00:00Z',
       amount: 10,
-      comment: 'Недоступно: расход',
+      comment: 'Расход в другом направлении',
     },
     {
       id: 'wrong-currency',
@@ -996,7 +1004,7 @@ test('existing payment selection searches all eligible operations and links the 
       categoryId: 'income',
       date: '2026-11-15T10:00:00Z',
       amount: 10,
-      comment: 'Недоступно: валюта',
+      comment: 'Доход в RSD',
     },
     {
       id: 'future-candidate',
@@ -1039,6 +1047,8 @@ test('existing payment selection searches all eligible operations and links the 
   await picker.getByTestId('TransactionListItem').click();
   await expect(picker).not.toBeVisible();
   await expect(page.getByTestId('SelectedDebtPayment')).toContainText('Возврат за мороженое');
+  await expect(page.locator('[name=debt-amount]')).toHaveValue('10');
+  await page.locator('[name=debt-amount]').fill('5');
   await page.getByTestId('SelectedDebtPayment').getByTestId('TransactionListItem').click();
   await expect(picker).toBeVisible();
   await picker.getByRole('button', { name: 'Назад', exact: true }).click();
@@ -1055,4 +1065,133 @@ test('existing payment selection searches all eligible operations and links the 
   ]);
   await page.goto('/debts');
   await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Анна' })).toContainText('30');
+});
+
+test('debt currency is chosen in a modal and the last choice survives cancellation and reload', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/debts');
+  await page.getByTestId('RecordDebt').click();
+  await expect(page.getByTestId('DebtCurrencyButton')).toHaveText('EUR');
+  await page.getByTestId('DebtCurrencyButton').click();
+  await expect(page.getByTestId('RecentDebtCurrencies')).toContainText('EUR');
+  await page.locator('[name=debt-currency]').fill('RSD');
+  await expect(page.locator('.modal-background')).toHaveCSS('opacity', '1');
+  await page.screenshot({ path: testInfo.outputPath('debt-entry-currency-modal-mobile.png') });
+  await page.getByTestId('SaveDebtCurrency').click();
+  await expect(page.getByTestId('DebtCurrencyButton')).toHaveText('RSD');
+  await page.getByTestId('DebtCurrencyButton').click();
+  await page.locator('[name=debt-currency]').fill('USD');
+  await page.getByTestId('CancelDebtCurrency').click();
+  await expect(page.getByTestId('DebtCurrencyButton')).toHaveText('RSD');
+  await page.getByTestId('DebtPaymentForm').getByRole('button', { name: 'Назад', exact: true }).click();
+  await page.reload();
+  await page.getByTestId('RecordDebt').click();
+  await expect(page.getByTestId('DebtCurrencyButton')).toHaveText('RSD');
+  await page.getByTestId('DebtCurrencyButton').click();
+  await expect(page.getByTestId('RecentDebtCurrencies')).toContainText('RSD');
+});
+
+test('choosing an existing operation fills currency, amount and direction across currencies without duplicates', async ({
+  page,
+}, testInfo) => {
+  const data = JSON.parse(backup);
+  data.accounts.push({ id: 'rsd-card', name: 'Карта RSD', currency: 'RSD' });
+  data.operations.push({
+    id: 'rsd-expense',
+    accountId: 'rsd-card',
+    categoryId: 'food',
+    amount: 238,
+    date: '2026-11-14T14:00:00Z',
+    comment: 'Покупка в RSD',
+    anotherCurrency: 'EUR',
+    anotherCurrencyAmount: 2,
+  });
+  await importMockDataAsync(page, JSON.stringify(data));
+  await page.goto('/debts');
+  await page.getByTestId('RecordDebt').click();
+  await setDebtCurrency(page, 'USD');
+  await page.getByTestId('PaymentContact').click();
+  await page.locator('[name=contact-search]').fill('Анна');
+  await page.getByTestId('PickContact').click();
+  await page.getByTestId('DebtPaymentMethod').selectOption('existing');
+  await page.getByTestId('ExistingDebtPayment').click();
+  await page.getByTestId('DebtOperationPicker').locator('[name=debt-operation-search]').fill('Покупка в RSD');
+  await page.getByTestId('DebtOperationPicker').getByTestId('TransactionListItem').click();
+  await expect(page.getByTestId('DebtCurrencyButton')).toHaveText('RSD');
+  await expect(page.locator('[name=debt-amount]')).toHaveValue('238');
+  await expect(page.getByTestId('DebtDirection')).toHaveValue('receivable');
+  await page.screenshot({ path: testInfo.outputPath('debt-operation-autofill-mobile.png') });
+  await page.getByTestId('DebtPaymentForm').getByRole('button', { name: 'Назад', exact: true }).click();
+  await page.getByTestId('RecordDebt').click();
+  await expect(page.getByTestId('DebtCurrencyButton')).toHaveText('RSD');
+  await page.getByTestId('PaymentContact').click();
+  await page.locator('[name=contact-search]').fill('Анна');
+  await page.getByTestId('PickContact').click();
+  await page.getByTestId('DebtEntryType').selectOption('repayment');
+  await page.getByTestId('DebtPaymentMethod').selectOption('existing');
+  await page.getByTestId('ExistingDebtPayment').click();
+  await page.getByTestId('DebtOperationPicker').locator('[name=debt-operation-search]').fill('Перевод от Анны');
+  await page.getByTestId('DebtOperationPicker').getByTestId('TransactionListItem').click();
+  await expect(page.getByTestId('DebtCurrencyButton')).toHaveText('EUR');
+  await expect(page.locator('[name=debt-amount]')).toHaveValue('20');
+  await expect(page.getByTestId('DebtDirection')).toHaveValue('receivable');
+  await page.getByTestId('SaveDebtPayment').click();
+  await expect(page.getByTestId('DebtPaymentForm')).not.toBeVisible();
+  await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Анна' })).toContainText('15');
+  await page.goto('/settings/import-export');
+  await page.getByTestId('ShowExportTextAreaButton').click();
+  const exported = JSON.parse(await page.getByTestId('ExportTextArea').inputValue());
+  expect(exported.operations).toHaveLength(data.operations.length);
+  expect(exported.operations.find((operation: { id: string }) => operation.id === 'rsd-expense').debt).toBeUndefined();
+  expect(exported.operations.find((operation: { id: string }) => operation.id === 'bank-return').debt.shares).toEqual([
+    { contactId: 'anna', amount: 20 },
+  ]);
+});
+
+test('a linked foreign-currency debt uses the operation exchange amounts for personal analytics', async ({ page }) => {
+  await importMockDataAsync(
+    page,
+    JSON.stringify({
+      accounts: [{ id: 'rsd-card', name: 'Карта RSD', currency: 'RSD' }],
+      operations: [
+        {
+          id: 'icecream',
+          accountId: 'rsd-card',
+          categoryId: 'food',
+          amount: 238,
+          anotherCurrency: 'EUR',
+          anotherCurrencyAmount: 2,
+          date: '2026-11-14T12:00:00Z',
+          comment: 'Мороженое в RSD',
+        },
+      ],
+    }),
+  );
+  await page.goto('/debts');
+  await page.getByTestId('RecordDebt').click();
+  await page.getByTestId('PaymentContact').click();
+  await page.locator('[name=contact-search]').fill('Анна');
+  await page.getByTestId('PickContact').click();
+  await page.getByTestId('DebtPaymentMethod').selectOption('existing');
+  await page.getByTestId('ExistingDebtPayment').click();
+  await page.getByTestId('DebtOperationPicker').locator('[name=debt-operation-search]').fill('Мороженое');
+  await page.getByTestId('DebtOperationPicker').getByTestId('TransactionListItem').click();
+  await setDebtCurrency(page, 'USD');
+  await page.locator('[name=debt-amount]').fill('1');
+  await page.getByTestId('SaveDebtPayment').click();
+  await expect(page.getByTestId('DebtPaymentForm').getByRole('alert')).toContainText(
+    'В операции нет суммы в этой валюте',
+  );
+  await setDebtCurrency(page, 'EUR');
+  await page.getByTestId('SaveDebtPayment').click();
+  await expect(page.getByTestId('DebtPaymentForm')).not.toBeVisible();
+  await page.goto('/settings/import-export');
+  await page.getByTestId('ShowExportTextAreaButton').click();
+  const exported = JSON.parse(await page.getByTestId('ExportTextArea').inputValue());
+  const operation = exported.operations.find((operation: { id: string }) => operation.id === 'icecream');
+  expect(operation.amount).toBe(238);
+  expect(operation.debt.shares).toEqual([{ contactId: 'anna', amount: 1, currency: 'EUR' }]);
+  await page.goto('/debts');
+  await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Анна' })).toContainText('36');
 });

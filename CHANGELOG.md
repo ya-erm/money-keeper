@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.35.1 - 2026-11-16
+
+### Improved
+
+- Debt entries remember the last used currency for the current workspace and offer a currency button with input and recent suggestions.
+- Existing payments can be selected across currencies and directions; selection fills the debt amount, currency and direction. Partial amounts remain editable, and linking preserves the original payment.
+
 ## 2.35.0 - 2026-11-15
 
 ### Added
