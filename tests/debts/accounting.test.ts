@@ -201,6 +201,14 @@ test('browser back closes one nested debt screen at a time and preserves the par
   await expect(page.getByTestId('DebtPaymentForm')).not.toBeVisible();
   await page.goBack();
   await expect(page).toHaveURL(/\/accounts(?:\?|$)/);
+  await page.getByRole('link', { name: 'Долги', exact: true }).click();
+  await page.getByTestId('DebtPerson').filter({ hasText: 'Анна' }).click();
+  await expect(page).toHaveURL(/contact-id=anna/);
+  await page.reload();
+  await page.getByTestId('ContactDetails').getByRole('button', { name: 'Назад', exact: true }).click();
+  await expect(page).toHaveURL(/\/debts$/);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/accounts(?:\?|$)/);
 });
 
 test('routed operation editors keep a single back step while participant selection has its own step', async ({
@@ -588,6 +596,11 @@ test('manual debt deletion uses the app modal and supports cancellation', async 
   await expect(page.getByTestId('DebtDeleteConfirm')).toBeVisible();
   await expect(page.locator('.modal-background')).toHaveCSS('opacity', '1');
   await page.screenshot({ path: testInfo.outputPath('delete-debt-modal-mobile.png') });
+  await page.goBack();
+  await expect(page.getByTestId('DebtDeleteConfirm')).not.toBeVisible();
+  await expect(page.getByTestId('DebtPaymentForm')).toBeVisible();
+  await page.getByTestId('DeleteDebtRecordButton').click();
+  await expect(page.getByTestId('DebtDeleteConfirm')).toBeVisible();
   await page.getByTestId('CancelDebtDeletion').click();
   await expect(page.getByTestId('DebtDeleteConfirm')).not.toBeVisible();
   await expect(page.getByTestId('DebtPaymentForm')).toBeVisible();

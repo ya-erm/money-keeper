@@ -7,6 +7,7 @@
 declare namespace App {
   interface PageState {
     subScreens?: string[];
+    debtContactFromList?: boolean;
   }
   interface Locals {
     // userId: number | null;

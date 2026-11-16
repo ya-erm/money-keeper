@@ -22,8 +22,16 @@
   let filter: 'all' | 'in' | 'out' | 'settled' | 'archived' = 'all';
   let query = '';
   $: detailId = getSearchParam($page, 'contact-id');
-  const openContact = (id: string) => void setSearchParam($page, 'contact-id', id, { replace: false });
-  const closeContact = () => void deleteSearchParam($page, 'contact-id');
+  const openContact = (id: string) =>
+    void setSearchParam($page, 'contact-id', id, {
+      replace: false,
+      state: { debtContactFromList: true },
+      persistState: true,
+    });
+  const closeContact = () => {
+    if ($page.state.debtContactFromList) history.back();
+    else void deleteSearchParam($page, 'contact-id');
+  };
   let creating = false;
   let limit = 20;
   let filtersOpened = false;

@@ -6,6 +6,7 @@
 
   export let opened = false;
   export let linkedOperation = false;
+  export let manageHistory = false;
   export let onDelete: () => void | Promise<void> = () => {};
   let deleting = false;
   async function confirmDelete() {
@@ -22,7 +23,7 @@
   }
 </script>
 
-<Modal bind:opened header={$translate('common.delete')} width={22} manageHistory>
+<Modal bind:opened header={$translate('common.delete')} width={22} {manageHistory}>
   <div data-testId="DebtDeleteConfirm">
     <p class="message">{$translate(linkedOperation ? 'debts.delete_payment' : 'debts.delete_confirm')}</p>
     <div class="grid-col-2 gap-1">

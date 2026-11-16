@@ -405,6 +405,7 @@
     onClose={() => (selectingCurrency = false)}
   />{/if}
 <DeleteDebtModal
+  manageHistory
   bind:opened={deleteOpened}
   onDelete={async () => {
     if (!record) return;
