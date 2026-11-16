@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.35.3 - 2026-11-16
+
+### Improved
+
+- The bottom action on Debts adds a debt entry. New contacts are added from the participant picker.
+- Debt filters use compact chips that fit within two rows on mobile.
+- Local nested screens add browser history steps, so the system back gesture returns to the parent screen without losing its draft. Routed operation editors retain their existing history step.
+
 ## 2.35.2 - 2026-11-16
 
 ### Improved

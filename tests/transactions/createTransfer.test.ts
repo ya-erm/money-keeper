@@ -66,7 +66,7 @@ test.describe('Transactions. Create. Transfer', () => {
     const comment = 'E2E transfer';
     await commentInput.fill(comment);
     await page.getByRole('heading', { level: 1, name: 'New operation' }).click();
-    await expect(page).toHaveScreenshot('1-transfer-form-filled.png', {
+    await expect.soft(page).toHaveScreenshot('1-transfer-form-filled.png', {
       maxDiffPixels: 30,
     });
 
@@ -76,7 +76,7 @@ test.describe('Transactions. Create. Transfer', () => {
     await assertTransactionVisibleAsync(page, comment);
 
     const transactionItem = page.getByTestId('TransactionListItem').filter({ hasText: comment });
-    await expect(page).toHaveScreenshot('2-transfer-created.png');
+    await expect.soft(page).toHaveScreenshot('2-transfer-created.png');
     await expect(transactionItem).toContainText('T_TST');
     await expect(transactionItem).toContainText('T_USD');
   });

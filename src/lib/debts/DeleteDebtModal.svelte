@@ -22,7 +22,7 @@
   }
 </script>
 
-<Modal bind:opened header={$translate('common.delete')} width={22}>
+<Modal bind:opened header={$translate('common.delete')} width={22} manageHistory>
   <div data-testId="DebtDeleteConfirm">
     <p class="message">{$translate(linkedOperation ? 'debts.delete_payment' : 'debts.delete_confirm')}</p>
     <div class="grid-col-2 gap-1">

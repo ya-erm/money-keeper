@@ -93,13 +93,17 @@ test('debts include all contacts and allow searching, renaming and adding withou
   await page.locator('input[name=debt-search]').fill('');
   await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
   await page.screenshot({ path: testInfo.outputPath('contacts-mobile.png') });
-  await page.getByTestId('AddContact').click();
+  await expect(page.getByTestId('AddContact')).toHaveCount(0);
+  await page.getByTestId('AddDebtEntry').click();
+  await expect(page.getByTestId('DebtPaymentForm')).toBeVisible();
+  await page.getByTestId('PaymentContact').click();
+  await page.locator('[name=contact-search]').fill('Новый контакт');
+  await page.getByTestId('PickerAddContact').click();
   await expect(page.getByTestId('ContactEditor')).toBeVisible();
-  await page.getByTestId('ContactEditor').getByRole('button', { name: 'Назад', exact: true }).click();
-  await page.getByTestId('AddContact').click();
-  await expect(page.getByTestId('ContactEditor')).toBeVisible();
-  await page.getByTestId('ContactForm').locator('[name=name]').fill('Новый контакт');
   await page.getByTestId('SaveContact').click();
+  await expect(page.getByTestId('ContactPicker')).not.toBeVisible();
+  await expect(page.getByTestId('PaymentContact')).toContainText('Новый контакт');
+  await page.getByTestId('DebtPaymentForm').getByRole('button', { name: 'Назад', exact: true }).click();
   await expect(page.getByTestId('DebtPerson')).toHaveCount(16);
   await page.goto('/debts/contacts');
   await expect(page).toHaveURL(/\/debts$/);
@@ -149,6 +153,70 @@ test('contact history owns its header, retains navigation and opens editors abov
   await expect(page).toHaveURL(/\/accounts(?:\?|$)/);
   await page.getByRole('link', { name: 'Долги', exact: true }).click();
   await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
+});
+
+test('browser back closes one nested debt screen at a time and preserves the parent draft', async ({ page }) => {
+  await page.goto('/accounts');
+  await page.getByRole('link', { name: 'Долги', exact: true }).click();
+  await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
+  const historyLength = await page.evaluate(() => history.length);
+  await page.getByTestId('AddDebtEntry').click();
+  await page.locator('[name=debt-amount]').fill('17');
+  await page.getByTestId('PaymentContact').click();
+  await page.getByTestId('PickerAddContact').click();
+  await page.getByTestId('ContactForm').locator('[name=name]').fill('Черновик контакта');
+  await expect.poll(() => page.evaluate(() => history.length)).toBe(historyLength + 3);
+  await page.goBack();
+  await expect(page.getByTestId('ContactEditor')).not.toBeVisible();
+  await expect(page.getByTestId('ContactPicker')).toBeVisible();
+  await page.goBack();
+  await expect(page.getByTestId('ContactPicker')).not.toBeVisible();
+  await expect(page.locator('[name=debt-amount]')).toHaveValue('17');
+  await page.getByTestId('PaymentContact').click();
+  await page.getByTestId('PickContact').filter({ hasText: 'Анна' }).click();
+  await expect(page.getByTestId('ContactPicker')).not.toBeVisible();
+  await expect(page.getByTestId('PaymentContact')).toContainText('Анна');
+  await page.getByTestId('DebtCurrencyButton').click();
+  await page.locator('[name=debt-currency]').fill('USD');
+  await page.goBack();
+  await expect(page.getByTestId('DebtCurrencyForm')).not.toBeVisible();
+  await expect(page.getByTestId('DebtCurrencyButton')).toHaveText('EUR');
+  await page.getByTestId('DebtPaymentMethod').selectOption('new');
+  await page.getByTestId('DebtAccount').getByRole('button', { name: 'Карта EUR', exact: true }).click();
+  await expect(page.getByTestId('DebtAccount.Portal')).toBeVisible();
+  await page.goBack();
+  await expect(page.getByTestId('DebtAccount.Portal')).not.toBeVisible();
+  await page.getByTestId('DebtPaymentMethod').selectOption('existing');
+  await page.getByTestId('ExistingDebtPayment').click();
+  await expect(page.getByTestId('DebtOperationPicker')).toBeVisible();
+  await page.goBack();
+  await expect(page.getByTestId('DebtOperationPicker')).not.toBeVisible();
+  await expect(page.locator('[name=debt-amount]')).toHaveValue('17');
+  await page.goBack();
+  await expect(page.getByTestId('DebtPaymentForm')).not.toBeVisible();
+  await expect(page.getByTestId('AddDebtEntry')).toBeVisible();
+  await page.getByTestId('AddDebtEntry').click();
+  await expect(page.getByTestId('DebtPaymentForm')).toBeVisible();
+  await page.getByTestId('DebtPaymentForm').getByRole('button', { name: 'Назад', exact: true }).click();
+  await expect(page.getByTestId('DebtPaymentForm')).not.toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/accounts(?:\?|$)/);
+});
+
+test('routed operation editors keep a single back step while participant selection has its own step', async ({
+  page,
+}) => {
+  await page.goto('/transactions');
+  await page.getByTestId('TransactionListItem').filter({ hasText: 'Ужин с друзьями' }).click();
+  await expect(page).toHaveURL(/operation-id=dinner/);
+  await page.getByTestId('AddDebtParticipant').click();
+  await expect(page.getByTestId('ContactPicker')).toBeVisible();
+  await page.goBack();
+  await expect(page.getByTestId('ContactPicker')).not.toBeVisible();
+  await expect(page.getByTestId('SaveTransactionButton')).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/transactions$/);
+  await expect(page.getByTestId('SaveTransactionButton')).not.toBeVisible();
 });
 
 test('editing an expense and linking an existing repayment updates debt and personal analytics', async ({
@@ -833,6 +901,15 @@ test('debt header actions and collapsible filters work alongside search', async 
   await expect(page.locator('.navigation-right-button').getByTestId('RecordDebt')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Контакты', exact: true })).toHaveCount(0);
   await filterButton.click();
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    const bounds = await filters.evaluate((element) => ({
+      height: element.getBoundingClientRect().height,
+      rowHeight: element.querySelector('button')?.getBoundingClientRect().height ?? 0,
+    }));
+    expect(bounds.height).toBeLessThanOrEqual(bounds.rowHeight * 2 + 8);
+  }
+  await page.screenshot({ path: testInfo.outputPath('debt-compact-filters-mobile.png') });
   await filters.getByRole('button', { name: 'Я должен', exact: true }).click();
   await expect(page.getByTestId('DebtPerson')).toHaveCount(1);
   await expect(page.getByTestId('DebtPerson')).toContainText('Миша');

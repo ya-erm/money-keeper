@@ -61,6 +61,7 @@
 </ShowMoreContainer>
 
 {#if !onSelect}<SubScreen
+    manageHistory={false}
     visible={!inlineDetails && operationId !== null}
     title={$translate('transactions.edit_transaction')}
     onBack={closeOperationForm}

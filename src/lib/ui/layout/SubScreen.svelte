@@ -4,6 +4,7 @@
   import Portal from '@ya-erm/svelte-ui/Portal';
 
   import Layout from './Layout.svelte';
+  import { subScreenHistory } from './subScreenHistory';
 
   /**
    * Nested screen opened on top of the current page.
@@ -17,6 +18,8 @@
   export let testId: string = 'Portal';
   /** Panel width on wide screens */
   export let width: string = '40rem';
+  /** Disable when the caller already opens this screen through route navigation. */
+  export let manageHistory = true;
 
   const handleKeydown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -28,7 +31,12 @@
 
 <Portal {visible} {testId}>
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="sub-screen" style:--panel-width={width} on:keydown={handleKeydown}>
+  <div
+    class="sub-screen"
+    style:--panel-width={width}
+    on:keydown={handleKeydown}
+    use:subScreenHistory={manageHistory ? onBack : null}
+  >
     <Layout {title} {onBack} {rightSlot} {rightSlotProps} hideMenu panel>
       <slot />
     </Layout>

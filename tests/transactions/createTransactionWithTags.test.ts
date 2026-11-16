@@ -35,7 +35,7 @@ test.describe('Transactions with tags', () => {
     await tagButton.click();
     await page.getByRole('heading', { level: 1, name: 'New operation' }).click();
     await page.getByTestId('TransactionForm').evaluate((form) => form.scrollIntoView({ block: 'start' }));
-    await expect(page).toHaveScreenshot('1-transaction-tag-selected.png', {
+    await expect.soft(page).toHaveScreenshot('1-transaction-tag-selected.png', {
       maxDiffPixels: 30,
     });
 
@@ -46,7 +46,7 @@ test.describe('Transactions with tags', () => {
     await assertTransactionVisibleAsync(page, comment);
 
     const transactionItem = page.getByTestId('TransactionListItem').filter({ hasText: comment });
-    await expect(page).toHaveScreenshot('2-transaction-with-tag-created.png');
+    await expect.soft(page).toHaveScreenshot('2-transaction-with-tag-created.png');
     const tag = transactionItem.getByText(`#${tagName}`);
 
     await tag.waitFor({ state: 'visible' });

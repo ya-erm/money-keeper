@@ -36,12 +36,12 @@ test.describe('Accounts > Create', () => {
     await currencyInput.fill('USD');
     await iconInput.fill('mdi:credit-card');
     await colorInput.fill('#cccccc');
-    await expect(page).toHaveScreenshot('1-account-create-form-filled.png');
+    await expect.soft(page).toHaveScreenshot('1-account-create-form-filled.png');
     await submitButton.click();
 
     await expect(form).toHaveCount(0);
     await expect(accountCardName.filter({ hasText: accountName })).toBeVisible();
-    await expect(page).toHaveScreenshot('2-account-created-card.png');
+    await expect.soft(page).toHaveScreenshot('2-account-created-card.png');
 
     await page.reload({ waitUntil: 'networkidle' });
 

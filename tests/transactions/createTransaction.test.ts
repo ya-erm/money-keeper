@@ -117,7 +117,7 @@ test.describe('Transactions > Create', () => {
       await commentInput.fill(comment);
       await page.getByRole('heading', { level: 1, name: 'New operation' }).click();
       await page.getByTestId('TransactionForm').evaluate((form) => form.scrollIntoView({ block: 'start' }));
-      await expect(page).toHaveScreenshot('1-incoming-transaction-form-filled.png', {
+      await expect.soft(page).toHaveScreenshot('1-incoming-transaction-form-filled.png', {
         maxDiffPixels: 30,
       });
 
@@ -127,7 +127,7 @@ test.describe('Transactions > Create', () => {
 
       const transactionListItem = page.getByTestId('TransactionListItem').filter({ hasText: comment });
       await transactionListItem.waitFor({ state: 'visible' });
-      await expect(page).toHaveScreenshot('2-incoming-transaction-created.png', {
+      await expect.soft(page).toHaveScreenshot('2-incoming-transaction-created.png', {
         maxDiffPixels: 1000,
       });
 
@@ -135,7 +135,7 @@ test.describe('Transactions > Create', () => {
       await transactionListItem.click();
 
       await page.waitForURL(new RegExp(`operation-id=${transactionId}`));
-      await expect(page).toHaveScreenshot('3-incoming-transaction-edit-opened.png', {
+      await expect.soft(page).toHaveScreenshot('3-incoming-transaction-edit-opened.png', {
         maxDiffPixels: 1000,
       });
 

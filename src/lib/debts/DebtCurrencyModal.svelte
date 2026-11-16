@@ -52,7 +52,7 @@
   }
 </script>
 
-<Modal bind:opened on:close={onClose} header={$translate('debts.currency')} width={18}>
+<Modal bind:opened on:close={onClose} header={$translate('debts.currency')} width={18} manageHistory>
   <form class="flex-col gap-1" data-testId="DebtCurrencyForm" on:submit|preventDefault|stopPropagation={save}>
     <Input
       name="debt-currency"

@@ -10,7 +10,6 @@
   import { contactBalances, fromMinor, toMinor } from '#lib/debts/calculations.js';
   import ContactDetails from '#lib/debts/ContactDetails.svelte';
   import DebtPaymentForm from '#lib/debts/DebtPaymentForm.svelte';
-  import ContactEditor from '#lib/debts/ContactEditor.svelte';
   import { page } from '#lib/page.js';
   import { getSearchParam, setSearchParam, deleteSearchParam } from '#lib/utils/getSearchParam.js';
   import { debtDirectionMessage } from '#lib/debts/grammar.js';
@@ -26,7 +25,6 @@
   const openContact = (id: string) => void setSearchParam($page, 'contact-id', id, { replace: false });
   const closeContact = () => void deleteSearchParam($page, 'contact-id');
   let creating = false;
-  let creatingContact = false;
   let limit = 20;
   let filtersOpened = false;
   $: people = $debtContactsStore
@@ -186,17 +184,10 @@
           <h2>{$translate('debts.empty')}</h2>
           <p>{$translate('debts.empty_hint')}</p>
         </div>{/if}
-      <Button text={$translate('debts.new_contact')} testId="AddContact" onClick={() => (creatingContact = true)} />
+      <Button text={$translate('debts.add_entry')} testId="AddDebtEntry" onClick={() => (creating = true)} />
     </div>
   </Layout>{/if}
 {#if creating}<DebtPaymentForm onClose={() => (creating = false)} />{/if}
-{#if creatingContact}<ContactEditor
-    onClose={() => (creatingContact = false)}
-    onSave={() => {
-      filter = 'all';
-      query = '';
-    }}
-  />{/if}
 
 <style>
   .debts-page {
@@ -274,15 +265,17 @@
   .filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.25rem;
   }
   .filters button {
     background: var(--header-background-color);
     color: var(--secondary-text-color);
-    padding: 0.65rem 0.8rem;
+    padding: 0.35rem 0.5rem;
+    min-height: 2.25rem;
     border: 1px solid var(--border-color);
-    border-radius: 0.75rem;
+    border-radius: 0.65rem;
     font: inherit;
+    font-size: 0.8rem;
     cursor: pointer;
   }
   .filters button[aria-pressed='true'] {
