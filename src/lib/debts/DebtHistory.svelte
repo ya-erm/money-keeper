@@ -121,7 +121,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.125rem;
   }
   .entry-head {
     display: flex;

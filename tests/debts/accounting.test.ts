@@ -298,9 +298,6 @@ test('full repayment keeps the settled contact in the list and deletion of its p
   await page.goto('/debts');
   await page.getByTestId('DebtPerson').filter({ hasText: 'Миша' }).click();
   await page.getByTestId('RecordRepayment').click();
-  await page.locator('input[name=debt-amount]').fill('46');
-  await page.getByTestId('SaveDebtPayment').click();
-  await expect(page.getByRole('alert')).toContainText('превышает остаток');
   await page.locator('input[name=debt-amount]').fill('45');
   await page.getByTestId('SaveDebtPayment').click();
   await expect(page.getByTestId('DebtPaymentForm')).not.toBeVisible();
@@ -325,6 +322,87 @@ test('full repayment keeps the settled contact in the list and deletion of its p
   await page.goto('/debts');
   await expect(page.getByTestId('DebtPerson').filter({ hasText: 'Миша' })).toContainText('45');
 });
+
+for (const direction of ['receivable', 'payable'] as const) {
+  for (const method of ['existing', 'new', 'manual'] as const) {
+    test(`overpayment reverses the ${direction} balance using ${method} without splitting the payment`, async ({
+      page,
+    }, testInfo) => {
+      const incoming = direction === 'receivable';
+      const name = incoming ? 'Анна' : 'Миша';
+      const contactId = incoming ? 'anna' : 'misha';
+      const label = incoming ? 'Я должен' : 'Мне должны';
+      const data = JSON.parse(backup);
+      const dinner = data.operations.find((operation: { id: string }) => operation.id === 'dinner');
+      dinner.amount = 147;
+      dinner.debt.shares[0].amount = 92;
+      data.debtRecords[0].amount = -92;
+      const original = {
+        id: 'overpayment',
+        accountId: 'card',
+        categoryId: incoming ? 'income' : 'food',
+        date: '2026-11-15T10:00:00Z',
+        amount: 150,
+        comment: 'Возврат с запасом',
+      };
+      if (method === 'existing') data.operations.push(original);
+      await importMockDataAsync(page, JSON.stringify(data));
+      await page.goto('/debts');
+      await page.getByTestId('DebtPerson').filter({ hasText: name }).click();
+      await page.getByTestId('RecordRepayment').click();
+      await expect(page.getByTestId('DebtDirection')).toHaveValue(direction);
+      await page.getByTestId('DebtPaymentMethod').selectOption(method);
+      if (method === 'existing') {
+        await page.getByTestId('ExistingDebtPayment').click();
+        await page
+          .getByTestId('DebtOperationPicker')
+          .getByTestId('TransactionListItem')
+          .filter({ hasText: original.comment })
+          .click();
+        await expect(page.getByTestId('DebtOperationPicker')).not.toBeVisible();
+      } else {
+        await page.locator('[name=debt-amount]').fill('150');
+      }
+      await expect(page.getByTestId('DebtRemaining')).toContainText(label);
+      await expect(page.getByTestId('DebtRemaining')).toContainText('58\u00a0EUR');
+      if (method === 'existing') {
+        await page.getByTestId('SaveDebtPayment').scrollIntoViewIfNeeded();
+        await page.screenshot({ path: testInfo.outputPath(`overpayment-${direction}-390px.png`) });
+      }
+      await page.getByTestId('SaveDebtPayment').click();
+      await expect(page.getByTestId('DebtPaymentForm')).not.toBeVisible();
+      await expect(page.getByTestId('ContactDetails').locator('.balance-row')).toContainText(label);
+      await expect(page.getByTestId('ContactDetails').locator('.balance')).toContainText('58\u00a0EUR');
+      await page.reload();
+      await expect(page.getByTestId('ContactDetails').locator('.balance-row')).toContainText(label);
+      await expect(page.getByTestId('ContactDetails').locator('.balance')).toContainText('58\u00a0EUR');
+      if (method === 'existing' && incoming)
+        await page.screenshot({ path: testInfo.outputPath('overpayment-history-390px.png') });
+      await page.goto('/settings/import-export');
+      await page.getByTestId('ShowExportTextAreaButton').click();
+      const exported = JSON.parse(await page.getByTestId('ExportTextArea').inputValue());
+      expect(exported.operations).toHaveLength(data.operations.length + (method === 'new' ? 1 : 0));
+      expect(exported.debtRecords).toHaveLength(data.debtRecords.length + (method === 'manual' ? 1 : 0));
+      if (method === 'manual') {
+        expect(exported.debtRecords).toContainEqual(
+          expect.objectContaining({ contactId, kind: 'repayment', amount: incoming ? -150 : 150, currency: 'EUR' }),
+        );
+      } else {
+        const linked = exported.operations.filter(
+          (operation: { debt?: { kind: string; shares: { contactId: string }[] } }) =>
+            operation.debt?.kind === 'repayment' && operation.debt.shares[0]?.contactId === contactId,
+        );
+        expect(linked).toHaveLength(1);
+        expect(linked[0]).toMatchObject({
+          amount: 150,
+          accountId: 'card',
+          debt: { kind: 'repayment', shares: [{ contactId, amount: 150 }] },
+        });
+        if (method === 'existing') expect(linked[0]).toMatchObject(original);
+      }
+    });
+  }
+}
 
 test('new loan and manual debt can be saved offline and survive reload', async ({ page }) => {
   // Before noon, a date-only debt must take effect immediately rather than become a future operation.
@@ -778,9 +856,13 @@ test('debt history uses category icons and day headings without the redundant de
   const manualReturn = details.getByTestId('DebtHistoryEntry').filter({ hasText: 'Вернули наличными' });
   await expect(manualReturn.locator('.entry-title')).toHaveText('Возврат');
   await expect(manualReturn.locator('.caption')).toHaveText('(без операции)');
+  const historyGap = await dinnerEntry.locator('.entry-main').evaluate((element) => getComputedStyle(element).rowGap);
   await page.screenshot({ path: testInfo.outputPath('debt-history-groups-mobile.png') });
   await details.getByTestId('DebtHistoryEntry').filter({ hasText: 'Ужин с друзьями' }).click();
   await expect(page.getByTestId('TransactionForm')).toBeVisible();
+  await page.goto('/transactions');
+  const operation = page.getByTestId('TransactionListItem').filter({ hasText: 'Ужин с друзьями' });
+  await expect(operation.locator('.text')).toHaveCSS('row-gap', historyGap);
 });
 
 test('operation rows prefix participant names with the debt icon and abbreviate my share', async ({

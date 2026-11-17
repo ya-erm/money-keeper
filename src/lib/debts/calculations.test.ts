@@ -190,6 +190,33 @@ describe('debt accounting', () => {
       personalAmount(payment({ amount: 50, debt: { kind: 'repayment', shares: [{ contactId: 'anna', amount: 20 }] } })),
     ).toBe(30);
   });
+  it.each(['IN', 'OUT'] as const)(
+    'nets a single %s overpayment into the opposite debt without personal income or expenses',
+    (direction) => {
+      const operation = payment({
+        id: 'overpayment',
+        amount: 150,
+        category: { id: 'return', name: 'Return', type: direction },
+        debt: { kind: 'repayment', shares: [{ contactId: 'anna', amount: 150 }] },
+      });
+      const starting = {
+        id: 'starting',
+        contactId: 'anna',
+        amount: direction === 'IN' ? 92 : -92,
+        currency: 'EUR',
+        date: '2026-11-01',
+      };
+      expect(validateDebt(operation, 'EUR', direction, contacts)).toBeNull();
+      expect(personalAmount(operation)).toBe(0);
+      expect(contactBalances(debtEntries([operation], [starting]), 'anna')).toEqual({
+        EUR: direction === 'IN' ? -58 : 58,
+      });
+      expect(contactBalances(debtEntries([{ ...operation, deleted: true }], [starting]), 'anna')).toEqual({
+        EUR: starting.amount,
+      });
+      expect(operation.amount).toBe(150);
+    },
+  );
   it('edits replace debt portions, deletion restores debt balances, and future payments do not count yet', () => {
     const original = payment();
     const edited = payment({ debt: { kind: 'expense', shares: [{ contactId: 'anna', amount: 40 }] } });

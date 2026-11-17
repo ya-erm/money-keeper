@@ -78,8 +78,6 @@ export const debtRu = {
   'debts.duplicate': 'Человек указан дважды.',
   'debts.contact_required': 'Выберите человека для каждой доли.',
   'debts.amount_required': 'Сначала укажите сумму операции и выберите счёт.',
-  'debts.repayment_too_much':
-    'Сумма возврата превышает остаток долга в этой валюте. Переплату запишите отдельным займом.',
   'debts.record_hint':
     'Только запись долга: счета и аналитика не изменятся. Подходит для старого долга или покупки, которую оплатили за вас.',
   'debts.account_hint': 'Денежная операция и долг сохранятся вместе. Заём и возврат не попадут в доходы и расходы.',
@@ -190,8 +188,6 @@ export const debtEn: Record<DebtMessage, string> = {
   'debts.duplicate': 'A person appears more than once.',
   'debts.contact_required': 'Select a person for each portion.',
   'debts.amount_required': 'Enter the amount and select an account first.',
-  'debts.repayment_too_much':
-    'The repayment exceeds the outstanding balance in this currency. Record the excess as a separate loan.',
   'debts.record_hint':
     'A debt record only: accounts and analytics stay unchanged. Use for an old debt or a purchase paid by someone else.',
   'debts.account_hint':
