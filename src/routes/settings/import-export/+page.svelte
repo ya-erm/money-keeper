@@ -124,45 +124,45 @@
         count += 1;
       }
 
-      v2.categories?.filter(notExists(categoriesService.items)).forEach((category) => {
-        void journalService.addOperationToQueue({ category }, { upload: false });
+      for (const category of v2.categories?.filter(notExists(categoriesService.items)) ?? []) {
+        await journalService.addOperationToQueue({ category }, { upload: false });
         count += 1;
-      });
+      }
 
-      v2.accountTags?.filter(notExists(accountTagsService.items)).forEach((accountTag) => {
-        void journalService.addOperationToQueue({ accountTag }, { upload: false });
+      for (const accountTag of v2.accountTags?.filter(notExists(accountTagsService.items)) ?? []) {
+        await journalService.addOperationToQueue({ accountTag }, { upload: false });
         count += 1;
-      });
+      }
 
-      v2.accounts?.filter(notExists(accountsService.items)).forEach((account) => {
-        void journalService.addOperationToQueue({ account }, { upload: false });
+      for (const account of v2.accounts?.filter(notExists(accountsService.items)) ?? []) {
+        await journalService.addOperationToQueue({ account }, { upload: false });
         count += 1;
-      });
+      }
 
-      v2.operationTags?.filter(notExists(operationTagsService.items)).forEach((tag) => {
-        void journalService.addOperationToQueue({ tag }, { upload: false });
+      for (const tag of v2.operationTags?.filter(notExists(operationTagsService.items)) ?? []) {
+        await journalService.addOperationToQueue({ tag }, { upload: false });
         count += 1;
-      });
+      }
 
-      v2.currencyRates?.filter(notExists(currencyRatesService.items)).forEach((currencyRate) => {
-        void journalService.addOperationToQueue({ currencyRate }, { upload: false });
+      for (const currencyRate of v2.currencyRates?.filter(notExists(currencyRatesService.items)) ?? []) {
+        await journalService.addOperationToQueue({ currencyRate }, { upload: false });
         count += 1;
-      });
+      }
 
-      v2.repeatings?.filter(notExists(repeatingsService.items)).forEach((repeating) => {
-        void journalService.addOperationToQueue({ repeating }, { upload: false });
+      for (const repeating of v2.repeatings?.filter(notExists(repeatingsService.items)) ?? []) {
+        await journalService.addOperationToQueue({ repeating }, { upload: false });
         count += 1;
-      });
+      }
 
-      v2.operations?.filter(notExists(operationsService.items)).forEach((transaction) => {
-        void journalService.addOperationToQueue({ transaction }, { upload: false });
+      for (const transaction of v2.operations?.filter(notExists(operationsService.items)) ?? []) {
+        await journalService.addOperationToQueue({ transaction }, { upload: false });
         count += 1;
-      });
+      }
 
-      v2.groupings?.filter(notExists(groupingsService.items)).forEach((grouping) => {
-        void journalService.addOperationToQueue({ grouping }, { upload: false });
+      for (const grouping of v2.groupings?.filter(notExists(groupingsService.items)) ?? []) {
+        await journalService.addOperationToQueue({ grouping }, { upload: false });
         count += 1;
-      });
+      }
 
       if (v2.knownPlaces && !deepEqual(v2.knownPlaces, membersService.selectedMemberSettings?.knownPlaces ?? [])) {
         await membersService.updateKnownPlaces(v2.knownPlaces, { upload: false });

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.35.6 - 2026-11-17
+
+### Fixed
+
+- Serialized journal synchronization and acknowledge only the uploaded batch, preserving contacts, debts and operations added during an upload and pending changes from other workspaces.
+- Advance the synchronization cursor only after downloaded data is saved locally. Keep conflict retries durable and avoid skipping changes from other devices when an upload response reports a newer server head.
+
 ## 2.35.4 - 2026-11-16
 
 ### Improved

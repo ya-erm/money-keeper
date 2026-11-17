@@ -282,7 +282,7 @@ export interface LocalDB extends DBSchema {
     indexes: { 'by-owner': string };
   };
   journal: {
-    key: string;
+    key: [string, number];
     value: WithOwner<JournalItem>;
     indexes: { 'by-owner': string };
   };

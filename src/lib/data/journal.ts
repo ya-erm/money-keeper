@@ -27,6 +27,32 @@ export class JournalService implements Initialisable {
   private _state = store<JournalState>('idle');
 
   private _subscribers = new Map<string, JournalSubscriber>();
+  private _syncWork: Promise<void> = Promise.resolve();
+  private _queueWork: Promise<void> = Promise.resolve();
+
+  private runSync<T>(work: () => Promise<T>): Promise<T> {
+    const result = this._syncWork.then(work);
+    this._syncWork = result.then(
+      () => {},
+      () => {},
+    );
+    return result;
+  }
+
+  private writeQueue<T>(work: () => Promise<T>): Promise<T> {
+    const result = this._queueWork.then(work);
+    this._queueWork = result.then(
+      () => {},
+      () => {},
+    );
+    return result;
+  }
+
+  private async advanceSyncNumber(value: number) {
+    if (value <= this.syncNumber) return;
+    await membersService.updateSyncNumber(value);
+    this._syncNumber.set(value);
+  }
 
   /** Incoming queue of updates */
   get updates() {
@@ -62,31 +88,21 @@ export class JournalService implements Initialisable {
     this._subscribers.delete(id);
   }
 
-  private _syncNumberUnsubscribe: (() => void) | undefined;
-
   /** Initialisation */
-  async init() {
-    if (this._syncNumberUnsubscribe !== undefined) {
-      this._syncNumberUnsubscribe?.();
-    }
-    this._syncNumberUnsubscribe = this._syncNumber.subscribe((value) => {
-      logger.debug('[subscription] _syncNumber:', value);
-      if (value >= 0) void membersService.updateSyncNumber(value);
+  init() {
+    return this.runSync(async () => {
+      logger.log('Load outgoing queue from local DB');
+      await this.loadQueueFromDB();
+
+      if (this.queue.length > 0) {
+        logger.log('Apply queue to subscribers');
+        await this.applyChangesToSubscribers(this.queue, false);
+      }
     });
-
-    logger.log('Load outgoing queue from local DB');
-    await this.loadQueueFromDB();
-
-    if (this.queue.length > 0) {
-      logger.log('Apply queue to subscribers');
-      await this.applyChangesToSubscribers(this.queue, false);
-    }
   }
 
   reset() {
     logger.debug('Reset journal service');
-    this._syncNumberUnsubscribe?.();
-    this._syncNumberUnsubscribe = undefined;
     this._updates.reset();
     this._queue.reset();
     this._syncNumber.reset();
@@ -94,29 +110,38 @@ export class JournalService implements Initialisable {
   }
 
   /** Synchronize updates with server */
-  async syncWithServer() {
-    logger.log('Fetch updates from server, sync number:', this.syncNumber);
-    await this.tryFetchUpdates();
+  syncWithServer() {
+    return this.runSync(async () => {
+      logger.log('Fetch updates from server, sync number:', this.syncNumber);
+      if (!(await this.tryFetchUpdates())) return;
 
-    if (this.queue.length > 0 && this.updates.length > 0) {
-      logger.log(`Warning. Incoming: ${this.updates.length}, outgoing: ${this.queue.length}. Conflicts may be ocurred`);
-    }
+      if (this.queue.length > 0 && this.updates.length > 0) {
+        logger.log(
+          `Warning. Incoming: ${this.updates.length}, outgoing: ${this.queue.length}. Conflicts may be ocurred`,
+        );
+      }
 
-    if (this.updates.length > 0) {
-      logger.log('Apply updates to subscribers');
-      await this.applyChangesToSubscribers(this.updates, true);
+      await this.applyFetchedUpdates();
 
       if (this.queue.length > 0) {
-        // Local changes must win over the incoming ones (including snapshots), they will be uploaded next
-        logger.log('Re-apply queue to subscribers');
-        await this.applyChangesToSubscribers(this.queue, true);
+        logger.log('Upload queue to server');
+        await this.tryUploadQueueInternal(true);
       }
-    }
+    });
+  }
 
-    if (this.queue.length > 0) {
-      logger.log('Upload queue to server');
-      await this.tryUploadQueue();
+  private async applyFetchedUpdates() {
+    const updates = this.updates;
+    if (!updates.length) return;
+    try {
+      await this.applyChangesToSubscribers(updates, true);
+    } finally {
+      // Preserve local changes even if one subscriber could not save the download.
+      if (this.queue.length) await this.applyChangesToSubscribers(this.queue, true);
     }
+    // Persist the cursor only after every subscriber has durably saved the batch.
+    await this.advanceSyncNumber(updates[updates.length - 1].order);
+    this._updates.set([]);
   }
 
   /** Apply changes to subscribers */
@@ -124,11 +149,16 @@ export class JournalService implements Initialisable {
     if (changes.length === 0) return;
     const subscribers = Array.from(this._subscribers.values());
     logger.debug('Apply changes to subscribers', { changes, subscribers });
-    await Promise.all(subscribers.map((subscriber) => subscriber.applyChanges(changes, saveToDB)));
+    const results = await Promise.allSettled(
+      subscribers.map((subscriber) => Promise.resolve().then(() => subscriber.applyChanges(changes, saveToDB))),
+    );
+    const failed = results.find((result) => result.status === 'rejected');
+    if (failed?.status === 'rejected') throw failed.reason;
   }
 
   /** Fetch updates updates from server */
   private async fetchUpdates() {
+    this._updates.set([]);
     // await new Promise<void>((resolve) => setTimeout(() => resolve(), 5000));
     const fetcher = useFetch<GetJournalRequest, GetJournalResponse>('POST', '/api/v2/journal/get-updates');
     const { journal } = await fetcher.fetch({ start: this.syncNumber });
@@ -161,9 +191,6 @@ export class JournalService implements Initialisable {
     );
     items.sort((a: JournalItem, b: JournalItem) => a.order - b.order);
     logger.debug('Updates:', items);
-    if (items.length > 0) {
-      this._syncNumber.set(items[items.length - 1].order);
-    }
     this._updates.set(items);
   }
 
@@ -172,6 +199,7 @@ export class JournalService implements Initialisable {
     try {
       this._state.set('downloading');
       await this.fetchUpdates();
+      return true;
     } catch (e) {
       logger.error('Failed to fetch updates', e);
       if (e instanceof Error) {
@@ -179,6 +207,7 @@ export class JournalService implements Initialisable {
       } else {
         showErrorToast('Failed to fetch updates');
       }
+      return false;
     } finally {
       this._state.set('idle');
     }
@@ -189,26 +218,27 @@ export class JournalService implements Initialisable {
     const db = await useDB();
     const member = membersService.getSelectedMember();
     const settings = membersService.selectedMemberSettings;
-    if (settings?.syncNumber) {
-      this._syncNumber.set(settings?.syncNumber);
-    }
+    this._syncNumber.set(settings?.syncNumber ?? -1);
     const items = await db.getAllFromIndex('journal', 'by-owner', member.uuid);
     this._queue.set(items);
   }
 
   /** Add operation to queue (in memory) and try to upload it */
   async addOperationToQueue(operation: JournalOperation, options?: { upload: boolean }) {
-    const item: JournalItem = {
-      order: this.syncNumber + this._queue.value.length + 1,
-      data: operation,
-    };
-    logger.debug('Add operation to queue', { item, options });
-    this._queue.update((prev) => prev.concat(item));
+    const item = await this.writeQueue(async () => {
+      const item: JournalItem = {
+        order: Math.max(this.syncNumber, this.queue.at(-1)?.order ?? -1) + 1,
+        data: operation,
+      };
+      logger.debug('Add operation to queue', { item, options });
 
-    // Save to DB
-    const db = await useDB();
-    const member = membersService.getSelectedMember();
-    await db.put('journal', { ...item, owner: member.uuid });
+      // Save to DB
+      const db = await useDB();
+      const member = membersService.getSelectedMember();
+      await db.put('journal', { ...item, owner: member.uuid });
+      this._queue.update((prev) => prev.concat(item));
+      return item;
+    });
 
     if (options?.upload ?? true) {
       // Try run upload asynchronously
@@ -216,13 +246,6 @@ export class JournalService implements Initialisable {
     }
 
     return item;
-  }
-
-  /** Clear queue */
-  private async clearQueue() {
-    this._queue.set([]);
-    const db = await useDB();
-    await db.clear('journal');
   }
 
   /** Upload queue to the server */
@@ -239,16 +262,28 @@ export class JournalService implements Initialisable {
 
     // TODO: pull and merge conflicts firstly
 
-    if (this.queue.some((x) => x.order <= this.syncNumber)) {
-      logger.log('Reorder queue');
-      const reorderedItems = this.queue.map((item, i) => ({ ...item, order: this.syncNumber + i + 1 }));
-      this._queue.set(reorderedItems);
-    }
+    const owner = membersService.getSelectedMember().uuid;
+    const batch = await this.writeQueue(async () => {
+      if (this.queue.some((item, index) => item.order !== this.syncNumber + index + 1)) {
+        const previous = this.queue;
+        const reorderedItems = previous.map((item, i) => ({ ...item, order: this.syncNumber + i + 1 }));
+        const db = await useDB();
+        const tx = db.transaction('journal', 'readwrite');
+        await Promise.all([
+          ...previous.map((item) => tx.store.delete([owner, item.order])),
+          ...reorderedItems.map((item) => tx.store.put({ ...item, owner })),
+          tx.done,
+        ]);
+        this._queue.set(reorderedItems);
+      }
+      return [...this.queue];
+    });
+    if (!batch.length) return;
 
     const encryption = membersService.selectedMemberSettings?.encryption ?? 'none';
 
     const items = await Promise.all(
-      this.queue.map(async (item) => {
+      batch.map(async (item) => {
         const json = JSON.stringify(item.data);
         switch (encryption) {
           case 'none':
@@ -273,19 +308,27 @@ export class JournalService implements Initialisable {
       }),
     );
 
-    const json = await useFetch<PostManyJournalRequestData, PostManyJournalResponseData>(
-      'POST',
-      '/api/v2/journal',
-    ).fetch({ items });
+    await useFetch<PostManyJournalRequestData, PostManyJournalResponseData>('POST', '/api/v2/journal').fetch({ items });
 
-    logger.log('Queue uploaded successfully.', 'New sync number:', json.syncNumber);
-    if (json.syncNumber) this._syncNumber.set(json.syncNumber);
-
-    await this.clearQueue();
+    if (membersService.getSelectedMember().uuid !== owner) throw new Error('Workspace changed during upload');
+    await this.writeQueue(async () => {
+      const db = await useDB();
+      const tx = db.transaction('journal', 'readwrite');
+      await Promise.all([...batch.map((item) => tx.store.delete([owner, item.order])), tx.done]);
+      const acknowledged = new Set(batch);
+      this._queue.update((queue) => queue.filter((item) => !acknowledged.has(item)));
+      // The response may include newer writes from another device that we have not downloaded.
+      await this.advanceSyncNumber(batch[batch.length - 1].order);
+    });
+    logger.log('Queue batch uploaded successfully.', 'New sync number:', this.syncNumber);
   }
 
   /** Upload queue to the server, @throw if error */
-  async uploadQueue() {
+  uploadQueue() {
+    return this.runSync(() => this.performUpload());
+  }
+
+  private async performUpload() {
     try {
       if (this.queue.length > 0) {
         this._state.set('uploading');
@@ -303,19 +346,20 @@ export class JournalService implements Initialisable {
    * Try to upload queue to the server, don't throw error.
    * On order conflict (another device uploaded something) fetches updates, renumbers the queue and retries once.
    */
-  async tryUploadQueue(retryOnConflict = true) {
+  tryUploadQueue(retryOnConflict = true) {
+    return this.runSync(() => this.tryUploadQueueInternal(retryOnConflict));
+  }
+
+  private async tryUploadQueueInternal(retryOnConflict: boolean) {
     try {
-      await this.uploadQueue();
+      await this.performUpload();
     } catch (e) {
       const cause = e instanceof Error ? e.cause : undefined;
       if (retryOnConflict && isApiError(cause) && cause.status === 409) {
         logger.log('Journal order conflict, fetch updates and retry upload');
-        await this.tryFetchUpdates();
-        if (this.updates.length > 0) {
-          await this.applyChangesToSubscribers(this.updates, true);
-          await this.applyChangesToSubscribers(this.queue, true);
-        }
-        await this.tryUploadQueue(false);
+        if (!(await this.tryFetchUpdates())) return;
+        await this.applyFetchedUpdates();
+        await this.tryUploadQueueInternal(false);
       }
     }
   }
