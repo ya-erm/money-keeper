@@ -1,11 +1,18 @@
 # Changelog
 
-## 2.35.5 - 2026-11-17
+## 2.35.7 - 2026-11-17
 
 ### Fixed
 
 - Repayments can exceed the outstanding debt in either direction. The excess becomes the opposite balance while keeping a single linked or newly created payment; the form previews who will owe the difference. Manual repayments support the same behavior.
 - Debt history uses the same spacing between text lines as the operation list.
+
+## 2.35.6 - 2026-11-17
+
+### Fixed
+
+- Serialized journal synchronization and acknowledge only the uploaded batch, preserving contacts, debts and operations added during an upload and pending changes from other workspaces.
+- Advance the synchronization cursor only after downloaded data is saved locally. Keep conflict retries durable and avoid skipping changes from other devices when an upload response reports a newer server head.
 
 ## 2.35.4 - 2026-11-16
 
