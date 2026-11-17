@@ -161,10 +161,6 @@
       error = $translate('debts.no_debt_in_direction');
       return;
     }
-    if (repayment && toMinor(value, currency) > toMinor(repayableBalance, currency)) {
-      error = $translate('debts.repayment_too_much');
-      return;
-    }
     if (method === 'existing' && !selectedOperation) {
       error = $translate('debts.payment_required');
       return;
@@ -374,8 +370,12 @@
     {#if method !== 'manual' || !repayment}<p class="caption">
         {$translate(method === 'manual' ? 'debts.record_hint' : 'debts.account_hint')}
       </p>{/if}
-    {#if repayment}<div class="remaining" aria-live="polite">
-        <span>{$translate('debts.remaining')}</span><strong>{formatMoney(remaining, { currency })}</strong>
+    {#if repayment}<div class="remaining" aria-live="polite" data-testId="DebtRemaining">
+        <span
+          >{$translate(
+            remaining < 0 ? debtDirectionMessage(contact, direction === 'receivable' ? -1 : 1) : 'debts.remaining',
+          )}</span
+        ><strong>{formatMoney(Math.abs(remaining), { currency })}</strong>
       </div>{/if}
     {#if error}<p class="error" role="alert">{error}</p>{/if}
     <Button type="submit" disabled={saving} text={$translate('common.save')} testId="SaveDebtPayment" />

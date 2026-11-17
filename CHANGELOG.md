@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.35.5 - 2026-11-17
+
+### Fixed
+
+- Repayments can exceed the outstanding debt in either direction. The excess becomes the opposite balance while keeping a single linked or newly created payment; the form previews who will owe the difference. Manual repayments support the same behavior.
+- Debt history uses the same spacing between text lines as the operation list.
+
 ## 2.35.4 - 2026-11-16
 
 ### Improved
