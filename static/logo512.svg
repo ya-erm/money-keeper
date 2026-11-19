@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Money Keeper">
+  <rect width="512" height="512" rx="104" fill="#fff" />
+  <g fill="#030303">
+    <path d="M44 181H82.5V372.5H391V411H44Z" />
+    <path fill-rule="evenodd" d="M121 104H468V334H121Z M198 142.5H391A38.5 38.5 0 0 0 429.5 181V257.5A38.5 38.5 0 0 0 391 296H198A38.5 38.5 0 0 0 159.5 257.5V181A38.5 38.5 0 0 0 198 142.5Z" />
+    <circle cx="294.5" cy="219.25" r="57.75" />
+  </g>
+</svg>
