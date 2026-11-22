@@ -16,10 +16,11 @@
   } from '#lib/utils/index.js';
 
   import AccountCard from './AccountCard.svelte';
+  import { selectedParticipantStore } from '#lib/data/participants.js';
 
   export let onEdit: (account: AccountViewModel) => void;
 
-  $: accounts = $accountsStore;
+  $: accounts = $accountsStore.filter((account) => !$selectedParticipantStore?.hiddenAccountIds?.includes(account.id));
   $: operations = $operationsStore;
   $: currencyRates = $currencyRatesStore;
   $: settings = $memberSettingsStore;

@@ -7,9 +7,9 @@ test.describe('Import / Export', () => {
     await openPathAsync(page);
     await importMockDataAsync(page);
 
-    await expect(page.getByText('Categories: 3,')).toBeVisible();
-    await expect(page.getByText('Accounts: 2,')).toBeVisible();
-    await expect(page.getByText('Operations: 4,')).toBeVisible();
+    await expect(page.getByText('Categories: 3,').first()).toBeVisible();
+    await expect(page.getByText('Accounts: 2,').first()).toBeVisible();
+    await expect(page.getByText('Operations: 4,').first()).toBeVisible();
     await expect.soft(page).toHaveScreenshot('1-import-summary.png');
 
     await page.goto('/transactions', { waitUntil: 'networkidle' });

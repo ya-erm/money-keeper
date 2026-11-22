@@ -14,6 +14,9 @@ import type {
   Repeating,
   Tag,
   Transaction,
+  Participant,
+  VirtualWallet,
+  WalletTransfer,
 } from './interfaces';
 import { journalService } from './journal';
 import { membersService } from './members';
@@ -21,6 +24,9 @@ import { SNAPSHOT_KEY_BY_STORAGE } from './snapshot';
 import { useDB } from './useDB';
 
 type StorageName =
+  | 'participants'
+  | 'virtualWallets'
+  | 'walletTransfers'
   | 'categories'
   | 'accounts'
   | 'transactions'
@@ -32,7 +38,18 @@ type StorageName =
   | 'debtContacts'
   | 'debtRecords';
 
-type EntityType = Category | Account | Transaction | Tag | CurrencyRate | Repeating | DebtContact | DebtRecord;
+type EntityType =
+  | Category
+  | Account
+  | Transaction
+  | Tag
+  | CurrencyRate
+  | Repeating
+  | DebtContact
+  | DebtRecord
+  | Participant
+  | VirtualWallet
+  | WalletTransfer;
 
 export class BaseService<T extends EntityType> implements Initialisable, JournalSubscriber {
   private _name: string;
@@ -59,6 +76,11 @@ export class BaseService<T extends EntityType> implements Initialisable, Journal
   /** List of all items */
   public get items() {
     return this._items.value.active;
+  }
+
+  /** Undecorated entities for reactive JSON exports. */
+  public get $rawItems() {
+    return this._activeItems;
   }
 
   /** Readable store of all items */

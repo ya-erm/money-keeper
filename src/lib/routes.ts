@@ -6,6 +6,9 @@ type Route = {
 };
 
 type RouteKey =
+  | 'settings.participants'
+  | 'settings.wallets'
+  | 'wallets'
   | 'debts'
   | 'debts.contacts'
   | 'root'
@@ -45,6 +48,9 @@ type RouteKey =
   | 'uikit';
 
 export const routes: { [key in RouteKey]: Route } = {
+  'settings.participants': { path: '/settings/participants', title: 'wallets.participants' },
+  'settings.wallets': { path: '/settings/wallets', title: 'wallets.title' },
+  wallets: { path: '/wallets', title: 'wallets.title' },
   debts: { path: '/debts', title: 'debts.title' },
   'debts.contacts': { path: '/debts/contacts', title: 'debts.contacts' },
   root: {

@@ -3,7 +3,7 @@
 import { openDB } from 'idb';
 import type { LocalDB } from './interfaces';
 
-const CURRENT_VERSION = 12;
+const CURRENT_VERSION = 13;
 
 export async function useDB() {
   return await openDB<LocalDB>('mk-2', CURRENT_VERSION, {
@@ -74,6 +74,12 @@ export async function useDB() {
       });
       migration(12, 'Creating private contacts and debt records', () => {
         for (const name of ['debtContacts', 'debtRecords'] as const) {
+          const objectStore = db.createObjectStore(name, { keyPath: 'id' });
+          objectStore.createIndex('by-owner', 'owner');
+        }
+      });
+      migration(13, 'Creating participants and virtual wallets', () => {
+        for (const name of ['participants', 'virtualWallets', 'walletTransfers'] as const) {
           const objectStore = db.createObjectStore(name, { keyPath: 'id' });
           objectStore.createIndex('by-owner', 'owner');
         }

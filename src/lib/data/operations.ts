@@ -215,6 +215,7 @@ export function cloneOperation(item: Transaction): Transaction {
     date: item.date,
     timeZone: item.timeZone,
     amount: item.amount,
+    walletAllocation: item.walletAllocation ? structuredClone(item.walletAllocation) : undefined,
     debt: item.debt ? structuredClone(item.debt) : undefined,
     comment: item.comment,
     description: item.description,

@@ -2,6 +2,7 @@ import { page } from '#lib/page.js';
 import type { Messages } from '#lib/translate/messages.js';
 import { derived, readable } from 'svelte/store';
 import { routes } from '../../routes';
+import { memberSettingsStore } from '#lib/data/members.js';
 
 export type MenuItem = {
   icon: string;
@@ -9,13 +10,8 @@ export type MenuItem = {
   path: string;
 };
 
-export const menu = readable<MenuItem[]>([
+const baseMenu = readable<MenuItem[]>([
   { icon: 'mdi:account-cash-outline', title: 'debts.title', path: routes.debts.path },
-  {
-    icon: 'mdi:shape-outline',
-    title: 'categories.title',
-    path: routes.categories.path,
-  },
   {
     icon: 'mdi:briefcase-outline',
     title: 'accounts.title',
@@ -32,5 +28,12 @@ export const menu = readable<MenuItem[]>([
     path: routes.settings.path,
   },
 ]);
+
+export const menu = derived([baseMenu, memberSettingsStore], ([items, settings]) => {
+  if (!settings?.walletsEnabled) return items;
+  const result = [...items];
+  result.splice(2, 0, { icon: 'mdi:credit-card-outline', title: 'wallets.title', path: routes.wallets.path });
+  return result;
+});
 
 export const activeMenuItem = derived([page, menu], ([p, m]) => m.find((x) => x.path == p.url.pathname));

@@ -13,6 +13,7 @@
   import { replaceCalcExpressions } from '#lib/utils/calc.js';
   import { formatMoney } from '#lib/utils/formatMoney.js';
   import { findNearbyPlaces, isValidCoordinates } from '#lib/utils/geolocation.js';
+  import { walletsService, walletsStore } from '#lib/data/wallets.js';
 
   export let transaction: TransactionViewModel;
   export let currencyRate: CurrencyRate | null = null;
@@ -22,6 +23,9 @@
   export let onClick: ((transaction: TransactionViewModel) => void) | null = null;
   export let onLongPress: ((transaction: TransactionViewModel) => void) | null = null;
   export let selected: boolean = false;
+  /** Wallet history projects its share without changing the stored bank operation. */
+  export let amountOverride: number | null = null;
+  export let linkedAmountOverride: number | null = null;
   const metadataSeparator = ' · ';
 
   $: incoming = transaction.category.type === 'IN';
@@ -180,17 +184,36 @@
           {/if}
         </div>
       {/if}
+      {#if transaction.walletAllocation?.shares.length}
+        <div class="metadata" data-testId="OperationWalletAllocation">
+          {transaction.walletAllocation.shares
+            .map(
+              (share) =>
+                `${$walletsStore.find((wallet) => wallet.id === share.walletId)?.name ?? walletsService.deletedItems.find((wallet) => wallet.id === share.walletId)?.name ?? '…'}: ${formatDebtMoney(share.amount, { currency: transaction.account.currency })}`,
+            )
+            .join(' · ')}
+        </div>
+      {/if}
     </div>
     <div class="flex-col items-end">
-      {#if !!transaction.anotherCurrencyAmount}
+      {#if !!transaction.anotherCurrencyAmount && amountOverride === null}
         <span class="other-money-value">
           {formatMoney(transaction.anotherCurrencyAmount, { currency: transaction.anotherCurrency ?? undefined })}
         </span>
       {/if}
       <span class="amount" class:incoming class:outgoing>
-        <span>{incoming ? '+' : outgoing ? '-' : ''}{formatMoney(transaction.amount)}</span>
+        <span>{incoming ? '+' : outgoing ? '-' : ''}{formatMoney(amountOverride ?? transaction.amount)}</span>
         <span class="small-text">{transaction.account.currency}</span>
       </span>
+      {#if linkedAmountOverride !== null && transaction.linkedTransaction}<span class="other-money-value"
+          >→ {formatMoney(linkedAmountOverride, { currency: transaction.linkedTransaction.account.currency })}</span
+        >{/if}
+      {#if amountOverride !== null && amountOverride !== transaction.amount && !transaction.linkedTransaction}<span
+          class="other-money-value"
+          >{$translate('wallets.total_payment')}: {formatMoney(transaction.amount, {
+            currency: transaction.account.currency,
+          })}</span
+        >{/if}
       {#if currencyRate}
         <span class="other-money-value">
           {formatMoney(transaction.amount * rate, { currency: otherCurrency })}

@@ -8,11 +8,12 @@
 
   import { accountsStore, membersService } from '#lib/data/index.js';
   import { translate } from '#lib/translate/index.js';
+  import { participantsService, selectedParticipantStore } from '#lib/data/participants.js';
 
   export let opened: boolean;
 
   const settings = membersService.$selectedMemberSettings;
-  let currency = $settings?.currency ?? '';
+  let currency = $selectedParticipantStore?.currency ?? $settings?.currency ?? '';
 
   const accountCurrencies = (() => {
     const currencies = new SvelteSet<string>();
@@ -28,7 +29,8 @@
   };
 
   const handleSaveCurrency = async () => {
-    await membersService.updateSettings({ currency });
+    if ($selectedParticipantStore) await participantsService.updatePreferences({ currency });
+    else await membersService.updateSettings({ currency });
     opened = false;
   };
 </script>

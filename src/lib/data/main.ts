@@ -18,6 +18,8 @@ import { operationTagsService } from './operationTags';
 import { operationsService } from './operations';
 import { repeatingsService } from './repeatings';
 import { settingsService } from './settings';
+import { participantsService } from './participants';
+import { walletsService, walletTransfersService } from './wallets';
 
 const logger = new Logger('MainService', { disabled: false, color: '#00cc55' });
 
@@ -47,6 +49,9 @@ class MainService implements Initialisable {
     await membersService.init();
 
     const services: Service[] = [
+      participantsService,
+      walletsService,
+      walletTransfersService,
       debtContactsService,
       debtRecordsService,
       categoriesService,

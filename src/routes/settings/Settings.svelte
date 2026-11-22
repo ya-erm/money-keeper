@@ -70,7 +70,9 @@
     onChange={handleHideBalancesChange}
   />
   <ListLinkItem title={$translate('currency_rates.title')} href={route('settings.currency_rates')} />
+  <ListLinkItem title={$translate('categories.title')} href={route('categories')} />
   <ListLinkItem title={$translate('settings.known_places')} href={route('settings.known_places')} />
+  <ListLinkItem title={$translate('wallets.title')} href={route('settings.wallets')} />
   <ListSelectItem
     title={$translate('currency_rates.default_currency')}
     value={memberSettings?.currency ?? ''}
@@ -79,6 +81,7 @@
 </ListGroup>
 
 <ListGroup title={$translate('settings.profile')}>
+  <ListLinkItem title={$translate('wallets.participants')} href={route('settings.participants')} />
   {#if !userIsLoggedIn}
     <ListLinkItem title={$translate('auth.sign_in')} href={route('login')} />
   {:else}

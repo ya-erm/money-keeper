@@ -124,7 +124,7 @@ test('contact history owns its header, retains navigation and opens editors abov
   await expect(page).toHaveURL(/contact-id=anna/);
   const details = page.getByTestId('ContactDetails');
   await expect(details.getByRole('heading', { name: 'Анна', exact: true })).toBeVisible();
-  await expect(details.locator('.menu-bar .menu-item')).toHaveCount(5);
+  await expect(details.locator('.menu-bar .menu-item')).toHaveCount(4);
   await expect(page.getByTestId('RecordDebt')).toHaveCount(0);
   await page.screenshot({ path: testInfo.outputPath('contact-history-navigation-mobile.png') });
   await details.getByRole('button', { name: 'Редактировать', exact: true }).click();
@@ -468,7 +468,7 @@ test('debt screens fit mobile and desktop, and follow the dark theme', async ({ 
   await expect(page.getByTestId('DebtPerson')).toHaveCount(15);
   const menu = page.locator('.menu-bar .menu-item');
   await expect(menu.nth(0)).toHaveText('Долги');
-  await expect(menu.nth(2)).toHaveText('Счета');
+  await expect(menu.nth(1)).toHaveText('Счета');
   for (const width of [320, 390, 1280]) {
     await page.setViewportSize({ width, height: 844 });
     const layout = await page.evaluate(() => ({

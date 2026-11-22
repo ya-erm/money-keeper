@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.36.0 - 2026-11-22
+
+### Added
+
+- Optional virtual wallets with multiple currencies, named participant profiles, synchronized personal account/wallet order, visibility, display currency and default allocation presets.
+- Allocate real payments across wallets, split equally or enter exact shares. Allocate both sides of a currency exchange using the recorded bank amounts and deterministic rounding.
+- Internal wallet transfers, unallocated balances by currency, shared savings contributions and returns, and wallet history linked to the original payments.
+- Wallet-first startup and expense/receipt QR shortcuts for the selected participant. Categories are available in settings; enabled wallets occupy the central menu position.
+- Include participants, wallets, transfers and enablement in synchronization, encrypted journals, snapshots, compaction and JSON backups.
+
+### Fixed
+
+- Keep two decimal places for RSD accounting even when the runtime's currency formatting defaults to whole dinars.
+
 ## 2.35.7 - 2026-11-17
 
 ### Fixed

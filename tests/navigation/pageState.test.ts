@@ -10,11 +10,12 @@ test('updates menu and query-driven modals during client navigation and history 
     if (request.isNavigationRequest() && request.frame() === page.mainFrame()) documentRequests++;
   });
 
-  const categories = page.getByTestId('MenuItem').filter({ hasText: 'Categories' });
-  const accounts = page.getByTestId('MenuItem').filter({ hasText: 'Accounts' });
-  await categories.click();
+  const settings = page.getByTestId('MenuItem').filter({ hasText: 'Settings' }).first();
+  const accounts = page.getByTestId('MenuItem').filter({ hasText: 'Accounts' }).first();
+  await settings.click();
+  await expect(settings).toHaveClass(/active/);
+  await page.getByRole('link', { name: 'Categories', exact: true }).click();
   await expect(page).toHaveURL(/\/categories$/);
-  await expect(categories).toHaveClass(/active/);
   await expect(accounts).not.toHaveClass(/active/);
 
   await accounts.click();
