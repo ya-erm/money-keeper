@@ -353,6 +353,7 @@
     white-space: nowrap;
   }
   .other-money-value {
+    text-align: right;
     opacity: 0.8;
     font-size: 0.75rem;
     color: var(--secondary-text-color);
