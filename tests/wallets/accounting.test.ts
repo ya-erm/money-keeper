@@ -238,3 +238,82 @@ test('swiping wallet cards changes history and archived wallets remain readable'
   await expect(page.getByTestId('WalletAddExpense')).toHaveCount(0);
   await expect(page.getByTestId('WalletCard').filter({ hasText: 'Алексей' })).toContainText('100\u00a0000');
 });
+
+test('wallets match account counters and day headers, totaling only wallet spending shares', async ({ page }) => {
+  const data = JSON.parse(backup);
+  const split = (amount: number) => ({
+    shares: [
+      { walletId: 'alex-wallet', amount },
+      { walletId: 'maria-wallet', amount },
+    ],
+  });
+  const date = '2026-11-22T09:00:00Z';
+  data.accounts[0].showReceiptScanButton = true;
+  data.operations.push(
+    { id: 'dinner', accountId: 'rsd', categoryId: 'rent', amount: 10000, date, walletAllocation: split(5000) },
+    { id: 'lunch', accountId: 'rsd', categoryId: 'rent', amount: 3000, date, walletAllocation: split(1500) },
+    { id: 'eur-rent', accountId: 'eur', categoryId: 'rent', amount: 900, date, walletAllocation: split(450) },
+    {
+      id: 'exchange-out',
+      accountId: 'rsd',
+      categoryId: '00000000-0001-0002-8ff6-187bca92f3f9',
+      amount: 120000,
+      date,
+      linkedTransactionId: 'exchange-in',
+      walletAllocation: split(60000),
+    },
+    {
+      id: 'exchange-in',
+      accountId: 'eur',
+      categoryId: '00000000-0001-0001-b91e-1a1822f82ab9',
+      amount: 1000,
+      date,
+      linkedTransactionId: 'exchange-out',
+      walletAllocation: split(500),
+    },
+    {
+      id: 'excluded',
+      accountId: 'rsd',
+      categoryId: 'rent',
+      amount: 1000,
+      date,
+      excludeFromAnalysis: true,
+      walletAllocation: split(500),
+    },
+  );
+  data.walletTransfers.push({
+    id: 'saving',
+    currency: 'RSD',
+    fromWalletId: 'alex-wallet',
+    toWalletId: 'holiday',
+    amount: 10000,
+    date,
+  });
+  await importMockDataAsync(page, JSON.stringify(data));
+  await page.goto('/wallets?wallet=alex-wallet', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('OperationsHeader')).toContainText('7 шт.');
+  const days = page.getByTestId('WalletDayGroup');
+  await expect(days).toHaveCount(2);
+  await expect(days.first()).toContainText('22 ноября 2026, воскресенье');
+  await expect(days.first().getByTestId('DayExpenses')).toHaveText('-6\u00a0500\u00a0RSD-450\u00a0EUR');
+  await expect(days.last().getByTestId('DayExpenses')).toHaveCount(0);
+  await page.screenshot({ path: 'output/virtual-wallets/12-wallet-day-totals.png', animations: 'disabled' });
+  await page.goto('/accounts?account-card=rsd', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('OperationsHeader')).toContainText('5 шт.');
+  await expect(page.getByTestId('DayExpenses').first()).toHaveText('-13\u00a0000\u00a0RSD');
+  await page.screenshot({ path: 'output/virtual-wallets/13-account-day-totals.png', animations: 'disabled' });
+  await page.goto('/wallets?wallet=alex-wallet', { waitUntil: 'networkidle' });
+  await page.getByPlaceholder('Поиск', { exact: true }).fill('Аренда');
+  await expect(page.getByTestId('OperationsHeader')).toContainText('4 шт.');
+});
+
+test('create a wallet directly from the wallet header', async ({ page }) => {
+  await page.getByRole('link', { name: 'Создать кошелёк', exact: true }).click();
+  const form = page.getByTestId('WalletForm');
+  await expect(form).toBeVisible();
+  await form.locator('input[name="wallet-name"]').fill('На дом');
+  await form.getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(form).toHaveCount(0);
+  await page.goto('/wallets', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('WalletCard').filter({ hasText: 'На дом' })).toBeAttached();
+});

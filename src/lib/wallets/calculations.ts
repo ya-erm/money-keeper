@@ -178,3 +178,26 @@ export function walletContributions(
     returned: fromMinor(value.returned, currency),
   }));
 }
+
+/** Wallet shares of daily spending, excluding internal/bank transfers and analytics exclusions. */
+export function walletDayExpenses(
+  entries: WalletEntry[],
+  categories: Category[],
+): { currency: string; amount: number }[] {
+  const byId = new Map(categories.map((category) => [category.id, category]));
+  const totals = new Map<string, number>();
+  for (const entry of entries) {
+    const operation = entry.operation;
+    const category = operation && byId.get(operation.categoryId);
+    if (
+      !operation ||
+      category?.type !== 'OUT' ||
+      category.system ||
+      operation.linkedTransactionId ||
+      operation.excludeFromAnalysis
+    )
+      continue;
+    totals.set(entry.currency, (totals.get(entry.currency) ?? 0) + toMinor(Math.abs(entry.amount), entry.currency));
+  }
+  return [...totals].map(([currency, amount]) => ({ currency, amount: fromMinor(amount, currency) }));
+}

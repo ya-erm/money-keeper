@@ -24,7 +24,17 @@
   import HiddenMoney from '#lib/ui/HiddenMoney.svelte';
   import { formatDebtMoney } from '#lib/debts/formatMoney.js';
   import { fromMinor, toMinor } from '#lib/debts/calculations.js';
-  import { orderedItems, walletBalance, walletContributions, walletEntries } from '#lib/wallets/calculations.js';
+  import {
+    orderedItems,
+    walletBalance,
+    walletContributions,
+    walletEntries,
+    walletDayExpenses,
+  } from '#lib/wallets/calculations.js';
+  import OperationsHeader from '#lib/ui/OperationsHeader.svelte';
+  import OperationDayHeader from '#lib/ui/OperationDayHeader.svelte';
+  import { formatMoney } from '#lib/utils/formatMoney.js';
+  import { groupBySelectorToMap } from '#lib/utils/groupBy.js';
   import WalletCards from '#lib/wallets/WalletCards.svelte';
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
 
@@ -78,6 +88,13 @@
     );
   });
   $: shown = filtered.slice(0, limit);
+  $: dayGroups = groupBySelectorToMap(shown, (entry) => dayjs(entry.date).format('YYYY-MM-DD'));
+  $: dayExpenses = new Map(
+    [...groupBySelectorToMap(filtered, (entry) => dayjs(entry.date).format('YYYY-MM-DD'))].map(([date, entries]) => [
+      date,
+      walletDayExpenses(entries, categories),
+    ]),
+  );
   $: contributions = currentWallet
     ? currencies.flatMap((currency) =>
         walletContributions(currentWallet, $walletTransfersStore, currency).map((value) => ({ ...value, currency })),
@@ -122,17 +139,16 @@
       />
       {#if currentWallet}
         <section class="operations" data-testId="WalletDetails">
-          <div class="operations-header">
-            <h3>{$translate('transactions.title')} <span class="count">({filtered.length})</span></h3>
-            {#if !currentWallet.archived}<div class="actions">
-                <a href={expense(true)} data-testId="WalletScanReceipt" aria-label={$translate('receipts.scan_qr')}
-                  ><Icon name="mdi:camera" size={1.1} />{$translate('receipts.qr_code')}</a
-                ><a href={expense()} data-testId="WalletAddExpense"
-                  ><Icon name="mdi:plus" size={1.1} />{$translate('common.add')}</a
-                >
-              </div>{/if}
+          <OperationsHeader
+            count={filtered.length}
+            addHref={!currentWallet.archived ? expense() : null}
+            scanHref={!currentWallet.archived ? expense(true) : null}
+            addTestId="WalletAddExpense"
+            scanTestId="WalletScanReceipt"
+          />
+          <div class="operations-search-container">
+            <Input bind:value={search} icon="mdi:search" placeholder={$translate('common.search')} clearable />
           </div>
-          <Input bind:value={search} icon="mdi:search" placeholder={$translate('common.search')} clearable />
           {#if !currentWallet.participantId && contributions.length}
             <details class="contributions" open>
               <summary>{$translate('wallets.contributions')}</summary>
@@ -160,50 +176,64 @@
           {/if}
           <ShowMoreContainer bind:limit step={20} total={filtered.length} translate={$translate}>
             <ul class="history">
-              {#each shown as entry, index (entry.id)}
-                {#if index === 0 || dayjs(entry.date).format('YYYY-MM-DD') !== dayjs(shown[index - 1].date).format('YYYY-MM-DD')}<li
-                    class="date"
-                  >
-                    {dayjs(entry.date).format('DD.MM.YYYY')}
-                  </li>{/if}
-                {@const operation = entry.operation
-                  ? $operationsStore.find((operation) => operation.id === entry.operation?.id)
-                  : undefined}
-                {@const linked = operation?.linkedTransactionId
-                  ? history.find((other) => other.operation?.id === operation.linkedTransactionId)
-                  : undefined}
-                {#if operation}
-                  <li data-testId="WalletHistoryEntry">
-                    <ul class="operation-item">
-                      <TransactionListItem
-                        transaction={operation}
-                        amountOverride={Math.abs(entry.amount)}
-                        linkedAmountOverride={linked ? Math.abs(linked.amount) : null}
-                        onClick={() => goto(`/transactions/edit?id=${operation.id}`)}
-                      />
-                    </ul>
-                  </li>
-                {:else if entry.transfer}
-                  <li data-testId="WalletHistoryEntry">
-                    <button
-                      class="transfer"
-                      type="button"
-                      on:click={() => goto(`/settings/wallets?action=transfer&transfer=${entry.transfer!.id}`)}
-                      ><span class="transfer-icon"><Icon name="mdi:swap-horizontal" size={1.75} padding={0.75} /></span
-                      ><span class="transfer-text"
-                        ><span>{walletName(entry.transfer.fromWalletId)} → {walletName(entry.transfer.toWalletId)}</span
-                        ><span class="hint">{entry.transfer.comment || $translate('wallets.internal')}</span></span
-                      ><span class="amount"
-                        >{#if $settingsStore.hideBalances}<HiddenMoney
-                            currency={entry.currency}
-                          />{:else}{formatDebtMoney(entry.amount, {
-                            currency: entry.currency,
-                            withSign: true,
-                          })}{/if}</span
-                      ></button
-                    >
-                  </li>
-                {/if}
+              {#each [...dayGroups] as [date, entries] (date)}
+                <li class="day-group" data-testId="WalletDayGroup">
+                  <OperationDayHeader
+                    {date}
+                    expenses={$settingsStore.hideBalances
+                      ? []
+                      : (dayExpenses.get(date) ?? []).map(
+                          (value) => `-${formatMoney(value.amount, { currency: value.currency })}`,
+                        )}
+                  />
+                  <ul class="day-entries">
+                    {#each entries as entry (entry.id)}
+                      {@const operation = entry.operation
+                        ? $operationsStore.find((operation) => operation.id === entry.operation?.id)
+                        : undefined}
+                      {@const linked = operation?.linkedTransactionId
+                        ? history.find((other) => other.operation?.id === operation.linkedTransactionId)
+                        : undefined}
+                      {#if operation}
+                        <li data-testId="WalletHistoryEntry">
+                          <ul class="operation-item">
+                            <TransactionListItem
+                              transaction={operation}
+                              amountOverride={Math.abs(entry.amount)}
+                              linkedAmountOverride={linked ? Math.abs(linked.amount) : null}
+                              onClick={() => goto(`/transactions/edit?id=${operation.id}`)}
+                            />
+                          </ul>
+                        </li>
+                      {:else if entry.transfer}
+                        <li data-testId="WalletHistoryEntry">
+                          <button
+                            class="transfer"
+                            type="button"
+                            on:click={() => goto(`/settings/wallets?action=transfer&transfer=${entry.transfer!.id}`)}
+                            ><span class="transfer-icon"
+                              ><Icon name="mdi:swap-horizontal" size={1.75} padding={0.75} /></span
+                            ><span class="transfer-text"
+                              ><span
+                                >{walletName(entry.transfer.fromWalletId)} → {walletName(
+                                  entry.transfer.toWalletId,
+                                )}</span
+                              ><span class="hint">{entry.transfer.comment || $translate('wallets.internal')}</span
+                              ></span
+                            ><span class="amount"
+                              >{#if $settingsStore.hideBalances}<HiddenMoney
+                                  currency={entry.currency}
+                                />{:else}{formatDebtMoney(entry.amount, {
+                                  currency: entry.currency,
+                                  withSign: true,
+                                })}{/if}</span
+                            ></button
+                          >
+                        </li>
+                      {/if}
+                    {/each}
+                  </ul>
+                </li>
               {/each}
             </ul>
           </ShowMoreContainer>
@@ -233,57 +263,37 @@
 
 <style>
   .operations {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
     padding: 1rem;
   }
-  .operations-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
+  .operations-search-container {
+    padding: 1rem 0;
+    background: var(--background-color);
+    position: relative;
   }
-  h3 {
-    margin: 0;
-    font-size: 1.17rem;
-    font-weight: normal;
-  }
-  .count,
   .hint {
     color: var(--secondary-text-color);
     font-size: 0.85rem;
-  }
-  .actions {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
   }
   a {
     color: var(--active-color);
     text-decoration: none;
   }
-  .actions a {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    min-height: 2.75rem;
-  }
   .history,
+  .day-entries,
   .operation-item {
     list-style: none;
     padding: 0;
     margin: 0;
   }
-  .history {
+  .history,
+  .day-entries,
+  .day-group {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
-  .date {
-    color: var(--secondary-text-color);
-    font-size: 0.85rem;
-    padding-top: 0.5rem;
+  .history {
+    padding-top: 1rem;
   }
   .transfer {
     display: flex;
@@ -333,14 +343,5 @@
   .unallocated,
   .empty {
     padding: 1rem;
-  }
-  @media (max-width: 350px) {
-    .actions {
-      gap: 0.5rem;
-    }
-    .actions a {
-      gap: 0.1rem;
-      font-size: 0.9rem;
-    }
   }
 </style>

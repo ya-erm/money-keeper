@@ -5,6 +5,7 @@
 ### Added
 
 - Optional virtual wallets with multiple currencies, named participant profiles, synchronized personal account/wallet order, visibility, display currency and default allocation presets.
+- Wallet operation lists share the account counter and daily headers, show daily expense shares by currency, and provide a create-wallet shortcut in the header.
 - Allocate real payments across wallets, split equally or enter exact shares. Allocate both sides of a currency exchange using the recorded bank amounts and deterministic rounding.
 - Internal wallet transfers, unallocated balances by currency, shared savings contributions and returns, and wallet history linked to the original payments.
 - Wallet-first startup and expense/receipt QR shortcuts for the selected participant. Categories are available in settings; enabled wallets occupy the central menu position.

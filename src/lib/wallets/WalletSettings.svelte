@@ -221,6 +221,7 @@
       mode = participant ? 'preferences' : null;
       return;
     }
+    if ($page.url.searchParams.get('action') === 'create') openWallet();
     if ($page.url.searchParams.get('action') === 'edit')
       openWallet($walletsStore.find((item) => item.id === $page.url.searchParams.get('id')) ?? null);
     if ($page.url.searchParams.get('action') === 'transfer') {
