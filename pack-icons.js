@@ -43,6 +43,7 @@ const iconsToBundle = [
   'mdi:account-cash-outline',
   'mdi:account-group',
   'ion:people',
+  'ion:people-outline',
   'mdi:analytics',
   'mdi:add',
   'mdi:beta',

@@ -4,6 +4,7 @@
 
   import { memberSettingsStore } from '#lib/data/index.js';
   import { debtContactsStore } from '#lib/data/debtContacts.js';
+  import { allocationPercentages } from '#lib/wallets/percentages.js';
   import { personalAmount } from '#lib/debts/calculations.js';
   import { formatDebtMoney } from '#lib/debts/formatMoney.js';
   import type { CurrencyRate, TransactionViewModel } from '#lib/data/interfaces.js';
@@ -30,7 +31,9 @@
   $: incoming = transaction.category.type === 'IN';
   $: outgoing = transaction.category.type === 'OUT';
   $: isTransfer = !!transaction.linkedTransaction;
-  $: sharedWalletOperation = (transaction.walletAllocation?.shares.filter((share) => share.amount > 0).length ?? 0) > 1;
+  $: percentages = allocationPercentages(transaction.walletAllocation);
+  $: sharedWalletOperation = percentages.length > 1;
+  $: allocationRatio = percentages.join('/');
   $: hasLocation =
     transaction.locationLat != null &&
     transaction.locationLng != null &&
@@ -155,7 +158,7 @@
       {#if knownPlace?.name || transaction.debt || sharedWalletOperation || transaction.tags?.length}
         <div class="metadata" class:shared={sharedWalletOperation} data-testId="OperationMetadata">
           {#if knownPlace?.name}<span class="place-name" data-testId="OperationPlaceName">{knownPlace.name}</span
-            >{/if}{#if knownPlace?.name && (transaction.debt || sharedWalletOperation || transaction.tags?.length)}
+            >{/if}{#if knownPlace?.name && (transaction.debt || sharedWalletOperation)}
             {metadataSeparator}
           {/if}
           {#if transaction.debt}<span class="debt-info" data-testId="TransactionDebtInfo">
@@ -173,19 +176,19 @@
                     },
                   )}{/if}</span
               >
-            </span>{/if}{#if transaction.debt && (sharedWalletOperation || transaction.tags?.length)}
+            </span>{/if}{#if transaction.debt && sharedWalletOperation}
             {metadataSeparator}
           {/if}
           {#if sharedWalletOperation}<span
               class="participants-symbol"
               role="img"
-              aria-label={$translate('wallets.shared_operation')}
-              title={$translate('wallets.shared_operation')}
-              data-testId="OperationWalletAllocation"><Icon name="ion:people" size={1} /></span
-            >{/if}{#if sharedWalletOperation && transaction.tags?.length}
-            {metadataSeparator}
-          {/if}
+              aria-label={`${$translate('wallets.shared_operation')}: ${allocationRatio}`}
+              title={`${$translate('wallets.shared_operation')}: ${allocationRatio}`}
+              data-testId="OperationWalletAllocation"
+              ><Icon name="ion:people-outline" size={1} /><span>{allocationRatio}</span></span
+            >{/if}
           {#if transaction.tags?.length}
+            {#if knownPlace?.name || transaction.debt || sharedWalletOperation}&nbsp;{/if}
             <span class="tags">
               {#each transaction.tags as tag (tag.id)}
                 <span class="tag" class:deleted={tag.deleted}>#{tag.name}</span>
@@ -371,6 +374,9 @@
     flex: 0 2 auto;
   }
   .participants-symbol {
+    align-items: center;
+    gap: 0.25em;
+    white-space: nowrap;
     flex-shrink: 0;
   }
   .tag:not(:last-child)::after {

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.36.3 - 2026-11-23
+
+### Changed
+
+- Shared operations show an outlined participant icon and rounded percentage ratios (50/50, 37/63). Percentages total 100; tags no longer have a middle-dot prefix.
+
 ## 2.36.2 - 2026-11-22
 
 ### Added

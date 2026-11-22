@@ -381,7 +381,7 @@ test('card options open a separate editor, archive, restore and delete without c
   await expect(page.getByTestId('TransactionListItem')).toHaveCount(1);
   await expect(page.getByTestId('OperationWalletAllocation')).toHaveAttribute(
     'aria-label',
-    'Распределено между участниками',
+    'Распределено между участниками: 50/50',
   );
 });
 
@@ -800,4 +800,87 @@ test('wallet dots open editing directly and icons support recommendations and cu
   await page.getByTestId('ShowExportTextAreaButton').click();
   const saved = JSON.parse(await page.getByTestId('ExportTextArea').inputValue());
   expect(saved.virtualWallets.find((wallet: { id: string }) => wallet.id === 'alex-wallet').icon).toBe('ion:people');
+});
+
+test('shared operation metadata shows outlined percentages and tags without a dot prefix in bank and wallet histories', async ({
+  page,
+}) => {
+  const data = JSON.parse(backup);
+  data.knownPlaces = [{ id: 'home', name: 'Дом', latitude: 44.8, longitude: 20.4 }];
+  data.debtContacts = [{ id: 'oleg', name: 'Олег' }];
+  data.operationTags = [
+    { id: 'food', name: 'Еда' },
+    { id: 'family', name: 'Семья' },
+  ];
+  const operation = (id: string, comment: string, amounts: number[], extra = {}) => ({
+    id,
+    comment,
+    accountId: 'rsd',
+    categoryId: 'rent',
+    amount: amounts.reduce((sum, amount) => sum + amount, 0),
+    date: '2026-11-21T10:00:00Z',
+    tagIds: ['food', 'family'],
+    walletAllocation: {
+      shares: amounts.map((amount, index) => ({ walletId: ['alex-wallet', 'maria-wallet', 'holiday'][index], amount })),
+    },
+    ...extra,
+  });
+  data.operations.push(
+    operation('even', 'Поровну', [500, 500]),
+    operation('uneven', 'Неравные доли', [367, 633], {
+      locationLat: 44.8,
+      locationLng: 20.4,
+      debt: { kind: 'expense', shares: [{ contactId: 'oleg', amount: 200 }] },
+    }),
+    operation('thirds', 'Три кошелька', [1, 1, 1]),
+    operation('personal', 'Личное с тегами', [1000], { locationLat: 44.8, locationLng: 20.4 }),
+    operation('debt-tags', 'Долг с тегами', [1000], {
+      debt: { kind: 'expense', shares: [{ contactId: 'oleg', amount: 200 }] },
+    }),
+  );
+  await importMockDataAsync(page, JSON.stringify(data));
+  await page.goto('/accounts?account-card=rsd', { waitUntil: 'networkidle' });
+  const row = (id: string) => page.locator(`[data-testid=TransactionListItem][data-id="${id}"]`);
+  for (const [id, ratio] of [
+    ['even', '50/50'],
+    ['uneven', '37/63'],
+    ['thirds', '34/33/33'],
+  ]) {
+    const indicator = row(id).getByTestId('OperationWalletAllocation');
+    await expect(indicator).toHaveText(ratio);
+    await expect(indicator).toHaveAttribute('aria-label', `Распределено между участниками: ${ratio}`);
+    await expect(indicator.locator('svg path[fill=none][stroke=currentColor]')).not.toHaveCount(0);
+    await expect(row(id).getByTestId('OperationMetadata')).not.toContainText(/·\s*#/);
+    await expect(row(id).locator('.tag')).toHaveText(['#Еда', '#Семья']);
+  }
+  const combined = row('uneven').getByTestId('OperationMetadata');
+  await expect(combined).toContainText(/Дом.*Олег.*37\/63.*#Еда/);
+  const positions = await combined.evaluate((element) => {
+    const place = element.querySelector('[data-testid=OperationPlaceName]')!.getBoundingClientRect();
+    const debt = element.querySelector('[data-testid=TransactionDebtInfo]')!.getBoundingClientRect();
+    const allocation = element.querySelector('[data-testid=OperationWalletAllocation]')!.getBoundingClientRect();
+    return {
+      place: place.x,
+      debt: debt.x,
+      allocation: allocation.x,
+      right: allocation.right,
+      containerRight: element.getBoundingClientRect().right,
+      height: element.getBoundingClientRect().height,
+      fontSize: Number.parseFloat(getComputedStyle(element).fontSize),
+    };
+  });
+  expect(positions.place).toBeLessThan(positions.debt);
+  expect(positions.debt).toBeLessThan(positions.allocation);
+  expect(positions.right).toBeLessThanOrEqual(positions.containerRight + 1);
+  expect(positions.height).toBeLessThanOrEqual(positions.fontSize * 1.5);
+  for (const id of ['personal', 'debt-tags']) {
+    await expect(row(id).getByTestId('OperationWalletAllocation')).toHaveCount(0);
+    await expect(row(id).getByTestId('OperationMetadata')).not.toContainText(/·\s*#/);
+  }
+  await page.screenshot({ path: 'output/virtual-wallets/59-shared-operation-ratios.png', animations: 'disabled' });
+  await page.goto('/wallets?wallet=alex-wallet', { waitUntil: 'networkidle' });
+  await expect(row('even').getByTestId('OperationWalletAllocation')).toHaveText('50/50');
+  await expect(row('uneven').getByTestId('OperationWalletAllocation')).toHaveText('37/63');
+  await expect(row('even').getByTestId('OperationMetadata')).not.toContainText(/·\s*#/);
+  await page.screenshot({ path: 'output/virtual-wallets/60-wallet-operation-ratios.png', animations: 'disabled' });
 });
