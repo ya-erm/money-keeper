@@ -4,6 +4,6 @@
 </script>
 
 <div class="flex">
-  <HeaderButton icon="mdi:format-list-bulleted" label={$translate('wallets.setup')} href="/settings/wallets" />
+  <HeaderButton icon="mdi:format-list-bulleted" label={$translate('wallets.list')} href="/wallets/list" />
   <HeaderButton icon="mdi:wallet-plus-outline" label={$translate('wallets.new')} href="/wallets/create" />
 </div>

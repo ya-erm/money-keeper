@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.36.1 - 2026-11-22
+
+### Added
+
+- Dark theme uses a moon icon in Settings.
+- Account and wallet order/visibility are configured in their list pages for the selected participant. Wallets have an account-style list with drag sorting and explicit visibility controls; profile editing no longer duplicates these settings.
+
 ## 2.36.0 - 2026-11-22
 
 ### Added

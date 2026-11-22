@@ -134,8 +134,8 @@ export class MembersService implements Initialisable, JournalSubscriber {
       await participantsService.updatePreferences({ accountsOrder });
       return;
     }
-    void journalService.addOperationToQueue({ accountsOrder });
-    void this.updateSettingsInMemory({ accountsOrder });
+    await journalService.addOperationToQueue({ accountsOrder });
+    await this.updateSettings({ accountsOrder });
   }
 
   /** Save categories order */

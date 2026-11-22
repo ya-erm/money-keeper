@@ -4,7 +4,7 @@ import { test, expect } from '@tests/fixtures';
 test('two devices synchronize wallet payments, savings and personal preferences while keeping independent active participants', async ({
   browser,
 }, testInfo) => {
-  test.setTimeout(60000);
+  test.setTimeout(90000);
   const owner = 'wallet-sync-owner';
   const snapshot = {
     walletsEnabled: true,
@@ -19,7 +19,10 @@ test('two devices synchronize wallet payments, savings and personal preferences 
     ],
     walletTransfers: [],
     categories: [{ id: 'out', name: 'Покупка', type: 'OUT' }],
-    accounts: [{ id: 'card', name: 'Карта RSD', currency: 'RSD' }],
+    accounts: [
+      { id: 'card', name: 'Карта RSD', currency: 'RSD' },
+      { id: 'eur', name: 'Счёт EUR', currency: 'EUR' },
+    ],
     operations: [],
     accountTags: [],
     operationTags: [],
@@ -89,6 +92,26 @@ test('two devices synchronize wallet payments, savings and personal preferences 
     await source.getByTestId('MainCurrencyForm').locator('input[name=currency]').fill('eur');
     await source.getByTestId('MainCurrencyForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
     await expect(source.getByTestId('MainCurrencyForm')).toHaveCount(0);
+    await source.goto('/accounts/list');
+    await source.getByRole('button', { name: 'Сортировка счетов', exact: true }).click();
+    const accountRow = source.getByTestId('AccountSortList').locator(':scope > li[data-id="eur"]');
+    await accountRow.focus();
+    await accountRow.press('Space');
+    await accountRow.press('ArrowUp');
+    await accountRow.press('Space');
+    await source.getByRole('button', { name: 'Скрыть Карта RSD', exact: true }).click();
+    await source.locator('.sorting').getByRole('button', { name: 'Сохранить', exact: true }).click();
+    await expect(source).not.toHaveURL(/action=sort/);
+    await source.goto('/wallets/list');
+    await source.getByRole('button', { name: 'Сортировка кошельков', exact: true }).click();
+    const walletRow = source.getByTestId('WalletSortList').locator(':scope > li[data-id="b"]');
+    await walletRow.focus();
+    await walletRow.press('Space');
+    await walletRow.press('ArrowUp');
+    await walletRow.press('Space');
+    await source.getByRole('button', { name: 'Скрыть Алексей', exact: true }).click();
+    await source.locator('.sorting-bar').getByRole('button', { name: 'Сохранить', exact: true }).click();
+    await expect(source).toHaveURL(/\/wallets\/list$/);
     await source.evaluate(async () => {
       const path = '/src/lib/data/index.ts';
       const data = await import(path);
@@ -132,6 +155,18 @@ test('two devices synchronize wallet payments, savings and personal preferences 
     await target.goto('/settings/participants');
     await target.getByTestId('ParticipantPicker').selectOption('alex');
     await expect(target.getByTestId('ParticipantPicker')).toBeEnabled();
+    await target.goto('/accounts/list');
+    await expect(target.getByTestId('AccountSortList').locator(':scope > li').first()).toHaveAttribute(
+      'data-id',
+      'eur',
+    );
+    await expect(target.getByTestId('AccountSortList').locator(':scope > li[data-id="card"]')).toHaveClass(
+      /personal-hidden/,
+    );
+    await target.goto('/wallets/list');
+    await expect(target.getByTestId('WalletListItem').first()).toHaveAttribute('data-id', 'b');
+    await target.goto('/wallets');
+    await expect(target.getByTestId('WalletCard')).toHaveCount(2);
     await target.goto('/settings', { waitUntil: 'networkidle' });
     await target.reload({ waitUntil: 'networkidle' });
     await target.getByRole('button', { name: /Основная валюта/ }).click();
@@ -142,6 +177,16 @@ test('two devices synchronize wallet payments, savings and personal preferences 
     await target.getByTestId('ParticipantPicker').selectOption('maria');
     await expect(target.getByTestId('ParticipantPicker')).toBeEnabled();
     await expect(target.getByTestId('ParticipantPicker')).toHaveValue('maria');
+    await target.goto('/accounts/list');
+    await expect(target.getByTestId('AccountSortList').locator(':scope > li').first()).toHaveAttribute(
+      'data-id',
+      'card',
+    );
+    await expect(target.getByTestId('AccountSortList').locator(':scope > li[data-id="card"]')).not.toHaveClass(
+      /personal-hidden/,
+    );
+    await target.goto('/wallets');
+    await expect(target.getByTestId('WalletCard')).toHaveCount(3);
     await source.reload();
     await source.goto('/settings/participants');
     await expect(source.getByTestId('ParticipantPicker')).toHaveValue('alex');

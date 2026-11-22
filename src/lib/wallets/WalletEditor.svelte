@@ -29,7 +29,12 @@
     ownerId = wallet.participantId ?? '';
     draftId = wallet.id;
   }
-  $: returnPath = $page.url.searchParams.get('from') === 'settings' ? '/settings/wallets' : '/wallets';
+  $: returnPath =
+    $page.url.searchParams.get('from') === 'settings'
+      ? '/settings/wallets'
+      : $page.url.searchParams.get('from') === 'list'
+        ? '/wallets/list'
+        : '/wallets';
 
   async function save(archived = wallet?.archived ?? false) {
     if (busy || !name.trim() || (!creating && !wallet)) return;

@@ -66,7 +66,7 @@
     value={$activeLocaleName}
     onClick={openLanguageModal}
   />
-  <ListSwitchItem icon="mdi:theme-light-dark" title={$translate('settings.darkMode')} bind:checked={$darkMode} />
+  <ListSwitchItem icon="mdi:moon-waning-crescent" title={$translate('settings.darkMode')} bind:checked={$darkMode} />
   <ListSwitchItem
     icon="mdi:eye-off-outline"
     title={$translate('settings.hideBalances')}
