@@ -11,6 +11,10 @@
   import Layout from '#lib/ui/layout/Layout.svelte';
   import HeaderFormSubmitButton from '#lib/ui/layout/HeaderFormSubmitButton.svelte';
   import Modal from '#lib/ui/Modal.svelte';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+  import SubScreen from '#lib/ui/layout/SubScreen.svelte';
+  import CategoryIcons from '../../routes/categories/CategoryIcons.svelte';
+  import { walletIcons } from './icons.js';
 
   export let creating = false;
   export let id: string | null = null;
@@ -18,6 +22,8 @@
   let initializedId: string | null = null;
   let name = '';
   let ownerId = '';
+  let icon: string | null = null;
+  let iconSelecting = false;
   let busy = false;
   let deleteOpened = false;
   $: wallet = creating ? undefined : $walletsStore.find((item) => item.id === id);
@@ -26,6 +32,7 @@
     // eslint-disable-next-line no-useless-assignment
     initializedId = wallet.id;
     name = wallet.name;
+    icon = wallet.icon ?? null;
     ownerId = wallet.participantId ?? '';
     draftId = wallet.id;
   }
@@ -47,6 +54,7 @@
         ...current,
         id: draftId,
         name: name.trim(),
+        icon: icon?.trim() || undefined,
         participantId: ownerId || undefined,
         archived,
       });
@@ -95,6 +103,17 @@
     <form class="wallet-form flex-col gap-1" data-testId="WalletForm" on:submit|preventDefault={() => save()}>
       {#if wallet?.archived}<p class="hint">{$translate('accounts.archived')}</p>{/if}
       <Input label={$translate('wallets.name')} name="wallet-name" bind:value={name} required maxlength={100} />
+      <button
+        type="button"
+        class="icon-picker"
+        aria-label={$translate('icons.select_icon')}
+        data-testId="WalletIconButton"
+        on:click={() => (iconSelecting = true)}
+      >
+        <Icon name={icon || 'mdi:wallet-outline'} size={2} /><span>{$translate('icons.select_icon')}</span><Icon
+          name="mdi:chevron-right"
+        />
+      </button>
       <label class="owner"
         >{$translate('wallets.owner')}
         <select name="wallet-owner" bind:value={ownerId}>
@@ -149,6 +168,21 @@
     </div>
   {/if}
 </Layout>
+{#if iconSelecting}<SubScreen
+    visible
+    title={$translate('icons.select_icon')}
+    onBack={() => (iconSelecting = false)}
+    testId="WalletIconPicker"
+  >
+    <CategoryIcons
+      icon={icon || 'mdi:wallet-outline'}
+      icons={walletIcons}
+      onSelect={(value) => {
+        icon = value;
+        iconSelecting = false;
+      }}
+    />
+  </SubScreen>{/if}
 <Modal bind:opened={deleteOpened} width={22} header={$translate('wallets.delete_confirm')}>
   <p>{$translate('wallets.delete_description')}</p>
   <div class="mt-1 grid-col-2 gap-1" data-testId="DeleteWalletConfirmation">
@@ -168,6 +202,22 @@
     padding: 1rem;
     max-width: 30rem;
     margin: auto;
+  }
+  .icon-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    font: inherit;
+    background: var(--header-background-color);
+    color: var(--primary-text-color);
+    cursor: pointer;
+  }
+  .icon-picker span {
+    flex: 1;
+    text-align: left;
   }
   .owner {
     display: flex;

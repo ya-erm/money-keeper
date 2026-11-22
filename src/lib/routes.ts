@@ -11,6 +11,7 @@ type RouteKey =
   | 'settings.participants.edit'
   | 'settings.wallets'
   | 'wallets'
+  | 'wallets.transfer'
   | 'wallets.list'
   | 'wallets.create'
   | 'wallets.edit'
@@ -57,6 +58,7 @@ export const routes: { [key in RouteKey]: Route } = {
   'settings.participants.edit': { path: '/settings/participants/edit', title: 'wallets.edit_participant' },
   'settings.participants': { path: '/settings/participants', title: 'wallets.participants' },
   'settings.wallets': { path: '/settings/wallets', title: 'wallets.title' },
+  'wallets.transfer': { path: '/wallets/transfer', title: 'wallets.transfer' },
   'wallets.list': { path: '/wallets/list', title: 'wallets.list' },
   'wallets.create': { path: '/wallets/create', title: 'wallets.new' },
   'wallets.edit': { path: '/wallets/edit', title: 'wallets.edit_wallet' },

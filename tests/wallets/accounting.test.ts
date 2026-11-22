@@ -97,9 +97,13 @@ test('participants, shared expense, holiday contributions, reload and export', a
     .filter({ hasText: 'Отпуск' })
     .getByRole('link', { name: 'Перераспределить', exact: true })
     .click();
-  await page.locator('[name=from-wallet]').selectOption('alex-wallet');
+  await page.getByTestId('SourceWalletSelect').getByRole('button').click();
+  await page.getByTestId('SourceWalletSelect.Portal').getByRole('button', { name: 'Алексей', exact: true }).click();
   await page.locator('[name=wallet-amount]').fill('20000');
-  await page.locator('[name=wallet-currency]').fill('RSD');
+  await page.getByTestId('WalletCurrencyButton').click();
+  await page.getByTestId('RecentWalletCurrencies').getByRole('button', { name: 'RSD', exact: true }).click();
+  await page.getByTestId('WalletCurrencyForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page.getByTestId('WalletCurrencyForm')).toHaveCount(0);
   expect(
     await page.getByTestId('WalletTransferForm').evaluate((form) =>
       Array.from((form as HTMLFormElement).elements)
@@ -236,11 +240,7 @@ test('swiping wallet cards changes history and archived wallets remain readable'
   await page
     .getByTestId('WalletCard')
     .filter({ hasText: 'Алексей' })
-    .getByRole('button', { name: 'Дополнительные опции', exact: true })
-    .click();
-  await page
-    .getByTestId('WalletOptions')
-    .getByRole('button', { name: 'Редактировать', exact: true, includeHidden: true })
+    .getByRole('button', { name: 'Редактировать кошелёк', exact: true })
     .click();
   await expect(page).toHaveURL(/\/wallets\/edit\?id=alex-wallet/);
   await page.getByRole('button', { name: 'Архивировать', exact: true }).click();
@@ -343,11 +343,7 @@ test('card options open a separate editor, archive, restore and delete without c
     await page
       .getByTestId('WalletCard')
       .filter({ hasText: name })
-      .getByRole('button', { name: 'Дополнительные опции', exact: true })
-      .click();
-    await page
-      .getByTestId('WalletOptions')
-      .getByRole('button', { name: 'Редактировать', exact: true, includeHidden: true })
+      .getByRole('button', { name: 'Редактировать кошелёк', exact: true })
       .click();
     await expect(page).toHaveURL(/\/wallets\/edit\?id=alex-wallet/);
     await expect(page.getByTestId('EnableWallets')).toHaveCount(0);
@@ -402,11 +398,7 @@ test('create page supports cancel and main-card editing returns to wallet histor
   await page
     .getByTestId('WalletCard')
     .filter({ hasText: 'Алексей' })
-    .getByRole('button', { name: 'Дополнительные опции', exact: true })
-    .click();
-  await page
-    .getByTestId('WalletOptions')
-    .getByRole('button', { name: 'Редактировать', exact: true, includeHidden: true })
+    .getByRole('button', { name: 'Редактировать кошелёк', exact: true })
     .click();
   await page.getByTestId('WalletForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
   await expect(page).toHaveURL(/\/wallets\?wallet=alex-wallet$/);
@@ -654,4 +646,158 @@ test('list sorting and visibility are saved per participant, cancel discards dra
   await page.getByTestId('WalletForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
   await expect(page).toHaveURL(/\/wallets\/list$/);
   await expect(page.getByTestId('WalletListItem').filter({ hasText: 'Новый резерв' })).toBeVisible();
+});
+
+test('reallocation is separate from settings, uses wallet previews and recent currencies, and preserves edited timestamps', async ({
+  page,
+}) => {
+  test.setTimeout(60000);
+  const data = JSON.parse(backup);
+  for (const currency of ['USD', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'NOK', 'SEK']) {
+    data.accounts.push({ id: currency, name: currency, currency });
+  }
+  await importMockDataAsync(page, JSON.stringify(data));
+  await page.goto('/settings/wallets', { waitUntil: 'networkidle' });
+  const explanation = page.getByText(
+    'Виртуальные кошельки позволяют распределить деньги со счетов без реальных операций',
+    { exact: true },
+  );
+  await expect(explanation).toBeVisible();
+  const toggleBox = await page.getByTestId('EnableWallets').boundingBox();
+  const hintBox = await explanation.boundingBox();
+  const headingBox = await page.getByRole('heading', { name: 'Кошельки', exact: true }).boundingBox();
+  expect(hintBox!.y).toBeGreaterThan(toggleBox!.y);
+  expect(hintBox!.y + hintBox!.height).toBeLessThan(headingBox!.y);
+  await expect(page.getByTestId('WalletTransferForm')).toHaveCount(0);
+  await page.screenshot({ path: 'output/virtual-wallets/51-wallet-settings-explanation.png', animations: 'disabled' });
+  await page.getByRole('button', { name: 'Перераспределить', exact: true }).click();
+  await expect(page).toHaveURL(/\/wallets\/transfer\?from=settings$/);
+  await expect(page.getByTestId('EnableWallets')).toHaveCount(0);
+  await expect(page.getByTestId('ActiveWallets')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Отмена', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/wallets$/);
+  await page.goto('/wallets?wallet=holiday', { waitUntil: 'networkidle' });
+  await page
+    .getByTestId('WalletCard')
+    .filter({ hasText: 'Отпуск' })
+    .getByRole('link', { name: 'Перераспределить', exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/wallets\/transfer\?to=holiday$/);
+  await expect(page.getByTestId('DestinationWalletSelect')).toContainText('Куда');
+  await expect(page.getByTestId('DestinationWalletSelect')).toContainText('Отпуск');
+  await page.getByTestId('SourceWalletSelect').getByRole('button').click();
+  const chooser = page.getByTestId('SourceWalletSelect.Portal');
+  await expect(chooser.getByTestId('WalletListItem')).toHaveCount(4);
+  await expect(chooser.getByRole('button', { name: 'Алексей', exact: true })).toContainText('100\u00a0000');
+  await page.screenshot({ path: 'output/virtual-wallets/52-wallet-selector.png', animations: 'disabled' });
+  await chooser.getByPlaceholder('Поиск', { exact: true }).fill('Алексей');
+  await chooser.getByRole('button', { name: 'Алексей', exact: true }).click();
+  await expect(page.getByTestId('SourceWalletSelect')).toContainText('Откуда');
+  await page.getByTestId('WalletCurrencyButton').click();
+  const currencies = page.getByTestId('RecentWalletCurrencies');
+  const dimensions = await currencies.getByTestId('TagsContainer').evaluate((element) => ({
+    width: element.clientWidth,
+    scroll: element.scrollWidth,
+    tops: Array.from(element.querySelectorAll('button')).map((button) => button.getBoundingClientRect().top),
+  }));
+  expect(dimensions.scroll).toBeGreaterThan(dimensions.width);
+  expect(new Set(dimensions.tops).size).toBe(1);
+  await currencies.getByRole('button', { name: 'RSD', exact: true }).click();
+  await page.screenshot({ path: 'output/virtual-wallets/53-wallet-currencies.png', animations: 'disabled' });
+  await page.getByTestId('WalletCurrencyForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page.getByTestId('WalletCurrencyForm')).toHaveCount(0);
+  await page.locator('[name=wallet-amount]').fill('5000');
+  await page.locator('[name=wallet-date]').fill('2026-11-21');
+  await page.locator('[name=wallet-time]').fill('14:37');
+  await page.locator('[name=wallet-comment]').fill('Перевод на отпуск');
+  await expect(page.locator('[name=wallet-amount]')).toHaveValue('5000');
+  await expect(page.locator('[name=wallet-comment]')).toHaveValue('Перевод на отпуск');
+  await page.screenshot({ path: 'output/virtual-wallets/54-wallet-transfer-page.png', animations: 'disabled' });
+  await page.getByTestId('WalletTransferForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page).toHaveURL(/\/wallets\?wallet=holiday$/);
+  const entry = page.getByTestId('WalletHistoryEntry').filter({ hasText: 'Перевод на отпуск' });
+  await expect(entry).toContainText('5\u00a0000');
+  await entry.getByRole('button').click();
+  await expect(page).toHaveURL(/\/wallets\/transfer\?transfer=/);
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.locator('[name=wallet-date]')).toHaveValue('2026-11-21');
+  await expect(page.locator('[name=wallet-time]')).toHaveValue('14:37');
+  await page.locator('[name=wallet-time]').fill('15:42');
+  await page.getByTestId('WalletTransferForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page).toHaveURL(/\/wallets\?wallet=holiday$/);
+  await page.goto('/settings/import-export');
+  await page.getByTestId('ShowExportTextAreaButton').click();
+  const saved = JSON.parse(await page.getByTestId('ExportTextArea').inputValue());
+  expect(saved.operations).toHaveLength(1);
+  expect(saved.walletTransfers).toHaveLength(1);
+  expect(saved.walletTransfers[0]).toMatchObject({
+    date: '2026-11-21T12:42:00.000Z',
+    amount: 5000,
+    contributorParticipantId: 'alex',
+  });
+  await page.goto(`/settings/wallets?action=transfer&transfer=${saved.walletTransfers[0].id}`);
+  await expect(page).toHaveURL(/\/wallets\/transfer\?transfer=/);
+  await expect(page.locator('[name=wallet-time]')).toHaveValue('15:42');
+  await page.getByRole('button', { name: 'Удалить', exact: true }).click();
+  await expect(page).toHaveURL(/\/wallets\?wallet=holiday$/);
+  await expect(page.getByTestId('WalletHistoryEntry')).toHaveCount(0);
+  await page.goto('/wallets/transfer?transfer=missing');
+  await expect(page.getByText('Перераспределение не найдено', { exact: true })).toBeVisible();
+  await expect(page.getByTestId('WalletTransferForm')).toHaveCount(0);
+});
+
+test('wallet dots open editing directly and icons support recommendations and custom sets', async ({ page }) => {
+  test.setTimeout(60000);
+  await page.goto('/settings/wallets', { waitUntil: 'networkidle' });
+  await page
+    .getByTestId('WalletCard')
+    .filter({ hasText: 'Алексей' })
+    .getByRole('button', { name: 'Редактировать кошелёк', exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/wallets\/edit\?id=alex-wallet/);
+  await expect(page.getByTestId('WalletOptions')).toHaveCount(0);
+  await page.getByTestId('WalletIconButton').click();
+  const icons = page.getByTestId('WalletIconPicker');
+  await page.screenshot({ path: 'output/virtual-wallets/55-wallet-icons.png', animations: 'disabled' });
+  await icons.locator('[data-testid=IconChoice][data-id="mdi:piggy-bank-outline"]').click();
+  await page.getByTestId('WalletForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/wallets$/);
+  await page
+    .getByTestId('WalletCard')
+    .filter({ hasText: 'Алексей' })
+    .getByRole('button', { name: 'Редактировать кошелёк', exact: true })
+    .click();
+  await page.getByTestId('WalletIconButton').click();
+  await icons.getByText('Пользовательский', { exact: true }).click();
+  await icons.locator('[name=icon]').fill('ion:people');
+  await icons.getByRole('button', { name: 'Продолжить', exact: true }).click();
+  await expect(icons).toHaveCount(0);
+  await page.getByTestId('WalletForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/wallets$/);
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.screenshot({ path: 'output/virtual-wallets/56-custom-wallet-icon.png', animations: 'disabled' });
+  await page
+    .getByTestId('WalletCard')
+    .filter({ hasText: 'Алексей' })
+    .getByRole('button', { name: 'Редактировать кошелёк', exact: true })
+    .click();
+  await page.getByTestId('WalletIconButton').click();
+  await expect(icons.locator('[name=icon]')).toHaveValue('ion:people');
+  await icons.locator('[name=icon]').fill('mdi:home-outline');
+  await icons.getByRole('button', { name: 'Назад', exact: true }).click();
+  await page.getByTestId('WalletForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/wallets$/);
+  await page.goto('/wallets?wallet=alex-wallet', { waitUntil: 'networkidle' });
+  await page
+    .getByTestId('WalletCard')
+    .filter({ hasText: 'Алексей' })
+    .getByRole('button', { name: 'Редактировать кошелёк', exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/wallets\/edit\?id=alex-wallet/);
+  await page.getByTestId('WalletForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page).toHaveURL(/\/wallets\?wallet=alex-wallet$/);
+  await page.goto('/settings/import-export');
+  await page.getByTestId('ShowExportTextAreaButton').click();
+  const saved = JSON.parse(await page.getByTestId('ExportTextArea').inputValue());
+  expect(saved.virtualWallets.find((wallet: { id: string }) => wallet.id === 'alex-wallet').icon).toBe('ion:people');
 });

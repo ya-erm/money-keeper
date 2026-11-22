@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '@ya-erm/svelte-ui/Icon';
   import type { VirtualWallet } from '#lib/data/interfaces.js';
   import { settingsStore } from '#lib/data/settings.js';
   import { translate } from '#lib/translate/index.js';
@@ -14,6 +15,7 @@
 
 <article class="wallet-card" data-testId="WalletCard" data-id={wallet.id}>
   <div class="heading">
+    <span class="wallet-icon"><Icon name={wallet.icon || 'mdi:wallet-outline'} size={1.25} /></span>
     <a class="name" href={`/wallets?wallet=${encodeURIComponent(wallet.id)}`}
       ><strong>{wallet.name}</strong><span class="hint">{ownerName}</span></a
     >
@@ -46,7 +48,18 @@
     overflow-wrap: anywhere;
     min-width: 0;
   }
+  .wallet-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+  .heading :global(.options) {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+  }
   .heading {
+    position: relative;
+    padding-right: 1.5rem;
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;

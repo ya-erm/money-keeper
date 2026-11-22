@@ -12,6 +12,18 @@ const target = 'src/lib/icons.ts';
 
 // Icons to bundle, array
 const iconsToBundle = [
+  'mdi:piggy-bank-outline',
+  'mdi:airplane',
+  'mdi:home-outline',
+  'mdi:food',
+  'mdi:cart-outline',
+  'mdi:car',
+  'mdi:heart-outline',
+  'mdi:gift-outline',
+  'mdi:school-outline',
+  'mdi:beach',
+  'mdi:medical-bag',
+
   'mdi:drag',
   'mdi:sort',
   'mdi:moon-waning-crescent',

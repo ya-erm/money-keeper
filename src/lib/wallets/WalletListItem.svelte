@@ -8,14 +8,17 @@
   export let ownerName: string;
   export let balances: { currency: string; amount: number }[];
   export let draggable = false;
+  export let disabled = false;
+  export let ariaLabel: string | undefined = undefined;
   export let onClick: () => void;
   $: shown = balances.filter((balance) => balance.amount !== 0 || balances.length === 1);
 </script>
 
 <button
   type="button"
+  {disabled}
   class:draggable
-  aria-label={wallet.name}
+  aria-label={ariaLabel ?? wallet.name}
   data-testId="WalletListItem"
   data-id={wallet.id}
   on:click={() => {
@@ -23,8 +26,10 @@
   }}
 >
   <span class="drag-zone" class:collapsed={!draggable}><Icon name="mdi:drag" /></span>
-  <span class="wallet-icon"><Icon name="mdi:wallet-outline" padding={0.5} /></span>
-  <span class="identity"><span>{wallet.name}</span><small>{ownerName}</small></span>
+  <span class="wallet-icon"><Icon name={wallet.icon || 'mdi:wallet-outline'} padding={0.5} /></span>
+  <span class="identity"
+    ><span>{wallet.name}</span>{#if ownerName}<small>{ownerName}</small>{/if}</span
+  >
   <span class="balances">
     {#each shown as balance (balance.currency)}<span
         >{#if $settingsStore.hideBalances}<HiddenMoney currency={balance.currency} />{:else}{formatDebtMoney(
@@ -36,6 +41,7 @@
         >{#if $settingsStore.hideBalances}<HiddenMoney />{:else}0{/if}</span
       >{/if}
   </span>
+  <slot name="end" />
 </button>
 
 <style>

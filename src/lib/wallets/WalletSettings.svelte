@@ -1,15 +1,13 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
-  import { v4 as uuid } from 'uuid';
-  import dayjs from 'dayjs';
+  import { SvelteURLSearchParams } from 'svelte/reactivity';
   import { page } from '#lib/page.js';
   import { accountsStore, categoriesStore, operationsStore, settingsStore } from '#lib/data/index.js';
   import { accountsService } from '#lib/data/accounts.js';
   import { participantsService, participantsStore, selectedParticipantStore } from '#lib/data/participants.js';
   import { membersService, memberSettingsStore } from '#lib/data/members.js';
-  import { walletsStore, walletTransfersService, walletTransfersStore } from '#lib/data/wallets.js';
-  import type { WalletTransfer } from '#lib/data/interfaces.js';
+  import { walletsStore, walletTransfersStore } from '#lib/data/wallets.js';
   import {
     SYSTEM_CATEGORY_TRANSFER_IN,
     SYSTEM_CATEGORY_TRANSFER_OUT,
@@ -24,19 +22,9 @@
   import { fromMinor, toMinor } from '#lib/debts/calculations.js';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
   import WalletOverviewCard from './WalletOverviewCard.svelte';
-  import { orderedItems, validateWalletTransfer, walletBalance, walletEntries } from '#lib/wallets/calculations.js';
+  import { orderedItems, walletBalance, walletEntries } from '#lib/wallets/calculations.js';
 
-  type Mode = 'transfer' | null;
-  let mode: Mode = null;
   let busy = false;
-  let editedTransfer: WalletTransfer | null = null;
-  let fromId = '';
-  let toId = '';
-  let transferCurrency = 'RSD';
-  let amount = '';
-  let date = dayjs().format('YYYY-MM-DD');
-  let comment = '';
-  let draftId = uuid();
   $: participant = $selectedParticipantStore;
   $: allAccounts = [...$accountsStore, ...accountsService.deletedItems];
   $: allCategories = [
@@ -112,48 +100,6 @@
       busy = false;
     }
   }
-  function openTransfer(transfer: WalletTransfer | null = null) {
-    draftId = transfer?.id ?? uuid();
-    editedTransfer = transfer;
-    fromId = transfer?.fromWalletId ?? '';
-    toId = transfer?.toWalletId ?? currentWallet?.id ?? '';
-    transferCurrency =
-      transfer?.currency ?? (currencies.includes(participant?.currency ?? '') ? participant!.currency! : currencies[0]);
-    amount = transfer?.amount.toString() ?? '';
-    date = transfer ? dayjs(transfer.date).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
-    comment = transfer?.comment ?? '';
-    mode = 'transfer';
-  }
-  async function saveTransfer() {
-    const fromWallet = $walletsStore.find((wallet) => wallet.id === fromId);
-    const toWallet = $walletsStore.find((wallet) => wallet.id === toId);
-    const sameEndpoints =
-      editedTransfer?.fromWalletId === (fromId || undefined) && editedTransfer?.toWalletId === (toId || undefined);
-    const transfer: WalletTransfer = {
-      id: draftId,
-      fromWalletId: fromId || undefined,
-      toWalletId: toId || undefined,
-      currency: transferCurrency.trim().toUpperCase(),
-      amount: Number(amount),
-      date:
-        editedTransfer && dayjs(editedTransfer.date).format('YYYY-MM-DD') === date
-          ? editedTransfer.date
-          : dayjs(date).hour(12).toISOString(),
-      comment: comment.trim() || undefined,
-      contributorParticipantId: sameEndpoints
-        ? editedTransfer?.contributorParticipantId
-        : (fromWallet?.participantId ?? toWallet?.participantId),
-    };
-    if (!validateWalletTransfer(transfer, $walletsStore)) {
-      showErrorToast($translate('wallets.invalid_transfer'));
-      return;
-    }
-    await run(async () => {
-      await walletTransfersService.save(transfer);
-      mode = null;
-      await goto(`/wallets?wallet=${transfer.toWalletId ?? transfer.fromWalletId ?? ''}`);
-    });
-  }
   onMount(() => {
     if ($page.url.searchParams.get('action') === 'create')
       void goto('/wallets/create?from=settings', { replace: true });
@@ -162,8 +108,9 @@
         replace: true,
       });
     if ($page.url.searchParams.get('action') === 'transfer') {
-      openTransfer($walletTransfersStore.find((item) => item.id === $page.url.searchParams.get('transfer')) ?? null);
-      if (!editedTransfer) toId = $page.url.searchParams.get('to') ?? '';
+      const params = new SvelteURLSearchParams($page.url.searchParams.toString());
+      params.delete('action');
+      void goto(`/wallets/transfer?${params}`, { replace: true });
     }
   });
 </script>
@@ -184,76 +131,12 @@
         />{$translate('wallets.enable')}</label
       >
     {/if}
-    {#if mode === 'transfer'}
-      <form class="editor" on:submit|preventDefault={saveTransfer} data-testId="WalletTransferForm">
-        <h2>{$translate('wallets.transfer')}</h2>
-        <label
-          >{$translate('wallets.from')}<select name="from-wallet" bind:value={fromId}
-            ><option value="">{$translate('wallets.unallocated')}</option
-            >{#each ordered.filter((wallet) => !wallet.archived || wallet.id === fromId) as wallet (wallet.id)}<option
-                value={wallet.id}>{wallet.name}</option
-              >{/each}</select
-          ></label
-        >
-        <label
-          >{$translate('wallets.to')}<select name="to-wallet" bind:value={toId}
-            ><option value="">{$translate('wallets.unallocated')}</option
-            >{#each ordered.filter((wallet) => !wallet.archived || wallet.id === toId) as wallet (wallet.id)}<option
-                value={wallet.id}>{wallet.name}</option
-              >{/each}</select
-          ></label
-        >
-        <div class="two-fields">
-          <label
-            >{$translate('transactions.amount')}<input
-              name="wallet-amount"
-              type="number"
-              min="0"
-              step="any"
-              bind:value={amount}
-              required
-            /></label
-          ><label
-            >{$translate('accounts.currency')}<input
-              name="wallet-currency"
-              bind:value={transferCurrency}
-              required
-              pattern={'[A-Za-z]{3}'}
-              list="wallet-currencies"
-            /></label
-          >
-        </div>
-        <datalist id="wallet-currencies"
-          >{#each currencies as currency (currency)}<option value={currency}></option>{/each}</datalist
-        >
-        <label
-          >{$translate('transactions.date')}<input name="wallet-date" type="date" bind:value={date} required /></label
-        >
-        <label>{$translate('transactions.comment')}<input name="wallet-comment" bind:value={comment} /></label>
-        <div class="toolbar">
-          <button class="primary" disabled={busy}>{$translate('common.save')}</button><button
-            type="button"
-            on:click={() => (mode = null)}>{$translate('common.cancel')}</button
-          >
-          {#if editedTransfer}<button
-              type="button"
-              class="danger"
-              disabled={busy}
-              on:click={() =>
-                run(async () => {
-                  await walletTransfersService.save({ ...editedTransfer!, deleted: true });
-                  mode = null;
-                })}>{$translate('common.delete')}</button
-            >{/if}
-        </div>
-      </form>
-    {/if}
 
+    <p class="hint">{$translate('wallets.budget_hint')}</p>
     <div class="section-heading">
       <h2>{$translate('wallets.title')}</h2>
       <a class="create-wallet" href="/wallets/create?from=settings">{$translate('wallets.new')}</a>
     </div>
-    <p class="hint">{$translate('wallets.budget_hint')}</p>
     {#if !$walletsStore.length}<p>{$translate('wallets.empty')}</p>{/if}
     <div class="wallet-grid" data-testId="ActiveWallets">
       {#each ordered.filter((wallet) => !wallet.archived) as wallet (wallet.id)}
@@ -273,8 +156,10 @@
                 value.currency,
               )}{/if}</strong
           >
-        </div>{/each}<button type="button" on:click={() => openTransfer()} disabled={!$walletsStore.length}
-        >{$translate('wallets.transfer')}</button
+        </div>{/each}<button
+        type="button"
+        on:click={() => goto('/wallets/transfer?from=settings')}
+        disabled={!$walletsStore.length}>{$translate('wallets.transfer')}</button
       >
     </section>
     {#if ordered.some((wallet) => wallet.archived)}<details data-testId="ArchivedWallets">
@@ -311,10 +196,6 @@
     margin: 0;
   }
   button,
-  input,
-  select {
-    font: inherit;
-  }
   button {
     min-height: 2.75rem;
     padding: 0.6rem 0.8rem;
@@ -328,35 +209,8 @@
     opacity: 0.4;
     cursor: default;
   }
-  .primary {
-    background: var(--active-color);
-    color: var(--background-color);
-  }
-  .danger {
-    color: var(--red-color);
-  }
-  .toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  .editor {
-    padding: 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-    min-width: 0;
-  }
-  label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    min-width: 0;
-  }
-  input,
-  select {
+
+  input {
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
@@ -368,11 +222,7 @@
     color: var(--primary-text-color);
     font-size: 1rem;
   }
-  .two-fields {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-    gap: 0.5rem;
-  }
+
   .hint {
     color: var(--secondary-text-color);
     font-size: 0.85rem;

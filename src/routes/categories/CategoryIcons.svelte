@@ -12,7 +12,7 @@
   export let icon: string | null = null;
   export let onSelect: (icon: string | null) => void;
 
-  const icons = Object.values(categoryIcons).flat();
+  export let icons: string[] = Object.values(categoryIcons).flat();
 
   const tabs = [
     { id: 'recommended', title: $translate('icons.recommended') },
@@ -27,7 +27,14 @@
   {#if selectedTab.id === 'recommended'}
     <div class="w-full grid">
       {#each icons as item (item)}
-        <GridCircleItem icon={item} text="" onClick={() => onSelect(item)} selected={item === icon} />
+        <GridCircleItem
+          icon={item}
+          dataId={item}
+          testId="IconChoice"
+          text=""
+          onClick={() => onSelect(item)}
+          selected={item === icon}
+        />
       {/each}
     </div>
   {/if}

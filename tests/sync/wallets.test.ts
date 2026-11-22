@@ -115,6 +115,7 @@ test('two devices synchronize wallet payments, savings and personal preferences 
     await source.evaluate(async () => {
       const path = '/src/lib/data/index.ts';
       const data = await import(path);
+      await data.walletsService.save({ ...data.walletsService.getById('a'), icon: 'ion:people' });
       await data.operationsService.save({
         id: 'shared',
         accountId: 'card',
@@ -148,6 +149,9 @@ test('two devices synchronize wallet payments, savings and personal preferences 
     await expect(target.getByTestId('ParticipantPicker')).toHaveValue('maria');
     await target.goto('/wallets');
     await expect(target.getByTestId('WalletCard').first()).toContainText('Мария');
+    await expect(
+      target.getByTestId('WalletCard').filter({ hasText: 'Алексей' }).locator('svg.iconify--ion'),
+    ).toHaveCount(1);
     await expect(target.getByTestId('WalletCard').filter({ hasText: 'Отпуск' })).toContainText('2\u00a0000');
     await target.goto('/wallets?wallet=holiday');
     await expect(target.getByTestId('WalletContribution')).toContainText('Алексей');

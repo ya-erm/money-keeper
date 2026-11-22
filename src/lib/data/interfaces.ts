@@ -129,6 +129,7 @@ export type Participant = {
 
 /** A multi-currency envelope, independent of where the money is held. */
 export type VirtualWallet = {
+  icon?: string;
   id: string;
   name: string;
   participantId?: string;

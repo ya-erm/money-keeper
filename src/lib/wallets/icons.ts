@@ -1,0 +1,18 @@
+export const walletIcons = [
+  'mdi:wallet-outline',
+  'mdi:piggy-bank-outline',
+  'mdi:airplane',
+  'mdi:home-outline',
+  'mdi:food',
+  'mdi:cart-outline',
+  'mdi:car',
+  'mdi:heart-outline',
+  'mdi:gift-outline',
+  'mdi:school-outline',
+  'mdi:briefcase-outline',
+  'mdi:beach',
+  'mdi:medical-bag',
+  'mdi:cash-multiple',
+  'mdi:account-outline',
+  'mdi:account-group',
+];

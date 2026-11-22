@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.36.2 - 2026-11-22
+
+### Added
+
+- Wallet reallocation has its own page with wallet preview selectors, recent currency badges and editable date/time.
+- Wallet cards open the editor directly. Wallet icons support bundled suggestions and custom Iconify sets.
+- Wallet settings explain virtual wallets immediately below the enable switch.
+
 ## 2.36.1 - 2026-11-22
 
 ### Added

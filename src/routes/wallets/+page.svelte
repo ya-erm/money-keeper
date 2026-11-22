@@ -215,7 +215,10 @@
                           <button
                             class="transfer"
                             type="button"
-                            on:click={() => goto(`/settings/wallets?action=transfer&transfer=${entry.transfer!.id}`)}
+                            on:click={() =>
+                              goto(
+                                `/wallets/transfer?transfer=${encodeURIComponent(entry.transfer!.id)}&wallet=${encodeURIComponent(currentWallet.id)}`,
+                              )}
                             ><span class="transfer-icon"
                               ><Icon name="mdi:swap-horizontal" size={1.75} padding={0.75} /></span
                             ><span class="transfer-text"
@@ -255,7 +258,7 @@
                   { currency: value.currency },
                 )}{/if}</span
             >
-          </div>{/each}<a href="/settings/wallets?action=transfer">{$translate('wallets.transfer')}</a>
+          </div>{/each}<a href="/wallets/transfer">{$translate('wallets.transfer')}</a>
       </details>
     {:else}
       <div class="empty">

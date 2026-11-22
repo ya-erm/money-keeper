@@ -53,7 +53,7 @@
     <div class="card" data-id={wallet.id} data-testId="WalletCard">
       <div class="card-content">
         <div class="card-heading">
-          <span class="wallet-icon"><Icon name="mdi:wallet-outline" padding={0.5} /></span>
+          <span class="wallet-icon"><Icon name={wallet.icon || 'mdi:wallet-outline'} padding={0.5} /></span>
           <a class="name" href={`/wallets?wallet=${wallet.id}`}
             ><span>{wallet.name}</span><span class="owner"
               >{wallet.participantId
@@ -84,8 +84,7 @@
             >{/if}
         </button>
         <div class="footer">
-          {#if !wallet.archived}<a href={`/settings/wallets?action=transfer&to=${wallet.id}`}
-              >{$translate('wallets.transfer')}</a
+          {#if !wallet.archived}<a href={`/wallets/transfer?to=${wallet.id}`}>{$translate('wallets.transfer')}</a
             >{:else}<span class="owner">{$translate('accounts.archived')}</span>{/if}
         </div>
       </div>
