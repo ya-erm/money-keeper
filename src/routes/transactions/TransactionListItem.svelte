@@ -154,17 +154,17 @@
       {/if}
       {#if sharedWalletOperation || knownPlace?.name || transaction.debt || transaction.tags?.length}
         <div class="metadata" data-testId="OperationMetadata">
+          {#if knownPlace?.name}<span class="place-name" data-testId="OperationPlaceName">{knownPlace.name}</span
+            >{/if}{#if knownPlace?.name && (sharedWalletOperation || transaction.debt || transaction.tags?.length)}
+            {metadataSeparator}
+          {/if}
           {#if sharedWalletOperation}<span
               class="participants-symbol"
               role="img"
               aria-label={$translate('wallets.shared_operation')}
               title={$translate('wallets.shared_operation')}
               data-testId="OperationWalletAllocation"><Icon name="mdi:account-multiple" size={1} /></span
-            >{/if}{#if sharedWalletOperation && (knownPlace?.name || transaction.debt || transaction.tags?.length)}
-            {metadataSeparator}
-          {/if}
-          {#if knownPlace?.name}<span class="place-name" data-testId="OperationPlaceName">{knownPlace.name}</span
-            >{/if}{#if knownPlace?.name && (transaction.debt || transaction.tags?.length)}
+            >{/if}{#if sharedWalletOperation && (transaction.debt || transaction.tags?.length)}
             {metadataSeparator}
           {/if}{#if transaction.debt}<span class="debt-info" data-testId="TransactionDebtInfo">
               <span class="debt-symbol" data-testId="TransactionDebtIcon" aria-hidden="true"
