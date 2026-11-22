@@ -63,7 +63,7 @@ test.beforeEach(async ({ page }) => {
   await page.clock.setSystemTime('2026-11-22T12:00:00Z');
   await importMockDataAsync(page, backup);
   await page.goto('/settings/participants');
-  await page.getByTestId('ParticipantPicker').selectOption('alex');
+  await page.locator('[data-testid=ParticipantRow][data-id=alex]').getByTestId('ParticipantSelect').click();
   await page.goto('/wallets');
 });
 
@@ -151,7 +151,7 @@ test('currency conversion uses both wallet balances and participant defaults', a
   await expect(conversion).toContainText('500');
   await page.screenshot({ path: testInfo.outputPath('wallet-currency-exchange-390.png'), fullPage: true });
   await page.goto('/settings/participants');
-  await page.getByTestId('ParticipantPicker').selectOption('maria');
+  await page.locator('[data-testid=ParticipantRow][data-id=maria]').getByTestId('ParticipantSelect').click();
   await page.goto('/');
   await expect(page).toHaveURL(/wallet=maria-wallet/);
   await page.getByTestId('WalletAddExpense').click();
@@ -166,7 +166,9 @@ test('currency conversion uses both wallet balances and participant defaults', a
   await expect(page.getByTestId('UnallocatedBalance').filter({ hasText: 'EUR' })).toContainText('0');
   await page.reload();
   await page.goto('/settings/participants');
-  await expect(page.getByTestId('ParticipantPicker')).toHaveValue('maria');
+  await expect(
+    page.locator('[data-testid=ParticipantRow][data-id=maria]').getByTestId('ParticipantSelect'),
+  ).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('QR shortcut opens the scanner with bank account and allocation ready', async ({ page }, testInfo) => {
@@ -197,11 +199,11 @@ test('create named profiles and wallets, personalize order, and disable the feat
   page,
 }) => {
   await page.goto('/settings/participants');
-  await page.getByRole('button', { name: 'Добавить участника', exact: true }).click();
+  await page.getByRole('link', { name: 'Добавить участника', exact: true }).click();
   await page.locator('[name=participant-name]').fill('Дмитрий');
   await page.getByTestId('ParticipantForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
   await expect(page.getByTestId('ParticipantForm')).not.toBeVisible();
-  await page.getByTestId('ParticipantPicker').selectOption({ label: 'Дмитрий' });
+  await page.getByTestId('ParticipantRow').filter({ hasText: 'Дмитрий' }).getByTestId('ParticipantSelect').click();
   await page.goto('/settings/wallets');
   await page.getByRole('link', { name: 'Создать кошелёк', exact: true }).click();
   await page.locator('[name=wallet-name]').fill('Резерв Дмитрия');
@@ -209,12 +211,16 @@ test('create named profiles and wallets, personalize order, and disable the feat
   await page.getByTestId('WalletForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
   await expect(page.getByTestId('WalletCard').first()).toContainText('Резерв Дмитрия');
   await page.goto('/settings/participants');
+  await page.getByRole('link', { name: 'Редактировать Дмитрий', exact: true }).click();
   await page.locator('[name=participant-currency]').fill('EUR');
   await page.locator('[name=participant-currency]').blur();
   await page.getByRole('button', { name: 'Выше Счёт EUR', exact: true }).click();
-  await page.getByRole('button', { name: 'Готово', exact: true }).click();
+  await page.getByTestId('ParticipantForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/participants$/);
   await page.reload();
-  await expect(page.getByTestId('ParticipantPicker').locator('option:checked')).toHaveText('Дмитрий');
+  await expect(
+    page.getByTestId('ParticipantRow').filter({ hasText: 'Дмитрий' }).getByTestId('ParticipantSelect'),
+  ).toHaveAttribute('aria-pressed', 'true');
   await page.goto('/settings/wallets');
   await expect(page.getByTestId('EnableWallets')).toBeChecked();
   await page.getByTestId('EnableWallets').uncheck();
@@ -410,4 +416,111 @@ test('create page supports cancel and main-card editing returns to wallet histor
   await page.goto('/wallets/edit?id=missing', { waitUntil: 'networkidle' });
   await expect(page.getByText('Кошелёк не найден', { exact: true })).toBeVisible();
   await expect(page.getByTestId('WalletForm')).toHaveCount(0);
+});
+
+test('participant avatars select device profiles and editing another participant preserves the selection', async ({
+  page,
+}) => {
+  await page.goto('/settings/participants', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('ParticipantRow')).toHaveCount(2);
+  await expect(page.getByTestId('ParticipantAvatar')).toHaveCount(2);
+  await expect(page.locator('select')).toHaveCount(0);
+  await expect(
+    page.locator('[data-testid=ParticipantRow][data-id=alex]').getByTestId('ParticipantSelect'),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await page.screenshot({ path: 'output/virtual-wallets/36-participants-list.png', animations: 'disabled' });
+  await page.getByRole('link', { name: 'Редактировать Мария', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/participants\/edit\?id=maria$/);
+  await page.locator('[name=participant-name]').fill('Мария Иванова');
+  await page.locator('[name=participant-currency]').fill('usd');
+  await page.locator('[name=allocation-preset]').selectOption('other');
+  await page.getByTestId('ParticipantForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/participants$/);
+  await expect(
+    page.locator('[data-testid=ParticipantRow][data-id=alex]').getByTestId('ParticipantSelect'),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('link', { name: 'Редактировать Мария Иванова', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/participants\/edit\?id=maria$/);
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.locator('[name=participant-currency]')).toHaveValue('USD');
+  await expect(page.locator('[name=allocation-preset]')).toHaveValue('other');
+  await page.screenshot({ path: 'output/virtual-wallets/37-participant-editor.png', animations: 'disabled' });
+  await page.getByRole('button', { name: 'Назад', exact: true }).click();
+  await page.locator('[data-testid=ParticipantRow][data-id=maria]').getByTestId('ParticipantSelect').click();
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(
+    page.locator('[data-testid=ParticipantRow][data-id=maria]').getByTestId('ParticipantSelect'),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Снять выбор участника', exact: true }).click();
+  await expect(page.locator('[data-testid=ParticipantSelect][aria-pressed=true]')).toHaveCount(0);
+});
+
+test('deleting the selected participant preserves wallets, bank operations and contribution names after reload', async ({
+  page,
+}) => {
+  const data = JSON.parse(backup);
+  data.walletTransfers.push({
+    id: 'saved-by-alex',
+    currency: 'RSD',
+    amount: 10000,
+    date: '2026-11-21T10:00:00Z',
+    fromWalletId: 'alex-wallet',
+    toWalletId: 'holiday',
+    contributorParticipantId: 'alex',
+  });
+  await importMockDataAsync(page, JSON.stringify(data));
+  await page.goto('/settings/participants', { waitUntil: 'networkidle' });
+  await page.getByRole('link', { name: 'Редактировать Алексей', exact: true }).click();
+  await page.getByRole('button', { name: 'Удалить', exact: true }).click();
+  const confirmation = page.getByTestId('DeleteParticipantConfirmation');
+  await confirmation.getByRole('button', { name: 'Отмена', exact: true, includeHidden: true }).click();
+  await expect(page.getByTestId('ParticipantForm')).toBeVisible();
+  await page.getByRole('button', { name: 'Удалить', exact: true }).click();
+  await confirmation.getByRole('button', { name: 'Удалить', exact: true, includeHidden: true }).click();
+  await expect(page).toHaveURL(/\/settings\/participants$/);
+  await expect(page.getByTestId('ParticipantRow')).toHaveCount(1);
+  await expect(page.locator('[data-testid=ParticipantSelect][aria-pressed=true]')).toHaveCount(0);
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.getByTestId('ParticipantRow')).toHaveCount(1);
+  await page.goto('/wallets?wallet=alex-wallet', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('WalletCard')).toHaveCount(3);
+  await expect(page.getByTestId('WalletCard').filter({ hasText: 'Алексей' })).toContainText('90\u00a0000');
+  await page.goto('/wallets?wallet=holiday', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('WalletContribution')).toContainText('Алексей');
+  await page.goto('/settings/import-export');
+  await page.getByTestId('ShowExportTextAreaButton').click();
+  const backupAfterDeletion = JSON.parse(await page.getByTestId('ExportTextArea').inputValue());
+  expect(backupAfterDeletion.participants).toContainEqual(
+    expect.objectContaining({ id: 'alex', name: 'Алексей', deleted: true }),
+  );
+  await page.goto('/accounts?account-card=rsd', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('TransactionListItem')).toHaveCount(1);
+  await page.goto('/settings/participants');
+  await page.locator('[data-testid=ParticipantRow][data-id=maria]').getByTestId('ParticipantSelect').click();
+  await expect(
+    page.locator('[data-testid=ParticipantRow][data-id=maria]').getByTestId('ParticipantSelect'),
+  ).toBeEnabled();
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(
+    page.locator('[data-testid=ParticipantRow][data-id=maria]').getByTestId('ParticipantSelect'),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await page.goto('/transactions/create?type=OUT', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('WalletAllocation').locator('input')).toHaveCount(1);
+  await page.goto('/settings/participants', { waitUntil: 'networkidle' });
+  await page.getByRole('link', { name: 'Редактировать Мария', exact: true }).click();
+  await page.getByRole('button', { name: 'Удалить', exact: true }).click();
+  await page
+    .getByTestId('DeleteParticipantConfirmation')
+    .getByRole('button', { name: 'Удалить', exact: true, includeHidden: true })
+    .click();
+  await expect(page.getByTestId('ParticipantRow')).toHaveCount(0);
+  await page.screenshot({ path: 'output/virtual-wallets/38-participants-empty.png', animations: 'disabled' });
+  await page.getByRole('link', { name: 'Добавить участника', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/participants\/create$/);
+  await expect(page.getByTestId('ParticipantRow')).toHaveCount(0);
+  await page.screenshot({ path: 'output/virtual-wallets/39-create-participant.png', animations: 'disabled' });
+  await page.locator('[name=participant-name]').fill('Иван');
+  await page.getByTestId('ParticipantForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page.getByTestId('ParticipantRow')).toContainText('Иван');
+  await expect(page.getByTestId('ParticipantSelect')).toHaveAttribute('aria-pressed', 'true');
 });

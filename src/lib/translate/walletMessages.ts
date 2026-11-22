@@ -9,6 +9,16 @@ export const walletRu = {
   'wallets.participant': 'Участник на этом устройстве',
   'wallets.no_participant': 'Без профиля',
   'wallets.new_participant': 'Добавить участника',
+  'wallets.edit_participant': 'Редактировать участника',
+  'wallets.select_participant': 'Выбрать участника',
+  'wallets.selected_participant': 'Выбран на этом устройстве',
+  'wallets.clear_participant': 'Снять выбор участника',
+  'wallets.no_participants': 'Участников пока нет. Добавьте первого участника.',
+  'wallets.participant_not_found': 'Участник не найден',
+  'wallets.delete_participant_confirm': 'Удалить участника?',
+  'wallets.delete_participant_description':
+    'Кошельки, операции и история взносов сохранятся. На устройствах, где выбран этот участник, потребуется выбрать другого.',
+
   'wallets.new': 'Создать кошелёк',
   'wallets.name': 'Название',
   'wallets.shared': 'Общий',
@@ -67,6 +77,16 @@ export const walletEn: Record<WalletMessage, string> = {
   'wallets.participant': 'Participant on this device',
   'wallets.no_participant': 'No profile',
   'wallets.new_participant': 'Add participant',
+  'wallets.edit_participant': 'Edit participant',
+  'wallets.select_participant': 'Select participant',
+  'wallets.selected_participant': 'Selected on this device',
+  'wallets.clear_participant': 'Clear participant selection',
+  'wallets.no_participants': 'No participants yet. Add your first participant.',
+  'wallets.participant_not_found': 'Participant not found',
+  'wallets.delete_participant_confirm': 'Delete participant?',
+  'wallets.delete_participant_description':
+    'Wallets, operations and contribution history will be preserved. Devices using this participant will need to select another one.',
+
   'wallets.new': 'Create wallet',
   'wallets.name': 'Name',
   'wallets.shared': 'Shared',

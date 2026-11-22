@@ -1,5 +1,5 @@
 <script lang="ts">
-  import WalletSettings from '#lib/wallets/WalletSettings.svelte';
+  import ParticipantsPage from '#lib/wallets/ParticipantsPage.svelte';
 </script>
 
-<WalletSettings participantsOnly />
+<ParticipantsPage />

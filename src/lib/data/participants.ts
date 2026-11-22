@@ -33,3 +33,9 @@ export const selectedParticipantStore = derived(
       (item) => item.id === settings.selectedParticipants?.[settings.selectedMember ?? 'guest'] && !item.archived,
     ) ?? null,
 );
+
+/** Keep participant names available on historical savings and wallet ownership. */
+export const participantHistoryStore = derived(participantsStore, (items) => [
+  ...items,
+  ...participantsService.deletedItems,
+]);

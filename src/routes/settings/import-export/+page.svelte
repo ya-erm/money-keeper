@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { participantHistoryStore } from '#lib/data/participants.js';
   import dayjs from 'dayjs';
   import { onMount } from 'svelte';
 
@@ -24,7 +25,6 @@
     debtContactsService,
     debtRecordsService,
     participantsService,
-    participantsStore,
     walletsService,
     walletsStore,
     walletTransfersService,
@@ -107,7 +107,7 @@
 
   $: current = {
     walletsEnabled: $memberSettingsStore?.walletsEnabled ?? false,
-    participants: $participantsStore,
+    participants: $participantHistoryStore,
     virtualWallets: $walletsStore,
     walletTransfers: $walletTransfersStore,
     categories: $rawCategories,

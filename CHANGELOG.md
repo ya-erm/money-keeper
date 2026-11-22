@@ -9,6 +9,7 @@
 - Manage wallets as cards with an options menu. Create and edit wallets on separate pages; archive, restore and confirm deletion from the editor.
 - Settings are organized into Interface, Common and Account sections, followed by integrations and app tools. Every setting has a recognizable icon.
 - Shared payments use a two-person icon in the metadata line after debt participants, instead of an extra line of wallet names and amounts. The same silhouette identifies Participants in settings.
+- Participants have a selectable avatar list with a highlighted device profile, separate create/edit pages and confirmed deletion that preserves wallet and contribution history.
 - Allocate real payments across wallets, split equally or enter exact shares. Allocate both sides of a currency exchange using the recorded bank amounts and deterministic rounding.
 - Internal wallet transfers, unallocated balances by currency, shared savings contributions and returns, and wallet history linked to the original payments.
 - Wallet-first startup and expense/receipt QR shortcuts for the selected participant. Categories are available in settings; enabled wallets occupy the central menu position.

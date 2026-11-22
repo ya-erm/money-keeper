@@ -9,7 +9,7 @@
   import { accountsStore, categoriesStore, operationsStore, settingsStore } from '#lib/data/index.js';
   import { accountsService } from '#lib/data/accounts.js';
   import { memberSettingsStore } from '#lib/data/members.js';
-  import { participantsStore, selectedParticipantStore } from '#lib/data/participants.js';
+  import { participantHistoryStore, selectedParticipantStore } from '#lib/data/participants.js';
   import { walletsService, walletsStore, walletTransfersStore } from '#lib/data/wallets.js';
   import {
     SYSTEM_CATEGORY_TRANSFER_IN,
@@ -136,7 +136,7 @@
     {#if $memberSettingsStore?.walletsEnabled}
       <WalletCards
         wallets={cardWallets}
-        participants={$participantsStore}
+        participants={$participantHistoryStore}
         selectedId={currentWallet?.id}
         currencies={currencies.length ? currencies : ['RSD']}
         getBalance={(id, currency) => walletBalance(entriesByWallet.get(id) ?? [], currency)}
@@ -161,7 +161,8 @@
                   data-testId="WalletContribution"
                 >
                   <span
-                    >{$participantsStore.find((person) => person.id === contribution.participantId)?.name ?? '…'}</span
+                    >{$participantHistoryStore.find((person) => person.id === contribution.participantId)?.name ??
+                      '…'}</span
                   ><span
                     >{#if $settingsStore.hideBalances}<HiddenMoney
                         currency={contribution.currency}

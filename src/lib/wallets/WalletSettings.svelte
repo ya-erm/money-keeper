@@ -1,7 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
-  export let participantsOnly = false;
   import { v4 as uuid } from 'uuid';
   import dayjs from 'dayjs';
   import { page } from '#lib/page.js';
@@ -25,13 +24,11 @@
   import { fromMinor, toMinor } from '#lib/debts/calculations.js';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
   import WalletOverviewCard from './WalletOverviewCard.svelte';
-  import ParticipantPicker from '#lib/wallets/ParticipantPicker.svelte';
   import { orderedItems, validateWalletTransfer, walletBalance, walletEntries } from '#lib/wallets/calculations.js';
 
-  type Mode = 'participant' | 'transfer' | 'preferences' | null;
+  type Mode = 'transfer' | null;
   let mode: Mode = null;
   let busy = false;
-  let name = '';
   let editedTransfer: WalletTransfer | null = null;
   let fromId = '';
   let toId = '';
@@ -115,11 +112,6 @@
       busy = false;
     }
   }
-  function openParticipant() {
-    draftId = uuid();
-    mode = 'participant';
-    name = '';
-  }
   function openTransfer(transfer: WalletTransfer | null = null) {
     draftId = transfer?.id ?? uuid();
     editedTransfer = transfer;
@@ -131,19 +123,6 @@
     date = transfer ? dayjs(transfer.date).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
     comment = transfer?.comment ?? '';
     mode = 'transfer';
-  }
-  async function saveParticipant() {
-    if (!name.trim()) return;
-    await run(async () => {
-      const id = draftId;
-      await participantsService.save({
-        id,
-        name: name.trim(),
-        accountsOrder: $accountsStore.map((account) => account.id),
-      });
-      if (!participant) await participantsService.select(id);
-      mode = null;
-    });
   }
   async function saveTransfer() {
     const fromWallet = $walletsStore.find((wallet) => wallet.id === fromId);
@@ -175,28 +154,7 @@
       await goto(`/wallets?wallet=${transfer.toWalletId ?? transfer.fromWalletId ?? ''}`);
     });
   }
-  async function move(kind: 'accountsOrder' | 'walletsOrder', id: string, shift: number) {
-    const items = kind === 'accountsOrder' ? $accountsStore : ordered;
-    const ids = items.map((item) => item.id);
-    const index = ids.indexOf(id),
-      next = index + shift;
-    if (next < 0 || next >= ids.length) return;
-    [ids[index], ids[next]] = [ids[next], ids[index]];
-    await run(() => participantsService.updatePreferences({ [kind]: ids }));
-  }
-  async function setVisible(kind: 'hiddenAccountIds' | 'hiddenWalletIds', id: string, shown: boolean) {
-    const ids = participant?.[kind] ?? [];
-    await run(() =>
-      participantsService.updatePreferences({
-        [kind]: shown ? ids.filter((value) => value !== id) : [...new Set([...ids, id])],
-      }),
-    );
-  }
   onMount(() => {
-    if (participantsOnly) {
-      mode = participant ? 'preferences' : null;
-      return;
-    }
     if ($page.url.searchParams.get('action') === 'create')
       void goto('/wallets/create?from=settings', { replace: true });
     if ($page.url.searchParams.get('action') === 'edit')
@@ -210,9 +168,9 @@
   });
 </script>
 
-<Layout title={$translate(participantsOnly ? 'wallets.participants' : 'wallets.setup')} leftSlot={HeaderBackButton}>
+<Layout title={$translate('wallets.setup')} leftSlot={HeaderBackButton}>
   <div class="wallet-page" data-testId="WalletsPage">
-    {#if !participantsOnly && !currentWallet}
+    {#if !currentWallet}
       <label class="visibility"
         ><input
           type="checkbox"
@@ -226,35 +184,7 @@
         />{$translate('wallets.enable')}</label
       >
     {/if}
-    {#if participantsOnly}<ParticipantPicker />{/if}
-    {#if participantsOnly && !currentWallet}
-      <div class="toolbar">
-        <button type="button" on:click={openParticipant}>{$translate('wallets.new_participant')}</button>
-        {#if participant}<button type="button" on:click={() => (mode = mode === 'preferences' ? null : 'preferences')}
-            >{$translate('wallets.preferences')}</button
-          >{/if}
-      </div>
-    {/if}
-
-    {#if mode === 'participant'}
-      <form class="editor" on:submit|preventDefault={saveParticipant} data-testId="ParticipantForm">
-        <h2>{$translate('wallets.new_participant')}</h2>
-        <label
-          >{$translate('wallets.participant_name')}<input
-            name="participant-name"
-            bind:value={name}
-            required
-            maxlength="100"
-          /></label
-        >
-        <div class="toolbar">
-          <button class="primary" disabled={busy}>{$translate('common.save')}</button><button
-            type="button"
-            on:click={() => (mode = null)}>{$translate('common.cancel')}</button
-          >
-        </div>
-      </form>
-    {:else if mode === 'transfer'}
+    {#if mode === 'transfer'}
       <form class="editor" on:submit|preventDefault={saveTransfer} data-testId="WalletTransferForm">
         <h2>{$translate('wallets.transfer')}</h2>
         <label
@@ -317,125 +247,48 @@
             >{/if}
         </div>
       </form>
-    {:else if mode === 'preferences' && participant}
-      <section class="editor" data-testId="ParticipantPreferences">
-        <h2>{$translate('wallets.preferences')} · {participant.name}</h2>
-        <p class="hint">{$translate('wallets.order_hint')}</p>
-        <label
-          >{$translate('wallets.name')}<input
-            aria-label={$translate('wallets.name')}
-            value={participant.name}
-            on:change={(event) => {
-              const value = event.currentTarget.value.trim();
-              if (value) void run(() => participantsService.updatePreferences({ name: value }));
-            }}
-          /></label
-        >
-        <label
-          >{$translate('currency_rates.default_currency')}<input
-            name="participant-currency"
-            value={participant.currency ?? ''}
-            maxlength="3"
-            on:change={(event) => {
-              const currency = event.currentTarget.value.trim().toUpperCase();
-              if (!currency || /^[A-Z]{3}$/.test(currency))
-                void run(() => participantsService.updatePreferences({ currency: currency || undefined }));
-            }}
-          /></label
-        >
-        <label
-          >{$translate('wallets.default_allocation')}<select
-            name="allocation-preset"
-            value={participant.allocationPreset ?? 'first'}
-            on:change={(event) => {
-              const allocationPreset = event.currentTarget.value as 'first' | 'other' | 'equal';
-              void run(() => participantsService.updatePreferences({ allocationPreset }));
-            }}
-            ><option value="first">{$translate('wallets.first_wallet')}</option><option value="other"
-              >{$translate('wallets.other_wallet')}</option
-            ><option value="equal">{$translate('wallets.equal')}</option></select
-          ></label
-        >
-        {#each ['accountsOrder', 'walletsOrder'] as kind (kind)}
-          <h3>{$translate(kind === 'accountsOrder' ? 'accounts.title' : 'wallets.title')}</h3>
-          {#each kind === 'accountsOrder' ? $accountsStore : ordered as item, index (item.id)}
-            <div class="preference-row">
-              <label class="visibility"
-                ><input
-                  type="checkbox"
-                  aria-label={`${$translate('wallets.visible')} ${item.name}`}
-                  checked={!(
-                    kind === 'accountsOrder' ? participant.hiddenAccountIds : participant.hiddenWalletIds
-                  )?.includes(item.id)}
-                  on:change={(event) =>
-                    setVisible(
-                      kind === 'accountsOrder' ? 'hiddenAccountIds' : 'hiddenWalletIds',
-                      item.id,
-                      event.currentTarget.checked,
-                    )}
-                />{item.name}</label
-              >
-              <button
-                type="button"
-                aria-label={`${$translate('wallets.up')} ${item.name}`}
-                disabled={busy || index === 0}
-                on:click={() => move(kind as 'accountsOrder' | 'walletsOrder', item.id, -1)}>↑</button
-              >
-              <button
-                type="button"
-                aria-label={`${$translate('wallets.down')} ${item.name}`}
-                disabled={busy || index === (kind === 'accountsOrder' ? $accountsStore : ordered).length - 1}
-                on:click={() => move(kind as 'accountsOrder' | 'walletsOrder', item.id, 1)}>↓</button
-              >
-            </div>
-          {/each}
-        {/each}
-        <button type="button" on:click={() => (mode = null)}>{$translate('common.done')}</button>
-      </section>
     {/if}
 
-    {#if !participantsOnly}
-      <div class="section-heading">
-        <h2>{$translate('wallets.title')}</h2>
-        <a class="create-wallet" href="/wallets/create?from=settings">{$translate('wallets.new')}</a>
-      </div>
-      <p class="hint">{$translate('wallets.budget_hint')}</p>
-      {#if !$walletsStore.length}<p>{$translate('wallets.empty')}</p>{/if}
-      <div class="wallet-grid" data-testId="ActiveWallets">
-        {#each ordered.filter((wallet) => !wallet.archived) as wallet (wallet.id)}
-          <WalletOverviewCard
-            {wallet}
-            ownerName={wallet.participantId ? personName(wallet.participantId) : $translate('wallets.shared')}
-            balances={currencies.map((currency) => ({ currency, amount: balance(wallet.id, currency) }))}
-          />
-        {/each}
-      </div>
-      <section class="unallocated">
-        <h2>{$translate('wallets.unallocated')}</h2>
-        {#each unallocated as value (value.currency)}<div class="row">
-            <span>{value.currency}</span><strong data-testId="UnallocatedBalance"
-              >{#if $settingsStore.hideBalances}<HiddenMoney currency={value.currency} />{:else}{money(
-                  value.amount,
-                  value.currency,
-                )}{/if}</strong
-            >
-          </div>{/each}<button type="button" on:click={() => openTransfer()} disabled={!$walletsStore.length}
-          >{$translate('wallets.transfer')}</button
-        >
-      </section>
-      {#if ordered.some((wallet) => wallet.archived)}<details data-testId="ArchivedWallets">
-          <summary>{$translate('wallets.archived')}</summary>
-          <div class="wallet-grid">
-            {#each ordered.filter((wallet) => wallet.archived) as wallet (wallet.id)}
-              <WalletOverviewCard
-                {wallet}
-                ownerName={wallet.participantId ? personName(wallet.participantId) : $translate('wallets.shared')}
-                balances={currencies.map((currency) => ({ currency, amount: balance(wallet.id, currency) }))}
-              />
-            {/each}
-          </div>
-        </details>{/if}
-    {/if}
+    <div class="section-heading">
+      <h2>{$translate('wallets.title')}</h2>
+      <a class="create-wallet" href="/wallets/create?from=settings">{$translate('wallets.new')}</a>
+    </div>
+    <p class="hint">{$translate('wallets.budget_hint')}</p>
+    {#if !$walletsStore.length}<p>{$translate('wallets.empty')}</p>{/if}
+    <div class="wallet-grid" data-testId="ActiveWallets">
+      {#each ordered.filter((wallet) => !wallet.archived) as wallet (wallet.id)}
+        <WalletOverviewCard
+          {wallet}
+          ownerName={wallet.participantId ? personName(wallet.participantId) : $translate('wallets.shared')}
+          balances={currencies.map((currency) => ({ currency, amount: balance(wallet.id, currency) }))}
+        />
+      {/each}
+    </div>
+    <section class="unallocated">
+      <h2>{$translate('wallets.unallocated')}</h2>
+      {#each unallocated as value (value.currency)}<div class="row">
+          <span>{value.currency}</span><strong data-testId="UnallocatedBalance"
+            >{#if $settingsStore.hideBalances}<HiddenMoney currency={value.currency} />{:else}{money(
+                value.amount,
+                value.currency,
+              )}{/if}</strong
+          >
+        </div>{/each}<button type="button" on:click={() => openTransfer()} disabled={!$walletsStore.length}
+        >{$translate('wallets.transfer')}</button
+      >
+    </section>
+    {#if ordered.some((wallet) => wallet.archived)}<details data-testId="ArchivedWallets">
+        <summary>{$translate('wallets.archived')}</summary>
+        <div class="wallet-grid">
+          {#each ordered.filter((wallet) => wallet.archived) as wallet (wallet.id)}
+            <WalletOverviewCard
+              {wallet}
+              ownerName={wallet.participantId ? personName(wallet.participantId) : $translate('wallets.shared')}
+              balances={currencies.map((currency) => ({ currency, amount: balance(wallet.id, currency) }))}
+            />
+          {/each}
+        </div>
+      </details>{/if}
   </div>
 </Layout>
 
@@ -453,11 +306,7 @@
     font-weight: 500;
     margin: 0;
   }
-  h3 {
-    font-size: 1rem;
-    font-weight: 500;
-    margin: 0.5rem 0 0;
-  }
+
   p {
     margin: 0;
   }
@@ -550,11 +399,6 @@
   .unallocated {
     border-top: 1px solid var(--border-color);
     padding-top: 1rem;
-  }
-  .preference-row {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
   }
   .visibility {
     flex: 1;

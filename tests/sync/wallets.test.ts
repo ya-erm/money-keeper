@@ -116,7 +116,9 @@ test('two devices synchronize wallet payments, savings and personal preferences 
       await journalService.syncWithServer();
     });
     await target.goto('/settings/participants');
-    await expect(target.getByTestId('ParticipantPicker')).toHaveValue('maria');
+    await expect(
+      target.locator('[data-testid=ParticipantRow][data-id=maria]').getByTestId('ParticipantSelect'),
+    ).toHaveAttribute('aria-pressed', 'true');
     await target.goto('/wallets');
     await expect(target.getByTestId('WalletCard').first()).toContainText('Мария');
     await expect(target.getByTestId('WalletCard').filter({ hasText: 'Отпуск' })).toContainText('2\u00a0000');
@@ -124,12 +126,38 @@ test('two devices synchronize wallet payments, savings and personal preferences 
     await expect(target.getByTestId('WalletContribution')).toContainText('Алексей');
     await target.screenshot({ path: testInfo.outputPath('shared-savings-second-device-390.png'), fullPage: true });
     await target.goto('/settings/participants');
-    await target.getByTestId('ParticipantPicker').selectOption('alex');
+    await target.getByRole('link', { name: 'Редактировать Алексей', exact: true }).click();
     await expect(target.locator('[name=participant-currency]')).toHaveValue('EUR');
+    await target.getByRole('button', { name: 'Назад', exact: true }).click();
+    await expect(
+      target.locator('[data-testid=ParticipantRow][data-id=maria]').getByTestId('ParticipantSelect'),
+    ).toHaveAttribute('aria-pressed', 'true');
     await source.reload();
     await source.goto('/settings/participants');
-    await expect(source.getByTestId('ParticipantPicker')).toHaveValue('alex');
+    await expect(
+      source.locator('[data-testid=ParticipantRow][data-id=alex]').getByTestId('ParticipantSelect'),
+    ).toHaveAttribute('aria-pressed', 'true');
     expect(rows.filter((row) => JSON.parse(row.data).walletTransfer?.id === 'saving')).toHaveLength(1);
+    await source.evaluate(async () => {
+      const path = '/src/lib/data/index.ts';
+      const { participantsService, journalService } = await import(path);
+      await participantsService.save({ ...participantsService.getById('alex')!, deleted: true });
+      await journalService.uploadQueue();
+    });
+    await target.evaluate(async () => {
+      const path = '/src/lib/data/index.ts';
+      const { journalService } = await import(path);
+      await journalService.syncWithServer();
+    });
+    await target.goto('/settings/participants');
+    await expect(target.getByTestId('ParticipantRow')).toHaveCount(1);
+    await expect(
+      target.locator('[data-testid=ParticipantRow][data-id=maria]').getByTestId('ParticipantSelect'),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await target.goto('/wallets?wallet=holiday');
+    await expect(target.getByTestId('WalletContribution')).toContainText('Алексей');
+    await source.goto('/settings/participants');
+    await expect(source.locator('[data-testid=ParticipantSelect][aria-pressed=true]')).toHaveCount(0);
   } finally {
     await a.close();
     await b.close();

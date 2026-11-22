@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { tick } from 'svelte';
+  import { $initialized as dataInitialized } from '#lib/data/initialized.js';
   import type { WalletAllocation } from '#lib/data/interfaces.js';
-  import { selectedParticipantStore } from '#lib/data/participants.js';
+  import { participantsStore, selectedParticipantStore } from '#lib/data/participants.js';
   import { memberSettingsStore } from '#lib/data/members.js';
   import { walletsService, walletsStore } from '#lib/data/wallets.js';
   import { translate } from '#lib/translate/index.js';
@@ -14,10 +16,12 @@
   export let useDefault = false;
   export let initialWalletId: string | null = null;
   let initialized = false;
+  let initializing = false;
   let previousAmount = amount;
   let automaticSingle = useDefault && !allocation;
   let automaticEqual = false;
   $: participant = $selectedParticipantStore;
+  $: activeOwnerIds = new Set($participantsStore.filter((item) => !item.archived).map((item) => item.id));
   $: available = orderedItems(
     $walletsStore.filter((wallet) => !wallet.archived && !participant?.hiddenWalletIds?.includes(wallet.id)),
     participant?.walletsOrder,
@@ -25,20 +29,36 @@
   $: rows = allocation?.shares ?? [];
   $: firstWallet = available.find((wallet) => wallet.id === initialWalletId) ?? available[0];
   $: otherWallet = available.find(
-    (wallet) => wallet.participantId && wallet.participantId !== participant?.id && wallet.id !== firstWallet?.id,
+    (wallet) =>
+      wallet.participantId &&
+      activeOwnerIds.has(wallet.participantId) &&
+      wallet.participantId !== participant?.id &&
+      wallet.id !== firstWallet?.id,
   );
   $: remaining = fromMinor(
     toMinor(amount || 0, currency) - rows.reduce((sum, row) => sum + toMinor(row.amount || 0, currency), 0),
     currency,
   );
-  $: initialize(available, useDefault);
-  function initialize(choices: typeof available, defaults: boolean) {
+  $: void initialize(available, useDefault, $dataInitialized);
+  async function initialize(choices: typeof available, _defaults: boolean, ready: boolean) {
+    if (!ready || initialized || initializing || !choices.length) return;
+    initializing = true;
+    // Hydration can publish the participant/default props after the wallet list.
+    await tick();
+    initializing = false;
+    if (!$dataInitialized) return;
+    choices = available;
+    const defaults = useDefault;
     if (!initialized && choices.length && ($memberSettingsStore?.walletsEnabled || allocation)) {
       initialized = true;
       if (defaults && !allocation) {
         const first = choices.find((wallet) => wallet.id === initialWalletId) ?? choices[0];
         const other = choices.find(
-          (wallet) => wallet.participantId && wallet.participantId !== participant?.id && wallet.id !== first.id,
+          (wallet) =>
+            wallet.participantId &&
+            activeOwnerIds.has(wallet.participantId) &&
+            wallet.participantId !== participant?.id &&
+            wallet.id !== first.id,
         );
         if (!initialWalletId && participant?.allocationPreset === 'equal' && other) {
           const values = splitEqually(amount || 0, 2, currency);
