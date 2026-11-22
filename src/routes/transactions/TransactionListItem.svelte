@@ -205,9 +205,19 @@
         <span>{incoming ? '+' : outgoing ? '-' : ''}{formatMoney(amountOverride ?? transaction.amount)}</span>
         <span class="small-text">{transaction.account.currency}</span>
       </span>
-      {#if linkedAmountOverride !== null && transaction.linkedTransaction}<span class="other-money-value"
-          >→ {formatMoney(linkedAmountOverride, { currency: transaction.linkedTransaction.account.currency })}</span
-        >{/if}
+      {#if linkedAmountOverride !== null && transaction.linkedTransaction}
+        <span
+          class="amount"
+          class:incoming={transaction.linkedTransaction.category.type === 'IN'}
+          class:outgoing={transaction.linkedTransaction.category.type === 'OUT'}
+          data-testId="WalletLinkedAmount"
+        >
+          <span
+            >{transaction.linkedTransaction.category.type === 'IN' ? '+' : '-'}{formatMoney(linkedAmountOverride)}</span
+          >
+          <span class="small-text">{transaction.linkedTransaction.account.currency}</span>
+        </span>
+      {/if}
       {#if amountOverride !== null && amountOverride !== transaction.amount && !transaction.linkedTransaction}<span
           class="other-money-value"
           >{$translate('wallets.total_payment')}: {formatMoney(transaction.amount, {
