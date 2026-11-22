@@ -101,11 +101,7 @@
       onClick={openChangeLoginModal}
     />
   {/if}
-  <ListLinkItem
-    icon="mdi:account-multiple"
-    title={$translate('wallets.participants')}
-    href={route('settings.participants')}
-  />
+  <ListLinkItem icon="ion:people" title={$translate('wallets.participants')} href={route('settings.participants')} />
   <ListLinkItem icon="mdi:wallet-outline" title={$translate('wallets.title')} href={route('settings.wallets')} />
   <ListSelectItem
     icon="mdi:cash-multiple"

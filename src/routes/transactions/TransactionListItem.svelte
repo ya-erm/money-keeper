@@ -85,6 +85,17 @@
   >
     <div class="icon flex-center" class:deleted={transaction.category.deleted}>
       <Icon name={transaction.category.icon || 'mdi:folder-outline'} size={1.75} padding={0.75} />
+      {#if sharedWalletOperation}
+        <div
+          class="participants-badge"
+          role="img"
+          aria-label={$translate('wallets.shared_operation')}
+          title={$translate('wallets.shared_operation')}
+          data-testId="OperationWalletAllocation"
+        >
+          <Icon name="ion:people" size={1.125} />
+        </div>
+      {/if}
       <div class="operation-icons" class:combined={combinedLocationAndItems}>
         {#if transaction.repeating}
           <div class="repeating-icon" data-testId="RepeatingOperationIcon">
@@ -152,21 +163,13 @@
             : ''}{showDescription ? (transaction.description ?? '') : ''}
         </div>
       {/if}
-      {#if sharedWalletOperation || knownPlace?.name || transaction.debt || transaction.tags?.length}
+      {#if knownPlace?.name || transaction.debt || transaction.tags?.length}
         <div class="metadata" data-testId="OperationMetadata">
           {#if knownPlace?.name}<span class="place-name" data-testId="OperationPlaceName">{knownPlace.name}</span
-            >{/if}{#if knownPlace?.name && (sharedWalletOperation || transaction.debt || transaction.tags?.length)}
+            >{/if}{#if knownPlace?.name && (transaction.debt || transaction.tags?.length)}
             {metadataSeparator}
           {/if}
-          {#if sharedWalletOperation}<span
-              class="participants-symbol"
-              role="img"
-              aria-label={$translate('wallets.shared_operation')}
-              title={$translate('wallets.shared_operation')}
-              data-testId="OperationWalletAllocation"><Icon name="mdi:account-multiple" size={1} /></span
-            >{/if}{#if sharedWalletOperation && (transaction.debt || transaction.tags?.length)}
-            {metadataSeparator}
-          {/if}{#if transaction.debt}<span class="debt-info" data-testId="TransactionDebtInfo">
+          {#if transaction.debt}<span class="debt-info" data-testId="TransactionDebtInfo">
               <span class="debt-symbol" data-testId="TransactionDebtIcon" aria-hidden="true"
                 ><Icon name="mdi:account-cash-outline" size={1} /></span
               >
@@ -277,6 +280,16 @@
     background-color: var(--header-background-color);
     position: relative;
   }
+  .participants-badge {
+    position: absolute;
+    left: -0.125rem;
+    bottom: -0.125rem;
+    display: flex;
+    border-radius: 50%;
+    background: var(--background-color);
+    outline: 1px solid var(--background-color);
+    color: var(--secondary-text-color);
+  }
   .operation-icons {
     position: absolute;
     bottom: -0.125rem;
@@ -333,8 +346,7 @@
   .small-text {
     font-size: 0.9rem;
   }
-  .debt-symbol,
-  .participants-symbol {
+  .debt-symbol {
     display: inline-flex;
     vertical-align: -0.15rem;
   }
