@@ -36,12 +36,18 @@
 <style>
   .picker {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 0.5rem;
     font-size: 0.9rem;
   }
+  .picker > span {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
   select {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
+    width: 0;
     box-sizing: border-box;
     min-height: 2.75rem;
     padding: 0.5rem;

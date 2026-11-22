@@ -4,6 +4,7 @@
 
 ### Added
 
+- Participant selection uses a compact “On this device” label and dropdown on the same row.
 - Dark theme uses a moon icon in Settings.
 - Account and wallet order/visibility are configured in their list pages for the selected participant. Wallets have an account-style list with drag sorting and explicit visibility controls; profile editing no longer duplicates these settings.
 
