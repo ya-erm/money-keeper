@@ -10,6 +10,7 @@
 - Settings are organized into Interface, Common and Account sections, followed by integrations and app tools. Every setting has a recognizable icon.
 - Shared payments use a two-person icon in the metadata line after debt participants, instead of an extra line of wallet names and amounts. The same silhouette identifies Participants in settings.
 - Participants have a device-profile dropdown and an avatar list highlighting the current selection. Each row opens a separate editor; confirmed deletion preserves wallet and contribution history.
+- Main currency is configured once in Settings and saved to the selected participant for synchronization. Recently used currency badges stay in one horizontally scrolling row; reopening the dialog refreshes its value.
 - Allocate real payments across wallets, split equally or enter exact shares. Allocate both sides of a currency exchange using the recorded bank amounts and deterministic rounding.
 - Internal wallet transfers, unallocated balances by currency, shared savings contributions and returns, and wallet history linked to the original payments.
 - Wallet-first startup and expense/receipt QR shortcuts for the selected participant. Categories are available in settings; enabled wallets occupy the central menu position.

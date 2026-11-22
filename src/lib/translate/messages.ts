@@ -432,6 +432,7 @@ export type Messages =
   | 'known_places.delete_confirm'
   | 'known_places.operations_count'
   | 'currency_rates.default_currency'
+  | 'currency_rates.recent_currencies'
   | 'currency_rates.new_currency_rate'
   | 'currency_rates.currency1'
   | 'currency_rates.currency2'

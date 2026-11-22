@@ -4,6 +4,7 @@ import { test, expect } from '@tests/fixtures';
 test('two devices synchronize wallet payments, savings and personal preferences while keeping independent active participants', async ({
   browser,
 }, testInfo) => {
+  test.setTimeout(60000);
   const owner = 'wallet-sync-owner';
   const snapshot = {
     walletsEnabled: true,
@@ -82,10 +83,15 @@ test('two devices synchronize wallet payments, savings and personal preferences 
   try {
     const source = await device(a, 'alex');
     const target = await device(b, 'maria');
+    await source.goto('/settings', { waitUntil: 'networkidle' });
+    await source.getByRole('button', { name: /Основная валюта/ }).click();
+    await expect(source.getByTestId('MainCurrencyParticipant')).toHaveText('Алексей');
+    await source.getByTestId('MainCurrencyForm').locator('input[name=currency]').fill('eur');
+    await source.getByTestId('MainCurrencyForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+    await expect(source.getByTestId('MainCurrencyForm')).toHaveCount(0);
     await source.evaluate(async () => {
       const path = '/src/lib/data/index.ts';
       const data = await import(path);
-      await data.participantsService.updatePreferences({ currency: 'EUR' });
       await data.operationsService.save({
         id: 'shared',
         accountId: 'card',
@@ -124,9 +130,17 @@ test('two devices synchronize wallet payments, savings and personal preferences 
     await expect(target.getByTestId('WalletContribution')).toContainText('Алексей');
     await target.screenshot({ path: testInfo.outputPath('shared-savings-second-device-390.png'), fullPage: true });
     await target.goto('/settings/participants');
-    await target.getByRole('link', { name: 'Редактировать Алексей', exact: true }).click();
-    await expect(target.locator('[name=participant-currency]')).toHaveValue('EUR');
-    await target.getByRole('button', { name: 'Назад', exact: true }).click();
+    await target.getByTestId('ParticipantPicker').selectOption('alex');
+    await expect(target.getByTestId('ParticipantPicker')).toBeEnabled();
+    await target.goto('/settings', { waitUntil: 'networkidle' });
+    await target.reload({ waitUntil: 'networkidle' });
+    await target.getByRole('button', { name: /Основная валюта/ }).click();
+    await expect(target.getByTestId('MainCurrencyParticipant')).toHaveText('Алексей');
+    await expect(target.getByTestId('MainCurrencyForm').locator('input[name=currency]')).toHaveValue('EUR');
+    await target.getByTestId('MainCurrencyForm').getByRole('button', { name: 'Отмена', exact: true }).click();
+    await target.goto('/settings/participants');
+    await target.getByTestId('ParticipantPicker').selectOption('maria');
+    await expect(target.getByTestId('ParticipantPicker')).toBeEnabled();
     await expect(target.getByTestId('ParticipantPicker')).toHaveValue('maria');
     await source.reload();
     await source.goto('/settings/participants');

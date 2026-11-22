@@ -448,6 +448,7 @@ export const ruDict: Dictionary = {
   'known_places.delete': 'Удалить место?',
   'known_places.delete_confirm': 'Удалить место «{name}» из сохранённых? Координаты операций останутся без изменений',
   'known_places.operations_count': '{count, plural, one {# операция} few {# операции} other {# операций}}',
+  'currency_rates.recent_currencies': 'Недавно используемые валюты',
   'currency_rates.default_currency': 'Основная валюта',
   'currency_rates.new_currency_rate': 'Новый курс валют',
   'currency_rates.currency1': 'Валюта 1',

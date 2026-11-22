@@ -442,6 +442,7 @@ export const enDict: Dictionary = {
   'known_places.delete': 'Delete place?',
   'known_places.delete_confirm': 'Delete “{name}” from saved places? Operation coordinates will remain unchanged',
   'known_places.operations_count': '{count, plural, one {# operation} other {# operations}}',
+  'currency_rates.recent_currencies': 'Recently used currencies',
   'currency_rates.default_currency': 'Main currency',
   'currency_rates.new_currency_rate': 'New currency rate',
   'currency_rates.currency1': 'Currency 1',

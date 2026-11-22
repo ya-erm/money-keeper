@@ -213,8 +213,6 @@ test('create named profiles and wallets, personalize order, and disable the feat
   await expect(page.getByTestId('WalletCard').first()).toContainText('Резерв Дмитрия');
   await page.goto('/settings/participants');
   await page.getByRole('link', { name: 'Редактировать Дмитрий', exact: true }).click();
-  await page.locator('[name=participant-currency]').fill('EUR');
-  await page.locator('[name=participant-currency]').blur();
   await page.getByRole('button', { name: 'Выше Счёт EUR', exact: true }).click();
   await page.getByTestId('ParticipantForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
   await expect(page).toHaveURL(/\/settings\/participants$/);
@@ -430,7 +428,7 @@ test('participant dropdown selects device profiles and avatar rows open editors 
   await page.getByRole('link', { name: 'Редактировать Мария', exact: true }).click();
   await expect(page).toHaveURL(/\/settings\/participants\/edit\?id=maria$/);
   await page.locator('[name=participant-name]').fill('Мария Иванова');
-  await page.locator('[name=participant-currency]').fill('usd');
+  await expect(page.locator('[name=participant-currency]')).toHaveCount(0);
   await page.locator('[name=allocation-preset]').selectOption('other');
   await page.getByTestId('ParticipantForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
   await expect(page).toHaveURL(/\/settings\/participants$/);
@@ -438,7 +436,7 @@ test('participant dropdown selects device profiles and avatar rows open editors 
   await page.getByRole('link', { name: 'Редактировать Мария Иванова', exact: true }).click();
   await expect(page).toHaveURL(/\/settings\/participants\/edit\?id=maria$/);
   await page.reload({ waitUntil: 'networkidle' });
-  await expect(page.locator('[name=participant-currency]')).toHaveValue('USD');
+  await expect(page.locator('[name=participant-currency]')).toHaveCount(0);
   await expect(page.locator('[name=allocation-preset]')).toHaveValue('other');
   await page.screenshot({ path: 'output/virtual-wallets/37-participant-editor.png', animations: 'disabled' });
   await page.getByRole('button', { name: 'Назад', exact: true }).click();
@@ -515,4 +513,68 @@ test('deleting the selected participant preserves wallets, bank operations and c
   await page.getByTestId('ParticipantForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
   await expect(page.getByTestId('ParticipantRow')).toContainText('Иван');
   await expect(page.getByTestId('ParticipantPicker').locator('option:checked')).toHaveText('Иван');
+});
+
+test('main currency is saved per participant from Settings and recent badges scroll in one row', async ({ page }) => {
+  const data = JSON.parse(backup);
+  for (const [index, currency] of ['USD', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'NOK', 'SEK'].entries()) {
+    data.accounts.push({ id: currency, name: currency, currency });
+    data.operations.push({
+      id: `recent-${currency}`,
+      accountId: currency,
+      categoryId: 'income',
+      date: new Date(Date.UTC(2026, 10, 21, 12, 0, -index)).toISOString(),
+      amount: 1,
+    });
+  }
+  await importMockDataAsync(page, JSON.stringify(data));
+  await page.goto('/settings', { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: /Основная валюта/ }).click();
+  const form = page.getByTestId('MainCurrencyForm');
+  await expect(page.getByTestId('MainCurrencyParticipant')).toHaveText('Алексей');
+  const badges = page.getByTestId('RecentMainCurrencies');
+  await expect(badges.getByRole('button').first()).toHaveText('USD');
+  const dimensions = await badges
+    .getByTestId('TagsContainer')
+    .evaluate((element) => ({
+      width: element.clientWidth,
+      scroll: element.scrollWidth,
+      tops: Array.from(element.querySelectorAll('button')).map((button) => button.getBoundingClientRect().top),
+    }));
+  expect(dimensions.scroll).toBeGreaterThan(dimensions.width);
+  expect(new Set(dimensions.tops).size).toBe(1);
+  await page.screenshot({ path: 'output/virtual-wallets/42-main-currency-badges.png', animations: 'disabled' });
+  await badges.getByRole('button', { name: 'SEK', exact: true }).click();
+  await expect(form.locator('input[name=currency]')).toHaveValue('SEK');
+  await form.getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(form).toHaveCount(0);
+  await page.getByRole('button', { name: /Основная валюта/ }).click();
+  await expect(form.locator('input[name=currency]')).toHaveValue('SEK');
+  await badges.getByRole('button', { name: 'GBP', exact: true }).click();
+  await form.getByRole('button', { name: 'Отмена', exact: true }).click();
+  await expect(form).toHaveCount(0);
+  await page.getByRole('button', { name: /Основная валюта/ }).click();
+  await expect(form.locator('input[name=currency]')).toHaveValue('SEK');
+  await form.getByRole('button', { name: 'Отмена', exact: true }).click();
+  await page.goto('/settings/participants');
+  await page.getByTestId('ParticipantPicker').selectOption('maria');
+  await expect(page.getByTestId('ParticipantPicker')).toBeEnabled();
+  await page.goto('/settings', { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: /Основная валюта/ }).click();
+  await expect(page.getByTestId('MainCurrencyParticipant')).toHaveText('Мария');
+  await expect(form.locator('input[name=currency]')).not.toHaveValue('SEK');
+  await form.locator('input[name=currency]').fill('eur');
+  await form.getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(form).toHaveCount(0);
+  await page.goto('/settings/participants');
+  await page.getByTestId('ParticipantPicker').selectOption('alex');
+  await expect(page.getByTestId('ParticipantPicker')).toBeEnabled();
+  await page.getByRole('link', { name: 'Редактировать Алексей', exact: true }).click();
+  await expect(page.locator('[name=participant-currency]')).toHaveCount(0);
+  await page.getByTestId('ParticipantForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/participants$/);
+  await page.goto('/settings', { waitUntil: 'networkidle' });
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: /Основная валюта/ }).click();
+  await expect(form.locator('input[name=currency]')).toHaveValue('SEK');
 });

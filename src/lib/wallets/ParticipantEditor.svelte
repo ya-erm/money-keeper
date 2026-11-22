@@ -51,7 +51,7 @@
         ...current,
         ...draft,
         name: draft.name.trim(),
-        currency: draft.currency?.trim().toUpperCase() || undefined,
+        currency: current?.currency,
         accountsOrder: draft.accountsOrder ?? (creating ? accounts.map((item) => item.id) : current?.accountsOrder),
       });
       if (creating && !$selectedParticipantStore) await participantsService.select(draft.id);
@@ -95,15 +95,6 @@
         bind:value={draft.name}
         required
         maxlength={100}
-      />
-      <Input
-        label={$translate('currency_rates.default_currency')}
-        name="participant-currency"
-        bind:value={draft.currency}
-        maxlength={3}
-        pattern={'[A-Za-z]{3}'}
-        optional
-        translate={$translate}
       />
       <label
         >{$translate('wallets.default_allocation')}

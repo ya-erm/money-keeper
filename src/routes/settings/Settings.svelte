@@ -165,7 +165,7 @@
 </div>
 
 <LanguageModal bind:opened={$languageModalOpened} />
-<MainCurrencyModal bind:opened={$currencyModalOpened} />
+{#if $currencyModalOpened}<MainCurrencyModal bind:opened={$currencyModalOpened} />{/if}
 
 <Portal visible={showLogoutPortal}>
   <div class="logout-portal flex-col items-center justify-center h-full">
