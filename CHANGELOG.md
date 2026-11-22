@@ -14,6 +14,12 @@
 
 - Keep two decimal places for RSD accounting even when the runtime's currency formatting defaults to whole dinars.
 
+## 2.35.8 - 2026-11-22
+
+### Fixed
+
+- Category icon selection uses a single browser history step. Back, recommended icons and Continue for custom icons return to the category draft without conflicting navigation; direct links also close correctly.
+
 ## 2.35.7 - 2026-11-17
 
 ### Fixed
