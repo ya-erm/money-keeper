@@ -31,6 +31,7 @@ const iconsToBundle = [
   'mdi:close-circle-outline',
   'mdi:credit-card-plus-outline',
   'mdi:credit-card-outline',
+  'mdi:wallet-outline',
   'mdi:crosshairs-gps',
   'mdi:cog-outline',
   'mdi:content-save-outline',

@@ -32,7 +32,7 @@ const baseMenu = readable<MenuItem[]>([
 export const menu = derived([baseMenu, memberSettingsStore], ([items, settings]) => {
   if (!settings?.walletsEnabled) return items;
   const result = [...items];
-  result.splice(2, 0, { icon: 'mdi:credit-card-outline', title: 'wallets.title', path: routes.wallets.path });
+  result.splice(2, 0, { icon: 'mdi:wallet-outline', title: 'wallets.title', path: routes.wallets.path });
   return result;
 });
 

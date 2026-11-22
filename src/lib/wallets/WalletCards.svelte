@@ -52,7 +52,7 @@
     <div class="card" data-id={wallet.id} data-testId="WalletCard">
       <div class="card-content">
         <div class="card-heading">
-          <span class="wallet-icon"><Icon name="mdi:briefcase-outline" padding={0.5} /></span>
+          <span class="wallet-icon"><Icon name="mdi:wallet-outline" padding={0.5} /></span>
           <a class="name" href={`/wallets?wallet=${wallet.id}`}
             ><span>{wallet.name}</span><span class="owner"
               >{wallet.participantId
