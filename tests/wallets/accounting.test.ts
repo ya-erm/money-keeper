@@ -380,7 +380,10 @@ test('card options open a separate editor, archive, restore and delete without c
   await expect(page.getByTestId('WalletCard')).toHaveCount(2);
   await page.goto('/accounts?account-card=rsd', { waitUntil: 'networkidle' });
   await expect(page.getByTestId('TransactionListItem')).toHaveCount(1);
-  await expect(page.getByTestId('OperationWalletAllocation')).toContainText('Личный бюджет');
+  await expect(page.getByTestId('OperationWalletAllocation')).toHaveAttribute(
+    'aria-label',
+    'Распределено между участниками',
+  );
 });
 
 test('create page supports cancel and main-card editing returns to wallet history', async ({ page }) => {

@@ -13,7 +13,6 @@
   import { replaceCalcExpressions } from '#lib/utils/calc.js';
   import { formatMoney } from '#lib/utils/formatMoney.js';
   import { findNearbyPlaces, isValidCoordinates } from '#lib/utils/geolocation.js';
-  import { walletsService, walletsStore } from '#lib/data/wallets.js';
 
   export let transaction: TransactionViewModel;
   export let currencyRate: CurrencyRate | null = null;
@@ -31,6 +30,7 @@
   $: incoming = transaction.category.type === 'IN';
   $: outgoing = transaction.category.type === 'OUT';
   $: isTransfer = !!transaction.linkedTransaction;
+  $: sharedWalletOperation = (transaction.walletAllocation?.shares.filter((share) => share.amount > 0).length ?? 0) > 1;
   $: hasLocation =
     transaction.locationLat != null &&
     transaction.locationLng != null &&
@@ -152,8 +152,17 @@
             : ''}{showDescription ? (transaction.description ?? '') : ''}
         </div>
       {/if}
-      {#if knownPlace?.name || transaction.debt || transaction.tags?.length}
+      {#if sharedWalletOperation || knownPlace?.name || transaction.debt || transaction.tags?.length}
         <div class="metadata" data-testId="OperationMetadata">
+          {#if sharedWalletOperation}<span
+              class="participants-symbol"
+              role="img"
+              aria-label={$translate('wallets.shared_operation')}
+              title={$translate('wallets.shared_operation')}
+              data-testId="OperationWalletAllocation"><Icon name="mdi:account-multiple" size={1} /></span
+            >{/if}{#if sharedWalletOperation && (knownPlace?.name || transaction.debt || transaction.tags?.length)}
+            {metadataSeparator}
+          {/if}
           {#if knownPlace?.name}<span class="place-name" data-testId="OperationPlaceName">{knownPlace.name}</span
             >{/if}{#if knownPlace?.name && (transaction.debt || transaction.tags?.length)}
             {metadataSeparator}
@@ -182,16 +191,6 @@
               {/each}
             </span>
           {/if}
-        </div>
-      {/if}
-      {#if transaction.walletAllocation?.shares.length}
-        <div class="metadata" data-testId="OperationWalletAllocation">
-          {transaction.walletAllocation.shares
-            .map(
-              (share) =>
-                `${$walletsStore.find((wallet) => wallet.id === share.walletId)?.name ?? walletsService.deletedItems.find((wallet) => wallet.id === share.walletId)?.name ?? '…'}: ${formatDebtMoney(share.amount, { currency: transaction.account.currency })}`,
-            )
-            .join(' · ')}
         </div>
       {/if}
     </div>
@@ -334,7 +333,8 @@
   .small-text {
     font-size: 0.9rem;
   }
-  .debt-symbol {
+  .debt-symbol,
+  .participants-symbol {
     display: inline-flex;
     vertical-align: -0.15rem;
   }

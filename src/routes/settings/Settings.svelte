@@ -102,7 +102,7 @@
     />
   {/if}
   <ListLinkItem
-    icon="mdi:account-group"
+    icon="mdi:account-multiple"
     title={$translate('wallets.participants')}
     href={route('settings.participants')}
   />

@@ -28,6 +28,7 @@ const iconsToBundle = [
   'mdi:account-outline',
   'mdi:account-cash-outline',
   'mdi:account-group',
+  'mdi:account-multiple',
   'mdi:analytics',
   'mdi:add',
   'mdi:beta',
