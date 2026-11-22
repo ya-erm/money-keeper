@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Expanded wallet icon suggestions from 16 to 50 to fill the mobile picker with more savings, home, travel, shopping and hobby choices.
 - Shared operations show an outlined participant icon and rounded percentage ratios (50/50, 37/63). Percentages total 100; tags no longer have a middle-dot prefix.
 
 ## 2.36.2 - 2026-11-22
