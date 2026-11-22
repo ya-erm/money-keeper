@@ -674,7 +674,8 @@ test('reallocation is separate from settings, uses wallet previews and recent cu
   await expect(page).toHaveURL(/\/wallets\/transfer\?from=settings$/);
   await expect(page.getByTestId('EnableWallets')).toHaveCount(0);
   await expect(page.getByTestId('ActiveWallets')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Отмена', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Отмена', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Назад', exact: true }).click();
   await expect(page).toHaveURL(/\/settings\/wallets$/);
   await page.goto('/wallets?wallet=holiday', { waitUntil: 'networkidle' });
   await page

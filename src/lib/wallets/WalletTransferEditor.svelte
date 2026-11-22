@@ -4,6 +4,7 @@
   import dayjs from 'dayjs';
   import Icon from '@ya-erm/svelte-ui/Icon';
   import InputLabel from '@ya-erm/svelte-ui/InputLabel';
+  import Input from '@ya-erm/svelte-ui/Input';
   import WalletSelector from './WalletSelector.svelte';
   import WalletCurrencyModal from './WalletCurrencyModal.svelte';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
@@ -175,24 +176,31 @@
           </button>
         </div>
       </div>
-      <div class="date-time">
-        <label
-          >{$translate('transactions.date')}<input name="wallet-date" type="date" bind:value={date} required /></label
-        >
-        <label
-          >{$translate('transactions.time')}<input name="wallet-time" type="time" bind:value={time} required /></label
-        >
+      <div class="flex-col gap-0.5">
+        <InputLabel text={$translate('transactions.dateTime')} />
+        <div class="date-time">
+          <Input
+            name="wallet-date"
+            type="date"
+            aria-label={$translate('transactions.date')}
+            bind:value={date}
+            required
+          />
+          <Input
+            name="wallet-time"
+            type="time"
+            aria-label={$translate('transactions.time')}
+            bind:value={time}
+            required
+          />
+        </div>
       </div>
       <label>{$translate('transactions.comment')}<input name="wallet-comment" bind:value={comment} /></label>
       <div class="toolbar">
-        <button type="submit" class="primary" disabled={busy || !ready}>{$translate('common.save')}</button><button
-          type="button"
-          disabled={busy}
-          on:click={() => finish()}>{$translate('common.cancel')}</button
-        >
         {#if editedTransfer}<button type="button" class="danger" disabled={busy} on:click={remove}
             >{$translate('common.delete')}</button
           >{/if}
+        <button type="submit" class="primary" disabled={busy || !ready}>{$translate('common.save')}</button>
       </div>
     </form>
   {:else if $dataInitialized}<p>{$translate('wallets.transfer_not_found')}</p>{/if}
@@ -207,6 +215,9 @@
 <style>
   .editor {
     padding: 1rem;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    box-sizing: border-box;
+    min-height: 100%;
     max-width: 36rem;
     margin: auto;
     display: flex;
@@ -257,8 +268,9 @@
     color: var(--red-color);
   }
   .toolbar {
+    margin-top: auto;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 0.5rem;
   }
   .two-fields {
