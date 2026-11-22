@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.36.4 - 2026-11-23
+
+### Fixed
+
+- Wallet currency selection stays centered in the visual viewport above the mobile keyboard, follows viewport panning/resizing, and scrolls internally when space is limited.
+
 ## 2.36.3 - 2026-11-23
 
 ### Changed

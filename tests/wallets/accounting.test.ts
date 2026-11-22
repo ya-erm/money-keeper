@@ -885,3 +885,76 @@ test('shared operation metadata shows outlined percentages and tags without a do
   await expect(row('even').getByTestId('OperationMetadata')).not.toContainText(/·\s*#/);
   await page.screenshot({ path: 'output/virtual-wallets/60-wallet-operation-ratios.png', animations: 'disabled' });
 });
+
+test('currency dialog stays centered above the keyboard and follows visible viewport offsets', async ({
+  page,
+  browserName,
+}) => {
+  test.setTimeout(60000);
+  await page
+    .getByTestId('WalletCard')
+    .filter({ hasText: 'Алексей' })
+    .getByRole('link', { name: 'Перераспределить', exact: true })
+    .click();
+  await page.evaluate(() => {
+    const viewport = Object.assign(new EventTarget(), {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      offsetTop: 0,
+      offsetLeft: 0,
+    });
+    Object.defineProperty(window, 'visualViewport', { value: viewport, configurable: true });
+  });
+  await page.getByTestId('WalletCurrencyButton').click();
+  const dialog = page.getByRole('dialog', { name: 'Валюта', exact: true });
+  const center = async () => {
+    const box = (await dialog.boundingBox())!;
+    return { x: Math.round(box.x + box.width / 2), y: Math.round(box.y + box.height / 2) };
+  };
+  const resize = async (height: number, top: number, width = 390, left = 0, event = 'resize') => {
+    await page.evaluate(
+      ({ height, top, width, left, event }) => {
+        Object.assign(window.visualViewport!, { height, width, offsetTop: top, offsetLeft: left });
+        window.visualViewport!.dispatchEvent(new Event(event));
+      },
+      { height, top, width, left, event },
+    );
+  };
+  await expect.poll(center).toEqual({ x: 195, y: 422 });
+  await page.getByTestId('WalletCurrencyForm').locator('[name=wallet-currency]').focus();
+  await resize(420, 0);
+  await expect.poll(center).toEqual({ x: 195, y: 210 });
+  await resize(360, 80, 390, 0, 'scroll');
+  await expect.poll(center).toEqual({ x: 195, y: 260 });
+  let box = (await dialog.boundingBox())!;
+  expect(box.y).toBeGreaterThanOrEqual(96);
+  expect(box.y + box.height).toBeLessThanOrEqual(424);
+  await page.screenshot({
+    path: `output/virtual-wallets/65-currency-visible-viewport-${browserName}.png`,
+    clip: { x: 0, y: 80, width: 390, height: 360 },
+    animations: 'disabled',
+  });
+  await resize(220, 90, 320, 20);
+  await expect.poll(center).toEqual({ x: 180, y: 200 });
+  box = (await dialog.boundingBox())!;
+  expect(box.y).toBeGreaterThanOrEqual(106);
+  expect(box.y + box.height).toBeLessThanOrEqual(294);
+  expect(box.x).toBeGreaterThanOrEqual(36);
+  expect(box.x + box.width).toBeLessThanOrEqual(324);
+  expect(await dialog.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
+  await page.getByTestId('WalletCurrencyForm').locator('[name=wallet-currency]').fill('RSD');
+  await dialog.getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page.getByTestId('WalletCurrencyForm')).toHaveCount(0);
+  await expect(page.getByTestId('WalletCurrencyButton')).toHaveText('RSD');
+  await resize(844, 0);
+  await page.getByTestId('WalletCurrencyButton').click();
+  await expect.poll(center).toEqual({ x: 195, y: 422 });
+  await dialog.getByRole('button', { name: 'Отмена', exact: true }).click();
+  await expect(page.getByTestId('WalletCurrencyForm')).toHaveCount(0);
+  await page.evaluate(() => Object.defineProperty(window, 'visualViewport', { value: null, configurable: true }));
+  await page.getByTestId('WalletCurrencyButton').click();
+  await page.setViewportSize({ width: 390, height: 600 });
+  await expect.poll(center).toEqual({ x: 195, y: 300 });
+  await dialog.getByRole('button', { name: 'Отмена', exact: true }).click();
+  await expect(page.getByTestId('WalletCurrencyForm')).toHaveCount(0);
+});

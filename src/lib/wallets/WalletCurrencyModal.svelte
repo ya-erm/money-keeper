@@ -7,6 +7,7 @@
   import { walletTransfersStore } from '#lib/data/wallets.js';
   import { translate } from '#lib/translate/index.js';
   import Modal from '@ya-erm/svelte-ui/Modal';
+  import { fitDialogToViewport } from '#lib/ui/fitDialogToViewport.js';
   export let currency: string;
   export let onSelect: (currency: string) => void;
   export let onClose: () => void;
@@ -40,7 +41,12 @@
 </script>
 
 <Modal bind:opened {onClose} header={$translate('accounts.currency')} width={18}>
-  <form class="flex-col gap-1" data-testId="WalletCurrencyForm" on:submit|preventDefault|stopPropagation={save}>
+  <form
+    use:fitDialogToViewport
+    class="flex-col gap-1"
+    data-testId="WalletCurrencyForm"
+    on:submit|preventDefault|stopPropagation={save}
+  >
     <Input
       name="wallet-currency"
       bind:value
