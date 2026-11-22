@@ -62,25 +62,23 @@
     categoryType = id as CategoryType;
   };
 
-  $: iconSelectingParam = getSearchParam($page, 'iconSelecting');
-  $: iconSelecting = iconSelectingParam === 'true';
-  $: if (iconSelectingParam === 'true') {
-    iconSelecting = true;
-  }
-  $: if (!!iconSelectingParam && !iconSelecting) {
-    void deleteSearchParam($page, 'iconSelecting');
-  }
+  $: iconSelecting = getSearchParam($page, 'iconSelecting') === 'true';
+
   const openIconSelecting = async () => {
-    await setSearchParam($page, 'iconSelecting', 'true', { replace: false });
+    await setSearchParam($page, 'iconSelecting', 'true', {
+      replace: false,
+      state: { ...$page.state, categoryIconPicker: true },
+    });
   };
-  const closeIconSelecting = async () => {
-    history.back();
-    await deleteSearchParam($page, 'iconSelecting');
+  const closeIconSelecting = () => {
+    // This routed screen owns one history entry. Direct links have no parent entry to return to.
+    if ($page.state.categoryIconPicker) history.back();
+    else void deleteSearchParam($page, 'iconSelecting');
   };
 </script>
 
 <Modal width={20} header={category?.name ?? $translate('categories.new_category')} bind:opened>
-  <form class="flex-col gap-1 items-center" on:submit|preventDefault={handleSave}>
+  <form data-testId="CategoryForm" class="flex-col gap-1 items-center" on:submit|preventDefault={handleSave}>
     <MultiSwitch {options} selected={selectedOption} onChange={handleChangeType} />
 
     <div class="w-full flex gap-1 items-center">
@@ -111,7 +109,12 @@
     </div>
   </form>
 
-  <SubScreen visible={iconSelecting} title={$translate('icons.select_icon')} onBack={closeIconSelecting}>
+  <SubScreen
+    manageHistory={false}
+    visible={iconSelecting}
+    title={$translate('icons.select_icon')}
+    onBack={closeIconSelecting}
+  >
     <CategoryIcons
       icon={icon ?? null}
       onSelect={(value) => {
