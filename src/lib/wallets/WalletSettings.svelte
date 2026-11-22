@@ -117,22 +117,25 @@
 
 <Layout title={$translate('wallets.setup')} leftSlot={HeaderBackButton}>
   <div class="wallet-page" data-testId="WalletsPage">
-    {#if !currentWallet}
-      <label class="visibility"
-        ><input
-          type="checkbox"
-          data-testId="EnableWallets"
-          checked={$memberSettingsStore?.walletsEnabled ?? false}
-          disabled={busy}
-          on:change={(event) => {
-            const enabled = event.currentTarget.checked;
-            void run(() => membersService.updateWalletsEnabled(enabled));
-          }}
-        />{$translate('wallets.enable')}</label
-      >
-    {/if}
+    <div class="wallet-toggle">
+      {#if !currentWallet}
+        <label class="visibility"
+          ><input
+            type="checkbox"
+            data-testId="EnableWallets"
+            aria-describedby="wallets-budget-hint"
+            checked={$memberSettingsStore?.walletsEnabled ?? false}
+            disabled={busy}
+            on:change={(event) => {
+              const enabled = event.currentTarget.checked;
+              void run(() => membersService.updateWalletsEnabled(enabled));
+            }}
+          />{$translate('wallets.enable')}</label
+        >
+      {/if}
 
-    <p class="hint">{$translate('wallets.budget_hint')}</p>
+      <p class="hint" id="wallets-budget-hint">{$translate('wallets.budget_hint')}</p>
+    </div>
     <div class="section-heading">
       <h2>{$translate('wallets.title')}</h2>
       <a class="create-wallet" href="/wallets/create?from=settings">{$translate('wallets.new')}</a>
@@ -195,8 +198,8 @@
   p {
     margin: 0;
   }
-  button,
   button {
+    font: inherit;
     min-height: 2.75rem;
     padding: 0.6rem 0.8rem;
     border: 1px solid var(--border-color);
@@ -225,7 +228,8 @@
 
   .hint {
     color: var(--secondary-text-color);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
     overflow-wrap: anywhere;
   }
   .section-heading,
@@ -250,8 +254,13 @@
     border-top: 1px solid var(--border-color);
     padding-top: 1rem;
   }
+  .wallet-toggle {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
   .visibility {
-    flex: 1;
+    min-height: 1.5rem;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -260,6 +269,10 @@
   }
   .visibility input {
     width: 1.2rem;
+    height: 1.2rem;
+    min-height: 1.2rem;
+    padding: 0;
+    margin: 0;
     flex-shrink: 0;
   }
   .create-wallet {

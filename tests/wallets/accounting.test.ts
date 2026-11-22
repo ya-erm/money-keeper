@@ -225,12 +225,12 @@ test('create named profiles and wallets, personalize order, and disable the feat
   await page.goto('/settings/wallets');
   await expect(page.getByTestId('EnableWallets')).toBeChecked();
   await page.getByTestId('EnableWallets').uncheck();
-  await expect(page.getByTestId('MenuItem')).toHaveText(['Долги', 'Счета', 'Аналитика', 'Настройки']);
+  await expect(page.getByTestId('MenuItem')).toHaveText(['Долги', 'Категории', 'Счета', 'Аналитика', 'Настройки']);
   await expect(page.getByTestId('WalletCard')).toHaveCount(4);
   await page.goto('/');
   await expect(page).toHaveURL(/\/accounts/);
   await page.goto('/settings');
-  await expect(page.getByRole('link', { name: 'Категории', exact: true })).toBeVisible();
+  await expect(page.locator('.list-group').getByRole('link', { name: 'Категории', exact: true })).toBeVisible();
 });
 
 test('swiping wallet cards changes history and archived wallets remain readable', async ({ page }) => {
@@ -673,7 +673,7 @@ test('reallocation is separate from settings, uses wallet previews and recent cu
   await importMockDataAsync(page, JSON.stringify(data));
   await page.goto('/settings/wallets', { waitUntil: 'networkidle' });
   const explanation = page.getByText(
-    'Виртуальные кошельки позволяют распределить деньги со счетов без реальных операций',
+    'Виртуальные кошельки позволяют распределить деньги со счетов без реальных операций. Их можно использовать для копилок или ведения бюджета на месяц.',
     { exact: true },
   );
   await expect(explanation).toBeVisible();

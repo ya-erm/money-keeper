@@ -30,9 +30,12 @@ const baseMenu = readable<MenuItem[]>([
 ]);
 
 export const menu = derived([baseMenu, memberSettingsStore], ([items, settings]) => {
-  if (!settings?.walletsEnabled) return items;
   const result = [...items];
-  result.splice(2, 0, { icon: 'mdi:wallet-outline', title: 'wallets.title', path: routes.wallets.path });
+  if (settings?.walletsEnabled) {
+    result.splice(2, 0, { icon: 'mdi:wallet-outline', title: 'wallets.title', path: routes.wallets.path });
+  } else {
+    result.splice(1, 0, { icon: 'mdi:shape-outline', title: 'categories.title', path: routes.categories.path });
+  }
   return result;
 });
 

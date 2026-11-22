@@ -59,7 +59,8 @@ export const walletRu = {
   'wallets.total_payment': 'Весь платёж',
   'wallets.setup': 'Настройки кошельков',
   'wallets.overdraft': 'Перерасход',
-  'wallets.budget_hint': 'Виртуальные кошельки позволяют распределить деньги со счетов без реальных операций',
+  'wallets.budget_hint':
+    'Виртуальные кошельки позволяют распределить деньги со счетов без реальных операций. Их можно использовать для копилок или ведения бюджета на месяц.',
   'wallets.edit_wallet': 'Редактировать кошелёк',
   'wallets.archive': 'Архивировать',
   'wallets.archived': 'Архивные кошельки',
@@ -132,7 +133,8 @@ export const walletEn: Record<WalletMessage, string> = {
   'wallets.total_payment': 'Full payment',
   'wallets.setup': 'Wallet settings',
   'wallets.overdraft': 'Overspent',
-  'wallets.budget_hint': 'Virtual wallets let you allocate money from accounts without real transactions',
+  'wallets.budget_hint':
+    'Virtual wallets let you allocate money from accounts without real transactions. Use them for savings goals or a monthly budget.',
   'wallets.edit_wallet': 'Edit wallet',
   'wallets.archive': 'Archive',
   'wallets.archived': 'Archived wallets',

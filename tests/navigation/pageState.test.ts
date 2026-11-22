@@ -14,7 +14,7 @@ test('updates menu and query-driven modals during client navigation and history 
   const accounts = page.getByTestId('MenuItem').filter({ hasText: 'Accounts' }).first();
   await settings.click();
   await expect(settings).toHaveClass(/active/);
-  await page.getByRole('link', { name: 'Categories', exact: true }).click();
+  await page.getByTestId('MenuItem').filter({ hasText: 'Categories' }).click();
   await expect(page).toHaveURL(/\/categories$/);
   await expect(accounts).not.toHaveClass(/active/);
 

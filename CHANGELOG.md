@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.36.6 - 2026-11-23
+
+### Changed
+
+- With wallets disabled, navigation shows Debts, Categories, Accounts, Analytics and Settings.
+- Wallet enablement has a smaller, closely grouped explanation describing savings goals and monthly budgeting.
+
 ## 2.36.5 - 2026-11-23
 
 ### Changed
