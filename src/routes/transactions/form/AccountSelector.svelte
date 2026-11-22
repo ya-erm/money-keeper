@@ -10,7 +10,6 @@
 
   import AccountList from '../../accounts/list/AccountList.svelte';
   import AccountListItem from '../../accounts/list/AccountListItem.svelte';
-  import { selectedParticipantStore } from '#lib/data/participants.js';
 
   export let name = 'accountId';
   export let testId: string = 'AccountSelect';
@@ -19,11 +18,7 @@
   export let selecting: boolean;
   export let accountFilter: ((account: AccountViewModel) => boolean) | null = null;
 
-  $: accounts = $accountsStore.filter(
-    (account) =>
-      (!accountFilter || accountFilter(account)) &&
-      (account.id === accountId || !$selectedParticipantStore?.hiddenAccountIds?.includes(account.id)),
-  );
+  $: accounts = $accountsStore.filter((account) => !accountFilter || accountFilter(account));
   $: currencyRates = $currencyRatesStore;
   $: settings = $memberSettingsStore;
 

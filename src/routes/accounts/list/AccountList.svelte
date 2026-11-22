@@ -51,7 +51,6 @@
   let sortedAccounts: AccountViewModel[] = [];
   let draftOpen = false;
   let sortingParticipantId: string | null = null;
-  let hiddenIds: string[] = [];
   let busy = false;
   $: syncDraft(sortable, accounts, filteredAccounts, $selectedParticipantStore);
   function syncDraft(
@@ -63,15 +62,10 @@
     if (sorting && !draftOpen) {
       sortingParticipantId = participant?.id ?? null;
       sortedAccounts = all.filter((account) => !account.archived);
-      hiddenIds = [...(participant?.hiddenAccountIds ?? [])];
     } else if (!sorting) {
       sortedAccounts = filtered.filter((account) => !account.archived);
     }
     draftOpen = sorting;
-  }
-  $: displayHiddenIds = sortable ? hiddenIds : ($selectedParticipantStore?.hiddenAccountIds ?? []);
-  function toggleHidden(id: string) {
-    hiddenIds = hiddenIds.includes(id) ? hiddenIds.filter((value) => value !== id) : [...hiddenIds, id];
   }
 
   const flipDurationMs = 200;
@@ -96,7 +90,7 @@
       if (sortingParticipantId) {
         const current = participantsService.getById(sortingParticipantId);
         if (!current) throw new Error('Participant is no longer available');
-        await participantsService.save({ ...current, accountsOrder, hiddenAccountIds: hiddenIds });
+        await participantsService.save({ ...current, accountsOrder });
       } else {
         await membersService.saveAccountsOrder(accountsOrder);
       }
@@ -175,7 +169,6 @@
     {#each sortedAccounts as account (account.id)}
       <li
         class="management-row"
-        class:personal-hidden={displayHiddenIds.includes(account.id)}
         animate:flip={{ duration: flipDurationMs }}
         data-id={account.id}
         aria-label={account.name}
@@ -189,19 +182,6 @@
             draggable={sortable}
           />
         </div>
-        {#if sortable && sortingParticipantId}<button
-            class="visibility-button"
-            type="button"
-            disabled={busy}
-            aria-label={`${$translate(displayHiddenIds.includes(account.id) ? 'common.show' : 'common.hide')} ${account.name}`}
-            aria-pressed={displayHiddenIds.includes(account.id)}
-            on:click|stopPropagation={() => toggleHidden(account.id)}
-            on:keydown|stopPropagation
-            ><Icon
-              name={displayHiddenIds.includes(account.id) ? 'mdi:eye-off-outline' : 'mdi:eye-outline'}
-              size={1.25}
-            /></button
-          >{/if}
       </li>
     {/each}
   </ul>
@@ -242,22 +222,7 @@
     flex: 1;
     min-width: 0;
   }
-  .personal-hidden .row-content {
-    opacity: 0.5;
-    filter: grayscale(1);
-  }
-  .visibility-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.75rem;
-    background: var(--header-background-color);
-    color: var(--secondary-text-color);
-    cursor: pointer;
-  }
+
   .sorting-caption {
     display: flex;
     flex-direction: column;

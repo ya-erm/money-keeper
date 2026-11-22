@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.36.5 - 2026-11-23
+
+### Changed
+
+- Removed participant-specific account/wallet hiding and its sorting controls. Earlier visibility preferences are ignored in cards, selectors, default allocations and startup; personal order remains synchronized.
+
 ## 2.36.4 - 2026-11-23
 
 ### Fixed

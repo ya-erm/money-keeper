@@ -119,7 +119,9 @@ export type Participant = {
   name: string;
   accountsOrder?: string[];
   walletsOrder?: string[];
+  /** @deprecated Retained for older backups; participant visibility is no longer applied. */
   hiddenAccountIds?: string[];
+  /** @deprecated Retained for older backups; participant visibility is no longer applied. */
   hiddenWalletIds?: string[];
   currency?: string;
   allocationPreset?: 'first' | 'other' | 'equal';

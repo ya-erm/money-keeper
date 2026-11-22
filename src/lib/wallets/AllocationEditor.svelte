@@ -23,7 +23,7 @@
   $: participant = $selectedParticipantStore;
   $: activeOwnerIds = new Set($participantsStore.filter((item) => !item.archived).map((item) => item.id));
   $: available = orderedItems(
-    $walletsStore.filter((wallet) => !wallet.archived && !participant?.hiddenWalletIds?.includes(wallet.id)),
+    $walletsStore.filter((wallet) => !wallet.archived),
     participant?.walletsOrder,
   );
   $: rows = allocation?.shares ?? [];

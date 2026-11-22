@@ -95,21 +95,21 @@ test('two devices synchronize wallet payments, savings and personal preferences 
     await source.goto('/accounts/list');
     await source.getByRole('button', { name: 'Сортировка счетов', exact: true }).click();
     const accountRow = source.getByTestId('AccountSortList').locator(':scope > li[data-id="eur"]');
+    await expect(accountRow).toHaveAttribute('tabindex', '0');
     await accountRow.focus();
     await accountRow.press('Space');
     await accountRow.press('ArrowUp');
     await accountRow.press('Space');
-    await source.getByRole('button', { name: 'Скрыть Карта RSD', exact: true }).click();
     await source.locator('.sorting').getByRole('button', { name: 'Сохранить', exact: true }).click();
     await expect(source).not.toHaveURL(/action=sort/);
     await source.goto('/wallets/list');
     await source.getByRole('button', { name: 'Сортировка кошельков', exact: true }).click();
     const walletRow = source.getByTestId('WalletSortList').locator(':scope > li[data-id="b"]');
+    await expect(walletRow).toHaveAttribute('tabindex', '0');
     await walletRow.focus();
     await walletRow.press('Space');
     await walletRow.press('ArrowUp');
     await walletRow.press('Space');
-    await source.getByRole('button', { name: 'Скрыть Алексей', exact: true }).click();
     await source.locator('.sorting-bar').getByRole('button', { name: 'Сохранить', exact: true }).click();
     await expect(source).toHaveURL(/\/wallets\/list$/);
     await source.evaluate(async () => {
@@ -164,13 +164,11 @@ test('two devices synchronize wallet payments, savings and personal preferences 
       'data-id',
       'eur',
     );
-    await expect(target.getByTestId('AccountSortList').locator(':scope > li[data-id="card"]')).toHaveClass(
-      /personal-hidden/,
-    );
+    await expect(target.getByTestId('AccountSortList').locator(':scope > li')).toHaveCount(2);
     await target.goto('/wallets/list');
     await expect(target.getByTestId('WalletListItem').first()).toHaveAttribute('data-id', 'b');
     await target.goto('/wallets');
-    await expect(target.getByTestId('WalletCard')).toHaveCount(2);
+    await expect(target.getByTestId('WalletCard')).toHaveCount(3);
     await target.goto('/settings', { waitUntil: 'networkidle' });
     await target.reload({ waitUntil: 'networkidle' });
     await target.getByRole('button', { name: /Основная валюта/ }).click();
@@ -186,9 +184,7 @@ test('two devices synchronize wallet payments, savings and personal preferences 
       'data-id',
       'card',
     );
-    await expect(target.getByTestId('AccountSortList').locator(':scope > li[data-id="card"]')).not.toHaveClass(
-      /personal-hidden/,
-    );
+    await expect(target.getByTestId('AccountSortList').locator(':scope > li')).toHaveCount(2);
     await target.goto('/wallets');
     await expect(target.getByTestId('WalletCard')).toHaveCount(3);
     await source.reload();

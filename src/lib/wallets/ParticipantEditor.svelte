@@ -38,8 +38,6 @@
         currency: current?.currency,
         accountsOrder: creating ? $accountsStore.map((item) => item.id) : current?.accountsOrder,
         walletsOrder: current?.walletsOrder,
-        hiddenAccountIds: current?.hiddenAccountIds,
-        hiddenWalletIds: current?.hiddenWalletIds,
       });
       if (creating && !$selectedParticipantStore) await participantsService.select(draft.id);
       await goto('/settings/participants', { replace: true });

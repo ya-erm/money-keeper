@@ -12,7 +12,7 @@
     await mainService.init();
     const participant = get(selectedParticipantStore);
     const wallet = orderedItems(
-      get(walletsStore).filter((wallet) => !wallet.archived && !participant?.hiddenWalletIds?.includes(wallet.id)),
+      get(walletsStore).filter((wallet) => !wallet.archived),
       participant?.walletsOrder,
     )[0];
     await goto(

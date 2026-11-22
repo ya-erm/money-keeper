@@ -569,10 +569,28 @@ test('main currency is saved per participant from Settings and recent badges scr
   await expect(form.locator('input[name=currency]')).toHaveValue('SEK');
 });
 
-test('list sorting and visibility are saved per participant, cancel discards drafts and analytics keeps hidden accounts', async ({
+test('personal sorting remains available and legacy hiding preferences do not hide accounts or wallets', async ({
   page,
 }) => {
-  test.setTimeout(60000);
+  test.setTimeout(90000);
+  const data = JSON.parse(backup);
+  data.participants[0].hiddenAccountIds = ['rsd', 'eur'];
+  data.participants[0].hiddenWalletIds = ['alex-wallet', 'maria-wallet', 'holiday'];
+  await importMockDataAsync(page, JSON.stringify(data));
+  await page.goto('/accounts', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('AccountCard')).toHaveCount(2);
+  await page.goto('/');
+  await expect(page).toHaveURL(/\/wallets\?wallet=alex-wallet$/);
+  await expect(page.getByTestId('WalletCard')).toHaveCount(3);
+  await page.goto('/transactions/create?type=OUT', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('SourceAccountSelect')).toContainText('Карта RSD');
+  await expect(page.getByTestId('WalletAllocation').locator('select')).toHaveValue('alex-wallet');
+  await page.getByTestId('SourceAccountSelect').getByRole('button').click();
+  await expect(
+    page.getByTestId('SourceAccountSelect.Portal').getByTestId('AccountSortList').locator(':scope > li'),
+  ).toHaveCount(2);
+  await page.getByTestId('SourceAccountSelect.Portal').getByRole('button', { name: 'Счёт EUR', exact: true }).click();
+  await expect(page.getByTestId('SourceAccountSelect')).toContainText('Счёт EUR');
   const selectParticipant = async (id: string) => {
     await page.goto('/settings/participants');
     await page.getByTestId('ParticipantPicker').selectOption(id);
@@ -590,22 +608,20 @@ test('list sorting and visibility are saved per participant, cancel discards dra
   await page.goto('/accounts/list');
   await page.getByRole('button', { name: 'Сортировка счетов', exact: true }).click();
   await moveUp('AccountSortList', 'eur');
-  await page.getByRole('button', { name: 'Скрыть Карта RSD', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Показать Карта RSD', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Показать Карта RSD', exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Карта RSD', exact: true })).toBeInViewport();
   await page.screenshot({ path: 'output/virtual-wallets/44-account-sort.png', animations: 'disabled' });
   await page.locator('.sorting').getByRole('button', { name: 'Отмена', exact: true }).click();
   await expect(page.getByTestId('AccountSortList').locator(':scope > li').first()).toHaveAttribute('data-id', 'rsd');
   await page.getByRole('button', { name: 'Сортировка счетов', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Скрыть Карта RSD', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Скрыть Карта RSD', exact: true })).toHaveCount(0);
   await moveUp('AccountSortList', 'eur');
-  await page.getByRole('button', { name: 'Скрыть Карта RSD', exact: true }).click();
   await page.locator('.sorting').getByRole('button', { name: 'Сохранить', exact: true }).click();
   await expect(page).not.toHaveURL(/action=sort/);
   await page.reload();
   await expect(page.getByTestId('AccountSortList').locator(':scope > li').first()).toHaveAttribute('data-id', 'eur');
   await page.goto('/accounts');
-  await expect(page.getByTestId('AccountCard')).toHaveCount(1);
+  await expect(page.getByTestId('AccountCard')).toHaveCount(2);
   await page.goto('/analytics/accounts');
   await expect(page.getByRole('cell', { name: 'Карта RSD RSD', exact: true })).toBeVisible();
   await selectParticipant('maria');
@@ -619,21 +635,19 @@ test('list sorting and visibility are saved per participant, cancel discards dra
   await page.goto('/wallets/list');
   await page.getByRole('button', { name: 'Сортировка кошельков', exact: true }).click();
   await moveUp('WalletSortList', 'maria-wallet');
-  await page.getByRole('button', { name: 'Скрыть Алексей', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Показать Алексей', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Показать Алексей', exact: true })).toHaveCount(0);
   await expect(page.getByTestId('WalletListItem').first()).toBeInViewport();
   await page.screenshot({ path: 'output/virtual-wallets/46-wallet-sort.png', animations: 'disabled' });
   await page.locator('.sorting-bar').getByRole('button', { name: 'Отмена', exact: true }).click();
   await expect(page.getByTestId('WalletListItem').first()).toHaveAttribute('data-id', 'alex-wallet');
   await page.getByRole('button', { name: 'Сортировка кошельков', exact: true }).click();
   await moveUp('WalletSortList', 'maria-wallet');
-  await page.getByRole('button', { name: 'Скрыть Алексей', exact: true }).click();
   await page.locator('.sorting-bar').getByRole('button', { name: 'Сохранить', exact: true }).click();
   await expect(page).toHaveURL(/\/wallets\/list$/);
   await page.reload();
   await expect(page.getByTestId('WalletListItem').first()).toHaveAttribute('data-id', 'maria-wallet');
   await page.goto('/wallets');
-  await expect(page.getByTestId('WalletCard')).toHaveCount(2);
+  await expect(page.getByTestId('WalletCard')).toHaveCount(3);
   await selectParticipant('maria');
   await page.goto('/wallets');
   await expect(page.getByTestId('WalletCard')).toHaveCount(3);

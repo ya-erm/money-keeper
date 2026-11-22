@@ -135,9 +135,7 @@
     );
   }
   $: if (!transaction && !accountId && $selectedParticipantStore) {
-    accountId = accounts.find(
-      (account) => !account.archived && !$selectedParticipantStore?.hiddenAccountIds?.includes(account.id),
-    )?.id;
+    accountId = accounts.find((account) => !account.archived)?.id;
   }
 
   let _value1 = (isTransfer ? sourceTransaction?.amount : transaction?.amount)?.toString() ?? '';

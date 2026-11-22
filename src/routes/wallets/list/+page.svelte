@@ -4,7 +4,6 @@
   import { dndzone, type DndEvent } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
   import Button from '@ya-erm/svelte-ui/Button';
-  import Icon from '@ya-erm/svelte-ui/Icon';
   import Input from '@ya-erm/svelte-ui/Input';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
   import { page } from '#lib/page.js';
@@ -28,7 +27,6 @@
   let items: VirtualWallet[] = [];
   let draftOpen = false;
   let sortingParticipantId: string | null = null;
-  let hiddenIds: string[] = [];
   let busy = false;
   $: participant = $selectedParticipantStore;
   $: sortable = $dataInitialized && $page.url.searchParams.get('action') === 'sort' && !!participant;
@@ -49,7 +47,6 @@
     if (sorting && !draftOpen) {
       sortingParticipantId = participant?.id ?? null;
       items = all.filter((wallet) => !wallet.archived);
-      hiddenIds = [...(participant?.hiddenWalletIds ?? [])];
     } else if (!sorting) {
       items = matching.filter((wallet) => !wallet.archived);
     }
@@ -78,10 +75,7 @@
   function ownerName(id?: string) {
     return id ? ($participantHistoryStore.find((item) => item.id === id)?.name ?? '…') : $translate('wallets.shared');
   }
-  $: displayHiddenIds = sortable ? hiddenIds : (participant?.hiddenWalletIds ?? []);
-  function toggleHidden(id: string) {
-    hiddenIds = hiddenIds.includes(id) ? hiddenIds.filter((value) => value !== id) : [...hiddenIds, id];
-  }
+
   function reordered(event: CustomEvent<DndEvent<VirtualWallet>>) {
     items = event.detail.items;
   }
@@ -95,7 +89,6 @@
       await participantsService.save({
         ...current,
         walletsOrder: [...ids, ...ordered.filter((wallet) => !ids.includes(wallet.id)).map((wallet) => wallet.id)],
-        hiddenWalletIds: hiddenIds,
       });
       await goto('/wallets/list', { replace: true });
     } catch {
@@ -127,7 +120,6 @@
       on:finalize={reordered}
     >
       {#each items as wallet (wallet.id)}<li
-          class:personal-hidden={displayHiddenIds.includes(wallet.id)}
           data-id={wallet.id}
           aria-label={wallet.name}
           animate:flip={{ duration: 200 }}
@@ -141,19 +133,6 @@
               onClick={() => goto(`/wallets?wallet=${encodeURIComponent(wallet.id)}`)}
             />
           </div>
-          {#if sortable}<button
-              class="visibility-button"
-              type="button"
-              disabled={busy}
-              aria-label={`${$translate(displayHiddenIds.includes(wallet.id) ? 'common.show' : 'common.hide')} ${wallet.name}`}
-              aria-pressed={displayHiddenIds.includes(wallet.id)}
-              on:click|stopPropagation={() => toggleHidden(wallet.id)}
-              on:keydown|stopPropagation
-              ><Icon
-                name={displayHiddenIds.includes(wallet.id) ? 'mdi:eye-off-outline' : 'mdi:eye-outline'}
-                size={1.25}
-              /></button
-            >{/if}
         </li>{/each}
     </ul>
     {#if !items.length}<p>{$translate('wallets.no_wallets')}</p>{/if}
@@ -197,22 +176,7 @@
     flex: 1;
     min-width: 0;
   }
-  .personal-hidden .row-content {
-    opacity: 0.5;
-    filter: grayscale(1);
-  }
-  .visibility-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.75rem;
-    background: var(--header-background-color);
-    color: var(--secondary-text-color);
-    cursor: pointer;
-  }
+
   .sorting-bar {
     display: flex;
     justify-content: space-between;

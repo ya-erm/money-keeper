@@ -42,7 +42,7 @@
   let limit = 20;
   $: participant = $selectedParticipantStore;
   $: visible = orderedItems(
-    $walletsStore.filter((wallet) => !wallet.archived && !participant?.hiddenWalletIds?.includes(wallet.id)),
+    $walletsStore.filter((wallet) => !wallet.archived),
     participant?.walletsOrder,
   );
   $: currentWallet = $walletsStore.find((wallet) => wallet.id === $page.url.searchParams.get('wallet')) ?? visible[0];
