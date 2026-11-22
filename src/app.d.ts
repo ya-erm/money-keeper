@@ -7,6 +7,7 @@
 declare namespace App {
   interface PageState {
     subScreens?: string[];
+    categoryIconPicker?: boolean;
     debtContactFromList?: boolean;
   }
   interface Locals {

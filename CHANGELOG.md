@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.35.8 - 2026-11-22
+
+### Fixed
+
+- Category icon selection uses a single browser history step. Back, recommended icons and Continue for custom icons return to the category draft without conflicting navigation; direct links also close correctly.
+
 ## 2.35.7 - 2026-11-17
 
 ### Fixed
