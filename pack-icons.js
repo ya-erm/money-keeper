@@ -12,6 +12,15 @@ const target = 'src/lib/icons.ts';
 
 // Icons to bundle, array
 const iconsToBundle = [
+  'mdi:theme-light-dark',
+  'mdi:currency-usd',
+  'mdi:repeat',
+  'mdi:cash-multiple',
+  'mdi:key-outline',
+  'mdi:history',
+  'mdi:bug-outline',
+  'mdi:text-box-search-outline',
+  'mdi:palette-outline',
   'mdi:camera-outline',
   'mdi:image-outline',
   'mdi:stop',

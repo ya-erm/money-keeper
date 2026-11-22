@@ -476,6 +476,9 @@ export type Messages =
   // Settings
   | 'settings.title'
   | 'settings.known_places'
+  | 'settings.interface'
+  | 'settings.account'
+  | 'settings.integrations'
   | 'settings.common'
   | 'settings.language'
   | 'settings.select_language'
