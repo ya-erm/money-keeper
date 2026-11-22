@@ -5,6 +5,7 @@
   import type { Participant, VirtualWallet } from '#lib/data/interfaces.js';
   import { settingsStore } from '#lib/data/settings.js';
   import { translate } from '#lib/translate/index.js';
+  import WalletOptionsButton from './WalletOptionsButton.svelte';
   import HiddenMoney from '#lib/ui/HiddenMoney.svelte';
   import { formatDebtMoney } from '#lib/debts/formatMoney.js';
 
@@ -60,11 +61,7 @@
                 : $translate('wallets.shared')}</span
             ></a
           >
-          <a
-            class="options"
-            href={`/settings/wallets?action=edit&id=${wallet.id}`}
-            aria-label={$translate('common.additional_options')}><Icon name="mdi:dots-vertical" padding={0.5} /></a
-          >
+          <WalletOptionsButton {wallet} />
         </div>
         <button
           type="button"
@@ -94,7 +91,7 @@
       </div>
     </div>
   {/each}
-  {#if !wallets.length}<a href="/settings/wallets" class="card dashed"
+  {#if !wallets.length}<a href="/wallets/create" class="card dashed"
       ><Icon name="mdi:plus" />{$translate('wallets.new')}</a
     >{/if}
 </div>
@@ -161,14 +158,7 @@
     color: var(--secondary-text-color);
     font-size: 0.9rem;
   }
-  .options {
-    color: var(--primary-text-color);
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+
   .balance {
     border: 0;
     padding: 0;

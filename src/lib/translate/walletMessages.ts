@@ -49,6 +49,9 @@ export const walletRu = {
   'wallets.restore': 'Восстановить',
   'wallets.remaining': 'Осталось распределить',
   'wallets.wallet': 'Кошелёк',
+  'wallets.not_found': 'Кошелёк не найден',
+  'wallets.delete_confirm': 'Удалить кошелёк?',
+  'wallets.delete_description': 'Кошелёк будет удалён. Банковские операции и история распределений сохранятся.',
   'wallets.save_failed': 'Не удалось сохранить изменения. Попробуйте ещё раз.',
 };
 export type WalletMessage = keyof typeof walletRu;
@@ -103,5 +106,8 @@ export const walletEn: Record<WalletMessage, string> = {
   'wallets.restore': 'Restore',
   'wallets.remaining': 'Left to allocate',
   'wallets.wallet': 'Wallet',
+  'wallets.not_found': 'Wallet not found',
+  'wallets.delete_confirm': 'Delete wallet?',
+  'wallets.delete_description': 'The wallet will be deleted. Bank operations and allocation history will be preserved.',
   'wallets.save_failed': 'Could not save changes. Please try again.',
 };

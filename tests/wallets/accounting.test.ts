@@ -203,7 +203,7 @@ test('create named profiles and wallets, personalize order, and disable the feat
   await expect(page.getByTestId('ParticipantForm')).not.toBeVisible();
   await page.getByTestId('ParticipantPicker').selectOption({ label: 'Дмитрий' });
   await page.goto('/settings/wallets');
-  await page.getByRole('button', { name: 'Создать кошелёк', exact: true }).click();
+  await page.getByRole('link', { name: 'Создать кошелёк', exact: true }).click();
   await page.locator('[name=wallet-name]').fill('Резерв Дмитрия');
   await page.locator('[name=wallet-owner]').selectOption({ label: 'Дмитрий' });
   await page.getByTestId('WalletForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
@@ -230,9 +230,19 @@ test('swiping wallet cards changes history and archived wallets remain readable'
   await page.getByTestId('WalletCards').evaluate((element) => element.scrollTo({ left: element.scrollWidth }));
   await expect(page).toHaveURL(/wallet=holiday/);
   await page.goto('/settings/wallets');
-  const row = page.locator('.wallet-management > .row').filter({ hasText: 'Алексей' });
-  await row.getByRole('button', { name: 'Архивировать', exact: true }).click();
-  await expect(row.getByRole('button', { name: 'Восстановить', exact: true })).toBeVisible();
+  await page
+    .getByTestId('WalletCard')
+    .filter({ hasText: 'Алексей' })
+    .getByRole('button', { name: 'Дополнительные опции', exact: true })
+    .click();
+  await page
+    .getByTestId('WalletOptions')
+    .getByRole('button', { name: 'Редактировать', exact: true, includeHidden: true })
+    .click();
+  await expect(page).toHaveURL(/\/wallets\/edit\?id=alex-wallet/);
+  await page.getByRole('button', { name: 'Архивировать', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/wallets$/);
+  await expect(page.getByTestId('ActiveWallets').getByTestId('WalletCard')).toHaveCount(2);
   await page.goto('/wallets?wallet=alex-wallet');
   await expect(page.getByTestId('WalletHistoryEntry')).toHaveCount(1);
   await expect(page.getByTestId('WalletAddExpense')).toHaveCount(0);
@@ -316,4 +326,85 @@ test('create a wallet directly from the wallet header', async ({ page }) => {
   await expect(form).toHaveCount(0);
   await page.goto('/wallets', { waitUntil: 'networkidle' });
   await expect(page.getByTestId('WalletCard').filter({ hasText: 'На дом' })).toBeAttached();
+});
+
+test('card options open a separate editor, archive, restore and delete without changing bank operations', async ({
+  page,
+}) => {
+  await page.goto('/settings/wallets', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('WalletCard')).toHaveCount(3);
+  await expect(page.getByTestId('WalletForm')).toHaveCount(0);
+  await page.screenshot({ path: 'output/virtual-wallets/16-settings-wallet-cards.png', animations: 'disabled' });
+  const openEditor = async (name: string, archived = false) => {
+    if (archived) await page.getByTestId('ArchivedWallets').locator('summary').click();
+    await page
+      .getByTestId('WalletCard')
+      .filter({ hasText: name })
+      .getByRole('button', { name: 'Дополнительные опции', exact: true })
+      .click();
+    await page
+      .getByTestId('WalletOptions')
+      .getByRole('button', { name: 'Редактировать', exact: true, includeHidden: true })
+      .click();
+    await expect(page).toHaveURL(/\/wallets\/edit\?id=alex-wallet/);
+    await expect(page.getByTestId('EnableWallets')).toHaveCount(0);
+  };
+  await openEditor('Алексей');
+  await expect(page.getByRole('button', { name: 'Удалить', exact: true })).toHaveCount(0);
+  await page.locator('[name=wallet-name]').fill('Личный бюджет');
+  await page.getByTestId('WalletForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/wallets$/);
+  await openEditor('Личный бюджет');
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.locator('[name=wallet-name]')).toHaveValue('Личный бюджет');
+  await page.screenshot({ path: 'output/virtual-wallets/17-edit-wallet-page.png', animations: 'disabled' });
+  await page.getByRole('button', { name: 'Архивировать', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/wallets$/);
+  await expect(page.getByTestId('ActiveWallets').getByTestId('WalletCard')).toHaveCount(2);
+  await openEditor('Личный бюджет', true);
+  await page.getByRole('button', { name: 'Восстановить', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/wallets$/);
+  await expect(page.getByTestId('ActiveWallets').getByTestId('WalletCard')).toHaveCount(3);
+  await openEditor('Личный бюджет');
+  await page.getByRole('button', { name: 'Архивировать', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/wallets$/);
+  await openEditor('Личный бюджет', true);
+  await page.screenshot({ path: 'output/virtual-wallets/18-archived-wallet-editor.png', animations: 'disabled' });
+  await page.getByRole('button', { name: 'Удалить', exact: true }).click();
+  const confirmation = page.getByTestId('DeleteWalletConfirmation');
+  await confirmation.getByRole('button', { name: 'Отмена', exact: true, includeHidden: true }).click();
+  await expect(page.getByTestId('WalletForm')).toBeVisible();
+  await page.getByRole('button', { name: 'Удалить', exact: true }).click();
+  await confirmation.getByRole('button', { name: 'Удалить', exact: true, includeHidden: true }).click();
+  await expect(page).toHaveURL(/\/settings\/wallets$/);
+  await expect(page.getByTestId('WalletCard')).toHaveCount(2);
+  await page.goto('/accounts?account-card=rsd', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('TransactionListItem')).toHaveCount(1);
+  await expect(page.getByTestId('OperationWalletAllocation')).toContainText('Личный бюджет');
+});
+
+test('create page supports cancel and main-card editing returns to wallet history', async ({ page }) => {
+  await page.goto('/settings/wallets', { waitUntil: 'networkidle' });
+  await page.getByRole('link', { name: 'Создать кошелёк', exact: true }).click();
+  await expect(page).toHaveURL(/\/wallets\/create/);
+  await expect(page.getByTestId('WalletCard')).toHaveCount(0);
+  await page.screenshot({ path: 'output/virtual-wallets/19-create-wallet-page.png', animations: 'disabled' });
+  await page.getByRole('button', { name: 'Отмена', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/wallets$/);
+  await expect(page.getByTestId('WalletCard')).toHaveCount(3);
+  await page.goto('/wallets?wallet=alex-wallet', { waitUntil: 'networkidle' });
+  await page
+    .getByTestId('WalletCard')
+    .filter({ hasText: 'Алексей' })
+    .getByRole('button', { name: 'Дополнительные опции', exact: true })
+    .click();
+  await page
+    .getByTestId('WalletOptions')
+    .getByRole('button', { name: 'Редактировать', exact: true, includeHidden: true })
+    .click();
+  await page.getByTestId('WalletForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page).toHaveURL(/\/wallets\?wallet=alex-wallet$/);
+  await page.goto('/wallets/edit?id=missing', { waitUntil: 'networkidle' });
+  await expect(page.getByText('Кошелёк не найден', { exact: true })).toBeVisible();
+  await expect(page.getByTestId('WalletForm')).toHaveCount(0);
 });

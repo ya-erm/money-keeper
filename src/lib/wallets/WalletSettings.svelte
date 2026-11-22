@@ -9,8 +9,8 @@
   import { accountsService } from '#lib/data/accounts.js';
   import { participantsService, participantsStore, selectedParticipantStore } from '#lib/data/participants.js';
   import { membersService, memberSettingsStore } from '#lib/data/members.js';
-  import { walletsService, walletsStore, walletTransfersService, walletTransfersStore } from '#lib/data/wallets.js';
-  import type { VirtualWallet, WalletTransfer } from '#lib/data/interfaces.js';
+  import { walletsStore, walletTransfersService, walletTransfersStore } from '#lib/data/wallets.js';
+  import type { WalletTransfer } from '#lib/data/interfaces.js';
   import {
     SYSTEM_CATEGORY_TRANSFER_IN,
     SYSTEM_CATEGORY_TRANSFER_OUT,
@@ -24,15 +24,14 @@
   import { formatDebtMoney } from '#lib/debts/formatMoney.js';
   import { fromMinor, toMinor } from '#lib/debts/calculations.js';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
+  import WalletOverviewCard from './WalletOverviewCard.svelte';
   import ParticipantPicker from '#lib/wallets/ParticipantPicker.svelte';
   import { orderedItems, validateWalletTransfer, walletBalance, walletEntries } from '#lib/wallets/calculations.js';
 
-  type Mode = 'participant' | 'wallet' | 'transfer' | 'preferences' | null;
+  type Mode = 'participant' | 'transfer' | 'preferences' | null;
   let mode: Mode = null;
   let busy = false;
   let name = '';
-  let ownerId = '';
-  let editedWallet: VirtualWallet | null = null;
   let editedTransfer: WalletTransfer | null = null;
   let fromId = '';
   let toId = '';
@@ -51,7 +50,6 @@
     SYSTEM_CATEGORY_DEBT_OUT,
   ];
   $: ordered = orderedItems($walletsStore, participant?.walletsOrder);
-  $: visible = ordered.filter((wallet) => !wallet.archived && !participant?.hiddenWalletIds?.includes(wallet.id));
   $: walletId = $page.url.searchParams.get('wallet');
   $: currentWallet = $walletsStore.find((wallet) => wallet.id === walletId);
   $: entriesByWallet = new Map(
@@ -122,13 +120,6 @@
     mode = 'participant';
     name = '';
   }
-  function openWallet(wallet: VirtualWallet | null = null) {
-    draftId = wallet?.id ?? uuid();
-    editedWallet = wallet;
-    name = wallet?.name ?? '';
-    ownerId = wallet?.participantId ?? '';
-    mode = 'wallet';
-  }
   function openTransfer(transfer: WalletTransfer | null = null) {
     draftId = transfer?.id ?? uuid();
     editedTransfer = transfer;
@@ -151,21 +142,6 @@
         accountsOrder: $accountsStore.map((account) => account.id),
       });
       if (!participant) await participantsService.select(id);
-      mode = null;
-    });
-  }
-  async function saveWallet() {
-    if (!name.trim()) return;
-    await run(async () => {
-      const id = draftId;
-      await walletsService.save({ ...editedWallet, id, name: name.trim(), participantId: ownerId || undefined });
-      const owner = participantsService.getById(ownerId);
-      if (!editedWallet && owner && !owner.walletsOrder?.length) {
-        await participantsService.save({
-          ...owner,
-          walletsOrder: [id, ...$walletsStore.filter((wallet) => wallet.id !== id).map((wallet) => wallet.id)],
-        });
-      }
       mode = null;
     });
   }
@@ -221,9 +197,12 @@
       mode = participant ? 'preferences' : null;
       return;
     }
-    if ($page.url.searchParams.get('action') === 'create') openWallet();
+    if ($page.url.searchParams.get('action') === 'create')
+      void goto('/wallets/create?from=settings', { replace: true });
     if ($page.url.searchParams.get('action') === 'edit')
-      openWallet($walletsStore.find((item) => item.id === $page.url.searchParams.get('id')) ?? null);
+      void goto(`/wallets/edit?id=${encodeURIComponent($page.url.searchParams.get('id') ?? '')}&from=settings`, {
+        replace: true,
+      });
     if ($page.url.searchParams.get('action') === 'transfer') {
       openTransfer($walletTransfersStore.find((item) => item.id === $page.url.searchParams.get('transfer')) ?? null);
       if (!editedTransfer) toId = $page.url.searchParams.get('to') ?? '';
@@ -267,26 +246,6 @@
             required
             maxlength="100"
           /></label
-        >
-        <div class="toolbar">
-          <button class="primary" disabled={busy}>{$translate('common.save')}</button><button
-            type="button"
-            on:click={() => (mode = null)}>{$translate('common.cancel')}</button
-          >
-        </div>
-      </form>
-    {:else if mode === 'wallet'}
-      <form class="editor" on:submit|preventDefault={saveWallet} data-testId="WalletForm">
-        <h2>{$translate(editedWallet ? 'wallets.edit_wallet' : 'wallets.new')}</h2>
-        <label
-          >{$translate('wallets.name')}<input name="wallet-name" bind:value={name} required maxlength="100" /></label
-        >
-        <label
-          >{$translate('wallets.owner')}<select name="wallet-owner" bind:value={ownerId}
-            ><option value="">{$translate('wallets.shared')}</option
-            >{#each $participantsStore as person (person.id)}<option value={person.id}>{person.name}</option
-              >{/each}</select
-          ></label
         >
         <div class="toolbar">
           <button class="primary" disabled={busy}>{$translate('common.save')}</button><button
@@ -438,44 +397,17 @@
     {#if !participantsOnly}
       <div class="section-heading">
         <h2>{$translate('wallets.title')}</h2>
-        <button type="button" class="primary" on:click={() => openWallet()}>{$translate('wallets.new')}</button>
+        <a class="create-wallet" href="/wallets/create?from=settings">{$translate('wallets.new')}</a>
       </div>
       <p class="hint">{$translate('wallets.budget_hint')}</p>
       {#if !$walletsStore.length}<p>{$translate('wallets.empty')}</p>{/if}
-      <div class="wallet-management">
-        {#each ordered as wallet (wallet.id)}
-          <div class="row">
-            <a href={`/wallets?wallet=${wallet.id}`}>{wallet.name}</a>
-            <div class="toolbar">
-              <button type="button" on:click={() => openWallet(wallet)}>{$translate('common.edit')}</button><button
-                type="button"
-                disabled={busy}
-                on:click={() => run(() => walletsService.save({ ...wallet, archived: !wallet.archived }))}
-                >{$translate(wallet.archived ? 'wallets.restore' : 'wallets.archive')}</button
-              >
-            </div>
-          </div>
-        {/each}
-      </div>
-      <div class="wallet-grid">
-        {#each visible as wallet (wallet.id)}
-          <a class="wallet-card" href={`/wallets?wallet=${wallet.id}`} data-testId="WalletCard" data-id={wallet.id}>
-            <strong>{wallet.name}</strong><span class="hint"
-              >{wallet.participantId ? personName(wallet.participantId) : $translate('wallets.shared')}</span
-            >
-            {#each currencies as currency (currency)}{#if balance(wallet.id, currency) !== 0 || currencies.length === 1}<span
-                  class="wallet-money"
-                  class:overdrawn={balance(wallet.id, currency) < 0}
-                  >{#if $settingsStore.hideBalances}<HiddenMoney {currency} />{:else}{money(
-                      balance(wallet.id, currency),
-                      currency,
-                    )}{/if}</span
-                >{/if}{/each}
-            {#if currencies.length > 1 && currencies.every((currency) => balance(wallet.id, currency) === 0)}<span
-                class="wallet-money"
-                >{#if $settingsStore.hideBalances}<HiddenMoney />{:else}0{/if}</span
-              >{/if}
-          </a>
+      <div class="wallet-grid" data-testId="ActiveWallets">
+        {#each ordered.filter((wallet) => !wallet.archived) as wallet (wallet.id)}
+          <WalletOverviewCard
+            {wallet}
+            ownerName={wallet.participantId ? personName(wallet.participantId) : $translate('wallets.shared')}
+            balances={currencies.map((currency) => ({ currency, amount: balance(wallet.id, currency) }))}
+          />
         {/each}
       </div>
       <section class="unallocated">
@@ -491,12 +423,17 @@
           >{$translate('wallets.transfer')}</button
         >
       </section>
-      {#if ordered.some((wallet) => wallet.archived)}<details>
-          <summary>{$translate('wallets.archived')}</summary
-          >{#each ordered.filter((wallet) => wallet.archived) as wallet (wallet.id)}<a
-              class="archive-link"
-              href={`/wallets?wallet=${wallet.id}`}>{wallet.name}</a
-            >{/each}
+      {#if ordered.some((wallet) => wallet.archived)}<details data-testId="ArchivedWallets">
+          <summary>{$translate('wallets.archived')}</summary>
+          <div class="wallet-grid">
+            {#each ordered.filter((wallet) => wallet.archived) as wallet (wallet.id)}
+              <WalletOverviewCard
+                {wallet}
+                ownerName={wallet.participantId ? personName(wallet.participantId) : $translate('wallets.shared')}
+                balances={currencies.map((currency) => ({ currency, amount: balance(wallet.id, currency) }))}
+              />
+            {/each}
+          </div>
         </details>{/if}
     {/if}
   </div>
@@ -546,8 +483,7 @@
     background: var(--active-color);
     color: var(--background-color);
   }
-  .danger,
-  .overdrawn {
+  .danger {
     color: var(--red-color);
   }
   .toolbar {
@@ -606,23 +542,6 @@
     grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
     gap: 0.75rem;
   }
-  .wallet-card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    border: 1px solid var(--border-color);
-    border-radius: 1rem;
-    padding: 1rem;
-    text-decoration: none;
-    color: var(--primary-text-color);
-    background: var(--header-background-color);
-    overflow-wrap: anywhere;
-    min-width: 0;
-  }
-  .wallet-money {
-    font-size: 1.2rem;
-    font-variant-numeric: tabular-nums;
-  }
   .unallocated {
     display: flex;
     flex-direction: column;
@@ -649,9 +568,15 @@
     width: 1.2rem;
     flex-shrink: 0;
   }
-  .archive-link {
-    display: block;
+  .create-wallet {
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.75rem;
+    color: var(--background-color);
+    background: var(--active-color);
+    text-decoration: none;
+  }
+  summary {
+    cursor: pointer;
     padding: 0.75rem 0;
-    color: var(--active-color);
   }
 </style>

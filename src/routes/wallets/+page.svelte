@@ -10,7 +10,7 @@
   import { accountsService } from '#lib/data/accounts.js';
   import { memberSettingsStore } from '#lib/data/members.js';
   import { participantsStore, selectedParticipantStore } from '#lib/data/participants.js';
-  import { walletsStore, walletTransfersStore } from '#lib/data/wallets.js';
+  import { walletsService, walletsStore, walletTransfersStore } from '#lib/data/wallets.js';
   import {
     SYSTEM_CATEGORY_TRANSFER_IN,
     SYSTEM_CATEGORY_TRANSFER_OUT,
@@ -117,7 +117,11 @@
     ),
   }));
   function walletName(id?: string) {
-    return $walletsStore.find((wallet) => wallet.id === id)?.name ?? $translate('wallets.unallocated');
+    return (
+      $walletsStore.find((wallet) => wallet.id === id)?.name ??
+      walletsService.deletedItems.find((wallet) => wallet.id === id)?.name ??
+      $translate('wallets.unallocated')
+    );
   }
   function expense(scan = false) {
     const params = new SvelteURLSearchParams({ type: 'OUT' });
