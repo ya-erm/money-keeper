@@ -98,7 +98,9 @@
     pointer-events: auto;
     justify-content: flex-start;
     color: var(--secondary-text-color);
-    transition: width 0.5s;
+    transition:
+      width 0.5s,
+      margin-right 0.5s;
     width: 2.5rem;
   }
   .drag-zone-hidden {

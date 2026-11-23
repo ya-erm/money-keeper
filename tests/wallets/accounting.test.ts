@@ -972,3 +972,110 @@ test('currency dialog stays centered above the keyboard and follows visible view
   await dialog.getByRole('button', { name: 'Отмена', exact: true }).click();
   await expect(page.getByTestId('WalletCurrencyForm')).toHaveCount(0);
 });
+
+for (const list of [
+  {
+    kind: 'accounts',
+    path: '/accounts/list',
+    label: 'Сортировка счетов',
+    listId: 'AccountSortList',
+    first: 'rsd',
+    second: 'eur',
+  },
+  {
+    kind: 'wallets',
+    path: '/wallets/list',
+    label: 'Сортировка кошельков',
+    listId: 'WalletSortList',
+    first: 'alex-wallet',
+    second: 'maria-wallet',
+  },
+]) {
+  test(`${list.kind} sorting toggles with save/discard confirmation only for a changed order`, async ({ page }) => {
+    test.setTimeout(90000);
+    await page.goto(list.path, { waitUntil: 'networkidle' });
+    const toggle = page.getByRole('button', { name: list.label, exact: true });
+    const rows = page.getByTestId(list.listId).locator(':scope > li');
+    const dialog = page.getByTestId('UnsavedSortDialog');
+    const moveUp = async (id: string) => {
+      const row = page.getByTestId(list.listId).locator(`:scope > li[data-id="${id}"]`);
+      await expect(row).toHaveAttribute('tabindex', '0');
+      await expect
+        .poll(() =>
+          page
+            .getByTestId('SortingToolbar')
+            .evaluate(
+              (element) =>
+                element.getAnimations({ subtree: true }).filter((animation) => animation.playState === 'running')
+                  .length,
+            ),
+        )
+        .toBe(0);
+      await row.focus();
+      await expect(row).toBeFocused();
+      await row.press('Space');
+      await row.press('ArrowUp');
+      await expect(rows.first()).toHaveAttribute('data-id', id);
+      await row.press('Space');
+    };
+    await toggle.click();
+    await expect(page).toHaveURL(/action=sort/);
+    await expect(page.getByRole('textbox', { name: '', exact: true })).toHaveCount(0);
+    await toggle.click();
+    await expect(page).not.toHaveURL(/action=sort/);
+    await expect(dialog).toHaveCount(0);
+    await expect(page.getByPlaceholder('Поиск', { exact: true })).toBeInViewport();
+    await toggle.click();
+    await moveUp(list.second);
+    await toggle.click();
+    await expect(dialog).toBeVisible();
+    await expect(page).toHaveURL(/action=sort/);
+    await expect(rows.first()).toHaveAttribute('data-id', list.second);
+    await page.screenshot({ path: `output/virtual-wallets/71-${list.kind}-unsaved-order.png`, animations: 'disabled' });
+    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
+    await expect(page).toHaveURL(/action=sort/);
+    await expect(rows.first()).toHaveAttribute('data-id', list.second);
+    await toggle.click();
+    await dialog.getByRole('button', { name: 'Отменить изменения', exact: true }).click();
+    await expect(dialog).toHaveCount(0);
+    await expect(page).not.toHaveURL(/action=sort/);
+    await expect(rows.first()).toHaveAttribute('data-id', list.first);
+    await toggle.click();
+    await moveUp(list.second);
+    await toggle.click();
+    await dialog.getByRole('button', { name: 'Сохранить', exact: true }).click();
+    await expect(dialog).toHaveCount(0);
+    await expect(page).not.toHaveURL(/action=sort/);
+    await page.reload({ waitUntil: 'networkidle' });
+    await expect(rows.first()).toHaveAttribute('data-id', list.second);
+    await toggle.click();
+    await moveUp(list.first);
+    await moveUp(list.second);
+    await toggle.click();
+    await expect(page).not.toHaveURL(/action=sort/);
+    await expect(dialog).toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    await page.screenshot({
+      path: `output/virtual-wallets/72-${list.kind}-sorting-closed.png`,
+      animations: 'disabled',
+    });
+    await page.goto(list.kind === 'accounts' ? '/accounts?account-card=rsd' : '/wallets?wallet=alex-wallet', {
+      waitUntil: 'networkidle',
+    });
+    await page
+      .getByRole('link', { name: list.kind === 'accounts' ? 'Список счетов' : 'Список кошельков', exact: true })
+      .click();
+    await expect(page).toHaveURL(new RegExp(`${list.path}$`));
+    await toggle.click();
+    await moveUp(list.first);
+    await page.getByRole('button', { name: 'Назад', exact: true }).click();
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole('button', { name: 'Отменить изменения', exact: true }).click();
+    await expect(page).toHaveURL(
+      list.kind === 'accounts' ? /\/accounts(?:\?account-card=rsd)?$/ : /\/wallets(?:\?wallet=alex-wallet)?$/,
+    );
+    await page.goto(list.path, { waitUntil: 'networkidle' });
+    await expect(rows.first()).toHaveAttribute('data-id', list.second);
+  });
+}

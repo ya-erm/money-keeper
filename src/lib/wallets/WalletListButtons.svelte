@@ -13,7 +13,7 @@
     icon="mdi:sort"
     label={$translate('wallets.sort')}
     disabled={!$dataInitialized || !$selectedParticipantStore}
-    onClick={() => goto(sortable ? '/wallets/list' : '/wallets/list?action=sort', { replace: true })}
+    onClick={() => goto(sortable ? '/wallets/list' : '/wallets/list?action=sort', { replace: true, reset: false })}
   />
   <HeaderButton
     icon="mdi:wallet-plus-outline"

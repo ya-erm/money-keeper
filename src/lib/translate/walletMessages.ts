@@ -1,4 +1,7 @@
 export const walletRu = {
+  'wallets.unsaved_order': 'Сохранить порядок?',
+  'wallets.unsaved_order_description': 'Порядок изменён. Сохранить его перед выходом из сортировки?',
+  'wallets.discard_order': 'Отменить изменения',
   'wallets.enable': 'Включить виртуальные кошельки',
   'wallets.title': 'Кошельки',
   'wallets.list': 'Список кошельков',
@@ -74,6 +77,9 @@ export const walletRu = {
 };
 export type WalletMessage = keyof typeof walletRu;
 export const walletEn: Record<WalletMessage, string> = {
+  'wallets.unsaved_order': 'Save the order?',
+  'wallets.unsaved_order_description': 'The order has changed. Save it before leaving sorting mode?',
+  'wallets.discard_order': 'Discard changes',
   'wallets.enable': 'Enable virtual wallets',
   'wallets.title': 'Wallets',
   'wallets.list': 'Wallet list',

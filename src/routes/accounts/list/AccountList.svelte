@@ -1,4 +1,8 @@
 <script lang="ts">
+  import { page } from '#lib/page.js';
+  import SortingToolbar from '#lib/ui/SortingToolbar.svelte';
+  import SortExitConfirmation from '#lib/ui/SortExitConfirmation.svelte';
+  import { sortExitGuard } from '#lib/ui/sortExitGuard.js';
   import { dndzone, type DndEvent } from 'svelte-dnd-action';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
   import { participantsService, selectedParticipantStore } from '#lib/data/participants.js';
@@ -52,6 +56,19 @@
   let draftOpen = false;
   let sortingParticipantId: string | null = null;
   let busy = false;
+  let initialIds: string[] = [];
+  const sortExit = sortExitGuard(
+    () => ({
+      active: sortable,
+      dirty: sortedAccounts.map((account) => account.id).join('\0') !== initialIds.join('\0'),
+      busy,
+    }),
+    () => {
+      const url = new URL($page.url.href);
+      url.searchParams.delete('action');
+      return url.href;
+    },
+  );
   $: syncDraft(sortable, accounts, filteredAccounts, $selectedParticipantStore);
   function syncDraft(
     sorting: boolean,
@@ -62,6 +79,7 @@
     if (sorting && !draftOpen) {
       sortingParticipantId = participant?.id ?? null;
       sortedAccounts = all.filter((account) => !account.archived);
+      initialIds = sortedAccounts.map((account) => account.id);
     } else if (!sorting) {
       sortedAccounts = filtered.filter((account) => !account.archived);
     }
@@ -94,15 +112,15 @@
       } else {
         await membersService.saveAccountsOrder(accountsOrder);
       }
-      sortable = false;
+      await sortExit.finish();
     } catch {
       showErrorToast($translate('wallets.save_failed'));
     } finally {
       busy = false;
     }
   }
-  function restoreAccountsOrder() {
-    if (!busy) sortable = false;
+  async function restoreAccountsOrder() {
+    if (!busy) await sortExit.finish();
   }
 
   let scrollTop = 0;
@@ -112,22 +130,14 @@
 
 <div on:scroll={(e) => (scrollTop = e.currentTarget.scrollTop)} class="accounts-list pb-1 flex-col">
   <div class="header py-1" class:sticky={sortable} class:bordered={scrollTop > 0}>
-    {#if sortable}
-      <div class="sorting flex-center px-1 gap-1">
-        <span class="sorting-caption"
-          >{$translate('common.sorting')}{#if $selectedParticipantStore}<small>{$selectedParticipantStore.name}</small
-            >{/if}</span
-        >
-        <div class="grid-col-2 gap-1">
-          <Button color="white" onClick={restoreAccountsOrder} disabled={busy}>
-            {$translate('common.cancel')}
-          </Button>
-          <Button color="primary" onClick={saveAccountsOrder} disabled={busy}>
-            {$translate('common.save')}
-          </Button>
-        </div>
-      </div>
-    {:else}
+    <SortingToolbar
+      sorting={sortable}
+      {busy}
+      participantName={$selectedParticipantStore?.name ?? ''}
+      padded
+      onSave={saveAccountsOrder}
+      onCancel={restoreAccountsOrder}
+    >
       <div class="search-and-filters">
         <div class="flex px-1 gap-1">
           <div class="flex-grow">
@@ -146,7 +156,7 @@
           </div>
         </Spoiler>
       </div>
-    {/if}
+    </SortingToolbar>
   </div>
 
   {#if accounts.length === 0}
@@ -212,6 +222,14 @@
   {/if}
 </div>
 
+<SortExitConfirmation
+  opened={$sortExit}
+  {busy}
+  onSave={saveAccountsOrder}
+  onDiscard={restoreAccountsOrder}
+  onClose={sortExit.dismiss}
+/>
+
 <style>
   .management-row {
     display: flex;
@@ -223,14 +241,6 @@
     min-width: 0;
   }
 
-  .sorting-caption {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  .sorting-caption small {
-    color: var(--secondary-text-color);
-  }
   .no-data {
     text-align: center;
     color: var(--secondary-text-color);

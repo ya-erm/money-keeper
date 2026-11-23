@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.36.7 - 2026-11-23
+
+### Changed
+
+- Account and wallet sorting toolbars slide between search and sorting controls. Toggling sorting off prompts to save or discard a changed order; dismissing the dialog keeps the draft.
+
 ## 2.36.6 - 2026-11-23
 
 ### Changed

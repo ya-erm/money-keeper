@@ -48,7 +48,7 @@
   {#if $participantsStore.some((item) => !item.archived) && !$selectedParticipantStore}<p class="px-1">
       <a href="/settings/participants">{$translate('wallets.choose_for_sorting')}</a>
     </p>{/if}
-  <AccountList {accounts} {onClick} bind:sortable />
+  <AccountList {accounts} {onClick} {sortable} />
 </Layout>
 
 {#if opened}

@@ -1,9 +1,11 @@
 <script lang="ts">
+  import SortingToolbar from '#lib/ui/SortingToolbar.svelte';
+  import SortExitConfirmation from '#lib/ui/SortExitConfirmation.svelte';
+  import { sortExitGuard } from '#lib/ui/sortExitGuard.js';
   import { $initialized as dataInitialized } from '#lib/data/initialized.js';
   import { goto } from '$app/navigation';
   import { dndzone, type DndEvent } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
-  import Button from '@ya-erm/svelte-ui/Button';
   import Input from '@ya-erm/svelte-ui/Input';
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
   import { page } from '#lib/page.js';
@@ -28,6 +30,11 @@
   let draftOpen = false;
   let sortingParticipantId: string | null = null;
   let busy = false;
+  let initialIds: string[] = [];
+  const sortExit = sortExitGuard(
+    () => ({ active: sortable, dirty: items.map((wallet) => wallet.id).join('\0') !== initialIds.join('\0'), busy }),
+    () => '/wallets/list',
+  );
   $: participant = $selectedParticipantStore;
   $: sortable = $dataInitialized && $page.url.searchParams.get('action') === 'sort' && !!participant;
   $: ordered = orderedItems($walletsStore, participant?.walletsOrder);
@@ -47,6 +54,7 @@
     if (sorting && !draftOpen) {
       sortingParticipantId = participant?.id ?? null;
       items = all.filter((wallet) => !wallet.archived);
+      initialIds = items.map((wallet) => wallet.id);
     } else if (!sorting) {
       items = matching.filter((wallet) => !wallet.archived);
     }
@@ -90,7 +98,7 @@
         ...current,
         walletsOrder: [...ids, ...ordered.filter((wallet) => !ids.includes(wallet.id)).map((wallet) => wallet.id)],
       });
-      await goto('/wallets/list', { replace: true });
+      await sortExit.finish();
     } catch {
       showErrorToast($translate('wallets.save_failed'));
     } finally {
@@ -102,16 +110,15 @@
 <Layout title={$translate('wallets.title')} onBack={() => goto('/wallets')} rightSlot={WalletListButtons}>
   <div class="wallet-list" data-testId="WalletList">
     {#if !participant}<p><a href="/settings/participants">{$translate('wallets.choose_for_sorting')}</a></p>{/if}
-    {#if sortable}
-      <div class="sorting-bar">
-        <span class="caption">{$translate('common.sorting')}<small>{participant?.name}</small></span>
-        <div class="grid-col-2 gap-1">
-          <Button color="white" disabled={busy} onClick={() => goto('/wallets/list', { replace: true })}
-            >{$translate('common.cancel')}</Button
-          ><Button disabled={busy} onClick={save}>{$translate('common.save')}</Button>
-        </div>
-      </div>
-    {:else}<Input bind:value={search} placeholder={$translate('common.search')} clearable />{/if}
+    <SortingToolbar
+      sorting={sortable}
+      {busy}
+      participantName={participant?.name ?? ''}
+      onSave={save}
+      onCancel={sortExit.finish}
+    >
+      <Input bind:value={search} placeholder={$translate('common.search')} clearable />
+    </SortingToolbar>
     <ul
       class="items"
       data-testId="WalletSortList"
@@ -152,6 +159,8 @@
   </div>
 </Layout>
 
+<SortExitConfirmation opened={$sortExit} {busy} onSave={save} onDiscard={sortExit.finish} onClose={sortExit.dismiss} />
+
 <style>
   .wallet-list {
     padding: 1rem;
@@ -177,25 +186,6 @@
     min-width: 0;
   }
 
-  .sorting-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    background: var(--background-color);
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    padding-bottom: 0.5rem;
-  }
-  .caption {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  small {
-    color: var(--secondary-text-color);
-  }
   p {
     margin: 0;
   }

@@ -69,7 +69,9 @@
     color: var(--secondary-text-color);
     flex-shrink: 0;
     width: 2rem;
-    transition: width 0.5s;
+    transition:
+      width 0.5s,
+      margin-right 0.5s;
     overflow: hidden;
   }
   .drag-zone.collapsed {
