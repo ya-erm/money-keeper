@@ -79,9 +79,10 @@ test('participants, shared expense, holiday contributions, reload and export', a
   await page.getByTestId('WalletAddExpense').click();
   await expect(page.getByTestId('SourceAccountSelect')).toContainText('Карта RSD');
   await page.locator('input[name=amount]').fill('10000');
-  await page.getByTestId('WalletAllocation').getByRole('button', { name: 'Поровну', exact: true }).click();
-  await expect(page.getByTestId('WalletAllocation').locator('input')).toHaveCount(2);
-  await expect(page.getByTestId('WalletAllocation').locator('input').first()).toHaveValue('5000');
+  await page.getByTestId('WalletAllocationMode.Button.shared').click();
+  await page.getByTestId('WalletAllocationMode.Button.custom').click();
+  await expect(page.getByTestId('WalletAllocation').locator('input[type=number]')).toHaveCount(2);
+  await expect(page.getByTestId('AllocationAmount.0')).toHaveValue('5000');
   await page.getByTestId('CategorySelect.Item').first().click();
   await page.locator('input[name=comment]').fill('Общая покупка');
   await page.screenshot({ path: testInfo.outputPath('shared-expense-390.png'), fullPage: true });
@@ -144,7 +145,7 @@ test('currency conversion uses both wallet balances and participant defaults', a
   await page.getByTestId('DestinationAccountSelect.Portal').getByText('Счёт EUR', { exact: true }).click();
   await page.locator('input[name=amount]').fill('120000');
   await page.locator('input[name=destinationAmount]').fill('1000');
-  await page.getByTestId('WalletAllocation').getByRole('button', { name: 'Поровну', exact: true }).click();
+  await page.getByTestId('WalletAllocationMode.Button.shared').click();
   await page.getByTestId('CreateTransactionButton').click();
   await expect(page.getByTestId('TransactionForm')).not.toBeVisible();
   await page.goto('/wallets?wallet=alex-wallet');
@@ -163,8 +164,9 @@ test('currency conversion uses both wallet balances and participant defaults', a
   await page.getByTestId('WalletAddExpense').click();
   await expect(page.getByTestId('SourceAccountSelect')).toContainText('Счёт EUR');
   await page.locator('input[name=amount]').fill('1000');
-  await expect(page.getByTestId('WalletAllocation').locator('input').first()).toHaveValue('500');
-  await expect(page.getByTestId('WalletAllocation').locator('input').nth(1)).toHaveValue('500');
+  await page.getByTestId('WalletAllocationMode.Button.custom').click();
+  await expect(page.getByTestId('AllocationAmount.0')).toHaveValue('500');
+  await expect(page.getByTestId('AllocationAmount.1')).toHaveValue('500');
   await page.getByTestId('CategorySelect.Item').first().click();
   await page.getByTestId('CreateTransactionButton').click();
   await expect(page.getByTestId('TransactionForm')).not.toBeVisible();
@@ -190,7 +192,8 @@ test('QR shortcut opens the scanner with bank account and allocation ready', asy
   await expect(page.getByTestId('ReceiptScanner')).not.toBeVisible();
   await expect(page.getByTestId('SourceAccountSelect')).toContainText('Карта RSD');
   await expect(page.locator('input[name=amount]')).toHaveValue('525.7');
-  await expect(page.getByTestId('WalletAllocation').locator('input')).toHaveValue('525.7');
+  await page.getByTestId('WalletAllocationMode.Button.custom').click();
+  await expect(page.getByTestId('AllocationAmount.0')).toHaveValue('525.7');
   await page.getByTestId('CategorySelect.Item').first().click();
   await page.getByTestId('CreateTransactionButton').click();
   await expect(page.getByTestId('WalletDetails')).toBeVisible();
@@ -487,7 +490,7 @@ test('deleting the selected participant preserves wallets, bank operations and c
   await page.reload({ waitUntil: 'networkidle' });
   await expect(page.getByTestId('ParticipantPicker')).toHaveValue('maria');
   await page.goto('/transactions/create?type=OUT', { waitUntil: 'networkidle' });
-  await expect(page.getByTestId('WalletAllocation').locator('input')).toHaveCount(1);
+  await expect(page.getByTestId('WalletAllocationMode.Button.self')).toHaveClass(/active/);
   await page.goto('/settings/participants', { waitUntil: 'networkidle' });
   await page.getByRole('link', { name: 'Редактировать Мария', exact: true }).click();
   await page.getByRole('button', { name: 'Удалить', exact: true }).click();
@@ -584,7 +587,7 @@ test('personal sorting remains available and legacy hiding preferences do not hi
   await expect(page.getByTestId('WalletCard')).toHaveCount(3);
   await page.goto('/transactions/create?type=OUT', { waitUntil: 'networkidle' });
   await expect(page.getByTestId('SourceAccountSelect')).toContainText('Карта RSD');
-  await expect(page.getByTestId('WalletAllocation').locator('select')).toHaveValue('alex-wallet');
+  await expect(page.getByTestId('WalletAllocationMode.Button.self')).toHaveClass(/active/);
   await page.getByTestId('SourceAccountSelect').getByRole('button').click();
   await expect(
     page.getByTestId('SourceAccountSelect.Portal').getByTestId('AccountSortList').locator(':scope > li'),
@@ -1079,3 +1082,98 @@ for (const list of [
     await expect(rows.first()).toHaveAttribute('data-id', list.second);
   });
 }
+
+test('compact allocation presets and partial amounts survive save and reload', async ({ page }) => {
+  await page.goto('/transactions/create?type=OUT', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('WalletAllocationMode.Button.self')).toHaveText('Алексей');
+  await expect(page.getByTestId('WalletAllocationMode.Button.self')).toHaveClass(/active/);
+  await expect(page.getByTestId('WalletAllocationMode.Button.other')).toHaveText('Мария');
+  await expect(page.getByTestId('WalletAllocationSettings')).toHaveCount(0);
+  await page.locator('input[name=amount]').fill('1000');
+  await page.getByTestId('WalletAllocationMode.Button.other').click();
+  await expect(page.getByTestId('WalletAllocationMode.Button.other')).toHaveClass(/active/);
+  await page.getByTestId('WalletAllocationMode.Button.shared').click();
+  await expect(page.getByTestId('WalletAllocationSettings')).toHaveCount(0);
+  await page.screenshot({ path: 'output/virtual-wallets/76-allocation-presets.png', fullPage: true });
+  await page.getByRole('button', { name: 'Настроить распределение', exact: true }).click();
+  await expect(page.getByTestId('AllocationAmount.0')).toHaveValue('500');
+  await expect(page.getByTestId('AllocationAmount.1')).toHaveValue('500');
+  await page.getByTestId('AllocationAmount.0.ClearButton').click();
+  await expect(page.getByTestId('AllocationAmount.0')).toHaveValue('');
+  await page.getByTestId('AllocationAmount.0').fill('300');
+  await page.getByTestId('AllocationAmount.1').fill('200');
+  await expect(page.getByTestId('UnallocatedOperationAmount')).toContainText('500');
+  await page.getByTestId('AllocationWallet.0').getByRole('button').click();
+  await expect(
+    page.getByTestId('AllocationWallet.0.Portal').getByRole('button', { name: 'Мария', exact: true }),
+  ).toHaveCount(0);
+  await page.getByTestId('AllocationWallet.0.Portal').getByRole('button', { name: 'Отпуск', exact: true }).click();
+  await expect(page.getByTestId('AllocationWallet.0')).toContainText('Отпуск');
+  await page.getByTestId('CategorySelect.Item').first().click();
+  await page.locator('input[name=comment]').fill('Частичное распределение');
+  await page.screenshot({ path: 'output/virtual-wallets/77-allocation-custom.png', fullPage: true });
+  await page.getByTestId('CreateTransactionButton').click();
+  await expect(page.getByTestId('TransactionForm')).not.toBeVisible();
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.goto('/settings/import-export', { waitUntil: 'networkidle' });
+  await page.getByTestId('ShowExportTextAreaButton').click();
+  const saved = JSON.parse(await page.getByTestId('ExportTextArea').inputValue());
+  const operation = saved.operations.find((op: { comment: string }) => op.comment === 'Частичное распределение');
+  expect(operation.amount).toBe(1000);
+  expect(operation.walletAllocation.shares).toEqual([
+    { walletId: 'holiday', amount: 300 },
+    { walletId: 'maria-wallet', amount: 200 },
+  ]);
+  await page.goto(`/transactions/edit?id=${operation.id}`, { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('WalletAllocationSettings')).toBeVisible();
+  await expect(page.getByTestId('AllocationAmount.0')).toHaveValue('300');
+  await page.getByTestId('AllocationAmount.0').fill('900');
+  await page.getByTestId('SaveTransactionButton').click();
+  await expect(page.getByTestId('TransactionForm')).toBeVisible();
+  await expect(page.getByTestId('UnallocatedOperationAmount')).toContainText('-100');
+  await page.getByTestId('RemoveAllocation.1').click();
+  await page.getByTestId('AllocationAmount.0.ClearButton').click();
+  await page.getByTestId('SaveTransactionButton').click();
+  await expect(page.getByTestId('TransactionForm')).not.toBeVisible();
+  await page.goto('/settings/import-export', { waitUntil: 'networkidle' });
+  await page.getByTestId('ShowExportTextAreaButton').click();
+  const cleared = JSON.parse(await page.getByTestId('ExportTextArea').inputValue());
+  expect(cleared.operations.find((op: { id: string }) => op.id === operation.id).walletAllocation).toBeUndefined();
+});
+
+test('partial conversion keeps the unallocated share in both currencies', async ({ page }) => {
+  await page.goto('/transactions/create?type=TRANSFER', { waitUntil: 'networkidle' });
+  await page.getByTestId('DestinationAccountSelect').click();
+  await page.getByTestId('DestinationAccountSelect.Portal').getByText('Счёт EUR', { exact: true }).click();
+  await page.locator('input[name=amount]').fill('120000');
+  await page.locator('input[name=destinationAmount]').fill('1000');
+  await page.getByTestId('WalletAllocationMode.Button.shared').click();
+  await page.getByTestId('WalletAllocationMode.Button.custom').click();
+  await page.getByTestId('AllocationAmount.0').fill('30000');
+  await page.getByTestId('AllocationAmount.1').fill('30000');
+  await expect(page.getByTestId('UnallocatedOperationAmount')).toContainText('60\u00a0000');
+  await page.getByTestId('CreateTransactionButton').click();
+  await expect(page.getByTestId('TransactionForm')).not.toBeVisible();
+  await page.goto('/settings/import-export', { waitUntil: 'networkidle' });
+  await page.getByTestId('ShowExportTextAreaButton').click();
+  const saved = JSON.parse(await page.getByTestId('ExportTextArea').inputValue());
+  expect(saved.operations).toHaveLength(3);
+  const converted = saved.operations.find((op: { accountId: string }) => op.accountId === 'eur');
+  expect(converted.amount).toBe(1000);
+  expect(converted.walletAllocation.shares.map((share: { amount: number }) => share.amount)).toEqual([250, 250]);
+});
+
+test('expense opened for a shared savings wallet follows the amount until edited manually', async ({ page }) => {
+  await page.goto('/transactions/create?type=OUT&walletId=holiday', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('AllocationWallet.0')).toContainText('Отпуск');
+  await page.locator('input[name=amount]').fill('1000');
+  await expect(page.getByTestId('AllocationAmount.0')).toHaveValue('1000');
+  await page.getByTestId('AllocationAmount.0').fill('300');
+  await page.locator('input[name=amount]').fill('1200');
+  await expect(page.getByTestId('AllocationAmount.0')).toHaveValue('300');
+  await expect(page.getByTestId('UnallocatedOperationAmount')).toContainText('900');
+  await page.getByTestId('RemoveAllocation.0').click();
+  await expect(page.getByTestId('AllocationAmount.0')).toHaveCount(0);
+  await page.getByTestId('WalletAllocation').getByRole('button', { name: 'Добавить кошелёк', exact: true }).click();
+  await expect(page.getByTestId('AllocationAmount.0')).toHaveValue('1200');
+});

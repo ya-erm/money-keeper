@@ -34,7 +34,13 @@ export function validateAllocation(
     used.add(share.walletId);
     total += toMinor(share.amount, currency);
   }
-  return total === toMinor(amount, currency);
+  return total <= toMinor(amount, currency);
+}
+
+/** Empty/zero draft shares do not create zero-value wallet history entries. */
+export function nonzeroAllocation(allocation: WalletAllocation | undefined): WalletAllocation | undefined {
+  const shares = allocation?.shares.filter((share) => share.amount !== 0) ?? [];
+  return shares.length ? { shares } : undefined;
 }
 
 export function splitEqually(amount: number, count: number, currency: string): number[] {
@@ -126,10 +132,17 @@ export function convertAllocation(
     return undefined;
   const total = toMinor(destinationAmount, currency);
   const sourceTotal = allocation.shares.reduce((sum, share) => sum + share.amount, 0);
-  if (Math.abs(sourceTotal - sourceAmount) > 1e-7) return undefined;
+  if (
+    !Number.isFinite(sourceTotal) ||
+    sourceTotal <= 0 ||
+    sourceTotal - sourceAmount > 1e-7 ||
+    allocation.shares.some((share) => !Number.isFinite(share.amount) || share.amount < 0)
+  )
+    return undefined;
   const raw = allocation.shares.map((share) => (total * share.amount) / sourceAmount);
   const minor = raw.map(Math.floor);
-  const remainder = total - minor.reduce((sum, amount) => sum + amount, 0);
+  const allocatedTotal = Math.min(total, Math.round((total * sourceTotal) / sourceAmount));
+  const remainder = allocatedTotal - minor.reduce((sum, amount) => sum + amount, 0);
   const rank = raw
     .map((value, index) => ({ index, fraction: value - minor[index] }))
     .sort((a, b) => b.fraction - a.fraction || a.index - b.index);

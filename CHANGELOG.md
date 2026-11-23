@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.37.0 - 2026-11-23
+
+### Added
+
+- Compact wallet allocation presets use participant names, shared spending and a custom-settings option. Custom shares have wallet-icon selectors, clearable amounts and delete controls.
+- Payments may be partially allocated; the remainder stays unallocated. Currency conversion preserves the unallocated proportion and zero-value shares are omitted from saved history.
+
 ## 2.36.7 - 2026-11-23
 
 ### Changed

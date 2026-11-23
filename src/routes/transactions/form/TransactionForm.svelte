@@ -66,7 +66,7 @@
   import RepeatingTypeModal from './RepeatingTypeModal.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
   import AllocationEditor from '#lib/wallets/AllocationEditor.svelte';
-  import { convertAllocation, validateAllocation } from '#lib/wallets/calculations.js';
+  import { convertAllocation, validateAllocation, nonzeroAllocation } from '#lib/wallets/calculations.js';
   import { walletsService } from '#lib/data/wallets.js';
   import { selectedParticipantStore } from '#lib/data/participants.js';
   import type { WalletAllocation } from '#lib/data/interfaces.js';
@@ -562,6 +562,9 @@
       }
 
       for (const item of transactions) {
+        const cleaned = nonzeroAllocation(item.walletAllocation);
+        if (cleaned) item.walletAllocation = cleaned;
+        else delete item.walletAllocation;
         const currency = accounts.find((account) => account.id === item.accountId)?.currency ?? '';
         if (
           !validateAllocation(item.walletAllocation, item.amount, currency, [

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { Account, Category, Transaction, VirtualWallet, WalletTransfer } from '../data/interfaces';
 import {
   convertAllocation,
+  nonzeroAllocation,
   orderedItems,
   splitEqually,
   validateAllocation,
@@ -88,7 +89,27 @@ describe('multi-currency virtual wallets', () => {
       ],
     };
     expect(convertAllocation(allocation, 3, 10, 'EUR')?.shares.map((share) => share.amount)).toEqual([6.67, 3.33]);
-    expect(convertAllocation(allocation, 4, 10, 'EUR')).toBeUndefined();
+    expect(convertAllocation(allocation, 4, 10, 'EUR')?.shares.map((share) => share.amount)).toEqual([5, 2.5]);
+  });
+
+  it('preserves unallocated money during conversion and rounds only the allocated portion', () => {
+    expect(convertAllocation(shares(30000), 120000, 1000, 'EUR')).toEqual(shares(250));
+    expect(convertAllocation(shares(1), 3, 0.01, 'EUR')?.shares.map((share) => share.amount)).toEqual([0.01, 0]);
+    expect(convertAllocation(shares(1), 3, 1, 'KWD')?.shares.map((share) => share.amount)).toEqual([0.334, 0.333]);
+    expect(convertAllocation(shares(60001), 120000, 1000, 'EUR')).toBeUndefined();
+    expect(convertAllocation(shares(0), 120000, 1000, 'EUR')).toBeUndefined();
+    expect(convertAllocation(shares(-1), 120000, 1000, 'EUR')).toBeUndefined();
+    expect(validateAllocation(shares(20), 100, 'EUR', wallets)).toBe(true);
+    expect(nonzeroAllocation(shares(0))).toBeUndefined();
+    expect(
+      nonzeroAllocation({
+        shares: [
+          { walletId: 'alex', amount: 0 },
+          { walletId: 'maria', amount: 20 },
+        ],
+      }),
+    ).toEqual({ shares: [{ walletId: 'maria', amount: 20 }] });
+    expect(validateAllocation(nonzeroAllocation(shares(-1)), 100, 'EUR', wallets)).toBe(false);
   });
 
   it('keeps gross contributions after spending and calculates edits, returns, deletions and overdrafts', () => {

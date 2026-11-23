@@ -1,40 +1,54 @@
 <script lang="ts">
   import { tick } from 'svelte';
+  import MultiSwitch from '@ya-erm/svelte-ui/MultiSwitch';
+  import Input from '@ya-erm/svelte-ui/Input';
+  import Button from '@ya-erm/svelte-ui/Button';
+  import Icon from '@ya-erm/svelte-ui/Icon';
+  import InputLabel from '@ya-erm/svelte-ui/InputLabel';
   import { $initialized as dataInitialized } from '#lib/data/initialized.js';
   import type { WalletAllocation } from '#lib/data/interfaces.js';
   import { participantsStore, selectedParticipantStore } from '#lib/data/participants.js';
   import { memberSettingsStore } from '#lib/data/members.js';
-  import { walletsService, walletsStore } from '#lib/data/wallets.js';
+  import { walletsStore } from '#lib/data/wallets.js';
   import { translate } from '#lib/translate/index.js';
   import { formatDebtMoney } from '#lib/debts/formatMoney.js';
   import { fromMinor, toMinor } from '#lib/debts/calculations.js';
   import { orderedItems, splitEqually } from './calculations';
+  import WalletSelector from './WalletSelector.svelte';
 
   export let allocation: WalletAllocation | undefined = undefined;
   export let currency: string;
   export let amount: number;
   export let useDefault = false;
   export let initialWalletId: string | null = null;
+  type Mode = 'self' | 'other' | 'shared' | 'custom';
+  let mode: Mode = 'custom';
   let initialized = false;
   let initializing = false;
   let previousAmount = amount;
-  let automaticSingle = useDefault && !allocation;
-  let automaticEqual = false;
+  let automaticCustomWallet: string | null = null;
   $: participant = $selectedParticipantStore;
-  $: activeOwnerIds = new Set($participantsStore.filter((item) => !item.archived).map((item) => item.id));
+  $: people = $participantsStore.filter((person) => !person.archived);
+  $: activeOwnerIds = new Set(people.map((person) => person.id));
   $: available = orderedItems(
     $walletsStore.filter((wallet) => !wallet.archived),
     participant?.walletsOrder,
   );
+  $: ownWallet = participant ? available.find((wallet) => wallet.participantId === participant.id) : undefined;
+  $: otherWallet = participant
+    ? available.find(
+        (wallet) =>
+          wallet.participantId && activeOwnerIds.has(wallet.participantId) && wallet.participantId !== participant.id,
+      )
+    : undefined;
+  $: other = people.find((person) => person.id === otherWallet?.participantId);
   $: rows = allocation?.shares ?? [];
-  $: firstWallet = available.find((wallet) => wallet.id === initialWalletId) ?? available[0];
-  $: otherWallet = available.find(
-    (wallet) =>
-      wallet.participantId &&
-      activeOwnerIds.has(wallet.participantId) &&
-      wallet.participantId !== participant?.id &&
-      wallet.id !== firstWallet?.id,
-  );
+  $: options = [
+    ...(ownWallet && participant ? [{ id: 'self', title: participant.name }] : []),
+    ...(otherWallet && other ? [{ id: 'other', title: other.name }] : []),
+    ...(ownWallet && otherWallet ? [{ id: 'shared', title: $translate('wallets.shared_allocation') }] : []),
+    { id: 'custom', title: '', icon: 'mdi:cog-outline' },
+  ];
   $: remaining = fromMinor(
     toMinor(amount || 0, currency) - rows.reduce((sum, row) => sum + toMinor(row.amount || 0, currency), 0),
     currency,
@@ -43,225 +57,247 @@
   async function initialize(choices: typeof available, _defaults: boolean, ready: boolean) {
     if (!ready || initialized || initializing || !choices.length) return;
     initializing = true;
-    // Hydration can publish the participant/default props after the wallet list.
     await tick();
     initializing = false;
-    if (!$dataInitialized) return;
-    choices = available;
-    const defaults = useDefault;
-    if (!initialized && choices.length && ($memberSettingsStore?.walletsEnabled || allocation)) {
-      initialized = true;
-      if (defaults && !allocation) {
-        const first = choices.find((wallet) => wallet.id === initialWalletId) ?? choices[0];
-        const other = choices.find(
-          (wallet) =>
-            wallet.participantId &&
-            activeOwnerIds.has(wallet.participantId) &&
-            wallet.participantId !== participant?.id &&
-            wallet.id !== first.id,
-        );
-        if (!initialWalletId && participant?.allocationPreset === 'equal' && other) {
-          const values = splitEqually(amount || 0, 2, currency);
-          allocation = {
-            shares: [
-              { walletId: first.id, amount: values[0] },
-              { walletId: other.id, amount: values[1] },
-            ],
-          };
-          automaticEqual = true;
-        } else {
-          allocation = {
-            shares: [
-              {
-                walletId: !initialWalletId && participant?.allocationPreset === 'other' && other ? other.id : first.id,
-                amount: amount || 0,
-              },
-            ],
-          };
-        }
-        automaticSingle = true;
-      }
+    if (!$dataInitialized || initialized) return;
+    initialized = true;
+    previousAmount = amount;
+    if (allocation) {
+      const positive = allocation.shares.filter((share) => share.amount > 0);
+      if (remaining === 0 && positive.length === 1 && positive[0].walletId === ownWallet?.id) mode = 'self';
+      else if (remaining === 0 && positive.length === 1 && positive[0].walletId === otherWallet?.id) mode = 'other';
+      else if (
+        remaining === 0 &&
+        positive.length === 2 &&
+        ownWallet &&
+        otherWallet &&
+        positive.some((share) => share.walletId === ownWallet!.id) &&
+        positive.some((share) => share.walletId === otherWallet!.id) &&
+        Math.abs(toMinor(positive[0].amount, currency) - toMinor(positive[1].amount, currency)) <= 1
+      )
+        mode = 'shared';
+      return;
     }
+    if (!useDefault || !$memberSettingsStore?.walletsEnabled) return;
+    if (initialWalletId && initialWalletId !== ownWallet?.id) {
+      allocation = { shares: [{ walletId: initialWalletId, amount: amount || 0 }] };
+      mode = 'custom';
+      automaticCustomWallet = initialWalletId;
+    } else
+      choose(
+        participant?.allocationPreset === 'equal'
+          ? 'shared'
+          : participant?.allocationPreset === 'other'
+            ? 'other'
+            : 'self',
+      );
+  }
+  function choose(next: string) {
+    automaticCustomWallet = null;
+    mode = next as Mode;
+    if (mode === 'custom') return;
+    if ((mode === 'shared' && (!ownWallet || !otherWallet)) || (mode === 'other' && !otherWallet))
+      mode = ownWallet ? 'self' : 'custom';
+    if (mode === 'self' && !ownWallet) mode = 'custom';
+    if (mode === 'custom') return;
+    const choices =
+      mode === 'shared' && ownWallet && otherWallet
+        ? [ownWallet, otherWallet]
+        : mode === 'other' && otherWallet
+          ? [otherWallet]
+          : ownWallet
+            ? [ownWallet]
+            : [];
+    if (!choices.length) {
+      mode = 'custom';
+      return;
+    }
+    const amounts = splitEqually(amount || 0, choices.length, currency);
+    allocation = { shares: choices.map((wallet, index) => ({ walletId: wallet.id, amount: amounts[index] })) };
   }
   $: updateAmount(amount);
   function updateAmount(value: number) {
-    if (automaticSingle && value !== previousAmount && allocation?.shares.length === 1) {
-      allocation = { shares: [{ walletId: allocation.shares[0].walletId, amount: value || 0 }] };
-    }
-    if (automaticEqual && value !== previousAmount && allocation?.shares.length) {
-      const amounts = splitEqually(value || 0, allocation.shares.length, currency);
-      allocation = { shares: allocation.shares.map((share, index) => ({ ...share, amount: amounts[index] })) };
+    if (initialized && value !== previousAmount) {
+      if (mode !== 'custom') choose(mode);
+      else if (automaticCustomWallet)
+        allocation = { shares: [{ walletId: automaticCustomWallet, amount: value || 0 }] };
     }
     previousAmount = value;
   }
-  function add() {
-    const wallet = available.find((wallet) => !rows.some((row) => row.walletId === wallet.id));
-    if (!wallet) return;
-    automaticSingle = false;
-    automaticEqual = false;
-    allocation = { shares: [...rows, { walletId: wallet.id, amount: Math.max(0, remaining) }] };
+  function changeAmount(index: number, value: string | null) {
+    automaticCustomWallet = null;
+    allocation = { shares: rows.map((share, i) => (i === index ? { ...share, amount: Number(value || 0) } : share)) };
   }
-  function equal() {
-    automaticSingle = false;
-    automaticEqual = true;
-    const amounts = splitEqually(amount, rows.length, currency);
-    allocation = { shares: rows.map((row, i) => ({ ...row, amount: amounts[i] })) };
+  function changeWallet(index: number, walletId: string) {
+    automaticCustomWallet = null;
+    allocation = { shares: rows.map((share, i) => (i === index ? { ...share, walletId } : share)) };
+  }
+  function add() {
+    automaticCustomWallet = null;
+    const wallet = available.find((wallet) => !rows.some((row) => row.walletId === wallet.id));
+    if (wallet) allocation = { shares: [...rows, { walletId: wallet.id, amount: Math.max(0, remaining) }] };
   }
   function remove(index: number) {
-    automaticSingle = false;
-    automaticEqual = false;
+    automaticCustomWallet = null;
     const shares = rows.filter((_, i) => i !== index);
     allocation = shares.length ? { shares } : undefined;
   }
-  function preset(equal = false, other = false) {
-    if (!firstWallet) return;
-    const choices =
-      equal && otherWallet ? [firstWallet, otherWallet] : [other && otherWallet ? otherWallet : firstWallet];
-    const amounts = splitEqually(amount || 0, choices.length, currency);
-    allocation = { shares: choices.map((wallet, index) => ({ walletId: wallet.id, amount: amounts[index] })) };
-    automaticSingle = choices.length === 1;
-    automaticEqual = equal;
+  function equal() {
+    automaticCustomWallet = null;
+    const amounts = splitEqually(amount || 0, rows.length, currency);
+    allocation = { shares: rows.map((share, index) => ({ ...share, amount: amounts[index] })) };
+  }
+  function labelSettings(node: HTMLElement, label: string) {
+    let disposed = false;
+    let previous: Element | null = null;
+    async function apply() {
+      await tick();
+      if (disposed) return;
+      const button = node.querySelector('[data-testid="WalletAllocationMode.Button.custom"]');
+      if (previous && previous !== button) {
+        previous.removeAttribute('aria-label');
+        previous.removeAttribute('title');
+      }
+      button?.setAttribute('aria-label', label);
+      button?.setAttribute('title', label);
+      previous = button;
+    }
+    void apply();
+    return {
+      update: (next: string) => {
+        label = next;
+        void apply();
+      },
+      destroy: () => {
+        disposed = true;
+      },
+    };
   }
 </script>
 
 {#if ($memberSettingsStore?.walletsEnabled && available.length) || rows.length}
-  <fieldset class="allocation" data-testId="WalletAllocation">
-    <legend>{$translate('wallets.allocation')}</legend>
-    {#if firstWallet}<div class="actions">
-        <button type="button" on:click={() => preset()}>{firstWallet.name}</button>
-        {#if otherWallet}<button type="button" on:click={() => preset(false, true)}>{otherWallet.name}</button><button
-            type="button"
-            on:click={() => preset(true)}>{$translate('wallets.equal')}</button
-          >{/if}
-      </div>{/if}
-    {#each rows as row, index (row.walletId)}
-      <div class="share">
-        <label
-          ><span class="sr-only">{$translate('wallets.wallet')}</span><select
-            aria-label={$translate('wallets.wallet')}
-            value={row.walletId}
-            on:change={(event) => {
-              automaticSingle = false;
-              automaticEqual = false;
-              allocation = {
-                shares: rows.map((share, i) =>
-                  i === index ? { ...share, walletId: event.currentTarget.value } : share,
-                ),
-              };
-            }}
-          >
-            {#each $walletsStore.filter((wallet) => !wallet.archived || wallet.id === row.walletId) as wallet (wallet.id)}<option
-                value={wallet.id}>{wallet.name}</option
-              >{/each}
-            {#if !$walletsStore.some((wallet) => wallet.id === row.walletId)}<option value={row.walletId}
-                >{walletsService.deletedItems.find((wallet) => wallet.id === row.walletId)?.name ?? '…'}</option
-              >{/if}
-          </select></label
-        >
-        <label
-          ><span class="sr-only">{$translate('transactions.amount')}</span><input
-            type="number"
-            min="0"
-            step="any"
-            aria-label={$translate('transactions.amount')}
-            value={row.amount}
-            on:input={(event) => {
-              automaticSingle = false;
-              automaticEqual = false;
-              allocation = {
-                shares: rows.map((share, i) =>
-                  i === index ? { ...share, amount: Number(event.currentTarget.value) } : share,
-                ),
-              };
-            }}
-          /></label
-        >
-        <button type="button" aria-label={$translate('common.delete')} on:click={() => remove(index)}>×</button>
-      </div>
-    {/each}
-    <div class="actions">
-      <button type="button" on:click={add} disabled={rows.length >= available.length}
-        >{$translate('wallets.add_share')}</button
-      >
-      {#if rows.length > 2}<button type="button" on:click={equal}>{$translate('wallets.equal')}</button>{/if}
-      {#if rows.length}<button
-          type="button"
-          on:click={() => {
-            allocation = undefined;
-            automaticSingle = false;
-            automaticEqual = false;
-          }}>{$translate('wallets.no_allocation')}</button
-        >{/if}
+  <section class="allocation" data-testId="WalletAllocation" aria-label={$translate('wallets.allocation')}>
+    <InputLabel text={$translate('wallets.allocation')} />
+    <div class="presets" use:labelSettings={$translate('wallets.allocation_settings')}>
+      <MultiSwitch
+        {options}
+        selected={options.find((option) => option.id === mode)}
+        onChange={(option) => choose(option.id)}
+        testId="WalletAllocationMode"
+        ariaLabel={$translate('wallets.allocation')}
+      />
     </div>
-    {#if rows.length}<div class="hint" aria-live="polite">
-        {$translate('wallets.remaining')}: {formatDebtMoney(remaining, { currency })}
-      </div>{/if}
-  </fieldset>
+    {#if mode === 'custom'}
+      <div class="shares" data-testId="WalletAllocationSettings">
+        {#each rows as row, index (row.walletId)}
+          <div class="share">
+            <WalletSelector
+              name={`allocation-wallet-${index}`}
+              label=""
+              compact
+              allowUnallocated={false}
+              walletId={row.walletId}
+              excludedWalletIds={rows.filter((_, i) => i !== index).map((share) => share.walletId)}
+              onSelect={(id) => changeWallet(index, id)}
+              testId={`AllocationWallet.${index}`}
+            />
+            <Input
+              type="number"
+              inputmode="decimal"
+              min="0"
+              step="any"
+              aria-label={$translate('transactions.amount')}
+              placeholder="0"
+              value={row.amount ? String(row.amount) : ''}
+              onChange={(value) => changeAmount(index, value)}
+              clearable
+              translate={$translate}
+              testId={`AllocationAmount.${index}`}
+            />
+            <Button
+              appearance="transparent"
+              aria-label={$translate('common.delete')}
+              onClick={() => remove(index)}
+              testId={`RemoveAllocation.${index}`}><Icon name="mdi:delete-outline" size={1.25} /></Button
+            >
+          </div>
+        {/each}
+        <div class="actions">
+          <Button
+            appearance="link"
+            onClick={add}
+            disabled={rows.length >= available.length}
+            text={$translate('wallets.add_share')}
+          />
+          {#if rows.length > 1}<Button appearance="link" onClick={equal} text={$translate('wallets.equal')} />{/if}
+          {#if rows.length}<Button
+              appearance="link"
+              onClick={() => {
+                automaticCustomWallet = null;
+                allocation = undefined;
+              }}
+              text={$translate('wallets.no_allocation')}
+            />{/if}
+        </div>
+        <div
+          class="hint"
+          class:overallocated={remaining < 0}
+          aria-live="polite"
+          data-testId="UnallocatedOperationAmount"
+        >
+          {$translate('wallets.remaining')}: {formatDebtMoney(remaining, { currency })}
+        </div>
+      </div>
+    {/if}
+  </section>
 {/if}
 
 <style>
   .allocation {
-    border: 1px solid var(--border-color);
-    border-radius: 1rem;
-    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
     min-width: 0;
-    margin: 0;
   }
-  legend {
-    padding: 0 0.25rem;
+  .presets {
+    min-width: 0;
+  }
+  .presets :global(.multi-switch) {
+    width: 100%;
+  }
+  .presets :global(.switch-item) {
+    flex: 1;
+    padding: 0.5rem;
+    white-space: nowrap;
+  }
+  .presets :global(.switch-item.with-icon) {
+    flex: 0 0 2.75rem;
+  }
+  .shares {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
   .share {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(4rem, 6rem) 2.75rem;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr) 2.5rem;
     gap: 0.4rem;
-    margin: 0.5rem 0;
     align-items: center;
-  }
-  label {
     min-width: 0;
   }
-  input,
-  select {
-    width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-    background: var(--background-color);
-    color: var(--primary-text-color);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    padding: 0.6rem 0.4rem;
-    font: inherit;
-    font-size: 1rem;
-  }
-  button {
-    border: 0;
-    border-radius: 0.5rem;
-    background: var(--header-background-color);
-    color: var(--active-color);
-    font: inherit;
-    min-height: 2.75rem;
-    padding: 0.4rem 0.6rem;
-    cursor: pointer;
-  }
-  button:disabled {
-    opacity: 0.4;
-    cursor: default;
+  .share :global(button.transparent) {
+    padding: 0.25rem;
   }
   .actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.25rem 0.75rem;
   }
   .hint {
     color: var(--secondary-text-color);
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
+    font-size: 0.85rem;
   }
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
+  .overallocated {
+    color: var(--red-color);
   }
 </style>
