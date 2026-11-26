@@ -17,6 +17,11 @@ async function pickIcon(page: Page, icon = 'mdi:cat') {
   await page.getByTestId('ParticipantIconPicker').locator(`[data-testid=IconChoice][data-id="${icon}"]`).click();
   await expect(page.getByTestId('ParticipantIconPicker')).toHaveCount(0);
 }
+async function pickColor(page: Page, color: string) {
+  await page.getByRole('button', { name: /^Avatar color/ }).click();
+  await page.locator('[name=participant-avatar-color]').fill(color);
+  await page.getByTestId('ParticipantColorPicker').getByRole('button', { name: 'Continue', exact: true }).click();
+}
 
 test('saves participant avatar color and icon through reload and JSON export/import', async ({
   page,
@@ -26,7 +31,7 @@ test('saves participant avatar color and icon through reload and JSON export/imp
   await page.goto('/settings/participants', { waitUntil: 'networkidle' });
   await page.getByTestId('ParticipantPicker').selectOption('alex');
   await page.getByRole('link', { name: 'Edit Alex User', exact: true }).click();
-  await page.locator('[name=participant-avatar-color]').fill('#2563eb');
+  await pickColor(page, '#2563eb');
   const avatar = page.getByTestId('ParticipantAvatar');
   await expect(avatar).toHaveCSS('background-color', 'rgb(37, 99, 235)');
   await expect(avatar).toHaveCSS('color', 'rgb(255, 255, 255)');
@@ -61,7 +66,7 @@ test('new participants can choose a custom icon and restore initials and automat
   await seed(page);
   await page.goto('/settings/participants/create', { waitUntil: 'networkidle' });
   await page.locator('[name=participant-name]').fill('Jane Doe');
-  await page.locator('[name=participant-avatar-color]').fill('#000000');
+  await pickColor(page, '#000000');
   await page.getByTestId('ParticipantIconButton').click();
   const picker = page.getByTestId('ParticipantIconPicker');
   await picker.getByRole('button', { name: 'Custom', exact: true }).click();
@@ -70,11 +75,16 @@ test('new participants can choose a custom icon and restore initials and automat
   await expect(picker).toHaveCount(0);
   await expect(page.getByTestId('ParticipantAvatar')).toHaveAttribute('data-icon', 'mdi:dog');
   await expect(page.getByTestId('ParticipantAvatar')).toHaveCSS('color', 'rgb(255, 255, 255)');
-  await page.getByTestId('ResetParticipantIconButton').click();
-  await page.getByTestId('ResetParticipantColorButton').click();
+  await page.getByTestId('ParticipantIconButton').click();
+  await page.getByTestId('ParticipantIconPicker').getByRole('button', { name: 'Recommended', exact: true }).click();
+  await page.getByTestId('ParticipantIconPicker').locator('[data-testid=IconChoice][data-id=none]').click();
+  await page.getByRole('button', { name: /^Avatar color/ }).click();
+  await page.getByTestId('ParticipantAutomaticColor').click();
   await expect(page.getByTestId('ParticipantAvatar')).toHaveText('JD');
   await expect(page.getByTestId('ParticipantAvatar')).not.toHaveAttribute('data-icon');
-  await expect(page.locator('[name=participant-avatar-color]')).not.toHaveValue('#000000');
+  await expect(page.getByRole('button', { name: /^Avatar color/ })).toContainText('Automatic color');
+  await expect(page.getByTestId('ResetParticipantIconButton')).toHaveCount(0);
+  await expect(page.getByTestId('ResetParticipantColorButton')).toHaveCount(0);
   await page.getByTestId('ParticipantForm').getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page).toHaveURL(/\/settings\/participants$/);
   const data = await exportData(page);
@@ -91,7 +101,7 @@ test('back from icon selection preserves the draft and leaving without Save keep
   await page.goto('/settings/participants/edit?id=alex', { waitUntil: 'networkidle' });
   await expect(page.getByTestId('ParticipantAvatar')).toHaveText('AU');
   await page.locator('[name=participant-name]').fill('Unsaved profile');
-  await page.locator('[name=participant-avatar-color]').fill('#ff0000');
+  await pickColor(page, '#ff0000');
   await page.getByTestId('ParticipantIconButton').click();
   await page.goBack();
   await expect(page.getByTestId('ParticipantIconPicker')).toHaveCount(0);

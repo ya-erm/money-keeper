@@ -119,6 +119,8 @@ export type Participant = {
   name: string;
   avatarColor?: string;
   avatarIcon?: string;
+  /** Private avatar object ID, scoped to the authenticated workspace. */
+  avatarId?: string;
   accountsOrder?: string[];
   walletsOrder?: string[];
   /** @deprecated Retained for older backups; participant visibility is no longer applied. */

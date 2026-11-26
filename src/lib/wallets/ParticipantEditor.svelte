@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
   import { v4 as uuid } from 'uuid';
   import Button from '@ya-erm/svelte-ui/Button';
@@ -6,6 +7,7 @@
   import { showErrorToast } from '@ya-erm/svelte-ui/toasts';
   import { accountsStore } from '#lib/data/accounts.js';
   import { participantsService, participantsStore, selectedParticipantStore } from '#lib/data/participants.js';
+  import { membersService } from '#lib/data/members.js';
   import type { Participant } from '#lib/data/interfaces.js';
   import { translate } from '#lib/translate/index.js';
   import Layout from '#lib/ui/layout/Layout.svelte';
@@ -15,6 +17,9 @@
   import SubScreen from '#lib/ui/layout/SubScreen.svelte';
   import CategoryIcons from '../../routes/categories/CategoryIcons.svelte';
   import { normalizeAvatarColor, participantAvatarAppearance, participantIcons } from './participantAvatar';
+  import { prepareAvatarImage, uploadAvatarImage } from './avatarImage';
+  import ListSelectItem from '#lib/ui/list/ListSelectItem.svelte';
+  import GridCircleItem from '#lib/ui/GridCircleItem.svelte';
   export let creating = false;
   export let id: string | null = null;
   let draft: Participant = { id: uuid(), name: '', allocationPreset: 'first' };
@@ -22,6 +27,40 @@
   let busy = false;
   let deleteOpened = false;
   let iconSelecting = false;
+  let colorSelecting = false;
+  let photoInput: HTMLInputElement;
+  let pendingPhoto: Blob | undefined;
+  let photoPreview: string | undefined;
+  let readingPhoto = false;
+  let destroyed = false;
+  onDestroy(() => {
+    destroyed = true;
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+  });
+  function clearPhoto() {
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    pendingPhoto = undefined;
+    photoPreview = undefined;
+    draft = { ...draft, avatarId: undefined };
+  }
+  async function choosePhoto() {
+    const file = photoInput.files?.[0];
+    photoInput.value = '';
+    if (!file || busy || readingPhoto) return;
+    readingPhoto = true;
+    try {
+      const image = await prepareAvatarImage(file);
+      if (destroyed) return;
+      clearPhoto();
+      pendingPhoto = image;
+      photoPreview = URL.createObjectURL(image);
+      iconSelecting = false;
+    } catch {
+      showErrorToast($translate('wallets.avatar_invalid_image'));
+    } finally {
+      readingPhoto = false;
+    }
+  }
   $: appearance = participantAvatarAppearance(draft);
   $: participant = creating ? undefined : $participantsStore.find((item) => item.id === id);
   $: if (participant && initializedId !== participant.id) {
@@ -31,11 +70,18 @@
     draft = { ...participant, allocationPreset: participant.allocationPreset ?? 'first' };
   }
   async function save() {
-    if (busy || !draft.name.trim() || (!creating && !participant)) return;
+    if (busy || readingPhoto || !draft.name.trim() || (!creating && !participant)) return;
     busy = true;
     try {
       const current = creating ? undefined : participantsService.getById(draft.id);
       if (!creating && !current) throw new Error('Participant is no longer available');
+      if (pendingPhoto) {
+        const owner = membersService.getSelectedMember().uuid;
+        if (membersService.isGuest) throw new Error('sign_in');
+        const avatarId = await uploadAvatarImage(pendingPhoto, owner);
+        draft = { ...draft, avatarId };
+        pendingPhoto = undefined;
+      }
       await participantsService.save({
         ...current,
         ...draft,
@@ -48,8 +94,12 @@
       });
       if (creating && !$selectedParticipantStore) await participantsService.select(draft.id);
       await goto('/settings/participants', { replace: true });
-    } catch {
-      showErrorToast($translate('wallets.save_failed'));
+    } catch (error) {
+      showErrorToast(
+        $translate(
+          error instanceof Error && error.message === 'sign_in' ? 'wallets.avatar_sign_in' : 'wallets.save_failed',
+        ),
+      );
     } finally {
       busy = false;
     }
@@ -85,21 +135,13 @@
           type="button"
           class="avatar-button"
           disabled={busy}
-          aria-label={$translate('icons.select_icon')}
+          aria-label={$translate('wallets.avatar_select')}
           data-testId="ParticipantIconButton"
           on:click={() => (iconSelecting = true)}
         >
-          <ParticipantAvatar participant={draft} />
-          <span>{$translate('icons.select_icon')}</span>
+          <ParticipantAvatar participant={draft} preview={photoPreview} />
+          <span>{$translate('wallets.avatar_select')}</span>
         </button>
-        {#if draft.avatarIcon}<Button
-            type="button"
-            appearance="link"
-            disabled={busy}
-            testId="ResetParticipantIconButton"
-            text={$translate('wallets.avatar_initials')}
-            onClick={() => (draft = { ...draft, avatarIcon: undefined })}
-          />{/if}
       </div>
       <Input
         label={$translate('wallets.participant_name')}
@@ -108,22 +150,14 @@
         required
         maxlength={100}
       />
-      <Input
-        label={$translate('wallets.avatar_color')}
-        type="color"
-        name="participant-avatar-color"
-        value={appearance.background}
-        disabled={busy}
-        onChange={(value) => (draft = { ...draft, avatarColor: value })}
+      <ListSelectItem
+        icon="mdi:palette-outline"
+        title={$translate('wallets.avatar_color')}
+        value={draft.avatarColor ?? $translate('wallets.avatar_auto_color')}
+        onClick={() => {
+          if (!busy && !readingPhoto) colorSelecting = true;
+        }}
       />
-      {#if draft.avatarColor}<Button
-          type="button"
-          appearance="link"
-          disabled={busy}
-          testId="ResetParticipantColorButton"
-          text={$translate('wallets.avatar_auto_color')}
-          onClick={() => (draft = { ...draft, avatarColor: undefined })}
-        />{/if}
       <label
         >{$translate('wallets.default_allocation')}
         <select name="allocation-preset" bind:value={draft.allocationPreset}>
@@ -132,7 +166,11 @@
           <option value="equal">{$translate('wallets.equal')}</option>
         </select>
       </label>
-      <Button type="submit" disabled={busy} text={$translate('common.save')} />
+      <Button
+        type="submit"
+        disabled={busy || readingPhoto}
+        text={$translate(readingPhoto ? 'wallets.avatar_processing' : 'common.save')}
+      />
       {#if !creating}<Button
           color="danger"
           appearance="transparent"
@@ -156,18 +194,64 @@
 </Layout>
 {#if iconSelecting}<SubScreen
     visible
-    title={$translate('icons.select_icon')}
+    title={$translate('wallets.avatar_select')}
     onBack={() => (iconSelecting = false)}
     testId="ParticipantIconPicker"
   >
+    <div class="p-1">
+      <input
+        type="file"
+        accept="image/*"
+        bind:this={photoInput}
+        on:change={choosePhoto}
+        hidden
+        data-testId="ParticipantPhotoInput"
+      />
+      <Button
+        disabled={readingPhoto}
+        text={$translate(readingPhoto ? 'wallets.avatar_processing' : 'wallets.avatar_upload')}
+        onClick={() => photoInput.click()}
+      />
+      <p class="photo-hint">{$translate('wallets.avatar_photo_hint')}</p>
+    </div>
     <CategoryIcons
       icon={draft.avatarIcon ?? null}
       icons={participantIcons}
+      allowEmpty
       onSelect={(value) => {
+        if (readingPhoto) return;
+        clearPhoto();
         draft = { ...draft, avatarIcon: value?.trim() || undefined };
         iconSelecting = false;
       }}
     />
+  </SubScreen>{/if}
+{#if colorSelecting}<SubScreen
+    visible
+    title={$translate('wallets.avatar_color')}
+    onBack={() => (colorSelecting = false)}
+    testId="ParticipantColorPicker"
+  >
+    <div class="p-1 flex-col gap-1 items-center">
+      <GridCircleItem
+        icon="mdi:palette-outline"
+        text={$translate('wallets.avatar_auto_color')}
+        selected={!draft.avatarColor}
+        testId="ParticipantAutomaticColor"
+        onClick={() => {
+          draft = { ...draft, avatarColor: undefined };
+          colorSelecting = false;
+        }}
+      />
+      <Input
+        label={$translate('wallets.avatar_custom_color')}
+        type="color"
+        name="participant-avatar-color"
+        value={appearance.background}
+        onChange={(value) => (draft = { ...draft, avatarColor: value })}
+      />
+      <Button text={$translate('common.continue')} onClick={() => (colorSelecting = false)} />
+    </div>
   </SubScreen>{/if}
 <Modal bind:opened={deleteOpened} width={22} header={$translate('wallets.delete_participant_confirm')}>
   <p>{$translate('wallets.delete_participant_description')}</p>
@@ -207,6 +291,10 @@
     color: var(--active-color);
     font: inherit;
     cursor: pointer;
+  }
+  .photo-hint {
+    color: var(--secondary-text-color);
+    font-size: 0.85rem;
   }
   label {
     display: flex;

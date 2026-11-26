@@ -4,7 +4,7 @@
 
 ### Added
 
-- Participants can choose an avatar color and icon with a live preview, or restore initials and the automatic color. Avatar preferences are included in synchronization and JSON backups; custom colors use a contrasting icon/text color.
+- Participants can choose an avatar color, icon, or photo with a live preview. The icon picker includes No icon for initials, and the color picker includes Automatic color. Photos are cropped to 512 × 512 px and converted to WebP at quality 95 before storage in a private S3 bucket. Avatar preferences are included in synchronization and JSON backups; custom colors use a contrasting icon/text color.
 
 ## 2.37.2 - 2026-11-26
 

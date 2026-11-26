@@ -2,7 +2,11 @@
   import Icon from '@ya-erm/svelte-ui/Icon';
   import type { Participant } from '#lib/data/interfaces.js';
   import { participantAvatarAppearance } from './participantAvatar';
-  export let participant: Pick<Participant, 'id' | 'name' | 'avatarColor' | 'avatarIcon'>;
+  import { participantAvatarUrl } from './avatarImage';
+  export let participant: Pick<Participant, 'id' | 'name' | 'avatarColor' | 'avatarIcon' | 'avatarId'>;
+  export let preview: string | undefined = undefined;
+  let failed: string | undefined;
+  $: photo = preview ?? participantAvatarUrl(participant.avatarId);
   $: words = participant.name.trim().split(/\s+/).filter(Boolean);
   $: initials =
     (Array.from(words[0] ?? '')[0] ?? '') + (words.length > 1 ? Array.from(words[words.length - 1])[0] : '');
@@ -17,10 +21,10 @@
   aria-hidden="true"
   data-testId="ParticipantAvatar"
   data-icon={icon || undefined}
-  >{#if icon}<Icon name={icon} size={1.5} />{:else if initials}{initials.toLocaleUpperCase()}{:else}<Icon
-      name="mdi:account"
+  >{#if photo && failed !== photo}<img src={photo} alt="" on:error={() => (failed = photo)} />{:else if icon}<Icon
+      name={icon}
       size={1.5}
-    />{/if}</span
+    />{:else if initials}{initials.toLocaleUpperCase()}{:else}<Icon name="mdi:account" size={1.5} />{/if}</span
 >
 
 <style>
@@ -36,5 +40,11 @@
     color: var(--avatar-color);
     font-size: 1.1rem;
     font-weight: 500;
+    overflow: hidden;
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 </style>
