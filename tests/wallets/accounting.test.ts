@@ -96,10 +96,12 @@ test('participants, shared expense, holiday contributions, reload and export', a
   await page
     .getByTestId('WalletCard')
     .filter({ hasText: 'Отпуск' })
-    .getByRole('link', { name: 'Перераспределить', exact: true })
+    .getByRole('link', { name: 'Перевести', exact: true })
     .click();
   await page.getByTestId('SourceWalletSelect').getByRole('button').click();
   await page.getByTestId('SourceWalletSelect.Portal').getByRole('button', { name: 'Алексей', exact: true }).click();
+  await page.getByTestId('DestinationWalletSelect').getByRole('button').click();
+  await page.getByTestId('DestinationWalletSelect.Portal').getByRole('button', { name: 'Отпуск', exact: true }).click();
   await page.locator('[name=wallet-amount]').fill('20000');
   await page.getByTestId('WalletCurrencyButton').click();
   await page.getByTestId('RecentWalletCurrencies').getByRole('button', { name: 'RSD', exact: true }).click();
@@ -687,7 +689,7 @@ test('reallocation is separate from settings, uses wallet previews and recent cu
   expect(hintBox!.y + hintBox!.height).toBeLessThan(headingBox!.y);
   await expect(page.getByTestId('WalletTransferForm')).toHaveCount(0);
   await page.screenshot({ path: 'output/virtual-wallets/51-wallet-settings-explanation.png', animations: 'disabled' });
-  await page.getByRole('button', { name: 'Перераспределить', exact: true }).click();
+  await page.getByRole('button', { name: 'Перевести', exact: true }).click();
   await expect(page).toHaveURL(/\/wallets\/transfer\?from=settings$/);
   await expect(page.getByTestId('EnableWallets')).toHaveCount(0);
   await expect(page.getByTestId('ActiveWallets')).toHaveCount(0);
@@ -698,11 +700,16 @@ test('reallocation is separate from settings, uses wallet previews and recent cu
   await page
     .getByTestId('WalletCard')
     .filter({ hasText: 'Отпуск' })
-    .getByRole('link', { name: 'Перераспределить', exact: true })
+    .getByRole('link', { name: 'Перевести', exact: true })
     .click();
-  await expect(page).toHaveURL(/\/wallets\/transfer\?to=holiday$/);
+  await expect(page).toHaveURL(/\/wallets\/transfer\?wallet=holiday$/);
   await expect(page.getByTestId('DestinationWalletSelect')).toContainText('Куда');
-  await expect(page.getByTestId('DestinationWalletSelect')).toContainText('Отпуск');
+  await expect(page.getByTestId('SourceWalletSelect')).toContainText('Отпуск');
+  await expect(page.getByTestId('DestinationWalletSelect')).toContainText('Выберите кошелёк');
+  await page.screenshot({
+    path: 'output/virtual-wallets/81-transfer-empty-destination-390.png',
+    animations: 'disabled',
+  });
   await page.getByTestId('SourceWalletSelect').getByRole('button').click();
   const chooser = page.getByTestId('SourceWalletSelect.Portal');
   await expect(chooser.getByTestId('WalletListItem')).toHaveCount(4);
@@ -711,6 +718,8 @@ test('reallocation is separate from settings, uses wallet previews and recent cu
   await chooser.getByPlaceholder('Поиск', { exact: true }).fill('Алексей');
   await chooser.getByRole('button', { name: 'Алексей', exact: true }).click();
   await expect(page.getByTestId('SourceWalletSelect')).toContainText('Откуда');
+  await page.getByTestId('DestinationWalletSelect').getByRole('button').click();
+  await page.getByTestId('DestinationWalletSelect.Portal').getByRole('button', { name: 'Отпуск', exact: true }).click();
   await page.getByTestId('WalletCurrencyButton').click();
   const currencies = page.getByTestId('RecentWalletCurrencies');
   const dimensions = await currencies.getByTestId('TagsContainer').evaluate((element) => ({
@@ -911,7 +920,7 @@ test('currency dialog stays centered above the keyboard and follows visible view
   await page
     .getByTestId('WalletCard')
     .filter({ hasText: 'Алексей' })
-    .getByRole('link', { name: 'Перераспределить', exact: true })
+    .getByRole('link', { name: 'Перевести', exact: true })
     .click();
   await page.evaluate(() => {
     const viewport = Object.assign(new EventTarget(), {
@@ -1176,4 +1185,38 @@ test('expense opened for a shared savings wallet follows the amount until edited
   await expect(page.getByTestId('AllocationAmount.0')).toHaveCount(0);
   await page.getByTestId('WalletAllocation').getByRole('button', { name: 'Добавить кошелёк', exact: true }).click();
   await expect(page.getByTestId('AllocationAmount.0')).toHaveValue('1200');
+});
+
+test('wallet transfer requires a destination and distinguishes an explicit unallocated selection', async ({ page }) => {
+  await page
+    .getByTestId('WalletCard')
+    .filter({ hasText: 'Мария' })
+    .getByRole('link', { name: 'Перевести', exact: true })
+    .click();
+  await expect(page.getByTestId('SourceWalletSelect')).toContainText('Мария');
+  await expect(page.getByTestId('DestinationWalletSelect')).toContainText('Выберите кошелёк');
+  await page.locator('[name=wallet-amount]').fill('500');
+  await page.getByTestId('WalletTransferForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page.getByTestId('WalletTransferForm')).toBeVisible();
+  await expect(page.getByText('Выберите, куда перевести деньги.', { exact: true })).toBeVisible();
+  await page.getByTestId('DestinationWalletSelect').getByRole('button').click();
+  await page
+    .getByTestId('DestinationWalletSelect.Portal')
+    .getByRole('button', { name: 'Нераспределённое', exact: true })
+    .click();
+  await expect(page.getByTestId('DestinationWalletSelect')).toContainText('Нераспределённое');
+  await page.locator('[name=wallet-comment]').fill('В нераспределённое');
+  await page.getByTestId('WalletTransferForm').getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page.getByTestId('WalletTransferForm')).not.toBeVisible();
+  await page.getByTestId('WalletHistoryEntry').filter({ hasText: 'В нераспределённое' }).getByRole('button').click();
+  await expect(page.getByTestId('SourceWalletSelect')).toContainText('Мария');
+  await expect(page.getByTestId('DestinationWalletSelect')).toContainText('Нераспределённое');
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.getByTestId('DestinationWalletSelect')).toContainText('Нераспределённое');
+  await page.goto('/wallets/transfer?wallet=', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('SourceWalletSelect')).toContainText('Нераспределённое');
+  await expect(page.getByTestId('DestinationWalletSelect')).toContainText('Выберите кошелёк');
+  await page.goto('/wallets/transfer?to=holiday', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('SourceWalletSelect')).toContainText('Алексей');
+  await expect(page.getByTestId('DestinationWalletSelect')).toContainText('Отпуск');
 });

@@ -84,7 +84,8 @@
             >{/if}
         </button>
         <div class="footer">
-          {#if !wallet.archived}<a href={`/wallets/transfer?to=${wallet.id}`}>{$translate('wallets.transfer')}</a
+          {#if !wallet.archived}<a href={`/wallets/transfer?wallet=${encodeURIComponent(wallet.id)}`}
+              >{$translate('wallets.transfer')}</a
             >{:else}<span class="owner">{$translate('accounts.archived')}</span>{/if}
         </div>
       </div>

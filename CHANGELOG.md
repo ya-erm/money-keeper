@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.37.1 - 2026-11-26
+
+### Fixed
+
+- Wallet transfer actions are named Transfer. New transfers start from the current wallet and require an explicit destination choice, including unallocated funds.
+
 ## 2.37.0 - 2026-11-23
 
 ### Added

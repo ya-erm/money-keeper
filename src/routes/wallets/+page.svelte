@@ -258,7 +258,7 @@
                   { currency: value.currency },
                 )}{/if}</span
             >
-          </div>{/each}<a href="/wallets/transfer">{$translate('wallets.transfer')}</a>
+          </div>{/each}<a href="/wallets/transfer?wallet=">{$translate('wallets.transfer')}</a>
       </details>
     {:else}
       <div class="empty">

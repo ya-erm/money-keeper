@@ -17,15 +17,15 @@
   import { translate } from '#lib/translate/index.js';
   import Layout from '#lib/ui/layout/Layout.svelte';
   import HeaderFormSubmitButton from '#lib/ui/layout/HeaderFormSubmitButton.svelte';
-  import { validateWalletTransfer } from './calculations.js';
+  import { orderedItems, validateWalletTransfer } from './calculations.js';
 
   let busy = false;
   let ready = false;
   let initializedKey: string | null = null;
   let editedTransfer: WalletTransfer | null = null;
   let draftId = uuid();
-  let fromId = '';
-  let toId = '';
+  let fromId: string | null = '';
+  let toId: string | null = null;
   let transferCurrency = 'RSD';
   let amount = '';
   let date = dayjs().format('YYYY-MM-DD');
@@ -33,6 +33,7 @@
   let selectingCurrency = false;
   let comment = '';
   $: transferId = $page.url.searchParams.get('transfer');
+  $: sourceId = $page.url.searchParams.get('wallet');
   $: targetId = $page.url.searchParams.get('to') ?? '';
   $: contextId = $page.url.searchParams.get('wallet') ?? targetId;
   $: currencies = [
@@ -41,25 +42,41 @@
       ...$walletTransfersStore.map((transfer) => transfer.currency),
     ]),
   ].sort();
-  $: initialize($dataInitialized, transferId, targetId, $walletTransfersStore, currencies, $selectedParticipantStore);
+  $: initialize(
+    $dataInitialized,
+    transferId,
+    targetId,
+    sourceId,
+    $walletTransfersStore,
+    currencies,
+    $selectedParticipantStore,
+  );
   function initialize(
     loaded: boolean,
     id: string | null,
     target: string,
+    source: string | null,
     transfers: WalletTransfer[],
     currencies: string[],
     participant: Participant | null,
   ) {
     if (!loaded) return;
-    const key = JSON.stringify([id, target]);
+    const key = JSON.stringify([id, target, source]);
     if (initializedKey === key) return;
     initializedKey = key;
     const transfer = id ? transfers.find((item) => item.id === id) : undefined;
     ready = !id || !!transfer;
     editedTransfer = transfer ?? null;
     draftId = transfer?.id ?? uuid();
-    fromId = transfer?.fromWalletId ?? '';
-    toId = transfer?.toWalletId ?? target;
+    fromId = transfer
+      ? (transfer.fromWalletId ?? '')
+      : (source ??
+        orderedItems(
+          $walletsStore.filter((wallet) => !wallet.archived),
+          participant?.walletsOrder,
+        )[0]?.id ??
+        '');
+    toId = transfer ? (transfer.toWalletId ?? '') : target || null;
     transferCurrency =
       transfer?.currency ??
       (currencies.includes(participant?.currency ?? '') ? participant!.currency! : (currencies[0] ?? 'RSD'));
@@ -81,6 +98,10 @@
   }
   async function saveTransfer() {
     if (busy || !ready) return;
+    if (toId === null) {
+      showErrorToast($translate('wallets.choose_destination'));
+      return;
+    }
     const current = transferId ? walletTransfersService.getById(draftId) : undefined;
     if (transferId && !current) {
       showErrorToast($translate('wallets.save_failed'));

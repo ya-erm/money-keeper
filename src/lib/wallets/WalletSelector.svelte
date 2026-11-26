@@ -13,7 +13,7 @@
 
   export let name: string;
   export let label: string;
-  export let walletId = '';
+  export let walletId: string | null = '';
   export let testId: string;
   export let disabled = false;
   export let compact = false;
@@ -27,7 +27,7 @@
   $: selected =
     $walletsStore.find((wallet) => wallet.id === walletId) ??
     walletsService.deletedItems.find((wallet) => wallet.id === walletId) ??
-    unallocated;
+    (walletId === null ? { id: '', name: $translate('wallets.select_wallet') } : unallocated);
   $: names = new Map($participantHistoryStore.map((person) => [person.id, person.name]));
   $: choices = [
     ...(allowUnallocated ? [unallocated] : []),
@@ -53,11 +53,12 @@
 
 <div class="selector" data-testId={testId}>
   {#if label}<InputLabel text={label} />{/if}
-  <input type="hidden" {name} value={walletId} />
-  {#if compact}
+  <input type="hidden" {name} value={walletId ?? ''} />
+  {#if compact || walletId === null}
     <button
       type="button"
       class="compact-select"
+      class:placeholder={walletId === null}
       {disabled}
       aria-label={`${$translate('wallets.wallet')}: ${selected.name}`}
       on:click={() => {
@@ -74,7 +75,7 @@
     <WalletListItem
       wallet={selected}
       ownerName={walletId ? (names.get(selected.participantId ?? '') ?? $translate('wallets.shared')) : ''}
-      balances={$walletOverviewStore.get(walletId) ?? []}
+      balances={$walletOverviewStore.get(walletId ?? '') ?? []}
       {disabled}
       ariaLabel={`${label}: ${selected.name}`}
       onClick={() => {
@@ -128,6 +129,10 @@
     background: var(--header-background-color);
     color: var(--primary-text-color);
     cursor: pointer;
+  }
+  .compact-select.placeholder {
+    min-height: 4rem;
+    border-radius: 1rem;
   }
   .compact-select span {
     flex: 1;
