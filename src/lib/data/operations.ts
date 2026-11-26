@@ -221,6 +221,7 @@ export function cloneOperation(item: Transaction): Transaction {
     description: item.description,
     receiptUrl: item.receiptUrl,
     receiptOrganizationName: item.receiptOrganizationName,
+    receiptAddress: item.receiptAddress,
     purchaseItems: item.purchaseItems?.map((purchaseItem) => ({ ...purchaseItem })),
     linkedTransactionId: item.linkedTransactionId,
     anotherCurrency: item.anotherCurrency,

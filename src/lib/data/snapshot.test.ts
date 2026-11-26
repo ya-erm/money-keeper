@@ -65,6 +65,9 @@ describe('reduceJournal', () => {
       description: 'Bank statement description',
       receiptUrl: 'https://suf.purs.gov.rs/v/?vl=example',
       receiptOrganizationName: 'LIDL SRBIJA KD',
+      receiptAddress: 'Test Street 12, Novi Sad',
+      locationLat: 45.2671,
+      locationLng: 19.8335,
       comment: 'Лидл',
       purchaseItems: [{ name: 'Cheese', quantity: 1, unitPrice: 100, total: 100 }],
     });
