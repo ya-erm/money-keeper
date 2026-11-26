@@ -14,6 +14,7 @@
 
   export let icons: string[] = Object.values(categoryIcons).flat();
   export let allowEmpty = false;
+  export let selectionEnabled = true;
 
   const tabs = [
     { id: 'recommended', title: $translate('icons.recommended') },
@@ -33,7 +34,7 @@
           testId="IconChoice"
           text={$translate('icons.none')}
           onClick={() => onSelect(null)}
-          selected={!icon}
+          selected={selectionEnabled && !icon}
         />{/if}
       {#each icons as item (item)}
         <GridCircleItem
@@ -42,7 +43,7 @@
           testId="IconChoice"
           text=""
           onClick={() => onSelect(item)}
-          selected={item === icon}
+          selected={selectionEnabled && item === icon}
         />
       {/each}
     </div>
