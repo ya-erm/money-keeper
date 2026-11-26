@@ -139,6 +139,9 @@ test('real private S3 upload, second-device synchronization, access isolation an
     await page.goto('/settings/participants/edit?id=photo-person', { waitUntil: 'networkidle' });
     await page.screenshot({ path: testInfo.outputPath('participant-photo-editor-ru-390px.png') });
     await page.getByTestId('ParticipantIconButton').click();
+    await expect(
+      page.getByTestId('ParticipantIconPicker').locator('[data-testid=IconChoice][data-id=none]'),
+    ).not.toHaveClass(/selected/);
     await page.screenshot({ path: testInfo.outputPath('participant-photo-picker-ru-390px.png') });
     await page.getByTestId('ParticipantIconPicker').locator('[data-testid=IconChoice][data-id=none]').click();
     await expect(page.getByTestId('ParticipantAvatar')).toHaveText('AP');

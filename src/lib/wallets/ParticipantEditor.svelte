@@ -215,7 +215,7 @@
       <p class="photo-hint">{$translate('wallets.avatar_photo_hint')}</p>
     </div>
     <CategoryIcons
-      icon={draft.avatarId || pendingPhoto ? null : draft.avatarIcon ?? null}
+      icon={draft.avatarId || pendingPhoto ? null : (draft.avatarIcon ?? null)}
       icons={participantIcons}
       allowEmpty
       selectionEnabled={!draft.avatarId && !pendingPhoto}
