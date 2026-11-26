@@ -57,6 +57,7 @@
   import PurchaseItemsEditor from '#lib/receipts/PurchaseItemsEditor.svelte';
   import { toPurchaseItems, type PurchaseItemDraft } from '#lib/receipts/purchaseItems.js';
   import { findReceiptOrganizationDefaults, getReceiptOrganizationName } from '#lib/receipts/organizationDefaults.js';
+  import { findReceiptLocation, getReceiptAddress } from '#lib/receipts/locationDefaults.js';
 
   import RepeatingModal from '../../repeatings/RepeatingModal.svelte';
   import RepeatingsList from '../../repeatings/RepeatingsList.svelte';
@@ -131,6 +132,9 @@
 
   let locationLat = transaction?.locationLat ?? null;
   let locationLng = transaction?.locationLng ?? null;
+  // Existing operations and explicit choices (including clearing) retain their location on rescans.
+  let locationTouched = !!transaction;
+  let receiptLocationApplied = false;
   let editorPlace: KnownPlace | null = null;
   let locationPickerOpened = false;
   let selectedKnownPlaceId = '';
@@ -166,7 +170,7 @@
       }
     };
     if (!transaction && membersService.selectedMemberSettings?.autoDetectLocation && !hasLocation) {
-      detectLocation();
+      detectLocation(true);
     } else {
       void suggestNearbyPlaces();
     }
@@ -243,6 +247,18 @@
     );
     if (!commentTouched) comment = defaults?.comment ?? receiptOrganizationName ?? '';
     if (!categoryTouched) categoryId = defaults?.categoryId ?? null;
+    receiptAddress = getReceiptAddress(receipt.details);
+    if (!locationTouched) {
+      const position = findReceiptLocation(receiptAddress, $operationsStore, transaction?.id);
+      // Discard an earlier receipt's suggestion when a different branch has no matching history.
+      if (position || receiptLocationApplied) {
+        locationRevision++;
+        locationLat = position?.latitude ?? null;
+        locationLng = position?.longitude ?? null;
+        selectedKnownPlaceId = position ? (findNearbyPlaces(position, knownPlaces)[0]?.id ?? '') : '';
+        receiptLocationApplied = !!position;
+      }
+    }
     receiptUrl = receipt.url;
     purchaseItems = receipt.details?.items.map((item) => ({ ...item })) ?? [];
     receiptScannerOpened = false;
@@ -272,6 +288,7 @@
   let description = transaction?.description ?? '';
   let receiptUrl = transaction?.receiptUrl ?? '';
   let receiptOrganizationName: string | null | undefined = transaction?.receiptOrganizationName;
+  let receiptAddress: string | null | undefined = transaction?.receiptAddress;
   let receiptHref: string | null = null;
   $: {
     try {
@@ -338,6 +355,7 @@
   };
 
   const chooseKnownPlace = (place: KnownPlace | null) => {
+    locationTouched = true;
     locationRevision++;
     if (place) {
       locationLat = place.latitude;
@@ -347,14 +365,19 @@
   };
 
   const removeLocation = () => {
+    locationTouched = true;
     locationRevision++;
     locationLat = null;
     locationLng = null;
     selectedKnownPlaceId = '';
   };
 
-  const detectLocation = () => {
+  const detectLocation = (automatic = false) => {
     if (locating) return;
+    if (!automatic) {
+      locationTouched = true;
+      locationRevision++;
+    }
     if (!navigator.geolocation) {
       showErrorToast($translate('transactions.geolocation_not_supported'));
       return;
@@ -388,6 +411,7 @@
   };
 
   const onLocationSelected = async (position: Coordinates, name: string) => {
+    locationTouched = true;
     locationRevision++;
     let savedPlace: KnownPlace | null = null;
     if (name) {
@@ -406,6 +430,7 @@
 
   const removeKnownPlace = async () => {
     if (!editorPlace) return;
+    locationTouched = true;
     const placeId = editorPlace.id;
     const places = membersService.selectedMemberSettings?.knownPlaces ?? [];
     await membersService.updateKnownPlaces(places.filter((place) => place.id !== placeId));
@@ -492,6 +517,7 @@
         ...(description.trim() ? { description: description.trim() } : {}),
         ...(receiptUrl.trim() ? { receiptUrl: receiptUrl.trim() } : {}),
         ...(receiptOrganizationName ? { receiptOrganizationName } : {}),
+        ...(receiptAddress ? { receiptAddress } : {}),
         ...(savedPurchaseItems.length ? { purchaseItems: savedPurchaseItems } : {}),
         tagIds,
         ...(anotherCurrency
@@ -521,6 +547,8 @@
           ...(destinationTransaction?.receiptOrganizationName
             ? { receiptOrganizationName: destinationTransaction.receiptOrganizationName }
             : {}),
+
+          ...(destinationTransaction?.receiptAddress ? { receiptAddress: destinationTransaction.receiptAddress } : {}),
 
           ...(destinationTransaction?.purchaseItems
             ? {
@@ -771,7 +799,10 @@
             aria-label={$translate('receipts.url')}
             name="receiptUrl"
             bind:value={receiptUrl}
-            onChange={() => (receiptOrganizationName = undefined)}
+            onChange={() => {
+              receiptOrganizationName = undefined;
+              receiptAddress = undefined;
+            }}
             inputmode="url"
             testId="ReceiptUrlInput"
             clearable
@@ -867,7 +898,7 @@
               appearance="link"
               underlined={false}
               disabled={locating}
-              onClick={detectLocation}
+              onClick={() => detectLocation()}
               testId="DetectLocationButton">{$translate('transactions.detect_geolocation')}</Button
             >{/if}
         </div>

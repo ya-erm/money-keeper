@@ -208,6 +208,8 @@ export type Transaction = {
   receiptUrl?: string | null;
   /** Hidden organization name from receipt merchant details, used to reuse the user's comment and category. */
   receiptOrganizationName?: string | null;
+  /** Hidden store address and city from the receipt, used to reuse a previous operation's location. */
+  receiptAddress?: string | null;
   /** Individual purchase items from the fiscal receipt. */
   purchaseItems?: PurchaseItem[];
   /** Result of the reconciliation with a bank statement, absent if the operation was not checked yet */
