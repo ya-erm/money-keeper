@@ -59,6 +59,9 @@
   const logger = new Logger('Import/Export');
 
   let rawImport = '';
+  let importFileInput: HTMLInputElement | null = null;
+  let importFileName = '';
+  let readingFile = false;
 
   let v2: {
     categories: Category[];
@@ -101,8 +104,44 @@
   const rawDebtRecords = debtRecordsService.$rawItems;
 
   function parseInput() {
-    v2 = JSON.parse(rawImport);
-    parsed = true;
+    parsed = false;
+    try {
+      const data: unknown = JSON.parse(rawImport.replace(/^\uFEFF/, ''));
+      if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Invalid import object');
+      const values = data as Record<string, unknown>;
+      if (
+        !Object.keys(current).some((key) => Object.hasOwn(values, key)) ||
+        Object.entries(values).some(
+          ([key, value]) => Object.hasOwn(current, key) && key !== 'walletsEnabled' && !Array.isArray(value),
+        ) ||
+        (values.walletsEnabled !== undefined && typeof values.walletsEnabled !== 'boolean')
+      ) {
+        throw new Error('Invalid import collections');
+      }
+      v2 = data as typeof v2;
+      parsed = true;
+    } catch {
+      showErrorToast($translate('import_export.invalid_json'), { testId: 'ImportParseErrorToast' });
+    }
+  }
+
+  async function readImportFile(event: Event) {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || readingFile || uploading) return;
+    readingFile = true;
+    parsed = false;
+    importFileName = '';
+    try {
+      rawImport = (await file.text()).replace(/^\uFEFF/, '');
+      importFileName = file.name;
+      parseInput();
+    } catch {
+      showErrorToast($translate('import_export.file_read_failure'), { testId: 'ImportFileErrorToast' });
+    } finally {
+      readingFile = false;
+    }
   }
 
   $: current = {
@@ -301,12 +340,48 @@
 <Layout title={$translate('import_export.title')} leftSlot={HeaderBackButton}>
   <div class="container p-1">
     <h2>{$translate('import_export.import')}</h2>
+    <input
+      type="file"
+      accept=".json,application/json,text/json"
+      aria-label={$translate('import_export.choose_file')}
+      bind:this={importFileInput}
+      on:change={readImportFile}
+      disabled={readingFile || uploading}
+      data-testId="ImportFileInput"
+      hidden
+    />
+    <Button
+      class="mb-1 w-full"
+      color="white"
+      bordered
+      disabled={readingFile || uploading}
+      onClick={() => importFileInput?.click()}
+      testId="ChooseImportFileButton"
+    >
+      {$translate(readingFile ? 'import_export.reading_file' : 'import_export.choose_file')}
+    </Button>
+    {#if importFileName}<p class="import-file-name" role="status" data-testId="ImportFileName">{importFileName}</p>{/if}
     <label class="flex-col gap-0.5">
       <span>{$translate('import_export.raw_data_json')}:</span>
-      <textarea class="text-area-json" data-testId="ImportTextArea" bind:value={rawImport}></textarea>
+      <textarea
+        class="text-area-json"
+        data-testId="ImportTextArea"
+        bind:value={rawImport}
+        disabled={readingFile || uploading}
+        on:input={() => {
+          parsed = false;
+          importFileName = '';
+        }}></textarea>
     </label>
 
-    <Button data-testId="ParseJsonButton" class="mt-1 w-full" onClick={parseInput} color="white" bordered>
+    <Button
+      data-testId="ParseJsonButton"
+      class="mt-1 w-full"
+      onClick={parseInput}
+      disabled={readingFile || uploading}
+      color="white"
+      bordered
+    >
       {$translate('import_export.parse_data')}
     </Button>
 
@@ -412,6 +487,9 @@
 </Modal>
 
 <style>
+  .import-file-name {
+    overflow-wrap: anywhere;
+  }
   .container {
     height: 100%;
   }
