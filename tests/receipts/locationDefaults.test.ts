@@ -113,9 +113,9 @@ test('learns a receipt address through save, edit, copy and JSON import, then re
   await page.goto('/accounts?account-card=receipt-account', { waitUntil: 'networkidle' });
   const row = page.getByTestId('TransactionListItem').filter({ hasText: 'Edited receipt location' });
   await row.dispatchEvent('pointerdown');
-  await expect(page.getByRole('button', { name: 'Duplicate', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Duplicate', exact: true, includeHidden: true })).toBeVisible();
   await row.dispatchEvent('pointerup');
-  await page.getByRole('button', { name: 'Duplicate', exact: true }).click();
+  await page.getByRole('button', { name: 'Duplicate', exact: true, includeHidden: true }).click();
   const copied = (await exportData(page)).operations.filter(
     (item: Transaction) => item.comment === 'Edited receipt location',
   );
