@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.37.3 - 2026-11-26
+
+### Added
+
+- Settings offer Light, Dark and System themes. System follows device changes immediately, including the startup screen; existing explicit light/dark preferences are preserved.
+
 ## 2.37.1 - 2026-11-26
 
 ### Fixed

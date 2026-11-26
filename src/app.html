@@ -5,12 +5,25 @@
     <meta id="app-theme-color" name="theme-color" content="#f2f2f2" />
     <script>
       // Runs before CSS or application code. Storage can be unavailable in private browsing.
-      try {
-        if (localStorage.getItem('mk_dark_mode') === 'true') {
+      (() => {
+        let theme = 'system';
+        try {
+          let saved;
+          try {
+            saved = JSON.parse(localStorage.getItem('mk_theme') || 'null');
+          } catch (_) {}
+          if (saved === 'light' || saved === 'dark' || saved === 'system') theme = saved;
+          else {
+            const legacy = localStorage.getItem('mk_dark_mode');
+            if (legacy === 'true') theme = 'dark';
+            else if (legacy === 'false') theme = 'light';
+          }
+        } catch (_) {}
+        if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
           document.documentElement.dataset.startupTheme = 'dark';
           document.getElementById('app-theme-color').content = '#000000';
         }
-      } catch (_) {}
+      })();
       try {
         const localeCookie = document.cookie.match(/(?:^|;\s*)locale=([^;]*)/);
         const locale = localeCookie ? decodeURIComponent(localeCookie[1]) : navigator.language;
