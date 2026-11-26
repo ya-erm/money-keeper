@@ -13,6 +13,8 @@
   export let onSelect: (icon: string | null) => void;
 
   export let icons: string[] = Object.values(categoryIcons).flat();
+  export let allowEmpty = false;
+  export let selectionEnabled = true;
 
   const tabs = [
     { id: 'recommended', title: $translate('icons.recommended') },
@@ -26,6 +28,14 @@
   <MultiSwitch options={tabs} selected={selectedTab} onChange={(value) => (selectedTab = value)} />
   {#if selectedTab.id === 'recommended'}
     <div class="w-full grid">
+      {#if allowEmpty}<GridCircleItem
+          icon="mdi:cancel"
+          dataId="none"
+          testId="IconChoice"
+          text={$translate('icons.none')}
+          onClick={() => onSelect(null)}
+          selected={selectionEnabled && !icon}
+        />{/if}
       {#each icons as item (item)}
         <GridCircleItem
           icon={item}
@@ -33,7 +43,7 @@
           testId="IconChoice"
           text=""
           onClick={() => onSelect(item)}
-          selected={item === icon}
+          selected={selectionEnabled && item === icon}
         />
       {/each}
     </div>

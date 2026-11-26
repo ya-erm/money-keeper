@@ -9,7 +9,7 @@
       <slot />
     </a>
   {:else}
-    <button class="item" on:click={onClick}>
+    <button type="button" class="item" on:click={onClick}>
       <slot />
     </button>
   {/if}

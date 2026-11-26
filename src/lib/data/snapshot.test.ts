@@ -18,6 +18,25 @@ function transaction(overrides: Partial<Transaction> = {}): Transaction {
 }
 
 describe('reduceJournal', () => {
+  it('preserves participant avatar preferences through journal compaction and JSON backups', () => {
+    const participant = {
+      id: 'alex',
+      name: 'Alex',
+      avatarColor: '#2563eb',
+      avatarIcon: 'mdi:cat',
+      avatarId: 'c03cd2f9-25df-46a6-953c-c23e7c147d11',
+    };
+    const snapshot = reduceJournal([{ order: 1, data: { participant } }]);
+    const imported = reduceJournal([{ order: 1, data: { snapshot: JSON.parse(JSON.stringify(snapshot)) } }]);
+    expect(imported.participants).toEqual([participant]);
+    const reset = { id: 'alex', name: 'Alex' };
+    expect(
+      reduceJournal([
+        { order: 1, data: { snapshot: imported } },
+        { order: 2, data: { participant: reset } },
+      ]).participants,
+    ).toEqual([reset]);
+  });
   it('preserves contacts, manual debts and embedded payment portions through compaction and old backups', () => {
     const debtContact = { id: 'anna', name: 'Anna', grammaticalForm: 'feminine' as const };
     const debtRecord = { id: 'old-debt', contactId: 'anna', amount: -20, currency: 'EUR', date: '2026-11-01' };
