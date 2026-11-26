@@ -23,7 +23,8 @@ export function findReceiptLocation(
   const address = normalizeReceiptAddress(receiptAddress);
   if (!address) return;
 
-  let latest: Transaction | undefined;
+  let position: Coordinates | undefined;
+  let latestId = '';
   let latestTime = -Infinity;
   for (const operation of operations) {
     if (
@@ -40,10 +41,11 @@ export function findReceiptLocation(
     }
     const time = Date.parse(operation.date);
     if (!Number.isFinite(time)) continue;
-    if (!latest || time > latestTime || (time === latestTime && operation.id > latest.id)) {
-      latest = operation;
+    if (time > latestTime || (time === latestTime && operation.id > latestId)) {
+      position = { latitude: operation.locationLat, longitude: operation.locationLng };
+      latestId = operation.id;
       latestTime = time;
     }
   }
-  if (latest) return { latitude: latest.locationLat!, longitude: latest.locationLng! };
+  return position;
 }
