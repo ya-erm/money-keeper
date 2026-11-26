@@ -261,9 +261,13 @@ test('a delayed automatic GPS result cannot overwrite a receipt location', async
     Object.defineProperty(navigator, 'geolocation', {
       value: {
         getCurrentPosition: (success: PositionCallback) => {
-          window.addEventListener('task4-gps-result', () => success({ coords: position } as GeolocationPosition), {
-            once: true,
-          });
+          window.addEventListener(
+            'task4-gps-result',
+            () => success({ coords: position } as unknown as GeolocationPosition),
+            {
+              once: true,
+            },
+          );
         },
       },
     });
