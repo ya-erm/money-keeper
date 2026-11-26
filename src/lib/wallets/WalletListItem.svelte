@@ -8,6 +8,7 @@
   export let ownerName: string;
   export let balances: { currency: string; amount: number }[];
   export let draggable = false;
+  export let placeholder = false;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
   export let onClick: () => void;
@@ -18,6 +19,7 @@
   type="button"
   {disabled}
   class:draggable
+  class:placeholder
   aria-label={ariaLabel ?? wallet.name}
   data-testId="WalletListItem"
   data-id={wallet.id}
@@ -30,17 +32,17 @@
   <span class="identity"
     ><span>{wallet.name}</span>{#if ownerName}<small>{ownerName}</small>{/if}</span
   >
-  <span class="balances">
-    {#each shown as balance (balance.currency)}<span
-        >{#if $settingsStore.hideBalances}<HiddenMoney currency={balance.currency} />{:else}{formatDebtMoney(
-            balance.amount,
-            { currency: balance.currency },
-          )}{/if}</span
-      >{/each}
-    {#if !shown.length}<span
-        >{#if $settingsStore.hideBalances}<HiddenMoney />{:else}0{/if}</span
-      >{/if}
-  </span>
+  {#if !placeholder}<span class="balances">
+      {#each shown as balance (balance.currency)}<span
+          >{#if $settingsStore.hideBalances}<HiddenMoney currency={balance.currency} />{:else}{formatDebtMoney(
+              balance.amount,
+              { currency: balance.currency },
+            )}{/if}</span
+        >{/each}
+      {#if !shown.length}<span
+          >{#if $settingsStore.hideBalances}<HiddenMoney />{:else}0{/if}</span
+        >{/if}
+    </span>{/if}
   <slot name="end" />
 </button>
 
@@ -100,6 +102,9 @@
   small {
     color: var(--secondary-text-color);
     font-size: 0.85rem;
+  }
+  .placeholder .identity > span {
+    color: var(--secondary-text-color);
   }
   .balances {
     display: flex;
