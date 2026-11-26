@@ -1,6 +1,6 @@
 {
   "name": "money-keeper",
-  "version": "2.35.9",
+  "version": "2.37.1",
   "private": true,
   "scripts": {
     "dev": "vite dev",

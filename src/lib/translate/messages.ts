@@ -1,7 +1,9 @@
 import type { DebtMessage } from './debtMessages';
+import type { WalletMessage } from './walletMessages';
 
 export type Messages =
   | DebtMessage
+  | WalletMessage
   | 'app.title'
   | 'receipts.manual'
   | 'receipts.qr_code'
@@ -430,6 +432,7 @@ export type Messages =
   | 'known_places.delete_confirm'
   | 'known_places.operations_count'
   | 'currency_rates.default_currency'
+  | 'currency_rates.recent_currencies'
   | 'currency_rates.new_currency_rate'
   | 'currency_rates.currency1'
   | 'currency_rates.currency2'
@@ -474,6 +477,9 @@ export type Messages =
   // Settings
   | 'settings.title'
   | 'settings.known_places'
+  | 'settings.interface'
+  | 'settings.account'
+  | 'settings.integrations'
   | 'settings.common'
   | 'settings.language'
   | 'settings.select_language'

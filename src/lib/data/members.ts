@@ -115,6 +115,11 @@ export class MembersService implements Initialisable, JournalSubscriber {
     await journalService.addOperationToQueue({ knownPlaces }, { upload: options?.upload ?? true });
   }
 
+  async updateWalletsEnabled(walletsEnabled: boolean, upload = true) {
+    await journalService.addOperationToQueue({ walletsEnabled }, { upload });
+    await this.updateSettings({ walletsEnabled });
+  }
+
   /** Delete member */
   async deleteMember(member: Member) {
     const db = await useDB();
@@ -122,9 +127,15 @@ export class MembersService implements Initialisable, JournalSubscriber {
   }
 
   /** Save accounts order */
-  saveAccountsOrder(accountsOrder: string[]) {
-    void journalService.addOperationToQueue({ accountsOrder });
-    void this.updateSettingsInMemory({ accountsOrder });
+  async saveAccountsOrder(accountsOrder: string[]) {
+    const { participantsService, selectedParticipantStore } = await import('./participants');
+    const { get } = await import('svelte/store');
+    if (get(selectedParticipantStore)) {
+      await participantsService.updatePreferences({ accountsOrder });
+      return;
+    }
+    await journalService.addOperationToQueue({ accountsOrder });
+    await this.updateSettings({ accountsOrder });
   }
 
   /** Save categories order */
@@ -137,7 +148,7 @@ export class MembersService implements Initialisable, JournalSubscriber {
   async applyChanges(changes: JournalItem[], saveToDB: boolean) {
     const mergedSettings: Pick<
       MemberSettings,
-      'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder' | 'knownPlaces'
+      'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder' | 'knownPlaces' | 'walletsEnabled'
     > = {};
     for (const { data } of changes) {
       if (data.snapshot) {
@@ -146,11 +157,13 @@ export class MembersService implements Initialisable, JournalSubscriber {
         mergedSettings.categoriesInOrder = data.snapshot.categoriesInOrder ?? [];
         mergedSettings.categoriesOutOrder = data.snapshot.categoriesOutOrder ?? [];
         mergedSettings.knownPlaces = data.snapshot.knownPlaces ?? [];
+        mergedSettings.walletsEnabled = data.snapshot.walletsEnabled ?? false;
       }
       if (data.accountsOrder) mergedSettings.accountsOrder = data.accountsOrder;
       if (data.categoriesInOrder) mergedSettings.categoriesInOrder = data.categoriesInOrder;
       if (data.categoriesOutOrder) mergedSettings.categoriesOutOrder = data.categoriesOutOrder;
       if (data.knownPlaces) mergedSettings.knownPlaces = data.knownPlaces;
+      if (data.walletsEnabled !== undefined) mergedSettings.walletsEnabled = data.walletsEnabled;
     }
     if (Object.keys(mergedSettings).length > 0) {
       await this.updateSettings({ ...mergedSettings }, saveToDB);

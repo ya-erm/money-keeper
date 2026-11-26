@@ -116,6 +116,33 @@ test('learns a receipt address through save, edit, copy and JSON import, then re
   await expect(page.getByRole('button', { name: 'Duplicate', exact: true, includeHidden: true })).toBeVisible();
   await row.dispatchEvent('pointerup');
   await page.getByRole('button', { name: 'Duplicate', exact: true, includeHidden: true }).click();
+  // Duplication saves asynchronously; do not unload its document before the database write completes.
+  await expect(row).toHaveCount(2);
+  await expect
+    .poll(() =>
+      page.evaluate(async () => {
+        const db = await new Promise<IDBDatabase>((resolve, reject) => {
+          const request = indexedDB.open('mk-2');
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+        try {
+          return await new Promise<number>((resolve, reject) => {
+            const request = db.transaction('transactions').objectStore('transactions').getAll();
+            request.onsuccess = () =>
+              resolve(
+                request.result.filter(
+                  (item: Transaction) => !item.deleted && item.comment === 'Edited receipt location',
+                ).length,
+              );
+            request.onerror = () => reject(request.error);
+          });
+        } finally {
+          db.close();
+        }
+      }),
+    )
+    .toBe(2);
   const copied = (await exportData(page)).operations.filter(
     (item: Transaction) => item.comment === 'Edited receipt location',
   );

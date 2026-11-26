@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { participantHistoryStore } from '#lib/data/participants.js';
   import dayjs from 'dayjs';
   import { onMount } from 'svelte';
 
@@ -23,6 +24,11 @@
     memberSettingsStore,
     debtContactsService,
     debtRecordsService,
+    participantsService,
+    walletsService,
+    walletsStore,
+    walletTransfersService,
+    walletTransfersStore,
   } from '#lib/data/index.js';
   import type {
     Account,
@@ -35,6 +41,9 @@
     Repeating,
     Tag,
     Transaction,
+    Participant,
+    VirtualWallet,
+    WalletTransfer,
   } from '#lib/data/interfaces.js';
   import type {
     CompactJournalRequestData,
@@ -63,6 +72,10 @@
     knownPlaces?: KnownPlace[];
     debtContacts?: DebtContact[];
     debtRecords?: DebtRecord[];
+    participants?: Participant[];
+    virtualWallets?: VirtualWallet[];
+    walletTransfers?: WalletTransfer[];
+    walletsEnabled?: boolean;
   } = {
     categories: [],
     accountTags: [],
@@ -76,27 +89,40 @@
   };
 
   let parsed = false;
+  const rawCategories = categoriesService.$rawItems;
+  const rawAccountTags = accountTagsService.$rawItems;
+  const rawAccounts = accountsService.$rawItems;
+  const rawOperationTags = operationTagsService.$rawItems;
+  const rawOperations = operationsService.$rawItems;
+  const rawCurrencyRates = currencyRatesService.$rawItems;
+  const rawGroupings = groupingsService.$rawItems;
+  const rawRepeatings = repeatingsService.$rawItems;
+  const rawDebtContacts = debtContactsService.$rawItems;
+  const rawDebtRecords = debtRecordsService.$rawItems;
 
   function parseInput() {
     v2 = JSON.parse(rawImport);
     parsed = true;
   }
 
-  let current = {
-    categories: categoriesService.items,
-    accountTags: accountTagsService.items,
-    accounts: accountsService.items,
-    operationTags: operationTagsService.items,
-    operations: operationsService.items,
-    currencyRates: currencyRatesService.items,
-    groupings: groupingsService.items,
-    repeatings: repeatingsService.items,
+  $: current = {
+    walletsEnabled: $memberSettingsStore?.walletsEnabled ?? false,
+    participants: $participantHistoryStore,
+    virtualWallets: $walletsStore,
+    walletTransfers: $walletTransfersStore,
+    categories: $rawCategories,
+    accountTags: $rawAccountTags,
+    accounts: $rawAccounts,
+    operationTags: $rawOperationTags,
+    operations: $rawOperations,
+    currencyRates: $rawCurrencyRates,
+    groupings: $rawGroupings,
+    repeatings: $rawRepeatings,
     knownPlaces: $memberSettingsStore?.knownPlaces ?? [],
-    debtContacts: debtContactsService.items,
-    debtRecords: debtRecordsService.items,
+    debtContacts: $rawDebtContacts,
+    debtRecords: $rawDebtRecords,
   };
 
-  // eslint-disable-next-line svelte/no-immutable-reactive-statements
   $: currentJson = JSON.stringify(current, null, 2);
   $: currentJsonFile = new Blob([currentJson], { type: 'text/json' });
 
@@ -114,6 +140,25 @@
       await mainService.init();
 
       let count = 0;
+      if (
+        v2.walletsEnabled !== undefined &&
+        v2.walletsEnabled !== membersService.selectedMemberSettings?.walletsEnabled
+      ) {
+        await membersService.updateWalletsEnabled(v2.walletsEnabled, false);
+        count += 1;
+      }
+      for (const participant of v2.participants?.filter(notExists(participantsService.items)) ?? []) {
+        await journalService.addOperationToQueue({ participant }, { upload: false });
+        count += 1;
+      }
+      for (const virtualWallet of v2.virtualWallets?.filter(notExists(walletsService.items)) ?? []) {
+        await journalService.addOperationToQueue({ virtualWallet }, { upload: false });
+        count += 1;
+      }
+      for (const walletTransfer of v2.walletTransfers?.filter(notExists(walletTransfersService.items)) ?? []) {
+        await journalService.addOperationToQueue({ walletTransfer }, { upload: false });
+        count += 1;
+      }
 
       for (const debtContact of v2.debtContacts?.filter(notExists(debtContactsService.items)) ?? []) {
         await journalService.addOperationToQueue({ debtContact }, { upload: false });
@@ -278,6 +323,9 @@
         <span>{$translate('debts.contacts')}: <b>{v2.debtContacts?.length ?? 0}</b></span>
         <span>{$translate('debts.title')}: <b>{v2.debtRecords?.length ?? 0}</b></span>
         <span>{$translate('settings.known_places')}: <b>{v2.knownPlaces?.length ?? 0}</b></span>
+        <span>{$translate('wallets.participants')}: <b>{v2.participants?.length ?? 0}</b></span>
+        <span>{$translate('wallets.title')}: <b>{v2.virtualWallets?.length ?? 0}</b></span>
+        <span>{$translate('wallets.internal')}: <b>{v2.walletTransfers?.length ?? 0}</b></span>
       </p>
 
       <Button data-testId="AddToJournalButton" disabled={uploading} class="w-full" onClick={addToJournal}>
@@ -314,6 +362,9 @@
       <span>{$translate('debts.contacts')}: <b>{current.debtContacts.length}</b></span>
       <span>{$translate('debts.title')}: <b>{current.debtRecords.length}</b></span>
       <span>{$translate('settings.known_places')}: <b>{current.knownPlaces?.length ?? 0}</b></span>
+      <span>{$translate('wallets.participants')}: <b>{current.participants.length}</b></span>
+      <span>{$translate('wallets.title')}: <b>{current.virtualWallets.length}</b></span>
+      <span>{$translate('wallets.internal')}: <b>{current.walletTransfers.length}</b></span>
     </p>
     <a href={URL.createObjectURL(currentJsonFile)} download={`export-${dayjs().format('YYYY-MM-DD')}.json`}>
       <Button class="w-full">{$translate('import_export.save')}</Button>

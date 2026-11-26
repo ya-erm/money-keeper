@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { browser } from '$app/env';
+  import { $initialized as dataInitialized } from '#lib/data/initialized.js';
   import { goto } from '$app/navigation';
   import { page } from '#lib/page.js';
 
+  import { participantsStore, selectedParticipantStore } from '#lib/data/participants.js';
   import { accountsStore } from '#lib/data/index.js';
   import type { Account } from '#lib/data/interfaces.js';
   import { route } from '#lib/routes.js';
@@ -27,9 +30,12 @@
     void deleteSearchParam($page, 'action');
   }
 
-  $: sortable = action === 'sort';
+  $: sortable =
+    $dataInitialized &&
+    action === 'sort' &&
+    (!$participantsStore.some((item) => !item.archived) || !!$selectedParticipantStore);
 
-  $: if (action === 'sort' && !sortable) {
+  $: if (browser && $dataInitialized && action === 'sort' && !sortable) {
     void goto('?', { replace: true });
   }
 
@@ -39,7 +45,10 @@
 </script>
 
 <Layout title={$translate('accounts.title')} leftSlot={HeaderBackButton} rightSlot={AccountListButtons}>
-  <AccountList {accounts} {onClick} bind:sortable />
+  {#if $participantsStore.some((item) => !item.archived) && !$selectedParticipantStore}<p class="px-1">
+      <a href="/settings/participants">{$translate('wallets.choose_for_sorting')}</a>
+    </p>{/if}
+  <AccountList {accounts} {onClick} {sortable} />
 </Layout>
 
 {#if opened}

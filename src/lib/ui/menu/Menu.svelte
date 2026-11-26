@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '#lib/page.js';
   import { derived } from 'svelte/store';
+  import { onMount } from 'svelte';
 
   import Icon from '@ya-erm/svelte-ui/Icon';
 
@@ -8,6 +9,10 @@
   import { translate } from '#lib/translate/index.js';
 
   import { menu } from './menu';
+  let mounted = false;
+  onMount(() => {
+    mounted = true;
+  });
 
   const isActive = derived(page, (page) => {
     return (path: string) => page.url.pathname.startsWith(path);
@@ -20,12 +25,12 @@
 
 <nav class="menu-bar" class:hidden={$hidden}>
   <div class="menu-title">{$translate('app.title')}</div>
-  {#each $menu as item (item.path)}
-    <a href={item.path} class="menu-item" data-testId="MenuItem" class:active={$isActive(item.path)}>
-      <Icon name={item.icon} size={1.5} />
-      <span class="text">{$translate(item.title)}</span>
-    </a>
-  {/each}
+  {#if mounted}{#each $menu as item (item.path)}
+      <a href={item.path} class="menu-item" data-testId="MenuItem" class:active={$isActive(item.path)}>
+        <Icon name={item.icon} size={1.5} />
+        <span class="text">{$translate(item.title)}</span>
+      </a>
+    {/each}{/if}
 </nav>
 
 <style>

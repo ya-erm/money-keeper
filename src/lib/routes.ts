@@ -6,6 +6,15 @@ type Route = {
 };
 
 type RouteKey =
+  | 'settings.participants'
+  | 'settings.participants.create'
+  | 'settings.participants.edit'
+  | 'settings.wallets'
+  | 'wallets'
+  | 'wallets.transfer'
+  | 'wallets.list'
+  | 'wallets.create'
+  | 'wallets.edit'
   | 'debts'
   | 'debts.contacts'
   | 'root'
@@ -45,6 +54,15 @@ type RouteKey =
   | 'uikit';
 
 export const routes: { [key in RouteKey]: Route } = {
+  'settings.participants.create': { path: '/settings/participants/create', title: 'wallets.new_participant' },
+  'settings.participants.edit': { path: '/settings/participants/edit', title: 'wallets.edit_participant' },
+  'settings.participants': { path: '/settings/participants', title: 'wallets.participants' },
+  'settings.wallets': { path: '/settings/wallets', title: 'wallets.title' },
+  'wallets.transfer': { path: '/wallets/transfer', title: 'wallets.transfer' },
+  'wallets.list': { path: '/wallets/list', title: 'wallets.list' },
+  'wallets.create': { path: '/wallets/create', title: 'wallets.new' },
+  'wallets.edit': { path: '/wallets/edit', title: 'wallets.edit_wallet' },
+  wallets: { path: '/wallets', title: 'wallets.title' },
   debts: { path: '/debts', title: 'debts.title' },
   'debts.contacts': { path: '/debts/contacts', title: 'debts.contacts' },
   root: {

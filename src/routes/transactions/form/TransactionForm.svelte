@@ -66,6 +66,11 @@
   import CategorySelect from './CategorySelect.svelte';
   import RepeatingTypeModal from './RepeatingTypeModal.svelte';
   import TypeSwitch from './TypeSwitch.svelte';
+  import AllocationEditor from '#lib/wallets/AllocationEditor.svelte';
+  import { convertAllocation, validateAllocation, nonzeroAllocation } from '#lib/wallets/calculations.js';
+  import { walletsService } from '#lib/data/wallets.js';
+  import { selectedParticipantStore } from '#lib/data/participants.js';
+  import type { WalletAllocation } from '#lib/data/interfaces.js';
 
   $: settings = $memberSettingsStore;
 
@@ -115,6 +120,24 @@
   $: destinationAccountCurrency = accounts.find(({ id }) => id === destinationAccountId)?.currency;
 
   let destinationAmountTouched = false;
+  let walletAllocation: WalletAllocation | undefined = structuredClone(
+    (isTransfer ? sourceTransaction : transaction)?.walletAllocation,
+  );
+  let destinationWalletAllocation: WalletAllocation | undefined = structuredClone(
+    destinationTransaction?.walletAllocation,
+  );
+  let automaticDestinationAllocation = !transaction;
+  $: if (type === 'TRANSFER' && automaticDestinationAllocation) {
+    destinationWalletAllocation = convertAllocation(
+      walletAllocation,
+      Number(_value1),
+      Number(_value2),
+      destinationAccountCurrency ?? 'EUR',
+    );
+  }
+  $: if (!transaction && !accountId && $selectedParticipantStore) {
+    accountId = accounts.find((account) => !account.archived)?.id;
+  }
 
   let _value1 = (isTransfer ? sourceTransaction?.amount : transaction?.amount)?.toString() ?? '';
   let _value2 = destinationTransaction?.amount?.toString() ?? transaction?.anotherCurrencyAmount?.toString() ?? '';
@@ -513,6 +536,7 @@
         date: datetime,
         ...(timeZone ? { timeZone } : {}),
         amount: checkNumberFormParameter(formData, 'amount'),
+        ...(walletAllocation ? { walletAllocation: structuredClone(walletAllocation) } : {}),
         comment: checkStringOptionalFormParameter(formData, 'comment'),
         ...(description.trim() ? { description: description.trim() } : {}),
         ...(receiptUrl.trim() ? { receiptUrl: receiptUrl.trim() } : {}),
@@ -539,6 +563,7 @@
           date: datetime,
           ...(timeZone ? { timeZone } : {}),
           amount: checkNumberFormParameter(formData, 'destinationAmount'),
+          ...(destinationWalletAllocation ? { walletAllocation: structuredClone(destinationWalletAllocation) } : {}),
           comment: checkStringOptionalFormParameter(formData, 'comment')?.trim(),
           ...(destinationTransaction?.description ? { description: destinationTransaction.description } : {}),
 
@@ -562,6 +587,24 @@
           ...(locationLat !== null && locationLng !== null ? { locationLat, locationLng } : {}),
         });
         transactions[0].linkedTransactionId = transactions[1].id;
+      }
+
+      for (const item of transactions) {
+        const cleaned = nonzeroAllocation(item.walletAllocation);
+        if (cleaned) item.walletAllocation = cleaned;
+        else delete item.walletAllocation;
+        const currency = accounts.find((account) => account.id === item.accountId)?.currency ?? '';
+        if (
+          !validateAllocation(item.walletAllocation, item.amount, currency, [
+            ...walletsService.items,
+            ...walletsService.deletedItems
+              .filter((wallet) => transaction?.walletAllocation?.shares.some((share) => share.walletId === wallet.id))
+              .map((wallet) => ({ ...wallet, deleted: false })),
+          ])
+        ) {
+          showErrorToast($translate('wallets.invalid'));
+          return;
+        }
       }
 
       if (type !== 'TRANSFER' && debt) {
@@ -722,6 +765,34 @@
         </div>
       {/if}
     </div>
+    <AllocationEditor
+      bind:allocation={walletAllocation}
+      currency={accountCurrency ?? 'EUR'}
+      amount={Number(_value1)}
+      useDefault={!transaction && (!!$selectedParticipantStore || !!getSearchParam($page, 'walletId'))}
+      initialWalletId={getSearchParam($page, 'walletId')}
+    />
+    {#if type === 'TRANSFER'}
+      <div class="flex-col gap-0.5">
+        <InputLabel text={$translate('transactions.to')} />
+        <Checkbox bind:checked={automaticDestinationAllocation} label={$translate('wallets.convert_proportionally')} />
+        {#if automaticDestinationAllocation}
+          {#each destinationWalletAllocation?.shares ?? [] as share (share.walletId)}
+            <div>
+              {walletsService.getById(share.walletId)?.name ?? '…'}: {formatMoney(share.amount, {
+                currency: destinationAccountCurrency,
+              })}
+            </div>
+          {/each}
+        {:else}
+          <AllocationEditor
+            bind:allocation={destinationWalletAllocation}
+            currency={destinationAccountCurrency ?? 'EUR'}
+            amount={Number(_value2)}
+          />
+        {/if}
+      </div>
+    {/if}
     <Input
       label={$translate('transactions.comment')}
       name="comment"

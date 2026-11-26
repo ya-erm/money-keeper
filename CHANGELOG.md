@@ -1,5 +1,87 @@
 # Changelog
 
+## 2.37.1 - 2026-11-26
+
+### Fixed
+
+- Wallet transfer actions are named Transfer. New transfers start from the current wallet and require an explicit destination choice, including unallocated funds.
+
+## 2.37.0 - 2026-11-23
+
+### Added
+
+- Compact wallet allocation presets use participant names, shared spending and a custom-settings option. Custom shares have wallet-icon selectors, clearable amounts and delete controls.
+- Payments may be partially allocated; the remainder stays unallocated. Currency conversion preserves the unallocated proportion and zero-value shares are omitted from saved history.
+
+## 2.36.7 - 2026-11-23
+
+### Changed
+
+- Account and wallet sorting toolbars slide between search and sorting controls. Toggling sorting off prompts to save or discard a changed order; dismissing the dialog keeps the draft.
+
+## 2.36.6 - 2026-11-23
+
+### Changed
+
+- With wallets disabled, navigation shows Debts, Categories, Accounts, Analytics and Settings.
+- Wallet enablement has a smaller, closely grouped explanation describing savings goals and monthly budgeting.
+
+## 2.36.5 - 2026-11-23
+
+### Changed
+
+- Removed participant-specific account/wallet hiding and its sorting controls. Earlier visibility preferences are ignored in cards, selectors, default allocations and startup; personal order remains synchronized.
+
+## 2.36.4 - 2026-11-23
+
+### Fixed
+
+- Wallet currency selection stays centered in the visual viewport above the mobile keyboard, follows viewport panning/resizing, and scrolls internally when space is limited.
+
+## 2.36.3 - 2026-11-23
+
+### Changed
+
+- Reallocation uses the same date/time inputs as operations, with a full-width Save button at the bottom and Back navigation instead of Cancel.
+- Expanded wallet icon suggestions from 16 to 50 to fill the mobile picker with more savings, home, travel, shopping and hobby choices.
+- Shared operations show an outlined participant icon and rounded percentage ratios (50/50, 37/63). Percentages total 100; tags no longer have a middle-dot prefix.
+
+## 2.36.2 - 2026-11-22
+
+### Added
+
+- Wallet reallocation has its own page with wallet preview selectors, recent currency badges and editable date/time.
+- Wallet cards open the editor directly. Wallet icons support bundled suggestions and custom Iconify sets.
+- Wallet settings explain virtual wallets immediately below the enable switch.
+
+## 2.36.1 - 2026-11-22
+
+### Added
+
+- Participant selection uses a compact “On this device” label and dropdown on the same row.
+- Dark theme uses a moon icon in Settings.
+- Account and wallet order/visibility are configured in their list pages for the selected participant. Wallets have an account-style list with drag sorting and explicit visibility controls; profile editing no longer duplicates these settings.
+
+## 2.36.0 - 2026-11-22
+
+### Added
+
+- Optional virtual wallets with multiple currencies, named participant profiles, synchronized personal account/wallet order, visibility, display currency and default allocation presets.
+- Wallet operation lists share the account counter and daily headers, show daily expense shares by currency, and provide a create-wallet shortcut in the header.
+- Manage wallets as cards with an options menu. Create and edit wallets on separate pages; archive, restore and confirm deletion from the editor.
+- Settings are organized into Interface, Common and Account sections, followed by integrations and app tools. Every setting has a recognizable icon.
+- Shared payments use a two-person icon in the metadata line after debt participants, instead of an extra line of wallet names and amounts. The same silhouette identifies Participants in settings.
+- Participants have a device-profile dropdown and an avatar list highlighting the current selection. Each row opens a separate editor; confirmed deletion preserves wallet and contribution history.
+- Main currency is configured once in Settings and saved to the selected participant for synchronization. Recently used currency badges stay in one horizontally scrolling row; reopening the dialog refreshes its value.
+- Allocate real payments across wallets, split equally or enter exact shares. Allocate both sides of a currency exchange using the recorded bank amounts and deterministic rounding.
+- Internal wallet transfers, unallocated balances by currency, shared savings contributions and returns, and wallet history linked to the original payments.
+- Wallet-first startup and expense/receipt QR shortcuts for the selected participant. Categories are available in settings; enabled wallets occupy the central menu position.
+- Include participants, wallets, transfers and enablement in synchronization, encrypted journals, snapshots, compaction and JSON backups.
+
+### Fixed
+
+- Keep two decimal places for RSD accounting even when the runtime's currency formatting defaults to whole dinars.
+
 ## 2.35.9 - 2026-11-26
 
 ### Improved

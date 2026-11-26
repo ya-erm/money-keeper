@@ -59,65 +59,97 @@
   }
 </script>
 
-<ListGroup title={$translate('settings.common')}>
-  <ListSelectItem title={$translate('settings.language')} value={$activeLocaleName} onClick={openLanguageModal} />
-
-  <ListSwitchItem title={$translate('settings.darkMode')} bind:checked={$darkMode} />
-
+<ListGroup title={$translate('settings.interface')}>
+  <ListSelectItem
+    icon="mdi:translate"
+    title={$translate('settings.language')}
+    value={$activeLocaleName}
+    onClick={openLanguageModal}
+  />
+  <ListSwitchItem icon="mdi:moon-waning-crescent" title={$translate('settings.darkMode')} bind:checked={$darkMode} />
   <ListSwitchItem
+    icon="mdi:eye-off-outline"
     title={$translate('settings.hideBalances')}
     bind:checked={balancesHidden}
     onChange={handleHideBalancesChange}
   />
-  <ListLinkItem title={$translate('currency_rates.title')} href={route('settings.currency_rates')} />
-  <ListLinkItem title={$translate('settings.known_places')} href={route('settings.known_places')} />
-  <ListSelectItem
-    title={$translate('currency_rates.default_currency')}
-    value={memberSettings?.currency ?? ''}
-    onClick={openCurrencyModal}
-  />
 </ListGroup>
 
-<ListGroup title={$translate('settings.profile')}>
+<ListGroup title={$translate('settings.common')}>
+  <ListLinkItem icon="mdi:shape-outline" title={$translate('categories.title')} href={route('categories')} />
+  <ListLinkItem
+    icon="mdi:currency-usd"
+    title={$translate('currency_rates.title')}
+    href={route('settings.currency_rates')}
+  />
+  <ListLinkItem
+    icon="mdi:map-marker-outline"
+    title={$translate('settings.known_places')}
+    href={route('settings.known_places')}
+  />
+  <ListLinkItem icon="mdi:repeat" title={$translate('settings.repeatings')} href={route('repeatings')} />
+</ListGroup>
+
+<ListGroup title={$translate('settings.account')}>
   {#if !userIsLoggedIn}
-    <ListLinkItem title={$translate('auth.sign_in')} href={route('login')} />
+    <ListLinkItem icon="mdi:login" title={$translate('auth.sign_in')} href={route('login')} />
   {:else}
     <ListSelectItem
+      icon="mdi:account-outline"
       title={$translate('auth.login')}
       value={selectedMember?.login ?? undefined}
       onClick={openChangeLoginModal}
     />
   {/if}
-  <ListLinkItem title={$translate('settings.import_export')} href={route('settings.import_export')} />
-  {#if userIsLoggedIn}
-    <ListLinkItem title={$translate('settings.api_tokens')} href={route('settings.api_tokens')} />
-  {/if}
-  <ListLinkItem title={$translate('settings.repeatings')} href={route('repeatings')} />
+  <ListLinkItem icon="ion:people" title={$translate('wallets.participants')} href={route('settings.participants')} />
+  <ListLinkItem icon="mdi:wallet-outline" title={$translate('wallets.title')} href={route('settings.wallets')} />
+  <ListSelectItem
+    icon="mdi:cash-multiple"
+    title={$translate('currency_rates.default_currency')}
+    value={memberSettings?.currency ?? ''}
+    onClick={openCurrencyModal}
+  />
+  <ListLinkItem
+    icon="mdi:swap-vertical"
+    title={$translate('settings.import_export')}
+    href={route('settings.import_export')}
+  />
 </ListGroup>
 
+{#if userIsLoggedIn}
+  <ListGroup title={$translate('settings.integrations')}>
+    <ListLinkItem
+      icon="mdi:key-outline"
+      title={$translate('settings.api_tokens')}
+      href={route('settings.api_tokens')}
+    />
+  </ListGroup>
+{/if}
+
 <ListGroup title={$translate('settings.about')}>
-  <ListLinkItem title={$translate('settings.changelog')} href={route('settings.changelog')} />
-  <ListLinkItem title={$translate('settings.report_problem')} href="https://github.com/ya-erm/money-keeper/issues" />
+  <ListLinkItem icon="mdi:history" title={$translate('settings.changelog')} href={route('settings.changelog')} />
+  <ListLinkItem
+    icon="mdi:bug-outline"
+    title={$translate('settings.report_problem')}
+    href="https://github.com/ya-erm/money-keeper/issues"
+  />
 </ListGroup>
 
 <ListGroup title={$translate('settings.debug_tools')}>
-  <ListLinkItem title={$translate('settings.logs')} href={route('settings.logs')} />
-  <ListLinkItem title="UI Kit" href={route('uikit')} />
+  <ListLinkItem icon="mdi:text-box-search-outline" title={$translate('settings.logs')} href={route('settings.logs')} />
+  <ListLinkItem icon="mdi:palette-outline" title="UI Kit" href={route('uikit')} />
 </ListGroup>
 
 <div class="mt-1 flex-col items-center gap-0.5">
   {#if userIsLoggedIn}
-    <Button
-      color="danger"
-      appearance="link"
-      underlined={false}
-      onClick={logout}
-      text={$translate('settings.profile.logout')}
-    />
+    <Button color="danger" appearance="link" underlined={false} onClick={logout}
+      ><Icon name="mdi:logout" size={1.25} />{$translate('settings.profile.logout')}</Button
+    >
   {/if}
   <a class="text-decoration-none" href="https://github.com/ya-erm/money-keeper/issues" target="_blank" rel="noreferrer">
     <Button appearance="link" underlined={false}>
       <span>
+        <Icon name="mdi:bug-outline" size={1.25} />
         <span>{$translate('settings.report_problem')}</span>
         <Icon name="ri:external-link-line" size={1} />
       </span>
@@ -126,12 +158,14 @@
   <div class="build-info">
     <span>{$translate('settings.version', { values: { version } })}</span>
     <span>•</span>
-    <Button appearance="link" underlined={false} text="UI Kit" onClick={() => goto(routes.uikit.path)} />
+    <Button appearance="link" underlined={false} onClick={() => goto(routes.uikit.path)}
+      ><Icon name="mdi:palette-outline" size={1.25} />UI Kit</Button
+    >
   </div>
 </div>
 
 <LanguageModal bind:opened={$languageModalOpened} />
-<MainCurrencyModal bind:opened={$currencyModalOpened} />
+{#if $currencyModalOpened}<MainCurrencyModal bind:opened={$currencyModalOpened} />{/if}
 
 <Portal visible={showLogoutPortal}>
   <div class="logout-portal flex-col items-center justify-center h-full">

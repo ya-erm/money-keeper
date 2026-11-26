@@ -4,6 +4,7 @@
 
   import { memberSettingsStore } from '#lib/data/index.js';
   import { debtContactsStore } from '#lib/data/debtContacts.js';
+  import { allocationPercentages } from '#lib/wallets/percentages.js';
   import { personalAmount } from '#lib/debts/calculations.js';
   import { formatDebtMoney } from '#lib/debts/formatMoney.js';
   import type { CurrencyRate, TransactionViewModel } from '#lib/data/interfaces.js';
@@ -22,11 +23,17 @@
   export let onClick: ((transaction: TransactionViewModel) => void) | null = null;
   export let onLongPress: ((transaction: TransactionViewModel) => void) | null = null;
   export let selected: boolean = false;
+  /** Wallet history projects its share without changing the stored bank operation. */
+  export let amountOverride: number | null = null;
+  export let linkedAmountOverride: number | null = null;
   const metadataSeparator = ' · ';
 
   $: incoming = transaction.category.type === 'IN';
   $: outgoing = transaction.category.type === 'OUT';
   $: isTransfer = !!transaction.linkedTransaction;
+  $: percentages = allocationPercentages(transaction.walletAllocation);
+  $: sharedWalletOperation = percentages.length > 1;
+  $: allocationRatio = percentages.join('/');
   $: hasLocation =
     transaction.locationLat != null &&
     transaction.locationLng != null &&
@@ -148,12 +155,13 @@
             : ''}{showDescription ? (transaction.description ?? '') : ''}
         </div>
       {/if}
-      {#if knownPlace?.name || transaction.debt || transaction.tags?.length}
-        <div class="metadata" data-testId="OperationMetadata">
+      {#if knownPlace?.name || transaction.debt || sharedWalletOperation || transaction.tags?.length}
+        <div class="metadata" class:shared={sharedWalletOperation} data-testId="OperationMetadata">
           {#if knownPlace?.name}<span class="place-name" data-testId="OperationPlaceName">{knownPlace.name}</span
-            >{/if}{#if knownPlace?.name && (transaction.debt || transaction.tags?.length)}
+            >{/if}{#if knownPlace?.name && (transaction.debt || sharedWalletOperation)}
             {metadataSeparator}
-          {/if}{#if transaction.debt}<span class="debt-info" data-testId="TransactionDebtInfo">
+          {/if}
+          {#if transaction.debt}<span class="debt-info" data-testId="TransactionDebtInfo">
               <span class="debt-symbol" data-testId="TransactionDebtIcon" aria-hidden="true"
                 ><Icon name="mdi:account-cash-outline" size={1} /></span
               >
@@ -168,10 +176,19 @@
                     },
                   )}{/if}</span
               >
-            </span>{/if}{#if transaction.debt && transaction.tags?.length}
+            </span>{/if}{#if transaction.debt && sharedWalletOperation}
             {metadataSeparator}
           {/if}
+          {#if sharedWalletOperation}<span
+              class="participants-symbol"
+              role="img"
+              aria-label={`${$translate('wallets.shared_operation')}: ${allocationRatio}`}
+              title={`${$translate('wallets.shared_operation')}: ${allocationRatio}`}
+              data-testId="OperationWalletAllocation"
+              ><Icon name="ion:people-outline" size={1} /><span>{allocationRatio}</span></span
+            >{/if}
           {#if transaction.tags?.length}
+            {#if knownPlace?.name || transaction.debt || sharedWalletOperation}&nbsp;{/if}
             <span class="tags">
               {#each transaction.tags as tag (tag.id)}
                 <span class="tag" class:deleted={tag.deleted}>#{tag.name}</span>
@@ -182,15 +199,34 @@
       {/if}
     </div>
     <div class="flex-col items-end">
-      {#if !!transaction.anotherCurrencyAmount}
+      {#if !!transaction.anotherCurrencyAmount && amountOverride === null}
         <span class="other-money-value">
           {formatMoney(transaction.anotherCurrencyAmount, { currency: transaction.anotherCurrency ?? undefined })}
         </span>
       {/if}
       <span class="amount" class:incoming class:outgoing>
-        <span>{incoming ? '+' : outgoing ? '-' : ''}{formatMoney(transaction.amount)}</span>
+        <span>{incoming ? '+' : outgoing ? '-' : ''}{formatMoney(amountOverride ?? transaction.amount)}</span>
         <span class="small-text">{transaction.account.currency}</span>
       </span>
+      {#if linkedAmountOverride !== null && transaction.linkedTransaction}
+        <span
+          class="amount"
+          class:incoming={transaction.linkedTransaction.category.type === 'IN'}
+          class:outgoing={transaction.linkedTransaction.category.type === 'OUT'}
+          data-testId="WalletLinkedAmount"
+        >
+          <span
+            >{transaction.linkedTransaction.category.type === 'IN' ? '+' : '-'}{formatMoney(linkedAmountOverride)}</span
+          >
+          <span class="small-text">{transaction.linkedTransaction.account.currency}</span>
+        </span>
+      {/if}
+      {#if amountOverride !== null && amountOverride !== transaction.amount && !transaction.linkedTransaction}<span
+          class="other-money-value"
+          >{$translate('wallets.total_payment')}: {formatMoney(transaction.amount, {
+            currency: transaction.account.currency,
+          })}</span
+        >{/if}
       {#if currencyRate}
         <span class="other-money-value">
           {formatMoney(transaction.amount * rate, { currency: otherCurrency })}
@@ -301,7 +337,8 @@
   .small-text {
     font-size: 0.9rem;
   }
-  .debt-symbol {
+  .debt-symbol,
+  .participants-symbol {
     display: inline-flex;
     vertical-align: -0.15rem;
   }
@@ -313,6 +350,34 @@
     white-space: nowrap;
     font-size: 0.85rem;
     color: var(--secondary-text-color);
+  }
+  .metadata.shared {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+  }
+  .metadata.shared .place-name {
+    flex-shrink: 0;
+    max-width: 40%;
+  }
+  .metadata.shared .debt-info,
+  .metadata.shared .tags {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .metadata.shared .debt-info {
+    flex: 0 1 auto;
+  }
+  .metadata.shared .tags {
+    flex: 0 2 auto;
+  }
+  .participants-symbol {
+    align-items: center;
+    gap: 0.25em;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .tag:not(:last-child)::after {
     content: ' ';
@@ -330,6 +395,7 @@
     white-space: nowrap;
   }
   .other-money-value {
+    text-align: right;
     opacity: 0.8;
     font-size: 0.75rem;
     color: var(--secondary-text-color);

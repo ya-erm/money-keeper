@@ -2,9 +2,11 @@ import { addMessages } from 'svelte-i18n';
 
 import type { Dictionary } from './types';
 import { debtEn } from './debtMessages';
+import { walletEn } from './walletMessages';
 
 export const enDict: Dictionary = {
   ...debtEn,
+  ...walletEn,
   'app.title': 'Money Keeper',
   'receipts.manual': 'Manually',
   'receipts.scan': 'Scan receipt QR',
@@ -440,6 +442,7 @@ export const enDict: Dictionary = {
   'known_places.delete': 'Delete place?',
   'known_places.delete_confirm': 'Delete “{name}” from saved places? Operation coordinates will remain unchanged',
   'known_places.operations_count': '{count, plural, one {# operation} other {# operations}}',
+  'currency_rates.recent_currencies': 'Recently used currencies',
   'currency_rates.default_currency': 'Main currency',
   'currency_rates.new_currency_rate': 'New currency rate',
   'currency_rates.currency1': 'Currency 1',
@@ -489,6 +492,9 @@ export const enDict: Dictionary = {
   'settings.known_places': 'Known places',
   'settings.language': 'Language',
   'settings.select_language': 'Select language',
+  'settings.interface': 'Interface',
+  'settings.account': 'Account',
+  'settings.integrations': 'Integrations',
   'settings.common': 'Common',
   'settings.darkMode': 'Dark mode',
   'settings.hideBalances': 'Hide amounts',

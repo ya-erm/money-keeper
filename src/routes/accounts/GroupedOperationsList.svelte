@@ -10,6 +10,8 @@
   import HeaderFormSubmitButton from '#lib/ui/layout/HeaderFormSubmitButton.svelte';
   import { findCurrencyRate, formatMoney, getSearchParam, setSearchParam } from '#lib/utils/index.js';
 
+  import OperationDayHeader from '#lib/ui/OperationDayHeader.svelte';
+
   import TransactionListItem from '../transactions/TransactionListItem.svelte';
   import EditTransaction from '../transactions/edit/EditTransaction.svelte';
   import OperationOptionsModal from './OperationOptionsModal.svelte';
@@ -55,16 +57,7 @@
 <ul class="operations-list flex-col gap-1">
   {#each Object.entries(groups) as [date, transactions] (date)}
     {@const dayExpenses = formatDayExpenses(transactions)}
-    <div class="day-header flex items-center justify-between gap-0.5">
-      <span>{dayjs(date).format('DD MMMM YYYY, dddd')}</span>
-      {#if dayExpenses.length}
-        <div class="day-expenses flex-col items-end" data-testId="DayExpenses">
-          {#each dayExpenses as dayExpense (dayExpense)}
-            <span>{dayExpense}</span>
-          {/each}
-        </div>
-      {/if}
-    </div>
+    <OperationDayHeader {date} expenses={dayExpenses} />
     {#each transactions as transaction (transaction.id)}
       <TransactionListItem
         hideAccount={!!account}
@@ -102,12 +95,5 @@
     padding: 0;
     margin: 0;
     padding-top: 1rem;
-  }
-  .day-expenses {
-    flex-shrink: 0;
-    font-size: 0.8rem;
-    color: var(--secondary-text-color);
-    opacity: 0.6;
-    white-space: nowrap;
   }
 </style>

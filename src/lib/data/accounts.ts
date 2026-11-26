@@ -6,6 +6,7 @@ import { accountTagsStore } from './accountTags';
 import type { Account, AccountViewModel, Tag } from './interfaces';
 import { memberSettingsStore } from './members';
 import { BaseService } from './service';
+import { selectedParticipantStore } from './participants';
 
 export class AccountsService extends BaseService<Account> {
   private _accountStore;
@@ -13,8 +14,10 @@ export class AccountsService extends BaseService<Account> {
   constructor() {
     super('AccountsService', 'accounts', 'account');
 
-    this._accountStore = derived([this.$items, accountTagsStore, memberSettingsStore], ([items, tags, settings]) =>
-      this.mapItems(items, tags, settings?.accountsOrder),
+    this._accountStore = derived(
+      [this.$items, accountTagsStore, memberSettingsStore, selectedParticipantStore],
+      ([items, tags, settings, participant]) =>
+        this.mapItems([...items], tags, participant?.accountsOrder ?? settings?.accountsOrder),
     );
   }
 

@@ -14,6 +14,7 @@ export type GlobalSettings = {
   id: 'global';
   selectedMember?: string | null;
   hideBalances?: boolean;
+  selectedParticipants?: Record<string, string>;
 };
 
 export type Member = {
@@ -26,6 +27,7 @@ export type Member = {
 export type EncryptionVersion = 'none' | 'aes+rsa-v1';
 
 export type MemberSettings = {
+  walletsEnabled?: boolean;
   syncNumber: number;
   currency?: string | null;
   encryption?: EncryptionVersion;
@@ -53,6 +55,10 @@ export type JournalItem = {
 };
 
 export type JournalOperation = {
+  walletsEnabled?: boolean;
+  participant?: Participant;
+  virtualWallet?: VirtualWallet;
+  walletTransfer?: WalletTransfer;
   debtContact?: DebtContact;
   debtRecord?: DebtRecord;
   category?: Category;
@@ -105,6 +111,48 @@ export type Account = {
 
 export type AccountViewModel = Account & {
   tags: Tag[];
+};
+
+/** A profile within the existing workspace, independent of authentication. */
+export type Participant = {
+  id: string;
+  name: string;
+  accountsOrder?: string[];
+  walletsOrder?: string[];
+  /** @deprecated Retained for older backups; participant visibility is no longer applied. */
+  hiddenAccountIds?: string[];
+  /** @deprecated Retained for older backups; participant visibility is no longer applied. */
+  hiddenWalletIds?: string[];
+  currency?: string;
+  allocationPreset?: 'first' | 'other' | 'equal';
+  archived?: boolean;
+  deleted?: boolean;
+};
+
+/** A multi-currency envelope, independent of where the money is held. */
+export type VirtualWallet = {
+  icon?: string;
+  id: string;
+  name: string;
+  participantId?: string;
+  archived?: boolean;
+  deleted?: boolean;
+};
+
+export type WalletAllocation = { shares: { walletId: string; amount: number }[] };
+
+/** No bank movement. An absent endpoint denotes the unallocated balance. */
+export type WalletTransfer = {
+  id: string;
+  currency: string;
+  fromWalletId?: string;
+  toWalletId?: string;
+  amount: number;
+  date: string;
+  comment?: string;
+  /** Budget contributor, not the author. Preserved if wallet ownership changes. */
+  contributorParticipantId?: string;
+  deleted?: boolean;
 };
 
 export type Tag = {
@@ -194,6 +242,7 @@ export type TransactionDebt = {
 // TODO: rename to Operation
 // after adding new field don't forget to change function cloneOperation
 export type Transaction = {
+  walletAllocation?: WalletAllocation;
   debt?: TransactionDebt;
   id: string;
   accountId: string;
@@ -260,6 +309,21 @@ export type Repeating = {
 };
 
 export interface LocalDB extends DBSchema {
+  participants: {
+    key: string;
+    value: WithOwner<Participant>;
+    indexes: { 'by-owner': string };
+  };
+  virtualWallets: {
+    key: string;
+    value: WithOwner<VirtualWallet>;
+    indexes: { 'by-owner': string };
+  };
+  walletTransfers: {
+    key: string;
+    value: WithOwner<WalletTransfer>;
+    indexes: { 'by-owner': string };
+  };
   debtContacts: {
     key: string;
     value: WithOwner<DebtContact>;

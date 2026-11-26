@@ -10,6 +10,9 @@ import type {
   Repeating,
   Tag,
   Transaction,
+  Participant,
+  VirtualWallet,
+  WalletTransfer,
 } from './interfaces';
 
 /**
@@ -17,6 +20,10 @@ import type {
  * The shape matches the JSON export of the import/export page.
  */
 export type Snapshot = {
+  walletsEnabled?: boolean;
+  participants?: Participant[];
+  virtualWallets?: VirtualWallet[];
+  walletTransfers?: WalletTransfer[];
   debtContacts?: DebtContact[];
   debtRecords?: DebtRecord[];
   categories: Category[];
@@ -35,13 +42,17 @@ export type Snapshot = {
 
 export type SnapshotEntityKey = Exclude<
   keyof Snapshot,
-  'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder' | 'knownPlaces'
+  'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder' | 'knownPlaces' | 'walletsEnabled'
 >;
 
 type SnapshotEntity = NonNullable<Snapshot[SnapshotEntityKey]>[number];
 
 /** Map from journal operation key to snapshot collection */
 const ENTITY_KEYS: { [key in keyof JournalOperation]: SnapshotEntityKey | 'setting' | 'snapshot' } = {
+  walletsEnabled: 'setting',
+  participant: 'participants',
+  virtualWallet: 'virtualWallets',
+  walletTransfer: 'walletTransfers',
   debtContact: 'debtContacts',
   debtRecord: 'debtRecords',
   category: 'categories',
@@ -61,6 +72,9 @@ const ENTITY_KEYS: { [key in keyof JournalOperation]: SnapshotEntityKey | 'setti
 
 /** Map from local storage name to snapshot collection */
 export const SNAPSHOT_KEY_BY_STORAGE = {
+  participants: 'participants',
+  virtualWallets: 'virtualWallets',
+  walletTransfers: 'walletTransfers',
   debtContacts: 'debtContacts',
   debtRecords: 'debtRecords',
   categories: 'categories',
@@ -74,6 +88,9 @@ export const SNAPSHOT_KEY_BY_STORAGE = {
 } as const satisfies Record<string, SnapshotEntityKey>;
 
 export const SNAPSHOT_ENTITY_KEYS: SnapshotEntityKey[] = [
+  'participants',
+  'virtualWallets',
+  'walletTransfers',
   'debtContacts',
   'debtRecords',
   'categories',
@@ -110,6 +127,9 @@ const DEFAULT_OPTIONS: ReduceJournalOptions = { deleted: 'none' };
 
 export function createEmptySnapshot(): Snapshot {
   return {
+    participants: [],
+    virtualWallets: [],
+    walletTransfers: [],
     debtContacts: [],
     debtRecords: [],
     categories: [],
@@ -139,7 +159,10 @@ export function reduceJournal(
   const maps = new Map<SnapshotEntityKey, Map<string, SnapshotEntity>>();
   SNAPSHOT_ENTITY_KEYS.forEach((key) => maps.set(key, new Map()));
 
-  const settings: Pick<Snapshot, 'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder' | 'knownPlaces'> = {};
+  const settings: Pick<
+    Snapshot,
+    'accountsOrder' | 'categoriesInOrder' | 'categoriesOutOrder' | 'knownPlaces' | 'walletsEnabled'
+  > = {};
 
   const sorted = [...items].sort((a, b) => a.order - b.order);
 
@@ -162,6 +185,8 @@ export function reduceJournal(
         delete settings.categoriesInOrder;
         delete settings.categoriesOutOrder;
         delete settings.knownPlaces;
+        delete settings.walletsEnabled;
+        if (snapshot.walletsEnabled !== undefined) settings.walletsEnabled = snapshot.walletsEnabled;
         if (snapshot.accountsOrder) settings.accountsOrder = snapshot.accountsOrder;
         if (snapshot.categoriesInOrder) settings.categoriesInOrder = snapshot.categoriesInOrder;
         if (snapshot.categoriesOutOrder) settings.categoriesOutOrder = snapshot.categoriesOutOrder;
@@ -189,6 +214,7 @@ export function reduceJournal(
   if (settings.categoriesInOrder) snapshot.categoriesInOrder = settings.categoriesInOrder;
   if (settings.categoriesOutOrder) snapshot.categoriesOutOrder = settings.categoriesOutOrder;
   if (settings.knownPlaces) snapshot.knownPlaces = settings.knownPlaces;
+  if (settings.walletsEnabled !== undefined) snapshot.walletsEnabled = settings.walletsEnabled;
 
   return snapshot;
 }

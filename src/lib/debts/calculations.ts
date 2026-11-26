@@ -8,6 +8,8 @@ import type {
 } from '../data/interfaces';
 
 export function currencyPrecision(currency: string): number {
+  // Some CLDR versions format RSD as whole dinars. Accounting still uses 100 para.
+  if (currency.toUpperCase() === 'RSD') return 2;
   try {
     return new Intl.NumberFormat('en', { style: 'currency', currency }).resolvedOptions().maximumFractionDigits ?? 2;
   } catch {
