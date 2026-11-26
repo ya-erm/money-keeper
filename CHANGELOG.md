@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.37.2 - 2026-11-26
+
+### Added
+
+- Import / Export accepts JSON backup files from the device, previews their contents and counts, and imports only after confirmation. Pasting JSON remains available. Invalid files show an error, and editing the input clears an outdated preview.
+
 ## 2.37.1 - 2026-11-26
 
 ### Fixed
