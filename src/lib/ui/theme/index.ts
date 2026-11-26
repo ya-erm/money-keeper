@@ -1,1 +1,1 @@
-export { darkMode, toggleDarkMode } from './theme';
+export { darkMode, toggleDarkMode, themePreference, type ThemePreference } from './theme';

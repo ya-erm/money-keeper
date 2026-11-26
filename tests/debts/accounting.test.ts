@@ -492,7 +492,7 @@ test('debt screens fit mobile and desktop, and follow the dark theme', async ({ 
   }
   await page.screenshot({ path: testInfo.outputPath('debts-desktop.png') });
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.evaluate(() => localStorage.setItem('mk_dark_mode', 'true'));
+  await page.evaluate(() => localStorage.setItem('mk_theme', JSON.stringify('dark')));
   await page.reload();
   await expect(page.locator('body')).toHaveClass(/dark-mode/);
   await expect(page.getByTestId('DebtPerson')).toHaveCount(15);

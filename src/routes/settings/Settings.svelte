@@ -21,7 +21,7 @@
   import ListLinkItem from '#lib/ui/list/ListLinkItem.svelte';
   import ListSelectItem from '#lib/ui/list/ListSelectItem.svelte';
   import ListSwitchItem from '#lib/ui/list/ListSwitchItem.svelte';
-  import { darkMode } from '#lib/ui/theme/index.js';
+  import ThemePicker from '#lib/ui/theme/ThemePicker.svelte';
   import createBooleanStore from '#lib/utils/createBooleanStore.js';
 
   import MainCurrencyModal from './currency-rates/MainCurrencyModal.svelte';
@@ -66,7 +66,7 @@
     value={$activeLocaleName}
     onClick={openLanguageModal}
   />
-  <ListSwitchItem icon="mdi:moon-waning-crescent" title={$translate('settings.darkMode')} bind:checked={$darkMode} />
+  <ThemePicker />
   <ListSwitchItem
     icon="mdi:eye-off-outline"
     title={$translate('settings.hideBalances')}
