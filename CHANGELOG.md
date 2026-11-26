@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.35.9 - 2026-11-26
+
+### Improved
+
+- Receipt scans retain the store address and city as hidden operation metadata and reuse the most recent saved location from receipts at the same address in the current workspace. Manual location choices and clearing are preserved; scans of another branch do not keep a previous receipt's suggestion.
+
 ## 2.35.8 - 2026-11-22
 
 ### Fixed
