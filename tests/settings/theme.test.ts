@@ -128,6 +128,8 @@ test('cancelling or dismissing a pending theme choice keeps the saved mode', asy
 test('language uses the same chooser and preserves accepted values when a later selection is cancelled', async ({
   page,
 }) => {
+  // Cookie expiry uses the browser's real clock, unlike the fixed application clock in the fixture.
+  await page.clock.setSystemTime(new Date());
   await page.goto('/settings', { waitUntil: 'networkidle' });
   const language = page.getByRole('button', { name: /^(Language|Язык)/ });
   await language.click();
