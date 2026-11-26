@@ -91,3 +91,17 @@ test('falls back to the previous preference when the saved theme is malformed', 
   await expect(page.locator('body')).toHaveClass(/dark-mode/);
   expect(await page.evaluate(() => localStorage.getItem('mk_theme'))).toBe(JSON.stringify('dark'));
 });
+
+test('shows the three theme choices in Russian at mobile width', async ({ page, context, baseURL }, testInfo) => {
+  if (!baseURL) throw new Error('A base URL is required');
+  await context.addCookies([{ name: 'locale', value: 'ru-RU', url: baseURL }]);
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto('/settings', { waitUntil: 'networkidle' });
+  const theme = page.getByRole('button', { name: /^Тема/ });
+  await expect(theme).toContainText('Системная');
+  await theme.click();
+  await expect(page.getByRole('radio')).toHaveCount(3);
+  for (const name of ['Светлая', 'Тёмная', 'Системная'])
+    await expect(page.getByRole('radio', { name, exact: true })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('system-theme-options-ru-390px.png') });
+});
