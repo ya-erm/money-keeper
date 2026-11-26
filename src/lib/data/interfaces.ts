@@ -117,6 +117,8 @@ export type AccountViewModel = Account & {
 export type Participant = {
   id: string;
   name: string;
+  avatarColor?: string;
+  avatarIcon?: string;
   accountsOrder?: string[];
   walletsOrder?: string[];
   /** @deprecated Retained for older backups; participant visibility is no longer applied. */

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.37.4 - 2026-11-26
+
+### Added
+
+- Participants can choose an avatar color and icon with a live preview, or restore initials and the automatic color. Avatar preferences are included in synchronization and JSON backups; custom colors use a contrasting icon/text color.
+
 ## 2.37.2 - 2026-11-26
 
 ### Added

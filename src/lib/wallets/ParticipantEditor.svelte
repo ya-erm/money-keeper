@@ -12,12 +12,17 @@
   import HeaderFormSubmitButton from '#lib/ui/layout/HeaderFormSubmitButton.svelte';
   import Modal from '#lib/ui/Modal.svelte';
   import ParticipantAvatar from './ParticipantAvatar.svelte';
+  import SubScreen from '#lib/ui/layout/SubScreen.svelte';
+  import CategoryIcons from '../../routes/categories/CategoryIcons.svelte';
+  import { normalizeAvatarColor, participantAvatarAppearance, participantIcons } from './participantAvatar';
   export let creating = false;
   export let id: string | null = null;
   let draft: Participant = { id: uuid(), name: '', allocationPreset: 'first' };
   let initializedId: string | null = null;
   let busy = false;
   let deleteOpened = false;
+  let iconSelecting = false;
+  $: appearance = participantAvatarAppearance(draft);
   $: participant = creating ? undefined : $participantsStore.find((item) => item.id === id);
   $: if (participant && initializedId !== participant.id) {
     // Keep in-progress preferences when synchronization updates this participant.
@@ -35,6 +40,8 @@
         ...current,
         ...draft,
         name: draft.name.trim(),
+        avatarColor: normalizeAvatarColor(draft.avatarColor),
+        avatarIcon: draft.avatarIcon?.trim() || undefined,
         currency: current?.currency,
         accountsOrder: creating ? $accountsStore.map((item) => item.id) : current?.accountsOrder,
         walletsOrder: current?.walletsOrder,
@@ -73,7 +80,27 @@
 >
   {#if creating || participant}
     <form class="participant-form flex-col gap-1" data-testId="ParticipantForm" on:submit|preventDefault={save}>
-      <div class="avatar-preview"><ParticipantAvatar participant={draft} /></div>
+      <div class="avatar-preview">
+        <button
+          type="button"
+          class="avatar-button"
+          disabled={busy}
+          aria-label={$translate('icons.select_icon')}
+          data-testId="ParticipantIconButton"
+          on:click={() => (iconSelecting = true)}
+        >
+          <ParticipantAvatar participant={draft} />
+          <span>{$translate('icons.select_icon')}</span>
+        </button>
+        {#if draft.avatarIcon}<Button
+            type="button"
+            appearance="link"
+            disabled={busy}
+            testId="ResetParticipantIconButton"
+            text={$translate('wallets.avatar_initials')}
+            onClick={() => (draft = { ...draft, avatarIcon: undefined })}
+          />{/if}
+      </div>
       <Input
         label={$translate('wallets.participant_name')}
         name="participant-name"
@@ -81,6 +108,22 @@
         required
         maxlength={100}
       />
+      <Input
+        label={$translate('wallets.avatar_color')}
+        type="color"
+        name="participant-avatar-color"
+        value={appearance.background}
+        disabled={busy}
+        onChange={(value) => (draft = { ...draft, avatarColor: value })}
+      />
+      {#if draft.avatarColor}<Button
+          type="button"
+          appearance="link"
+          disabled={busy}
+          testId="ResetParticipantColorButton"
+          text={$translate('wallets.avatar_auto_color')}
+          onClick={() => (draft = { ...draft, avatarColor: undefined })}
+        />{/if}
       <label
         >{$translate('wallets.default_allocation')}
         <select name="allocation-preset" bind:value={draft.allocationPreset}>
@@ -111,6 +154,21 @@
       <a href="/settings/participants">{$translate('common.back')}</a>
     </div>{/if}
 </Layout>
+{#if iconSelecting}<SubScreen
+    visible
+    title={$translate('icons.select_icon')}
+    onBack={() => (iconSelecting = false)}
+    testId="ParticipantIconPicker"
+  >
+    <CategoryIcons
+      icon={draft.avatarIcon ?? null}
+      icons={participantIcons}
+      onSelect={(value) => {
+        draft = { ...draft, avatarIcon: value?.trim() || undefined };
+        iconSelecting = false;
+      }}
+    />
+  </SubScreen>{/if}
 <Modal bind:opened={deleteOpened} width={22} header={$translate('wallets.delete_participant_confirm')}>
   <p>{$translate('wallets.delete_participant_description')}</p>
   <div class="mt-1 grid-col-2 gap-1" data-testId="DeleteParticipantConfirmation">
@@ -133,8 +191,22 @@
   }
   .avatar-preview {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     padding: 0.5rem;
+  }
+  .avatar-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 0;
+    background: transparent;
+    color: var(--active-color);
+    font: inherit;
+    cursor: pointer;
   }
   label {
     display: flex;
