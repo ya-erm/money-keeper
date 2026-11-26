@@ -1,13 +1,23 @@
 <script lang="ts">
-  import Modal from '@ya-erm/svelte-ui/Modal';
   import { translate } from '#lib/translate/index.js';
   import ListSelectItem from '#lib/ui/list/ListSelectItem.svelte';
+  import ChoiceModal from '#lib/ui/ChoiceModal.svelte';
   import { themePreference, type ThemePreference } from './theme';
 
   let opened = false;
-  const options: ThemePreference[] = ['light', 'dark', 'system'];
-  const select = (value: ThemePreference) => {
-    themePreference.set(value);
+  let pending: ThemePreference = 'system';
+  const modes = [
+    { value: 'light' as const, icon: 'mdi:lightbulb-outline' },
+    { value: 'dark' as const, icon: 'mdi:moon-waning-crescent' },
+    { value: 'system' as const, icon: 'mdi:cellphone' },
+  ];
+  $: options = modes.map((option) => ({ ...option, label: $translate(`settings.theme.${option.value}`) }));
+  const open = () => {
+    pending = $themePreference;
+    opened = true;
+  };
+  const accept = () => {
+    themePreference.set(pending);
     opened = false;
   };
 </script>
@@ -16,41 +26,16 @@
   icon="mdi:moon-waning-crescent"
   title={$translate('settings.theme')}
   value={$translate(`settings.theme.${$themePreference}`)}
-  onClick={() => (opened = true)}
+  onClick={open}
 />
 
-<Modal id="theme-modal" header={$translate('settings.theme')} {opened} onClose={() => (opened = false)}>
-  <fieldset aria-label={$translate('settings.theme')}>
-    {#each options as option (option)}
-      <label>
-        <input
-          type="radio"
-          name="theme-preference"
-          value={option}
-          checked={$themePreference === option}
-          on:change={() => select(option)}
-        />
-        <span>{$translate(`settings.theme.${option}`)}</span>
-      </label>
-    {/each}
-  </fieldset>
-</Modal>
-
-<style>
-  fieldset {
-    border: 0;
-    margin: 0;
-    padding: 0;
-  }
-  label {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    min-height: 2.75rem;
-    padding: 0.5rem;
-    cursor: pointer;
-  }
-  input {
-    accent-color: var(--active-color);
-  }
-</style>
+<ChoiceModal
+  id="theme-modal"
+  header={$translate('settings.theme')}
+  {opened}
+  {options}
+  value={pending}
+  onSelect={(value) => (pending = value as ThemePreference)}
+  onAccept={accept}
+  onClose={() => (opened = false)}
+/>

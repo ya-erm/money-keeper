@@ -5,6 +5,7 @@
 ### Added
 
 - Settings offer Light, Dark and System themes. System follows device changes immediately, including the startup screen; existing explicit light/dark preferences are preserved.
+- Theme and language selection share the same dialog with option icons, selection marks and Cancel / Accept actions. Pending theme changes apply only after acceptance.
 
 ## 2.37.2 - 2026-11-26
 

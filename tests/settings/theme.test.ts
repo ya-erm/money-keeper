@@ -4,7 +4,8 @@ import { expect, test } from '@tests/fixtures';
 const setting = (page: Page) => page.getByRole('button', { name: /^Theme/ });
 async function choose(page: Page, mode: 'Light' | 'Dark' | 'System') {
   await setting(page).click();
-  await page.getByRole('radio', { name: mode, exact: true }).click();
+  await page.getByRole('option', { name: mode, exact: true }).click();
+  await page.getByRole('button', { name: 'Accept', exact: true }).click();
   await expect(setting(page)).toContainText(mode);
 }
 
@@ -36,8 +37,8 @@ test('follows the device live in System mode and preserves explicit choices afte
   await expect(page.locator('body')).toHaveClass(/dark-mode/);
   await expect(page.locator('#app-theme-color')).toHaveAttribute('content', '#121212');
   await setting(page).click();
-  await expect(page.getByRole('radio')).toHaveCount(3);
-  await expect(page.getByRole('radio', { name: 'System', exact: true })).toBeChecked();
+  await expect(page.getByRole('option')).toHaveCount(3);
+  await expect(page.getByRole('option', { name: 'System', exact: true })).toHaveAttribute('aria-selected', 'true');
   await page.screenshot({ path: testInfo.outputPath('system-theme-options-390px.png') });
 });
 
@@ -100,8 +101,47 @@ test('shows the three theme choices in Russian at mobile width', async ({ page, 
   const theme = page.getByRole('button', { name: /^Тема/ });
   await expect(theme).toContainText('Системная');
   await theme.click();
-  await expect(page.getByRole('radio')).toHaveCount(3);
+  await expect(page.getByRole('option')).toHaveCount(3);
   for (const name of ['Светлая', 'Тёмная', 'Системная'])
-    await expect(page.getByRole('radio', { name, exact: true })).toBeVisible();
+    await expect(page.getByRole('option', { name, exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Отмена', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Принять', exact: true })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('system-theme-options-ru-390px.png') });
+});
+
+test('cancelling or dismissing a pending theme choice keeps the saved mode', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto('/settings', { waitUntil: 'networkidle' });
+  await setting(page).click();
+  await page.getByRole('option', { name: 'Light', exact: true }).click();
+  await expect(page.locator('body')).toHaveClass(/dark-mode/);
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(setting(page)).toContainText('System');
+  await setting(page).click();
+  await expect(page.getByRole('option', { name: 'System', exact: true })).toHaveAttribute('aria-selected', 'true');
+  await page.getByRole('option', { name: 'Light', exact: true }).click();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('listbox')).toHaveCount(0);
+  expect(await page.evaluate(() => localStorage.getItem('mk_theme'))).toBe(JSON.stringify('system'));
+});
+
+test('language uses the same chooser and preserves accepted values when a later selection is cancelled', async ({
+  page,
+}) => {
+  await page.goto('/settings', { waitUntil: 'networkidle' });
+  const language = page.getByRole('button', { name: /^(Language|Язык)/ });
+  await language.click();
+  await page.getByRole('option', { name: 'Русский', exact: true }).click();
+  await page.getByRole('button', { name: 'Отмена', exact: true }).click();
+  await expect(language).toContainText('English');
+  await language.click();
+  await page.getByRole('option', { name: 'Русский', exact: true }).click();
+  await page.getByRole('button', { name: 'Принять', exact: true }).click();
+  await expect(language).toContainText('Русский');
+  await language.click();
+  await page.getByRole('option', { name: 'English', exact: true }).click();
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(language).toContainText('Русский');
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(language).toContainText('Русский');
 });
