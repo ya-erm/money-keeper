@@ -6,12 +6,8 @@
 
   let opened = false;
   let pending: ThemePreference = 'system';
-  const modes = [
-    { value: 'light' as const, icon: 'mdi:lightbulb-outline' },
-    { value: 'dark' as const, icon: 'mdi:moon-waning-crescent' },
-    { value: 'system' as const, icon: 'mdi:cellphone' },
-  ];
-  $: options = modes.map((option) => ({ ...option, label: $translate(`settings.theme.${option.value}`) }));
+  const modes = ['light', 'dark', 'system'] as const;
+  $: options = modes.map((value) => ({ value, label: $translate(`settings.theme.${value}`) }));
   const open = () => {
     pending = $themePreference;
     opened = true;
