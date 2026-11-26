@@ -1,5 +1,6 @@
 import type { BrowserContext, Route } from '@playwright/test';
 import { test, expect } from '@tests/fixtures';
+import { moveSortItemUp } from '@tests/helpers';
 
 test('two devices synchronize wallet payments, savings and personal preferences while keeping independent active participants', async ({
   browser,
@@ -94,22 +95,12 @@ test('two devices synchronize wallet payments, savings and personal preferences 
     await expect(source.getByTestId('MainCurrencyForm')).toHaveCount(0);
     await source.goto('/accounts/list');
     await source.getByRole('button', { name: 'Сортировка счетов', exact: true }).click();
-    const accountRow = source.getByTestId('AccountSortList').locator(':scope > li[data-id="eur"]');
-    await expect(accountRow).toHaveAttribute('tabindex', '0');
-    await accountRow.focus();
-    await accountRow.press('Space');
-    await accountRow.press('ArrowUp');
-    await accountRow.press('Space');
+    await moveSortItemUp(source, 'AccountSortList', 'eur');
     await source.locator('.sorting').getByRole('button', { name: 'Сохранить', exact: true }).click();
     await expect(source).not.toHaveURL(/action=sort/);
     await source.goto('/wallets/list');
     await source.getByRole('button', { name: 'Сортировка кошельков', exact: true }).click();
-    const walletRow = source.getByTestId('WalletSortList').locator(':scope > li[data-id="b"]');
-    await expect(walletRow).toHaveAttribute('tabindex', '0');
-    await walletRow.focus();
-    await walletRow.press('Space');
-    await walletRow.press('ArrowUp');
-    await walletRow.press('Space');
+    await moveSortItemUp(source, 'WalletSortList', 'b');
     await source.locator('.sorting-bar').getByRole('button', { name: 'Сохранить', exact: true }).click();
     await expect(source).toHaveURL(/\/wallets\/list$/);
     await source.evaluate(async () => {

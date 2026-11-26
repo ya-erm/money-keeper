@@ -1,5 +1,5 @@
 import { test, expect } from '@tests/fixtures';
-import { importMockDataAsync } from '@tests/helpers';
+import { importMockDataAsync, moveSortItemUp } from '@tests/helpers';
 import { fileURLToPath } from 'node:url';
 
 test.use({ locale: 'ru-RU' });
@@ -601,15 +601,7 @@ test('personal sorting remains available and legacy hiding preferences do not hi
     await page.getByTestId('ParticipantPicker').selectOption(id);
     await expect(page.getByTestId('ParticipantPicker')).toBeEnabled();
   };
-  const moveUp = async (listId: string, id: string) => {
-    const row = page.getByTestId(listId).locator(`:scope > li[data-id="${id}"]`);
-    await expect(row).toHaveAttribute('tabindex', '0');
-    await row.focus();
-    await row.press('Space');
-    await row.press('ArrowUp');
-    await expect(page.getByTestId(listId).locator(':scope > li').first()).toHaveAttribute('data-id', id);
-    await row.press('Space');
-  };
+  const moveUp = (listId: string, id: string) => moveSortItemUp(page, listId, id);
   await page.goto('/accounts/list');
   await page.getByRole('button', { name: 'Сортировка счетов', exact: true }).click();
   await moveUp('AccountSortList', 'eur');
@@ -1009,27 +1001,7 @@ for (const list of [
     const toggle = page.getByRole('button', { name: list.label, exact: true });
     const rows = page.getByTestId(list.listId).locator(':scope > li');
     const dialog = page.getByTestId('UnsavedSortDialog');
-    const moveUp = async (id: string) => {
-      const row = page.getByTestId(list.listId).locator(`:scope > li[data-id="${id}"]`);
-      await expect(row).toHaveAttribute('tabindex', '0');
-      await expect
-        .poll(() =>
-          page
-            .getByTestId('SortingToolbar')
-            .evaluate(
-              (element) =>
-                element.getAnimations({ subtree: true }).filter((animation) => animation.playState === 'running')
-                  .length,
-            ),
-        )
-        .toBe(0);
-      await row.focus();
-      await expect(row).toBeFocused();
-      await row.press('Space');
-      await row.press('ArrowUp');
-      await expect(rows.first()).toHaveAttribute('data-id', id);
-      await row.press('Space');
-    };
+    const moveUp = (id: string) => moveSortItemUp(page, list.listId, id);
     await toggle.click();
     await expect(page).toHaveURL(/action=sort/);
     await expect(page.getByRole('textbox', { name: '', exact: true })).toHaveCount(0);
